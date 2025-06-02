@@ -1,9 +1,4 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './auth/login/login';
-import { MainLayoutComponent } from './layout/main-layout/main-layout';
-import { Home } from './home/home';
-import { MaterialesComponent } from './materiales/materiales.component';
-import { Proveedores } from './proveedores/proveedores';
 
 export const routes: Routes = [
   {
@@ -57,6 +52,10 @@ export const routes: Routes = [
         path: 'unidades',
         loadComponent: () =>
           import('./unidades/unidades').then((m) => m.Unidades),
+      },
+      {
+        path: 'lotes',
+        loadComponent: () => import('./lotes/lotes').then((m) => m.Lotes),
       },
     ],
   },

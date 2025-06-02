@@ -1,0 +1,232 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">
+      <mat-icon>visibility</mat-icon>
+      Detalle del lote
+    </h2>
+    <div class="header-info">
+      <mat-chip-set>
+        <mat-chip [class]="'chip-' + getEstadoColor(lote.estado_lote)">
+          {{ lote.estado_lote || 'Sin estado' }}
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+  </div>
+
+  <div class="dialog-content">
+    <!-- Información principal -->
+    <div class="main-info">
+      <div class="lote-card">
+        <div class="lote-header">
+          <h3 class="lote-codigo">{{ lote.lote || 'Sin código' }}</h3>
+          <div class="lote-alerts">
+            <mat-icon
+              *ngIf="isLoteVencido()"
+              class="alert-icon vencido"
+              matTooltip="Lote vencido"
+            >
+              warning
+            </mat-icon>
+            <mat-icon
+              *ngIf="isLotePorVencer()"
+              class="alert-icon por-vencer"
+              matTooltip="Por vencer pronto"
+            >
+              schedule
+            </mat-icon>
+          </div>
+        </div>
+
+        <div class="lote-details">
+          <div class="detail-item">
+            <label>Insumo:</label>
+            <span class="value primary"
+              >{{ insumo?.nombre || 'Sin insumo asignado' }}</span
+            >
+          </div>
+          <div class="detail-item">
+            <label>Ubicación:</label>
+            <span class="value">{{ lote.ubicacion || 'Sin ubicación' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock y estado -->
+    <div class="stock-section">
+      <h4>Estado del stock</h4>
+      <div class="stock-card">
+        <div class="stock-visual">
+          <div class="stock-bar">
+            <div
+              class="stock-fill"
+              [style.width.%]="calcularPorcentajeStock()"
+              [class]="'stock-' + getStockStatus()"
+            ></div>
+          </div>
+          <div class="stock-percentage">{{ calcularPorcentajeStock() }}%</div>
+        </div>
+
+        <div class="stock-numbers">
+          <div class="stock-item">
+            <label>Stock inicial:</label>
+            <span class="value">{{ lote.stock_inicial || 0 }}</span>
+          </div>
+          <div class="stock-item">
+            <label>Stock actual:</label>
+            <span class="value" [class]="'stock-' + getStockStatus()">
+              {{ lote.stock_actual || 0 }}
+            </span>
+          </div>
+          <div class="stock-item">
+            <label>Utilizado:</label>
+            <span class="value">
+              {{ (lote.stock_inicial || 0) - (lote.stock_actual || 0) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información de vencimiento -->
+    <div class="expiration-section" *ngIf="lote.fecha_expiracion">
+      <h4>Información de vencimiento</h4>
+      <div class="expiration-card">
+        <div class="expiration-info">
+          <mat-icon
+            [class]="{
+            'expired': isLoteVencido(),
+            'warning': isLotePorVencer(),
+            'normal': !isLoteVencido() && !isLotePorVencer()
+          }"
+          >
+            {{ isLoteVencido() ? 'dangerous' : isLotePorVencer() ? 'warning' :
+            'check_circle' }}
+          </mat-icon>
+          <div class="expiration-details">
+            <div class="expiration-date">
+              <label>Fecha de vencimiento:</label>
+              <span
+                class="value"
+                [class]="{
+                'expired': isLoteVencido(),
+                'warning': isLotePorVencer()
+              }"
+              >
+                {{ lote.fecha_expiracion | date: 'dd/MM/yyyy' }}
+              </span>
+            </div>
+            <div class="expiration-status">
+              <span *ngIf="isLoteVencido()" class="expired">
+                Vencido hace {{ getDiasAbsolutos() }} días
+              </span>
+              <span *ngIf="isLotePorVencer()" class="warning">
+                Vence en {{ getDiasParaVencimiento() }} días
+              </span>
+              <span
+                *ngIf="!isLoteVencido() && !isLotePorVencer()"
+                class="normal"
+              >
+                Vence en {{ getDiasParaVencimiento() }} días
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información financiera -->
+    <div
+      class="financial-section"
+      *ngIf="lote.precio_total && lote.precio_total > 0"
+    >
+      <h4>Información financiera</h4>
+      <div class="financial-grid">
+        <div class="financial-item">
+          <label>Precio total:</label>
+          <span class="value currency"
+            >{{ lote.precio_total | currency: 'USD':'symbol':'1.2-2' }}</span
+          >
+        </div>
+        <div class="financial-item">
+          <label>Precio unitario:</label>
+          <span class="value currency"
+            >{{ getPrecioUnitario() | currency: 'USD':'symbol':'1.2-2' }}</span
+          >
+        </div>
+        <div class="financial-item">
+          <label>Valor actual:</label>
+          <span class="value currency highlight"
+            >{{ getValorActual() | currency: 'USD':'symbol':'1.2-2' }}</span
+          >
+        </div>
+        <div class="financial-item">
+          <label>Valor utilizado:</label>
+          <span class="value currency">
+            {{ (lote.precio_total || 0) - getValorActual() | currency:
+            'USD':'symbol':'1.2-2' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recomendaciones -->
+    <div class="recommendation-section">
+      <h4>Recomendación</h4>
+      <div class="recommendation-card" [class]="getStockStatus()">
+        <mat-icon
+          >{{ isLoteVencido() || getStockStatus() === 'critical' ? 'warning' :
+          'info' }}</mat-icon
+        >
+        <p>{{ getRecomendacion() }}</p>
+      </div>
+    </div>
+
+    <!-- Usos comunes -->
+    <div class="usage-section" *ngIf="getEjemplosUso().length > 0">
+      <h4>Usos comunes del insumo</h4>
+      <div class="usage-chips">
+        <mat-chip-set>
+          <mat-chip *ngFor="let uso of getEjemplosUso()" class="usage-chip">
+            {{ uso }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+    </div>
+
+    <!-- Información técnica -->
+    <div class="technical-section">
+      <h4>Información técnica</h4>
+      <div class="technical-grid">
+        <div class="technical-item">
+          <label>ID del lote:</label>
+          <span class="value">{{ lote.id_lote || 'N/A' }}</span>
+        </div>
+        <div class="technical-item">
+          <label>ID del insumo:</label>
+          <span class="value">{{ lote.id_insumo || 'N/A' }}</span>
+        </div>
+        <div class="technical-item" *ngIf="insumo?.id_fox">
+          <label>Código Fox:</label>
+          <span class="value">{{ insumo?.id_fox }}</span>
+        </div>
+        <div class="technical-item" *ngIf="insumo?.id_unidad">
+          <label>Unidad:</label>
+          <span class="value">{{ insumo?.id_unidad }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="cerrar()"
+      class="btn-cerrar"
+    >
+      <mat-icon>close</mat-icon>
+      Cerrar
+    </button>
+  </div>
+</div>

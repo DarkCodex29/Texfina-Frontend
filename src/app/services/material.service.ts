@@ -17,6 +17,13 @@ import {
   Consumo,
   Receta,
   RecetaDetalle,
+  UsuarioFormDto,
+  ProveedorFormDto,
+  InsumoFormDto,
+  IngresoFormDto,
+  AlmacenFormDto,
+  UnidadFormDto,
+  LoteFormDto,
 } from '../models/insumo.model';
 
 @Injectable({
@@ -824,14 +831,308 @@ export class MaterialService {
   }
 
   buscarUnidades(filtros: { descripcion?: string }): Observable<Unidad[]> {
-    let resultados = [...this.unidades];
+    return new Observable((observer) => {
+      setTimeout(() => {
+        let unidadesFiltradas = [...this.unidades];
 
-    if (filtros.descripcion) {
-      resultados = resultados.filter((u) =>
-        u.nombre.toLowerCase().includes(filtros.descripcion!.toLowerCase())
-      );
-    }
+        if (filtros.descripcion) {
+          const descripcion = filtros.descripcion.toLowerCase();
+          unidadesFiltradas = unidadesFiltradas.filter((unidad) =>
+            unidad.nombre.toLowerCase().includes(descripcion)
+          );
+        }
 
-    return of(resultados);
+        observer.next(unidadesFiltradas);
+        observer.complete();
+      }, 300);
+    });
+  }
+
+  // ===== LOTES (ALINEADOS CON BD) =====
+  private lotes: Lote[] = [
+    {
+      id_lote: 1,
+      id_insumo: 1,
+      lote: 'LT2024001',
+      ubicacion: 'Almacén Principal - A1',
+      stock_inicial: 500,
+      stock_actual: 350,
+      fecha_expiracion: new Date('2025-06-15'),
+      precio_total: 7750.0,
+      estado_lote: 'ACTIVO',
+    },
+    {
+      id_lote: 2,
+      id_insumo: 2,
+      lote: 'LT2024002',
+      ubicacion: 'Almacén Químicos - B2',
+      stock_inicial: 300,
+      stock_actual: 180,
+      fecha_expiracion: new Date('2025-12-20'),
+      precio_total: 6840.0,
+      estado_lote: 'ACTIVO',
+    },
+    {
+      id_lote: 3,
+      id_insumo: 3,
+      lote: 'LT2024003',
+      ubicacion: 'Almacén Tintas - C1',
+      stock_inicial: 100,
+      stock_actual: 25,
+      fecha_expiracion: new Date('2026-03-10'),
+      precio_total: 4500.0,
+      estado_lote: 'ACTIVO',
+    },
+    {
+      id_lote: 4,
+      id_insumo: 4,
+      lote: 'LT2024004',
+      ubicacion: 'Almacén Tintas - C2',
+      stock_inicial: 80,
+      stock_actual: 0,
+      fecha_expiracion: new Date('2025-08-30'),
+      precio_total: 3080.0,
+      estado_lote: 'AGOTADO',
+    },
+    {
+      id_lote: 5,
+      id_insumo: 5,
+      lote: 'LT2024005',
+      ubicacion: 'Almacén Materia Prima - D1',
+      stock_inicial: 1000,
+      stock_actual: 750,
+      fecha_expiracion: undefined,
+      precio_total: 6800.0,
+      estado_lote: 'ACTIVO',
+    },
+    {
+      id_lote: 6,
+      id_insumo: 6,
+      lote: 'LT2024006',
+      ubicacion: 'Almacén Materia Prima - D2',
+      stock_inicial: 200,
+      stock_actual: 50,
+      fecha_expiracion: undefined,
+      precio_total: 2400.0,
+      estado_lote: 'ACTIVO',
+    },
+    {
+      id_lote: 7,
+      id_insumo: 1,
+      lote: 'LT2024007',
+      ubicacion: 'Almacén Principal - A2',
+      stock_inicial: 400,
+      stock_actual: 400,
+      fecha_expiracion: new Date('2024-02-10'), // Vencido
+      precio_total: 6200.0,
+      estado_lote: 'VENCIDO',
+    },
+    {
+      id_lote: 8,
+      id_insumo: 7,
+      lote: 'LT2024008',
+      ubicacion: 'Almacén Acabados - E1',
+      stock_inicial: 150,
+      stock_actual: 120,
+      fecha_expiracion: new Date('2025-01-25'), // Por vencer
+      precio_total: 1800.0,
+      estado_lote: 'ACTIVO',
+    },
+    {
+      id_lote: 9,
+      id_insumo: 8,
+      lote: 'LT2024009',
+      ubicacion: 'Almacén Acabados - E2',
+      stock_inicial: 60,
+      stock_actual: 35,
+      fecha_expiracion: new Date('2026-09-15'),
+      precio_total: 1440.0,
+      estado_lote: 'RESERVADO',
+    },
+    {
+      id_lote: 10,
+      id_insumo: 9,
+      lote: 'LT2024010',
+      ubicacion: 'Almacén Mantenimiento - F1',
+      stock_inicial: 250,
+      stock_actual: 15,
+      fecha_expiracion: undefined,
+      precio_total: 3750.0,
+      estado_lote: 'ACTIVO',
+    },
+  ];
+
+  // ===== MÉTODOS CRUD LOTES =====
+  getLotes(): Observable<Lote[]> {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        observer.next([...this.lotes]);
+        observer.complete();
+      }, 300);
+    });
+  }
+
+  getLote(id: number): Observable<Lote | undefined> {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        const lote = this.lotes.find((l) => l.id_lote === id);
+        observer.next(lote);
+        observer.complete();
+      }, 200);
+    });
+  }
+
+  crearLote(loteData: LoteFormDto): Observable<Lote> {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        // Validar duplicado
+        const existe = this.lotes.some(
+          (l) => l.lote?.toLowerCase() === loteData.lote?.toLowerCase()
+        );
+
+        if (existe) {
+          observer.error({
+            message: 'Ya existe un lote con este código duplicado',
+          });
+          return;
+        }
+
+        // Crear nuevo lote
+        const nuevoId = Math.max(...this.lotes.map((l) => l.id_lote || 0)) + 1;
+        const nuevoLote: Lote = {
+          id_lote: nuevoId,
+          id_insumo: loteData.id_insumo,
+          lote: loteData.lote?.toUpperCase(),
+          ubicacion: loteData.ubicacion,
+          stock_inicial: loteData.stock_inicial,
+          stock_actual: loteData.stock_actual,
+          fecha_expiracion: loteData.fecha_expiracion,
+          precio_total: loteData.precio_total,
+          estado_lote: loteData.estado_lote || 'ACTIVO',
+        };
+
+        this.lotes.push(nuevoLote);
+        observer.next(nuevoLote);
+        observer.complete();
+      }, 500);
+    });
+  }
+
+  actualizarLote(id: number, loteData: LoteFormDto): Observable<Lote> {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        const index = this.lotes.findIndex((l) => l.id_lote === id);
+
+        if (index === -1) {
+          observer.error({ message: 'Lote no encontrado' });
+          return;
+        }
+
+        // Validar duplicado (excluyendo el actual)
+        const existeOtro = this.lotes.some(
+          (l) =>
+            l.id_lote !== id &&
+            l.lote?.toLowerCase() === loteData.lote?.toLowerCase()
+        );
+
+        if (existeOtro) {
+          observer.error({
+            message: 'Ya existe otro lote con este código',
+          });
+          return;
+        }
+
+        // Actualizar lote
+        const loteActualizado: Lote = {
+          ...this.lotes[index],
+          id_insumo: loteData.id_insumo,
+          lote: loteData.lote?.toUpperCase(),
+          ubicacion: loteData.ubicacion,
+          stock_inicial: loteData.stock_inicial,
+          stock_actual: loteData.stock_actual,
+          fecha_expiracion: loteData.fecha_expiracion,
+          precio_total: loteData.precio_total,
+          estado_lote: loteData.estado_lote,
+        };
+
+        this.lotes[index] = loteActualizado;
+        observer.next(loteActualizado);
+        observer.complete();
+      }, 500);
+    });
+  }
+
+  eliminarLote(id: number): Observable<boolean> {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        const index = this.lotes.findIndex((l) => l.id_lote === id);
+
+        if (index === -1) {
+          observer.error({ message: 'Lote no encontrado' });
+          return;
+        }
+
+        // Verificar si el lote está siendo usado (mock de verificación)
+        const estaEnUso = false; // En la API real verificaría en Stock, Ingresos, Consumos
+
+        if (estaEnUso) {
+          observer.error({
+            message:
+              'No se puede eliminar el lote porque está siendo utilizado en otros registros',
+          });
+          return;
+        }
+
+        this.lotes.splice(index, 1);
+        observer.next(true);
+        observer.complete();
+      }, 500);
+    });
+  }
+
+  buscarLotes(filtros: {
+    lote?: string;
+    insumo?: string;
+    estado?: string;
+    ubicacion?: string;
+  }): Observable<Lote[]> {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        let lotesFiltrados = [...this.lotes];
+
+        if (filtros.lote) {
+          const lote = filtros.lote.toLowerCase();
+          lotesFiltrados = lotesFiltrados.filter((l) =>
+            l.lote?.toLowerCase().includes(lote)
+          );
+        }
+
+        if (filtros.insumo) {
+          const insumo = filtros.insumo.toLowerCase();
+          lotesFiltrados = lotesFiltrados.filter((l) => {
+            const insumoData = this.materiales.find(
+              (m) => m.id_insumo === l.id_insumo
+            );
+            return insumoData?.nombre.toLowerCase().includes(insumo);
+          });
+        }
+
+        if (filtros.estado) {
+          lotesFiltrados = lotesFiltrados.filter(
+            (l) => l.estado_lote === filtros.estado
+          );
+        }
+
+        if (filtros.ubicacion) {
+          const ubicacion = filtros.ubicacion.toLowerCase();
+          lotesFiltrados = lotesFiltrados.filter((l) =>
+            l.ubicacion?.toLowerCase().includes(ubicacion)
+          );
+        }
+
+        observer.next(lotesFiltrados);
+        observer.complete();
+      }, 300);
+    });
   }
 }

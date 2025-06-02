@@ -274,3 +274,14 @@ export interface UnidadFormDto {
   id_unidad: string;
   nombre: string;
 }
+
+export interface LoteFormDto {
+  id_insumo?: number;
+  lote?: string;
+  ubicacion?: string;
+  stock_inicial?: number;
+  stock_actual?: number;
+  fecha_expiracion?: Date;
+  precio_total?: number;
+  estado_lote?: string;
+}

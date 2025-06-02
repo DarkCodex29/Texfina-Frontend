@@ -1,0 +1,198 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">
+      <mat-icon>{{ esNuevo ? 'add_circle_outline' : 'edit' }}</mat-icon>
+      {{ esNuevo ? 'Nuevo lote' : 'Editar lote' }}
+    </h2>
+  </div>
+
+  <div class="dialog-content">
+    <form [formGroup]="loteForm" class="lote-form">
+      <!-- Fila 1: Insumo y Código de lote -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Insumo *</mat-label>
+          <mat-select formControlName="id_insumo" required>
+            <mat-option value="">Seleccione un insumo</mat-option>
+            <mat-option
+              *ngFor="let insumo of insumos"
+              [value]="insumo.id_insumo"
+            >
+              {{ insumo.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error>{{ getErrorMessage('id_insumo') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Código de lote *</mat-label>
+          <input
+            matInput
+            formControlName="lote"
+            placeholder="Ej: LT2024001"
+            (input)="onLoteInput($event)"
+            maxlength="100"
+            required
+          />
+          <mat-hint
+            >Solo letras mayúsculas, números, guiones y guiones bajos</mat-hint
+          >
+          <mat-error>{{ getErrorMessage('lote') }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Fila 2: Ubicación y Estado -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Ubicación</mat-label>
+          <input
+            matInput
+            formControlName="ubicacion"
+            placeholder="Ej: Almacén A - Estante 1"
+            maxlength="200"
+          />
+          <mat-error>{{ getErrorMessage('ubicacion') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Estado *</mat-label>
+          <mat-select formControlName="estado_lote" required>
+            <mat-option
+              *ngFor="let estado of estadosLote"
+              [value]="estado.valor"
+            >
+              {{ estado.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error>{{ getErrorMessage('estado_lote') }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Fila 3: Stocks -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Stock inicial *</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="stock_inicial"
+            placeholder="0"
+            min="0"
+            step="0.01"
+            required
+          />
+          <mat-error>{{ getErrorMessage('stock_inicial') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Stock actual *</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="stock_actual"
+            placeholder="0"
+            min="0"
+            step="0.01"
+            (blur)="validarStockActual()"
+            required
+          />
+          <mat-error>{{ getErrorMessage('stock_actual') }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Indicador de porcentaje de stock -->
+      <div
+        class="stock-indicator"
+        *ngIf="
+          loteForm.get('stock_inicial')?.value &&
+          loteForm.get('stock_actual')?.value
+        "
+      >
+        <div class="stock-bar">
+          <div
+            class="stock-fill"
+            [style.width.%]="calcularPorcentajeStock()"
+            [class]="{
+              'stock-critical': calcularPorcentajeStock() <= 10,
+              'stock-low': calcularPorcentajeStock() <= 25 && calcularPorcentajeStock() > 10,
+              'stock-medium': calcularPorcentajeStock() <= 50 && calcularPorcentajeStock() > 25,
+              'stock-good': calcularPorcentajeStock() > 50
+            }"
+          ></div>
+        </div>
+        <span class="stock-percentage">{{ calcularPorcentajeStock() }}%</span>
+      </div>
+
+      <!-- Fila 4: Fecha de expiración y Precio -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Fecha de expiración</mat-label>
+          <input
+            matInput
+            [matDatepicker]="fechaPicker"
+            formControlName="fecha_expiracion"
+            placeholder="Seleccione una fecha"
+          />
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="fechaPicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #fechaPicker></mat-datepicker>
+          <mat-hint>Opcional - para productos perecederos</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Precio total</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="precio_total"
+            placeholder="0.00"
+            min="0"
+            step="0.01"
+          />
+          <span matTextPrefix>$ </span>
+          <mat-error>{{ getErrorMessage('precio_total') }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="info-section" *ngIf="!esNuevo">
+        <h4>Información del lote</h4>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>ID del lote:</label>
+            <span>{{ data.lote?.id_lote }}</span>
+          </div>
+          <div class="info-item">
+            <label>Insumo actual:</label>
+            <span>{{ getInsumoNombre(data.lote?.id_insumo || 0) }}</span>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-actions">
+    <button
+      mat-button
+      color="warn"
+      (click)="cancelar()"
+      [disabled]="cargando"
+      class="btn-cancelar"
+    >
+      Cancelar
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="guardar()"
+      [disabled]="loteForm.invalid || cargando"
+      class="btn-guardar"
+    >
+      <mat-icon *ngIf="cargando">hourglass_empty</mat-icon>
+      <mat-icon *ngIf="!cargando">{{ esNuevo ? 'add' : 'save' }}</mat-icon>
+      {{ esNuevo ? 'Crear lote' : 'Guardar cambios' }}
+    </button>
+  </div>
+</div>

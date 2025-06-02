@@ -1,0 +1,409 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+  max-height: 90vh;
+  width: 100%;
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #fafafa;
+
+    .dialog-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+      color: #1976d2;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+  }
+
+  .dialog-content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+
+    h4 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #424242;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 8px;
+    }
+
+    .main-info .lote-card {
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+
+      .lote-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+
+        .lote-codigo {
+          margin: 0;
+          font-size: 28px;
+          font-weight: 700;
+          color: #1976d2;
+          text-transform: uppercase;
+        }
+
+        .alert-icon {
+          font-size: 24px;
+          &.vencido {
+            color: #f44336;
+          }
+          &.por-vencer {
+            color: #ff9800;
+          }
+        }
+      }
+
+      .lote-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+
+        .detail-item {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #757575;
+            text-transform: uppercase;
+          }
+
+          .value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #424242;
+            &.primary {
+              color: #1976d2;
+              font-weight: 600;
+            }
+          }
+        }
+      }
+    }
+
+    .stock-section,
+    .expiration-section,
+    .financial-section,
+    .recommendation-section,
+    .usage-section,
+    .technical-section {
+      margin-bottom: 32px;
+
+      .stock-card,
+      .expiration-card,
+      .financial-grid,
+      .recommendation-card,
+      .technical-grid {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+      }
+    }
+
+    .stock-visual {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+
+      .stock-bar {
+        flex: 1;
+        height: 12px;
+        background-color: #e0e0e0;
+        border-radius: 6px;
+        overflow: hidden;
+
+        .stock-fill {
+          height: 100%;
+          transition: width 0.5s ease;
+          border-radius: 6px;
+          &.stock-critical {
+            background: #f44336;
+          }
+          &.stock-low {
+            background: #ff9800;
+          }
+          &.stock-medium {
+            background: #2196f3;
+          }
+          &.stock-good {
+            background: #4caf50;
+          }
+        }
+      }
+
+      .stock-percentage {
+        font-size: 18px;
+        font-weight: 600;
+        color: #424242;
+        min-width: 60px;
+        text-align: right;
+      }
+    }
+
+    .stock-numbers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+
+      .stock-item {
+        text-align: center;
+
+        label {
+          display: block;
+          font-size: 12px;
+          color: #757575;
+          margin-bottom: 4px;
+          text-transform: uppercase;
+        }
+
+        .value {
+          font-size: 18px;
+          font-weight: 600;
+          &.stock-critical {
+            color: #f44336;
+          }
+          &.stock-low {
+            color: #ff9800;
+          }
+          &.stock-medium {
+            color: #2196f3;
+          }
+          &.stock-good {
+            color: #4caf50;
+          }
+        }
+      }
+    }
+
+    .expiration-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        &.expired {
+          color: #f44336;
+        }
+        &.warning {
+          color: #ff9800;
+        }
+        &.normal {
+          color: #4caf50;
+        }
+      }
+
+      .expiration-details {
+        flex: 1;
+
+        .expiration-date {
+          margin-bottom: 8px;
+
+          label {
+            font-size: 12px;
+            color: #757575;
+            display: block;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+          }
+
+          .value {
+            font-size: 16px;
+            font-weight: 600;
+            &.expired {
+              color: #f44336;
+            }
+            &.warning {
+              color: #ff9800;
+            }
+          }
+        }
+
+        .expiration-status span {
+          font-size: 14px;
+          font-weight: 500;
+          &.expired {
+            color: #f44336;
+          }
+          &.warning {
+            color: #ff9800;
+          }
+          &.normal {
+            color: #4caf50;
+          }
+        }
+      }
+    }
+
+    .financial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+
+      .financial-item {
+        text-align: center;
+
+        label {
+          display: block;
+          font-size: 12px;
+          color: #757575;
+          margin-bottom: 4px;
+          text-transform: uppercase;
+        }
+
+        .value {
+          font-size: 16px;
+          font-weight: 600;
+          color: #424242;
+          &.currency {
+            color: #1976d2;
+          }
+          &.highlight {
+            color: #4caf50;
+            background: #e8f5e8;
+            padding: 4px 8px;
+            border-radius: 4px;
+          }
+        }
+      }
+    }
+
+    .recommendation-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      &.critical {
+        border-left: 4px solid #f44336;
+      }
+      &.low {
+        border-left: 4px solid #ff9800;
+      }
+      &.medium {
+        border-left: 4px solid #2196f3;
+      }
+      &.good {
+        border-left: 4px solid #4caf50;
+      }
+
+      mat-icon {
+        font-size: 24px;
+        color: #757575;
+      }
+
+      p {
+        margin: 0;
+        font-size: 14px;
+        color: #424242;
+      }
+    }
+
+    .usage-chips mat-chip-set {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .usage-chip {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        font-size: 12px;
+      }
+    }
+
+    .technical-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+
+      .technical-item {
+        label {
+          display: block;
+          font-size: 12px;
+          color: #757575;
+          margin-bottom: 4px;
+          text-transform: uppercase;
+        }
+
+        .value {
+          font-size: 14px;
+          color: #424242;
+        }
+      }
+    }
+  }
+
+  .dialog-actions {
+    padding: 16px 24px;
+    border-top: 1px solid #e0e0e0;
+    background-color: #fafafa;
+
+    .btn-cerrar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+  }
+}
+
+// Chips de estado
+.chip-success {
+  background-color: #e8f5e8;
+  color: #4caf50;
+}
+.chip-warn {
+  background-color: #fff3e0;
+  color: #ff9800;
+}
+.chip-danger {
+  background-color: #ffebee;
+  color: #f44336;
+}
+.chip-primary {
+  background-color: #e3f2fd;
+  color: #2196f3;
+}
+.chip-default {
+  background-color: #f5f5f5;
+  color: #757575;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .dialog-container .dialog-content {
+    .lote-details,
+    .stock-numbers,
+    .financial-grid,
+    .technical-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
