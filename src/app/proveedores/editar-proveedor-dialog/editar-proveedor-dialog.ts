@@ -36,7 +36,7 @@ import { Proveedor } from '../../models/insumo.model';
 })
 export class EditarProveedorDialogComponent {
   proveedorForm: FormGroup;
-  esNuevo: boolean = true;
+  isEditMode: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -44,32 +44,30 @@ export class EditarProveedorDialogComponent {
     @Inject(MAT_DIALOG_DATA)
     public data: { proveedor?: Proveedor; esNuevo: boolean }
   ) {
-    this.esNuevo = data.esNuevo;
+    this.isEditMode = !data.esNuevo;
 
     this.proveedorForm = this.fb.group({
-      codigo: [''],
       ruc: ['', [Validators.required]],
-      razon_social: ['', [Validators.required]],
+      empresa: ['', [Validators.required]],
       direccion: [''],
-      representante: [''],
+      contacto: [''],
       telefono: [''],
-      correo: ['', [Validators.email]],
+      email: ['', [Validators.email]],
     });
 
-    if (!this.esNuevo && data.proveedor) {
+    if (this.isEditMode && data.proveedor) {
       this.cargarDatosProveedor(data.proveedor);
     }
   }
 
   cargarDatosProveedor(proveedor: Proveedor): void {
     this.proveedorForm.patchValue({
-      codigo: this.formatearCodigo(proveedor.id_proveedor),
       ruc: proveedor.ruc || '',
-      razon_social: proveedor.empresa || '',
+      empresa: proveedor.empresa || '',
       direccion: proveedor.direccion || '',
-      representante: proveedor.contacto || '',
+      contacto: proveedor.contacto || '',
       telefono: proveedor.telefono || '',
-      correo: proveedor.email || '',
+      email: proveedor.email || '',
     });
   }
 
@@ -83,15 +81,15 @@ export class EditarProveedorDialogComponent {
       const formData = this.proveedorForm.value;
 
       const proveedor: Proveedor = {
-        empresa: formData.razon_social,
+        empresa: formData.empresa,
         ruc: formData.ruc,
         direccion: formData.direccion,
-        contacto: formData.representante,
+        contacto: formData.contacto,
         telefono: formData.telefono,
-        email: formData.correo,
+        email: formData.email,
       };
 
-      if (!this.esNuevo) {
+      if (this.isEditMode) {
         proveedor.id_proveedor = this.data.proveedor?.id_proveedor;
       }
 

@@ -1,92 +1,120 @@
 .dialog-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+  padding: 0;
+  margin: 0;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .dialog-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e9ecef;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #fafafa;
 
   .dialog-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #2c3e50;
     margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #333;
   }
 
   .close-button {
-    color: #6c757d;
+    color: #666;
 
     &:hover {
-      color: #495057;
+      background-color: #f0f0f0;
     }
   }
 }
 
 .detalle-content {
+  padding: 2rem;
+
   .form-row {
     display: flex;
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+
+    .form-field {
+      flex: 1;
+    }
 
     &.form-row-two {
       .form-field {
         flex: 1;
       }
     }
+  }
 
-    .form-field {
-      width: 100%;
+  // Estilos específicos para los campos de formulario de solo lectura
+  .mat-mdc-form-field {
+    width: 100%;
 
-      ::ng-deep {
-        .mat-mdc-form-field {
-          width: 100%;
+    .mat-mdc-form-field-label {
+      color: #555;
+    }
 
-          .mat-mdc-text-field-wrapper {
-            background-color: #f8f9fa;
-          }
+    .mat-mdc-input-element {
+      color: #333;
+      background-color: #f8f9fa;
 
-          .mdc-notched-outline {
-            border-color: #dee2e6;
-          }
+      &[readonly] {
+        cursor: default;
+      }
+    }
 
-          input[readonly] {
-            color: #6c757d;
-            cursor: not-allowed;
-          }
-        }
+    // Estilo para campos deshabilitados
+    &.mat-form-field-disabled {
+      .mat-mdc-form-field-label {
+        color: #6c757d;
       }
     }
   }
 }
 
-// Responsive
-@media (max-width: 600px) {
+// Media queries para responsividad
+@media (max-width: 768px) {
   .dialog-container {
-    padding: 1rem;
-  }
-
-  .form-row {
-    &.form-row-two {
-      flex-direction: column;
-
-      .form-field {
-        width: 100%;
-      }
-    }
-
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    margin: 0.5rem;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   .dialog-header {
+    padding: 1rem 1.5rem;
+
     .dialog-title {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
     }
+  }
+
+  .detalle-content {
+    padding: 1.5rem;
+
+    .form-row {
+      flex-direction: column;
+      margin-bottom: 1rem;
+
+      &.form-row-two {
+        flex-direction: column;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-container {
+    margin: 0.25rem;
+  }
+
+  .dialog-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .detalle-content {
+    padding: 1rem;
   }
 }
