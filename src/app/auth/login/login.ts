@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -27,6 +28,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
@@ -34,6 +36,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 export class LoginComponent {
   loginForm: FormGroup;
   hidePassword = true;
+  isLoading = false;
 
   constructor(private fb: FormBuilder, private router: Router) {
     this.loginForm = this.fb.group({
@@ -43,10 +46,20 @@ export class LoginComponent {
     });
   }
 
+  togglePassword(): void {
+    this.hidePassword = !this.hidePassword;
+  }
+
   onSubmit(): void {
     if (this.loginForm.valid) {
+      this.isLoading = true;
       console.log('Form submitted:', this.loginForm.value);
-      this.router.navigate(['/home']);
+
+      // Simular login async
+      setTimeout(() => {
+        this.isLoading = false;
+        this.router.navigate(['/home']);
+      }, 1500);
     }
   }
 }
