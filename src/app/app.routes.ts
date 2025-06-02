@@ -6,17 +6,44 @@ import { MaterialesComponent } from './materiales/materiales.component';
 import { Proveedores } from './proveedores/proveedores';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
   {
     path: '',
-    component: MainLayoutComponent,
+    redirectTo: '/login',
+    pathMatch: 'full',
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./auth/login/login').then((m) => m.Login),
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./layout/main-layout/main-layout').then(
+        (m) => m.MainLayoutComponent
+      ),
     children: [
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', component: Home },
-      { path: 'materiales', component: MaterialesComponent },
-      { path: 'proveedores', component: Proveedores },
-      // Aquí irán las rutas protegidas, por ejemplo:
-      // { path: 'home', component: HomeComponent },
+      {
+        path: '',
+        loadComponent: () =>
+          import('./dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'materiales',
+        loadComponent: () =>
+          import('./materiales/materiales.component').then(
+            (m) => m.MaterialesComponent
+          ),
+      },
+      {
+        path: 'proveedores',
+        loadComponent: () =>
+          import('./proveedores/proveedores').then((m) => m.Proveedores),
+      },
+      {
+        path: 'usuarios',
+        loadComponent: () =>
+          import('./usuarios/usuarios').then((m) => m.Usuarios),
+      },
     ],
   },
 ];

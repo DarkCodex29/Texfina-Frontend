@@ -58,8 +58,11 @@ export class LoginComponent {
       // Simular login async
       setTimeout(() => {
         this.isLoading = false;
-        this.router.navigate(['/home']);
+        this.router.navigate(['/dashboard']);
       }, 1500);
     }
   }
 }
+
+// Export adicional para compatibilidad con rutas
+export { LoginComponent as Login };

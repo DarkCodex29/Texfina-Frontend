@@ -39,3 +39,6 @@ export class MainLayoutComponent {
     );
   }
 }
+
+// Export adicional para compatibilidad con rutas
+export { MainLayoutComponent as Layout };

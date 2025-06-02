@@ -4,7 +4,7 @@
   </div>
   <ul class="sidebar-menu">
     <li>
-      <a routerLink="/home" routerLinkActive="active">
+      <a routerLink="/dashboard" routerLinkActive="active">
         <img src="assets/icons/home.svg" class="sidebar-icon" alt="Inicio" />
         <span>Inicio</span>
       </a>
@@ -19,10 +19,14 @@
       </div>
       <ul *ngIf="openSection === 'maestro'" class="sidebar-submenu">
         <li>
-          <a routerLink="/materiales" routerLinkActive="active">Materiales</a>
+          <a routerLink="/dashboard/materiales" routerLinkActive="active"
+            >Materiales</a
+          >
         </li>
         <li>
-          <a routerLink="/proveedores" routerLinkActive="active">Proveedores</a>
+          <a routerLink="/dashboard/proveedores" routerLinkActive="active"
+            >Proveedores</a
+          >
         </li>
       </ul>
     </li>
@@ -40,7 +44,9 @@
       </div>
       <ul *ngIf="openSection === 'configuracion'" class="sidebar-submenu">
         <li>
-          <a routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
+          <a routerLink="/dashboard/usuarios" routerLinkActive="active"
+            >Usuarios</a
+          >
         </li>
         <li>
           <a routerLink="/perfiles" routerLinkActive="active">Perfiles</a>

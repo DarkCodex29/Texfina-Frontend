@@ -1,0 +1,112 @@
+.dialog-container {
+  padding: 0;
+  margin: 0;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #fafafa;
+
+  .dialog-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .close-button {
+    color: #666;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+}
+
+.detalle-content {
+  padding: 2rem;
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .form-field {
+      flex: 1;
+    }
+
+    &.form-row-two {
+      .form-field {
+        flex: 1;
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .mat-mdc-form-field {
+    width: 100%;
+
+    .mat-mdc-input-element {
+      background-color: #f8f9fa;
+      color: #666;
+      cursor: not-allowed;
+
+      &:disabled {
+        background-color: #f8f9fa;
+        color: #666;
+      }
+    }
+
+    .mdc-text-field--outlined {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: #e0e0e0;
+      }
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .detalle-content {
+    padding: 1.5rem;
+
+    .form-row {
+      flex-direction: column;
+      gap: 1rem;
+
+      &.form-row-two {
+        flex-direction: column;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-header {
+    padding: 1rem 1.5rem;
+
+    .dialog-title {
+      font-size: 1.125rem;
+    }
+  }
+
+  .detalle-content {
+    padding: 1rem;
+  }
+}
