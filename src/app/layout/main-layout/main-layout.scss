@@ -1,0 +1,32 @@
+.app-container {
+  height: 100vh;
+  width: 100vw;
+}
+
+mat-sidenav-content {
+  height: 100vh;
+  width: 100vw;
+  background: #fafafd;
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.responsive-container {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+// Ajuste para que el contenido del home ocupe todo el espacio
+:host ::ng-deep app-home,
+:host ::ng-deep .home-root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+}

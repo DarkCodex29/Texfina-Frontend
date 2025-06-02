@@ -1,0 +1,81 @@
+// Variables
+$sidenav-width: 250px;
+$toolbar-height: 64px;
+$toolbar-mobile-height: 56px;
+
+// Contenedor principal
+.app-container {
+  height: 100vh;
+  width: 100vw;
+}
+
+// Sidenav
+.app-sidenav {
+  width: $sidenav-width;
+  background-color: white;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+// Toolbar
+mat-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+
+  .toolbar-links {
+    margin-left: 2rem;
+
+    a {
+      margin-right: 1rem;
+    }
+  }
+}
+
+// Contenido principal
+mat-sidenav-content {
+  margin-top: $toolbar-height;
+
+  @media (max-width: 599px) {
+    margin-top: $toolbar-mobile-height;
+  }
+
+  .responsive-container {
+    padding: 2rem;
+
+    @media (max-width: 599px) {
+      padding: 1rem;
+    }
+  }
+}
+
+// Utilidades
+.spacer {
+  flex: 1 1 auto;
+}
+
+// Animaciones
+.mat-drawer {
+  transition: transform 0.3s ease-in-out;
+}
+
+// Estilos para elementos de navegación
+mat-nav-list {
+  a {
+    display: flex;
+    align-items: center;
+
+    mat-icon {
+      margin-right: 1rem;
+    }
+  }
+}
+
+// Media queries específicos
+@media (max-width: 599px) {
+  .app-sidenav {
+    width: 80vw;
+    max-width: $sidenav-width;
+  }
+}

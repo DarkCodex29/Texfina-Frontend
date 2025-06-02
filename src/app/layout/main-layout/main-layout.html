@@ -1,0 +1,33 @@
+<!-- Layout principal responsive -->
+<mat-sidenav-container class="app-container">
+  <!-- Sidenav responsive -->
+  <mat-sidenav
+    #sidenav
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="!(isHandset$ | async)"
+    class="app-sidenav"
+  >
+    <app-sidebar></app-sidebar>
+  </mat-sidenav>
+
+  <!-- Contenido principal -->
+  <mat-sidenav-content>
+    <!-- Toolbar responsive -->
+    <mat-toolbar color="primary">
+      <button
+        mat-icon-button
+        (click)="sidenav.toggle()"
+        *ngIf="isHandset$ | async"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>Texfina Web</span>
+      <span class="spacer"></span>
+      <!-- Links o acciones adicionales -->
+    </mat-toolbar>
+
+    <div class="responsive-container">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

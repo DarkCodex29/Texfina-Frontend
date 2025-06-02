@@ -1,0 +1,72 @@
+<div class="login-container d-flex justify-content-center align-items-center">
+  <mat-card class="login-card">
+    <mat-card-header class="d-flex justify-content-center">
+      <mat-card-title>Bienvenido</mat-card-title>
+      <mat-card-subtitle
+        >Por favor ingresa tu correo y contraseña</mat-card-subtitle
+      >
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" class="d-flex flex-column">
+        <mat-form-field appearance="outline">
+          <mat-label>Correo</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="ejemplo@correo.com"
+          />
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+            El correo es requerido
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+            Por favor ingresa un correo válido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            [type]="hidePassword ? 'password' : 'text'"
+            formControlName="password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="hidePassword = !hidePassword"
+          >
+            <mat-icon
+              >{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon
+            >
+          </button>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            La contraseña es requerida
+          </mat-error>
+        </mat-form-field>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <mat-checkbox formControlName="remember">Recuérdame</mat-checkbox>
+          <a mat-button color="primary">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button
+          mat-raised-button
+          color="primary"
+          [disabled]="loginForm.invalid"
+          (click)="onSubmit()"
+        >
+          Ingresar
+        </button>
+
+        <div class="mt-3 text-center">
+          <span>¿No tienes una cuenta? </span>
+          <a mat-button color="primary" routerLink="/auth/register"
+            >Crea una cuenta</a
+          >
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
