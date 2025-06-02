@@ -19,8 +19,8 @@ export interface Insumo {
 
 export interface Clase {
   id_clase: string;
-  familia?: string;
-  sub_familia?: string;
+  familia: string;
+  sub_familia: string;
 }
 
 export interface Unidad {
@@ -34,6 +34,8 @@ export interface Proveedor {
   ruc?: string;
   contacto?: string;
   direccion?: string;
+  telefono?: string;
+  email?: string;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -56,6 +58,9 @@ export interface Lote {
   fecha_expiracion?: Date;
   precio_total?: number;
   estado_lote?: string;
+
+  // Relaciones
+  insumo?: Insumo;
 }
 
 export interface Almacen {

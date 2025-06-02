@@ -1,0 +1,68 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">Detalle de proveedor</h2>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="detalle-content">
+    <!-- Primera fila - Código y RUC -->
+    <div class="form-row form-row-two">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Código</mat-label>
+        <input
+          matInput
+          [value]="formatearCodigo(proveedor.id_proveedor)"
+          readonly
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>RUC</mat-label>
+        <input matInput [value]="proveedor.ruc || '-'" readonly />
+      </mat-form-field>
+    </div>
+
+    <!-- Segunda fila - Razón social -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Razón social</mat-label>
+        <input matInput [value]="proveedor.empresa || '-'" readonly />
+      </mat-form-field>
+    </div>
+
+    <!-- Tercera fila - Dirección -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Dirección</mat-label>
+        <input matInput [value]="proveedor.direccion || '-'" readonly />
+      </mat-form-field>
+    </div>
+
+    <!-- Cuarta fila - Representante -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Representante</mat-label>
+        <input matInput [value]="proveedor.contacto || '-'" readonly />
+      </mat-form-field>
+    </div>
+
+    <!-- Quinta fila - Teléfono y Correo -->
+    <div class="form-row form-row-two">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Teléfono</mat-label>
+        <input matInput [value]="proveedor.telefono || '234 837'" readonly />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Correo</mat-label>
+        <input
+          matInput
+          [value]="proveedor.email || 'empresa@mail.com'"
+          readonly
+        />
+      </mat-form-field>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,120 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">
+      {{ esNuevo ? 'Agregar proveedor' : 'Editar proveedor' }}
+    </h2>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form
+    [formGroup]="proveedorForm"
+    (ngSubmit)="onSubmit()"
+    class="proveedor-form"
+  >
+    <div class="form-content">
+      <!-- Primera fila - Código y RUC -->
+      <div class="form-row form-row-two">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Código</mat-label>
+          <input
+            matInput
+            formControlName="codigo"
+            placeholder="Autogenerado"
+            readonly
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>RUC</mat-label>
+          <input matInput formControlName="ruc" placeholder="Ingrese el RUC" />
+          <mat-error *ngIf="proveedorForm.get('ruc')?.hasError('required')">
+            El RUC es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Segunda fila - Razón social -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Razón social</mat-label>
+          <input
+            matInput
+            formControlName="razon_social"
+            placeholder="Ingrese la razón social"
+          />
+          <mat-error
+            *ngIf="proveedorForm.get('razon_social')?.hasError('required')"
+          >
+            La razón social es requerida
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Tercera fila - Dirección -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Dirección</mat-label>
+          <input
+            matInput
+            formControlName="direccion"
+            placeholder="Ingrese la dirección"
+          />
+        </mat-form-field>
+      </div>
+
+      <!-- Cuarta fila - Representante -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Representante</mat-label>
+          <input
+            matInput
+            formControlName="representante"
+            placeholder="Ingrese el nombre del representante"
+          />
+        </mat-form-field>
+      </div>
+
+      <!-- Quinta fila - Teléfono y Correo -->
+      <div class="form-row form-row-two">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Teléfono</mat-label>
+          <input
+            matInput
+            formControlName="telefono"
+            placeholder="Ingrese el teléfono"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Correo</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="correo"
+            placeholder="Ingrese el correo"
+          />
+          <mat-error *ngIf="proveedorForm.get('correo')?.hasError('email')">
+            Ingrese un correo válido
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="dialog-actions">
+      <button mat-button type="button" (click)="onCancel()" class="btn-cancel">
+        Cancelar
+      </button>
+      <button
+        mat-raised-button
+        type="submit"
+        [disabled]="!proveedorForm.valid"
+        class="btn-guardar"
+      >
+        {{ esNuevo ? 'Crear' : 'Editar' }}
+      </button>
+    </div>
+  </form>
+</div>
