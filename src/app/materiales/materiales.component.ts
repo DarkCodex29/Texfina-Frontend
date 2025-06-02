@@ -46,13 +46,13 @@ export class MaterialesComponent implements OnInit {
   proveedores: Proveedor[] = [];
   filtrosForm: FormGroup;
   displayedColumns: string[] = [
-    'lote',
-    'descripcion',
-    'proveedor',
-    'cantidad',
-    'unidad',
-    'fecha_registro',
-    'precio',
+    'id_fox',
+    'nombre',
+    'id_clase',
+    'peso_unitario',
+    'id_unidad',
+    'presentacion',
+    'precio_unitario',
     'acciones',
   ];
 

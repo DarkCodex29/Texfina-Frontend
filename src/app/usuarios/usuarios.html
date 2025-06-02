@@ -53,7 +53,18 @@
             class="btn-buscar"
             (click)="buscar()"
           >
+            <mat-icon>search</mat-icon>
             Buscar
+          </button>
+          <button
+            mat-stroked-button
+            color="accent"
+            type="button"
+            (click)="limpiarFiltros()"
+            class="btn-limpiar"
+          >
+            <mat-icon>clear</mat-icon>
+            Limpiar
           </button>
         </div>
       </div>

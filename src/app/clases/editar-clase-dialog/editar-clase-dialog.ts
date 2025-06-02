@@ -82,11 +82,14 @@ export class EditarClaseDialogComponent implements OnInit {
           this.dialogRef.close(true);
         });
       } else if (this.clase) {
-        this.materialService
-          .actualizarClase(this.clase.id_clase, claseData)
-          .subscribe(() => {
-            this.dialogRef.close(true);
-          });
+        // Combinar ID con los datos para el método actualizarClase
+        const claseActualizada = {
+          ...claseData,
+          id_clase: this.clase.id_clase,
+        };
+        this.materialService.actualizarClase(claseActualizada).subscribe(() => {
+          this.dialogRef.close(true);
+        });
       }
     }
   }

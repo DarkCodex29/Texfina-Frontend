@@ -61,7 +61,18 @@
             type="submit"
             class="btn-buscar"
           >
+            <mat-icon>search</mat-icon>
             Buscar
+          </button>
+          <button
+            mat-stroked-button
+            color="accent"
+            type="button"
+            (click)="limpiarFiltros()"
+            class="btn-limpiar"
+          >
+            <mat-icon>clear</mat-icon>
+            Limpiar
           </button>
         </div>
       </div>
@@ -72,22 +83,22 @@
   <mat-card class="tabla-card">
     <div class="table-container">
       <table mat-table [dataSource]="materiales" class="materiales-table">
-        <!-- Columna Código -->
-        <ng-container matColumnDef="lote">
-          <th mat-header-cell *matHeaderCellDef>Código</th>
+        <!-- Columna Código Fox -->
+        <ng-container matColumnDef="id_fox">
+          <th mat-header-cell *matHeaderCellDef>Código Fox</th>
           <td mat-cell *matCellDef="let material">
             {{ material.id_fox || "-" }}
           </td>
         </ng-container>
 
-        <!-- Columna Descripción Insumo -->
-        <ng-container matColumnDef="descripcion">
-          <th mat-header-cell *matHeaderCellDef>Descripción</th>
+        <!-- Columna Nombre -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
           <td mat-cell *matCellDef="let material">{{ material.nombre }}</td>
         </ng-container>
 
         <!-- Columna Clase -->
-        <ng-container matColumnDef="proveedor">
+        <ng-container matColumnDef="id_clase">
           <th mat-header-cell *matHeaderCellDef>Clase</th>
           <td mat-cell *matCellDef="let material">
             {{ material.id_clase || "-" }}
@@ -95,15 +106,15 @@
         </ng-container>
 
         <!-- Columna Peso Unitario -->
-        <ng-container matColumnDef="cantidad">
-          <th mat-header-cell *matHeaderCellDef>Peso Unit.</th>
+        <ng-container matColumnDef="peso_unitario">
+          <th mat-header-cell *matHeaderCellDef>Peso Unitario</th>
           <td mat-cell *matCellDef="let material">
             {{ material.peso_unitario || "-" }}
           </td>
         </ng-container>
 
         <!-- Columna Unidad -->
-        <ng-container matColumnDef="unidad">
+        <ng-container matColumnDef="id_unidad">
           <th mat-header-cell *matHeaderCellDef>Unidad</th>
           <td mat-cell *matCellDef="let material">
             {{ material.id_unidad || "-" }}
@@ -111,16 +122,16 @@
         </ng-container>
 
         <!-- Columna Presentación -->
-        <ng-container matColumnDef="fecha_registro">
+        <ng-container matColumnDef="presentacion">
           <th mat-header-cell *matHeaderCellDef>Presentación</th>
           <td mat-cell *matCellDef="let material">
             {{ material.presentacion || "-" }}
           </td>
         </ng-container>
 
-        <!-- Columna Precio -->
-        <ng-container matColumnDef="precio">
-          <th mat-header-cell *matHeaderCellDef>Precio Unit.</th>
+        <!-- Columna Precio Unitario -->
+        <ng-container matColumnDef="precio_unitario">
+          <th mat-header-cell *matHeaderCellDef>Precio Unitario</th>
           <td mat-cell *matCellDef="let material">
             {{
               material.precio_unitario
@@ -134,22 +145,24 @@
         <ng-container matColumnDef="acciones">
           <th mat-header-cell *matHeaderCellDef>Acciones</th>
           <td mat-cell *matCellDef="let material">
-            <button
-              mat-icon-button
-              (click)="verDetalle(material)"
-              class="btn-ver"
-              matTooltip="Ver detalle"
-            >
-              <mat-icon class="icon-ver">visibility</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              (click)="editarMaterial(material)"
-              class="btn-editar"
-              matTooltip="Editar"
-            >
-              <mat-icon class="icon-editar">edit</mat-icon>
-            </button>
+            <div class="action-buttons">
+              <button
+                mat-icon-button
+                (click)="verDetalle(material)"
+                class="btn-ver"
+                matTooltip="Ver detalle"
+              >
+                <mat-icon class="icon-ver">visibility</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                (click)="editarMaterial(material)"
+                class="btn-editar"
+                matTooltip="Editar"
+              >
+                <mat-icon class="icon-editar">edit</mat-icon>
+              </button>
+            </div>
           </td>
         </ng-container>
 

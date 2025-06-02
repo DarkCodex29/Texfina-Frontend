@@ -1,520 +1,641 @@
 .lotes-container {
-  padding: 20px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #f5f7fa;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
 
-  .page-header {
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
+
+  .page-title {
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin: 0;
+  }
+
+  .action-buttons {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+    gap: 1rem;
 
-    .page-title {
-      font-size: 28px;
-      font-weight: 500;
-      color: #1976d2;
-      margin: 0;
+    .btn-agregar {
+      background-color: #7c3aed;
+      color: white;
+      border: none;
+
+      &:hover {
+        background-color: #6d28d9;
+      }
+
+      mat-icon {
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}
+
+// Estilos para la tarjeta de filtros
+.filtros-card {
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  flex-shrink: 0;
+
+  .filtros-form {
+    padding: 1rem;
+
+    .filtros-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+      flex-wrap: wrap;
+
+      .filtro-field {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .filtro-buttons {
+        display: flex;
+        gap: 0.5rem;
+        align-items: flex-end;
+
+        .btn-buscar {
+          background-color: #7c3aed;
+          color: white;
+          height: 56px;
+          padding: 0 2rem;
+          margin-bottom: 1.25rem;
+
+          &:hover {
+            background-color: #6d28d9;
+          }
+        }
+
+        .btn-limpiar {
+          background-color: transparent;
+          border: 1px solid #7c3aed;
+          color: #7c3aed;
+          height: 56px;
+          padding: 0 2rem;
+          margin-bottom: 1.25rem;
+
+          &:hover {
+            background-color: #7c3aed;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estilos para la tabla - MÁXIMA DENSIDAD
+.tabla-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  .table-container {
+    overflow-x: auto;
+    flex: 1;
+
+    .lotes-table {
+      width: 100%;
+      height: 100%;
+
+      .mat-mdc-header-cell {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        padding: 0.4rem 0.3rem;
+        font-size: 0.75rem;
+        line-height: 1.1;
+      }
+
+      .mat-mdc-cell {
+        padding: 0.3rem 0.3rem;
+        border-bottom: 1px solid #dee2e6;
+        color: #495057;
+        font-size: 0.75rem;
+        line-height: 1.1;
+      }
+
+      .mat-mdc-row {
+        height: 32px;
+
+        &:hover {
+          background-color: #f8f9fa !important;
+        }
+
+        &:nth-child(even) {
+          background-color: #fbfcfd;
+        }
+
+        &:nth-child(odd) {
+          background-color: #ffffff;
+        }
+      }
+
+      // Estilos específicos de celdas de lotes
+      .td-lote {
+        .lote-info {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          .lote-codigo {
+            font-weight: 500;
+            color: #7c3aed;
+            font-size: 0.75rem;
+          }
+
+          .lote-alert {
+            display: flex;
+            align-items: center;
+
+            .icon-vencido {
+              color: #f44336;
+              font-size: 14px;
+            }
+
+            .icon-por-vencer {
+              color: #ff9800;
+              font-size: 14px;
+            }
+          }
+        }
+      }
+
+      .td-insumo {
+        font-weight: 500;
+        color: #495057;
+      }
+
+      .td-ubicacion {
+        color: #6c757d;
+        font-style: italic;
+      }
+
+      .td-stock {
+        text-align: center;
+
+        .stock-info {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .stock-value {
+            font-weight: 600;
+            font-size: 0.8rem;
+
+            &.stock-critical {
+              color: #f44336;
+            }
+
+            &.stock-low {
+              color: #ff9800;
+            }
+
+            &.stock-medium {
+              color: #2196f3;
+            }
+
+            &.stock-good {
+              color: #4caf50;
+            }
+          }
+
+          .stock-inicial {
+            font-size: 0.6rem;
+            color: #9e9e9e;
+          }
+        }
+      }
+
+      .td-fecha {
+        text-align: center;
+
+        .fecha-vencida {
+          color: #f44336;
+          font-weight: 600;
+        }
+
+        .fecha-por-vencer {
+          color: #ff9800;
+          font-weight: 500;
+        }
+
+        .fecha-sin-vencimiento {
+          color: #9e9e9e;
+          font-style: italic;
+          font-size: 0.65rem;
+        }
+      }
+
+      .td-estado {
+        text-align: center;
+
+        .estado-chip {
+          font-size: 0.6rem;
+          height: 20px;
+          min-height: 20px;
+          font-weight: 500;
+
+          &.chip-success {
+            background-color: #e8f5e8;
+            color: #4caf50;
+          }
+
+          &.chip-warn {
+            background-color: #fff3e0;
+            color: #ff9800;
+          }
+
+          &.chip-danger {
+            background-color: #ffebee;
+            color: #f44336;
+          }
+
+          &.chip-primary {
+            background-color: #e3f2fd;
+            color: #2196f3;
+          }
+
+          &.chip-default {
+            background-color: #f5f5f5;
+            color: #757575;
+          }
+        }
+      }
+
+      .td-acciones {
+        text-align: center;
+
+        .action-buttons {
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+
+          .btn-detalle,
+          .btn-editar {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+
+            mat-icon {
+              font-size: 1.125rem;
+            }
+          }
+
+          .btn-detalle {
+            background-color: #e0f2fe;
+            color: #0284c7;
+
+            &:hover {
+              background-color: #bae6fd;
+            }
+          }
+
+          .btn-editar {
+            background-color: #ecfdf5;
+            color: #059669;
+
+            &:hover {
+              background-color: #d1fae5;
+            }
+          }
+        }
+      }
     }
 
-    .action-buttons {
-      .btn-agregar {
-        height: 40px;
-        font-weight: 500;
+    .no-data {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px;
+      text-align: center;
+      color: #6c757d;
 
+      mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+        color: #bdbdbd;
+      }
+
+      p {
+        font-size: 16px;
+        margin: 0 0 20px 0;
+      }
+
+      button {
         mat-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
           margin-right: 8px;
         }
       }
     }
   }
 
-  .filtros-card {
-    margin-bottom: 20px;
-    padding: 20px;
+  .pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    flex-shrink: 0;
+    min-height: 44px;
 
-    .filtros-form {
-      width: 100%;
-
-      .filtros-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto;
-        gap: 16px;
-        align-items: end;
-
-        .filtro-field {
-          width: 100%;
-        }
-
-        .filtro-buttons {
-          display: flex;
-          gap: 8px;
-
-          .btn-buscar {
-            height: 40px;
-            min-width: 100px;
-            font-weight: 500;
-
-            mat-icon {
-              margin-right: 4px;
-            }
-          }
-        }
-      }
+    .pagination-info {
+      color: #6c757d;
+      font-size: 0.8rem;
     }
-  }
 
-  .tabla-card {
-    .table-container {
-      overflow-x: auto;
+    .pagination-buttons {
+      display: flex;
+      gap: 0.5rem;
 
-      .lotes-table {
-        width: 100%;
-        min-width: 800px;
-
-        // Columnas de la tabla
-        .th-lote,
-        .td-lote {
-          width: 140px;
-          min-width: 140px;
-        }
-
-        .th-insumo,
-        .td-insumo {
-          width: 200px;
-          min-width: 200px;
-        }
-
-        .th-ubicacion,
-        .td-ubicacion {
-          width: 150px;
-          min-width: 150px;
-        }
-
-        .th-stock,
-        .td-stock {
-          width: 120px;
-          min-width: 120px;
-          text-align: center;
-        }
-
-        .th-fecha,
-        .td-fecha {
-          width: 120px;
-          min-width: 120px;
-          text-align: center;
-        }
-
-        .th-estado,
-        .td-estado {
-          width: 120px;
-          min-width: 120px;
-          text-align: center;
-        }
-
-        .th-acciones,
-        .td-acciones {
-          width: 100px;
-          min-width: 100px;
-          text-align: center;
-        }
-
-        // Estilos específicos de celdas
-        .td-lote {
-          .lote-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            .lote-codigo {
-              font-weight: 500;
-              color: #424242;
-            }
-
-            .lote-alert {
-              display: flex;
-              align-items: center;
-
-              .icon-vencido {
-                color: #f44336;
-                font-size: 18px;
-              }
-
-              .icon-por-vencer {
-                color: #ff9800;
-                font-size: 18px;
-              }
-            }
-          }
-        }
-
-        .td-insumo {
-          font-weight: 500;
-          color: #616161;
-        }
-
-        .td-ubicacion {
-          color: #757575;
-          font-style: italic;
-        }
-
-        .td-stock {
-          .stock-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-            .stock-value {
-              font-weight: 600;
-              font-size: 16px;
-
-              &.stock-critical {
-                color: #f44336;
-              }
-
-              &.stock-low {
-                color: #ff9800;
-              }
-
-              &.stock-medium {
-                color: #2196f3;
-              }
-
-              &.stock-good {
-                color: #4caf50;
-              }
-            }
-
-            .stock-inicial {
-              font-size: 12px;
-              color: #9e9e9e;
-            }
-          }
-        }
-
-        .td-fecha {
-          .fecha-vencida {
-            color: #f44336;
-            font-weight: 600;
-          }
-
-          .fecha-por-vencer {
-            color: #ff9800;
-            font-weight: 500;
-          }
-
-          .fecha-sin-vencimiento {
-            color: #9e9e9e;
-            font-style: italic;
-            font-size: 12px;
-          }
-        }
-
-        .td-estado {
-          .estado-chip {
-            font-size: 11px;
-            height: 24px;
-            min-height: 24px;
-            font-weight: 500;
-
-            &.chip-success {
-              background-color: #e8f5e8;
-              color: #4caf50;
-            }
-
-            &.chip-warn {
-              background-color: #fff3e0;
-              color: #ff9800;
-            }
-
-            &.chip-danger {
-              background-color: #ffebee;
-              color: #f44336;
-            }
-
-            &.chip-primary {
-              background-color: #e3f2fd;
-              color: #2196f3;
-            }
-
-            &.chip-default {
-              background-color: #f5f5f5;
-              color: #757575;
-            }
-          }
-        }
-
-        .td-acciones {
-          .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-
-            .btn-detalle,
-            .btn-editar {
-              width: 36px;
-              height: 36px;
-
-              mat-icon {
-                font-size: 18px;
-              }
-            }
-          }
-        }
-
-        // Headers
-        .mat-mdc-header-cell {
-          font-weight: 600;
-          color: #424242;
-          background-color: #fafafa;
-          border-bottom: 2px solid #e0e0e0;
-        }
-
-        // Filas
-        .mat-mdc-row {
-          &:hover {
-            background-color: #f8f9fa;
-          }
-
-          &:nth-child(even) {
-            background-color: #fafafa;
-          }
-        }
-      }
-
-      .no-data {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 60px 20px;
-        text-align: center;
-        color: #757575;
-
-        mat-icon {
-          font-size: 64px;
-          width: 64px;
-          height: 64px;
-          margin-bottom: 16px;
-          color: #bdbdbd;
-        }
-
-        p {
-          font-size: 18px;
-          margin: 0 0 20px 0;
-        }
-
-        button {
-          mat-icon {
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
-            margin-right: 8px;
-          }
+      button {
+        &:disabled {
+          opacity: 0.5;
         }
       }
     }
   }
 }
 
-// Responsive Design
-@media (max-width: 1400px) {
+// ============================================================================
+// RESPONSIVE DESIGN MEJORADO
+// ============================================================================
+
+// ===== DESKTOP GRANDE (1400px+) =====
+@media (min-width: 1400px) {
   .lotes-container {
-    padding: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
 
-    .page-header {
-      .page-title {
-        font-size: 24px;
+    .filtros-card .filtros-form .filtros-row {
+      .filtro-field {
+        max-width: 300px;
       }
-    }
-
-    .filtros-card {
-      padding: 16px;
     }
   }
 }
 
-@media (max-width: 1200px) {
+// ===== DESKTOP (1200px - 1399px) =====
+@media (min-width: 1200px) and (max-width: 1399px) {
   .lotes-container {
-    .filtros-card {
-      .filtros-form {
-        .filtros-row {
-          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto;
-          gap: 12px;
+    .tabla-card .table-container .lotes-table {
+      .mat-mdc-row {
+        height: 36px;
+
+        .mat-mdc-cell {
+          font-size: 0.7rem;
+          padding: 0.4rem;
         }
       }
     }
   }
 }
 
-@media (max-width: 992px) {
+// ===== LAPTOP (992px - 1199px) =====
+@media (min-width: 992px) and (max-width: 1199px) {
   .lotes-container {
-    padding: 12px;
+    .filtros-card .filtros-form .filtros-row {
+      .filtro-field {
+        min-width: 180px;
+      }
+
+      .filtro-buttons .btn-buscar {
+        min-width: 100px;
+        padding: 0.75rem 1.5rem;
+      }
+    }
+
+    .tabla-card .table-container .lotes-table {
+      .mat-mdc-row {
+        height: 34px;
+
+        .mat-mdc-cell {
+          font-size: 0.65rem;
+          padding: 0.35rem;
+        }
+      }
+    }
+  }
+}
+
+// ===== TABLET (768px - 991px) =====
+@media (min-width: 768px) and (max-width: 991px) {
+  .lotes-container {
+    padding: 1rem;
 
     .page-header {
       flex-direction: column;
-      align-items: flex-start;
-      gap: 16px;
+      gap: 1rem;
+      align-items: stretch;
+      text-align: center;
 
+      .action-buttons {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+    }
+
+    .filtros-card .filtros-form .filtros-row {
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      .filtro-field {
+        flex: 1 1 calc(50% - 0.5rem);
+        min-width: 200px;
+      }
+
+      .filtro-buttons {
+        flex: 1 1 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+
+        .btn-buscar {
+          width: 100%;
+          max-width: 300px;
+        }
+      }
+    }
+
+    .tabla-card .table-container {
+      .lotes-table {
+        min-width: 800px;
+
+        .mat-mdc-row {
+          height: 36px;
+
+          .mat-mdc-cell {
+            font-size: 0.65rem;
+            padding: 0.3rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ===== MÓVIL GRANDE (576px - 767px) =====
+@media (min-width: 576px) and (max-width: 767px) {
+  .lotes-container {
+    padding: 0.75rem;
+
+    .page-header .page-title {
+      font-size: 1.5rem;
+    }
+
+    .filtros-card .filtros-form {
+      padding: 1rem;
+
+      .filtros-row {
+        flex-direction: column;
+        gap: 1rem;
+
+        .filtro-field {
+          min-width: 100%;
+        }
+
+        .filtro-buttons {
+          .btn-buscar {
+            width: 100%;
+            height: 48px;
+          }
+        }
+      }
+    }
+
+    .tabla-card .table-container {
+      .lotes-table {
+        min-width: 700px;
+
+        .mat-mdc-row {
+          height: 40px;
+
+          .mat-mdc-cell {
+            font-size: 0.7rem;
+            padding: 0.4rem;
+          }
+        }
+      }
+    }
+
+    .pagination-container {
+      padding: 1rem;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+  }
+}
+
+// ===== MÓVIL PEQUEÑO (320px - 575px) =====
+@media (max-width: 575px) {
+  .lotes-container {
+    padding: 0.5rem;
+
+    .page-header {
       .page-title {
-        font-size: 22px;
+        font-size: 1.25rem;
       }
 
       .action-buttons {
-        align-self: stretch;
+        flex-direction: column;
 
-        .btn-agregar {
+        button {
           width: 100%;
           justify-content: center;
         }
       }
     }
 
-    .filtros-card {
-      .filtros-form {
-        .filtros-row {
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-
-          .filtro-buttons {
-            grid-column: 1 / -1;
-            justify-content: center;
-
-            .btn-buscar {
-              width: 100%;
-            }
-          }
-        }
-      }
-    }
-
-    .tabla-card {
-      .table-container {
-        .lotes-table {
-          .td-stock {
-            .stock-info {
-              .stock-value {
-                font-size: 14px;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .lotes-container {
-    padding: 8px;
-
-    .page-header {
-      .page-title {
-        font-size: 20px;
-      }
-    }
-
-    .filtros-card {
-      padding: 12px;
-
-      .filtros-form {
-        .filtros-row {
-          grid-template-columns: 1fr;
-        }
-      }
-    }
-
-    .tabla-card {
-      .table-container {
-        .lotes-table {
-          min-width: 700px;
-
-          .td-acciones {
-            .action-buttons {
-              .btn-detalle,
-              .btn-editar {
-                width: 32px;
-                height: 32px;
-
-                mat-icon {
-                  font-size: 16px;
-                }
-              }
-            }
-          }
-        }
-
-        .no-data {
-          padding: 40px 16px;
-
-          mat-icon {
-            font-size: 48px;
-            width: 48px;
-            height: 48px;
-          }
-
-          p {
-            font-size: 16px;
-          }
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 576px) {
-  .lotes-container {
-    padding: 4px;
-
-    .page-header {
-      .page-title {
-        font-size: 18px;
-      }
-    }
-
-    .filtros-card {
-      padding: 8px;
-      margin-bottom: 12px;
+    .filtros-card .filtros-form {
+      padding: 0.75rem;
     }
 
     .tabla-card {
       .table-container {
         .lotes-table {
           min-width: 600px;
-          font-size: 12px;
+          font-size: 0.6rem;
 
-          .td-stock {
-            .stock-info {
-              .stock-value {
-                font-size: 12px;
-              }
-
-              .stock-inicial {
-                font-size: 10px;
-              }
-            }
-          }
-
-          .td-estado {
-            .estado-chip {
-              font-size: 9px;
-              height: 20px;
-              min-height: 20px;
-            }
-          }
-        }
-
-        .no-data {
-          padding: 30px 8px;
-
-          mat-icon {
-            font-size: 36px;
-            width: 36px;
+          .mat-mdc-row {
             height: 36px;
+
+            .mat-mdc-cell {
+              font-size: 0.6rem;
+              padding: 0.25rem;
+            }
           }
 
-          p {
-            font-size: 14px;
+          // Ocultar columnas menos importantes en móvil pequeño
+          .mat-column-ubicacion,
+          .mat-column-vencimiento {
+            display: none;
           }
         }
+      }
+
+      .pagination-container {
+        padding: 0.75rem;
+
+        .pagination-info {
+          font-size: 0.75rem;
+        }
+      }
+
+      .no-data {
+        padding: 30px 8px;
+
+        mat-icon {
+          font-size: 36px;
+          width: 36px;
+          height: 36px;
+        }
+
+        p {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+// ===== MÓVIL EXTRA PEQUEÑO (menos de 320px) =====
+@media (max-width: 319px) {
+  .lotes-container {
+    padding: 0.25rem;
+
+    .tabla-card .table-container .lotes-table {
+      min-width: 400px;
+
+      // Mostrar solo columnas esenciales
+      .mat-column-ubicacion,
+      .mat-column-vencimiento,
+      .mat-column-estado {
+        display: none;
       }
     }
   }

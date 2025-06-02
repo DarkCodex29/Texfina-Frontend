@@ -199,7 +199,7 @@ export class EditarLoteDialogComponent implements OnInit {
     }
 
     this.cargando = true;
-    const formData = this.loteForm.value as LoteFormDto;
+    const formData = this.loteForm.value as any;
 
     try {
       if (this.esNuevo) {
@@ -209,10 +209,11 @@ export class EditarLoteDialogComponent implements OnInit {
           panelClass: ['success-snackbar'],
         });
       } else {
-        const id_lote = this.data.lote!.id_lote!;
-        await this.materialService
-          .actualizarLote(id_lote, formData)
-          .toPromise();
+        const loteActualizado = {
+          ...formData,
+          id_lote: this.data.lote!.id_lote!,
+        };
+        await this.materialService.actualizarLote(loteActualizado).toPromise();
         this.snackBar.open('Lote actualizado exitosamente', 'Cerrar', {
           duration: 3000,
           panelClass: ['success-snackbar'],

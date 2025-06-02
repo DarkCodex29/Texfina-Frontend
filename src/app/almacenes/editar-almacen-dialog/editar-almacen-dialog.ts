@@ -77,8 +77,12 @@ export class EditarAlmacenDialogComponent implements OnInit {
           this.dialogRef.close(true);
         });
       } else if (this.almacen) {
+        const almacenActualizado = {
+          ...almacenData,
+          id_almacen: this.almacen.id_almacen,
+        };
         this.materialService
-          .actualizarAlmacen(this.almacen.id_almacen!, almacenData)
+          .actualizarAlmacen(almacenActualizado)
           .subscribe(() => {
             this.dialogRef.close(true);
           });

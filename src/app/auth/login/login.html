@@ -23,20 +23,19 @@
 
             <div class="form-fields">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Correo electrónico</mat-label>
+                <mat-label>Usuario</mat-label>
                 <input
                   matInput
-                  type="email"
-                  formControlName="email"
-                  placeholder="ejemplo@correo.com"
-                  autocomplete="email"
+                  type="text"
+                  formControlName="username"
+                  placeholder="Ingrese su usuario"
+                  autocomplete="username"
                 />
                 <mat-icon matPrefix>person_outline</mat-icon>
-                <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-                  El correo es requerido
-                </mat-error>
-                <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-                  Por favor ingresa un correo válido
+                <mat-error
+                  *ngIf="loginForm.get('username')?.hasError('required')"
+                >
+                  El usuario es requerido
                 </mat-error>
               </mat-form-field>
 

@@ -62,6 +62,16 @@
             <mat-icon>search</mat-icon>
             Buscar
           </button>
+          <button
+            mat-stroked-button
+            color="accent"
+            type="button"
+            (click)="limpiarFiltros()"
+            class="btn-limpiar"
+          >
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
         </div>
       </div>
     </form>
@@ -238,6 +248,19 @@
         <button mat-raised-button color="primary" (click)="abrirNuevoLote()">
           <mat-icon>add</mat-icon>
           Crear primer lote
+        </button>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination-container">
+      <span class="pagination-info">Página 1 de 10</span>
+      <div class="pagination-buttons">
+        <button mat-icon-button>
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon>chevron_right</mat-icon>
         </button>
       </div>
     </div>

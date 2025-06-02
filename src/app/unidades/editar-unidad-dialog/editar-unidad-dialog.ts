@@ -90,18 +90,20 @@ export class EditarUnidadDialogComponent implements OnInit {
             },
           });
         } else {
-          const idOriginal = this.data.unidad!.id_unidad;
-          this.materialService
-            .actualizarUnidad(idOriginal, unidadData)
-            .subscribe({
-              next: (result) => {
-                this.dialogRef.close(result);
-              },
-              error: (error) => {
-                console.error('Error al actualizar unidad:', error);
-                // Aquí podrías mostrar un mensaje de error
-              },
-            });
+          // Combinar datos para actualizar con ID original preservado
+          const unidadActualizada = {
+            ...unidadData,
+            id_unidad: this.data.unidad!.id_unidad,
+          };
+          this.materialService.actualizarUnidad(unidadActualizada).subscribe({
+            next: (result) => {
+              this.dialogRef.close(result);
+            },
+            error: (error) => {
+              console.error('Error al actualizar unidad:', error);
+              // Aquí podrías mostrar un mensaje de error
+            },
+          });
         }
       } catch (error) {
         console.error('Error:', error);

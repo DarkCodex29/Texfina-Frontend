@@ -46,6 +46,16 @@
             <mat-icon>search</mat-icon>
             Buscar
           </button>
+          <button
+            mat-stroked-button
+            color="accent"
+            type="button"
+            (click)="limpiarFiltros()"
+            class="btn-limpiar"
+          >
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
         </div>
       </div>
     </form>
@@ -55,18 +65,13 @@
   <mat-card class="tabla-card">
     <div class="table-container">
       <table mat-table [dataSource]="almacenes" class="almacenes-table" matSort>
-        <!-- Columna Código -->
-        <ng-container matColumnDef="codigo">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header
-            class="th-codigo"
-          >
-            Código
+        <!-- Columna ID Almacén -->
+        <ng-container matColumnDef="id_almacen">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="th-id">
+            ID
           </th>
-          <td mat-cell *matCellDef="let almacen" class="td-codigo">
-            {{ formatearCodigo(almacen.id_almacen) }}
+          <td mat-cell *matCellDef="let almacen" class="td-id">
+            {{ almacen.id_almacen || '-' }}
           </td>
         </ng-container>
 

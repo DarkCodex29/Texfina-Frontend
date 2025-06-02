@@ -79,6 +79,20 @@
             background-color: #6d28d9;
           }
         }
+
+        .btn-limpiar {
+          background-color: transparent;
+          border: 1px solid #7c3aed;
+          color: #7c3aed;
+          height: 56px;
+          padding: 0 2rem;
+          margin-bottom: 1.25rem;
+
+          &:hover {
+            background-color: #7c3aed;
+            color: white;
+          }
+        }
       }
     }
   }
@@ -137,25 +151,45 @@
       }
 
       // Estilos específicos para iconos de acciones
+      .td-acciones {
+        .action-buttons {
+          display: flex;
+          gap: 0.5rem;
+          justify-content: center;
+        }
+      }
+
       .btn-ver {
-        .icon-ver {
-          color: #17a2b8;
-          font-size: 18px; // Iconos más pequeños
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background-color: #e0f2fe;
+        color: #0284c7;
+
+        &:hover {
+          background-color: #bae6fd;
         }
 
-        &:hover .icon-ver {
-          color: #138496;
+        .icon-ver {
+          color: #0284c7;
+          font-size: 1.125rem;
         }
       }
 
       .btn-editar {
-        .icon-editar {
-          color: #ffc107;
-          font-size: 18px; // Iconos más pequeños
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background-color: #ecfdf5;
+        color: #059669;
+
+        &:hover {
+          background-color: #d1fae5;
         }
 
-        &:hover .icon-editar {
-          color: #e0a800;
+        .icon-editar {
+          color: #059669;
+          font-size: 1.125rem;
         }
       }
     }

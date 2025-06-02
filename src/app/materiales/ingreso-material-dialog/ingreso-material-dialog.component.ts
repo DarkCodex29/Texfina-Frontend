@@ -82,10 +82,10 @@ export class IngresoMaterialDialogComponent implements OnInit {
       };
 
       this.materialService.registrarIngreso(ingreso as any).subscribe({
-        next: (resultado) => {
+        next: (resultado: any) => {
           this.dialogRef.close(resultado);
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error al registrar ingreso:', error);
         },
       });

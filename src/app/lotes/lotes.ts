@@ -91,9 +91,14 @@ export class LotesComponent implements OnInit {
 
   buscar(): void {
     const filtros = this.filtrosForm.value;
-    this.materialService.buscarLotes(filtros).subscribe((lotes) => {
+    this.materialService.buscarLotes(filtros).subscribe((lotes: Lote[]) => {
       this.lotes = lotes;
     });
+  }
+
+  limpiarFiltros(): void {
+    this.filtrosForm.reset();
+    this.cargarDatos();
   }
 
   abrirNuevoLote(): void {

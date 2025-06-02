@@ -60,14 +60,13 @@ export class RegistroMaterialDialogComponent implements OnInit {
     this.esEdicion = data?.esEdicion || false;
 
     this.materialForm = this.fb.group({
-      codigo: ['', [Validators.required]],
-      descripcion_material: ['', [Validators.required]],
-      proveedor: ['', [Validators.required]],
-      almacen: ['', [Validators.required]],
-      unidad_medida_base: ['', [Validators.required]],
-      tipo_material: ['', [Validators.required]],
-      codigo_ean1: [''],
-      codigo_ean2: [''],
+      id_fox: ['', [Validators.required]],
+      nombre: ['', [Validators.required]],
+      id_clase: ['', [Validators.required]],
+      peso_unitario: [null, [Validators.required, Validators.min(0)]],
+      id_unidad: ['', [Validators.required]],
+      presentacion: ['', [Validators.required]],
+      precio_unitario: [null, [Validators.min(0)]],
     });
   }
 
@@ -79,14 +78,13 @@ export class RegistroMaterialDialogComponent implements OnInit {
     } else {
       // Valores por defecto para nuevo material
       this.materialForm.patchValue({
-        codigo: '103832',
-        descripcion_material: 'Tinte1',
-        proveedor: 'Texfina',
-        almacen: 'Texfina',
-        unidad_medida_base: 'KG',
-        tipo_material: 'KG',
-        codigo_ean1: '2345678907654',
-        codigo_ean2: '432345676543',
+        id_fox: 'QUIM003',
+        nombre: 'Nuevo Material',
+        id_clase: 'QUIM',
+        peso_unitario: 1.0,
+        id_unidad: 'KG',
+        presentacion: 'Bolsa 25kg',
+        precio_unitario: 0,
       });
     }
   }
@@ -111,14 +109,13 @@ export class RegistroMaterialDialogComponent implements OnInit {
 
   cargarMaterialParaEdicion(material: Insumo): void {
     this.materialForm.patchValue({
-      codigo: material.id_fox,
-      descripcion_material: material.nombre,
-      proveedor: 'Texfina', // Aquí debería venir de la relación
-      almacen: 'Texfina',
-      unidad_medida_base: material.id_unidad,
-      tipo_material: material.id_unidad,
-      codigo_ean1: '2345678907654',
-      codigo_ean2: '432345676543',
+      id_fox: material.id_fox || '',
+      nombre: material.nombre || '',
+      id_clase: material.id_clase || '',
+      peso_unitario: material.peso_unitario || 0,
+      id_unidad: material.id_unidad || '',
+      presentacion: material.presentacion || '',
+      precio_unitario: material.precio_unitario || 0,
     });
   }
 
@@ -135,13 +132,13 @@ export class RegistroMaterialDialogComponent implements OnInit {
       const formValue = this.materialForm.value;
 
       const material: Insumo = {
-        id_fox: formValue.codigo,
-        nombre: formValue.descripcion_material,
-        id_unidad: formValue.unidad_medida_base,
-        id_clase: formValue.tipo_material === 'KG' ? 'TINTAS' : 'QUIM',
-        peso_unitario: 1.0,
-        presentacion: 'Bolsa 25kg',
-        precio_unitario: 0,
+        id_fox: formValue.id_fox,
+        nombre: formValue.nombre,
+        id_clase: formValue.id_clase,
+        peso_unitario: formValue.peso_unitario,
+        id_unidad: formValue.id_unidad,
+        presentacion: formValue.presentacion,
+        precio_unitario: formValue.precio_unitario,
       };
 
       if (this.esEdicion && this.data?.material) {

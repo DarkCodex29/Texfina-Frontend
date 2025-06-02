@@ -42,7 +42,12 @@ import { DetalleAlmacenDialogComponent } from './detalle-almacen-dialog/detalle-
 export class AlmacenesComponent implements OnInit {
   almacenes: Almacen[] = [];
   filtrosForm: FormGroup;
-  displayedColumns: string[] = ['codigo', 'nombre', 'ubicacion', 'acciones'];
+  displayedColumns: string[] = [
+    'id_almacen',
+    'nombre',
+    'ubicacion',
+    'acciones',
+  ];
 
   constructor(
     private materialService: MaterialService,
@@ -67,7 +72,13 @@ export class AlmacenesComponent implements OnInit {
 
   buscar(): void {
     const filtros = this.filtrosForm.value;
-    // Implementar búsqueda filtrada cuando esté lista la API
+    this.materialService.buscarAlmacenes(filtros).subscribe((almacenes) => {
+      this.almacenes = almacenes;
+    });
+  }
+
+  limpiarFiltros(): void {
+    this.filtrosForm.reset();
     this.cargarAlmacenes();
   }
 

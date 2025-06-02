@@ -120,9 +120,16 @@ export class Usuarios implements OnInit {
   buscar(): void {
     const filtros = this.filtrosForm.value;
 
-    this.materialService.buscarUsuarios(filtros).subscribe((usuarios) => {
-      this.usuarios = usuarios;
-    });
+    this.materialService
+      .buscarUsuarios(filtros)
+      .subscribe((usuarios: Usuario[]) => {
+        this.usuarios = usuarios;
+      });
+  }
+
+  limpiarFiltros(): void {
+    this.filtrosForm.reset();
+    this.cargarDatos();
   }
 
   abrirNuevoUsuario(): void {

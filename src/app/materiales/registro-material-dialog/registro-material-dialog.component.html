@@ -12,74 +12,74 @@
     class="material-form"
   >
     <div class="form-content">
-      <!-- Primera fila -->
+      <!-- Primera fila - Código Fox -->
       <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Código</mat-label>
-          <input
-            matInput
-            formControlName="codigo"
-            placeholder="Ingrese el código"
-          />
-          <mat-error *ngIf="materialForm.get('codigo')?.hasError('required')">
-            El código es requerido
+          <mat-label>Código Fox *</mat-label>
+          <input matInput formControlName="id_fox" placeholder="Ej: QUIM001" />
+          <mat-error *ngIf="materialForm.get('id_fox')?.hasError('required')">
+            El código Fox es requerido
           </mat-error>
         </mat-form-field>
       </div>
 
-      <!-- Segunda fila -->
+      <!-- Segunda fila - Nombre -->
       <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Descripción de material</mat-label>
+          <mat-label>Nombre del material *</mat-label>
           <input
             matInput
-            formControlName="descripcion_material"
-            placeholder="Ingrese la descripción"
+            formControlName="nombre"
+            placeholder="Ej: Ácido Acético"
           />
-          <mat-error
-            *ngIf="
-              materialForm.get('descripcion_material')?.hasError('required')
-            "
-          >
-            La descripción es requerida
+          <mat-error *ngIf="materialForm.get('nombre')?.hasError('required')">
+            El nombre es requerido
           </mat-error>
         </mat-form-field>
       </div>
 
-      <!-- Tercera fila -->
+      <!-- Tercera fila - Clase -->
       <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Proveedor</mat-label>
-          <input
-            matInput
-            formControlName="proveedor"
-            placeholder="Ingrese el proveedor"
-          />
-          <mat-error
-            *ngIf="materialForm.get('proveedor')?.hasError('required')"
-          >
-            El proveedor es requerido
+          <mat-label>Clase *</mat-label>
+          <mat-select formControlName="id_clase">
+            <mat-option value="">Seleccione una clase</mat-option>
+            <mat-option *ngFor="let clase of clases" [value]="clase.id_clase">
+              {{ clase.familia }} - {{ clase.sub_familia }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="materialForm.get('id_clase')?.hasError('required')">
+            La clase es requerida
           </mat-error>
         </mat-form-field>
       </div>
 
-      <!-- Cuarta fila - dos campos -->
+      <!-- Cuarta fila - Peso unitario y Unidad -->
       <div class="form-row form-row-two">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Almacén</mat-label>
+          <mat-label>Peso unitario *</mat-label>
           <input
             matInput
-            formControlName="almacen"
-            placeholder="Ingrese el almacén"
+            type="number"
+            formControlName="peso_unitario"
+            placeholder="1.0"
+            step="0.01"
+            min="0"
           />
-          <mat-error *ngIf="materialForm.get('almacen')?.hasError('required')">
-            El almacén es requerido
+          <mat-error
+            *ngIf="materialForm.get('peso_unitario')?.hasError('required')"
+          >
+            El peso unitario es requerido
+          </mat-error>
+          <mat-error *ngIf="materialForm.get('peso_unitario')?.hasError('min')">
+            El peso debe ser mayor a 0
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Unidad de medida base</mat-label>
-          <mat-select formControlName="unidad_medida_base">
+          <mat-label>Unidad *</mat-label>
+          <mat-select formControlName="id_unidad">
+            <mat-option value="">Seleccione una unidad</mat-option>
             <mat-option
               *ngFor="let unidad of unidades"
               [value]="unidad.id_unidad"
@@ -88,48 +88,48 @@
             </mat-option>
           </mat-select>
           <mat-error
-            *ngIf="materialForm.get('unidad_medida_base')?.hasError('required')"
+            *ngIf="materialForm.get('id_unidad')?.hasError('required')"
           >
-            La unidad de medida es requerida
+            La unidad es requerida
           </mat-error>
         </mat-form-field>
       </div>
 
-      <!-- Quinta fila - tres campos -->
-      <div class="form-row form-row-three">
+      <!-- Quinta fila - Presentación -->
+      <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Tipo de material</mat-label>
-          <mat-select formControlName="tipo_material">
-            <mat-option
-              *ngFor="let unidad of unidades"
-              [value]="unidad.id_unidad"
-            >
-              {{ unidad.nombre }}
-            </mat-option>
-          </mat-select>
+          <mat-label>Presentación *</mat-label>
+          <input
+            matInput
+            formControlName="presentacion"
+            placeholder="Ej: Bidón 20L, Bolsa 25Kg"
+          />
           <mat-error
-            *ngIf="materialForm.get('tipo_material')?.hasError('required')"
+            *ngIf="materialForm.get('presentacion')?.hasError('required')"
           >
-            El tipo de material es requerido
+            La presentación es requerida
           </mat-error>
         </mat-form-field>
+      </div>
 
+      <!-- Sexta fila - Precio unitario -->
+      <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Código EAN1</mat-label>
+          <mat-label>Precio unitario</mat-label>
           <input
             matInput
-            formControlName="codigo_ean1"
-            placeholder="Código EAN1"
+            type="number"
+            formControlName="precio_unitario"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
           />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Código EAN2</mat-label>
-          <input
-            matInput
-            formControlName="codigo_ean2"
-            placeholder="Código EAN2"
-          />
+          <span matTextPrefix>S/ </span>
+          <mat-error
+            *ngIf="materialForm.get('precio_unitario')?.hasError('min')"
+          >
+            El precio debe ser mayor o igual a 0
+          </mat-error>
         </mat-form-field>
       </div>
     </div>

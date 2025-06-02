@@ -50,7 +50,7 @@ export class UnidadesComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.filtrosForm = this.fb.group({
-      descripcion: [''],
+      nombre: [''],
     });
   }
 
@@ -66,7 +66,13 @@ export class UnidadesComponent implements OnInit {
 
   buscar(): void {
     const filtros = this.filtrosForm.value;
-    // Implementar búsqueda filtrada cuando esté lista la API
+    this.materialService.buscarUnidades(filtros).subscribe((unidades) => {
+      this.unidades = unidades;
+    });
+  }
+
+  limpiarFiltros(): void {
+    this.filtrosForm.reset();
     this.cargarUnidades();
   }
 

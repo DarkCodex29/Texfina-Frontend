@@ -73,7 +73,13 @@ export class Proveedores implements OnInit {
 
   buscar(): void {
     const filtros = this.filtrosForm.value;
-    // Implementar búsqueda filtrada cuando esté lista la API
+    this.materialService.buscarProveedores(filtros).subscribe((proveedores) => {
+      this.proveedores = proveedores;
+    });
+  }
+
+  limpiarFiltros(): void {
+    this.filtrosForm.reset();
     this.cargarProveedores();
   }
 

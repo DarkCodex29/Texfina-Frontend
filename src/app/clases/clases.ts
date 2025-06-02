@@ -67,7 +67,13 @@ export class ClasesComponent implements OnInit {
 
   buscar(): void {
     const filtros = this.filtrosForm.value;
-    // Implementar búsqueda filtrada cuando esté lista la API
+    this.materialService.buscarClases(filtros).subscribe((clases) => {
+      this.clases = clases;
+    });
+  }
+
+  limpiarFiltros(): void {
+    this.filtrosForm.reset();
     this.cargarClases();
   }
 
