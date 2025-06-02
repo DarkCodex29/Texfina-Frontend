@@ -1,0 +1,130 @@
+.sidebar {
+  background: #fff;
+  height: 100vh;
+  width: 240px;
+  min-width: 200px;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  padding: 16px 0 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.sidebar-logo img {
+  max-height: 48px;
+  max-width: 180px;
+  object-fit: contain;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0 0 0 0;
+  margin: 0;
+  flex: 1;
+}
+
+.sidebar-menu > li {
+  margin: 0;
+}
+
+.sidebar-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  color: #222;
+  text-decoration: none;
+  font-size: 1rem;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-menu a.active,
+.sidebar-menu a:hover {
+  background: #f5f7fa;
+  color: #1976d2;
+}
+
+.sidebar-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.sidebar-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #222;
+  user-select: none;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+.sidebar-section:hover,
+.sidebar-section:focus {
+  background: #f5f7fa;
+  color: #1976d2;
+}
+
+.arrow {
+  margin-left: auto;
+  transition: transform 0.2s;
+}
+.arrow.open {
+  transform: rotate(180deg);
+}
+
+.sidebar-submenu {
+  list-style: none;
+  padding: 0 0 0 40px;
+  margin: 0;
+  background: none;
+}
+.sidebar-submenu li a {
+  font-size: 0.97rem;
+  padding: 8px 0;
+  color: #444;
+  border-radius: 4px;
+}
+.sidebar-submenu li a.active,
+.sidebar-submenu li a:hover {
+  color: #1976d2;
+  background: #e3eafc;
+}
+
+@media (max-width: 800px) {
+  .sidebar {
+    width: 64px;
+    min-width: 64px;
+    padding: 0;
+  }
+  .sidebar-logo img {
+    max-width: 48px;
+    max-height: 48px;
+  }
+  .sidebar-menu a span,
+  .sidebar-section span {
+    display: none;
+  }
+  .sidebar-section {
+    padding: 12px 12px;
+  }
+  .sidebar-menu a {
+    padding: 12px 12px;
+  }
+  .sidebar-submenu {
+    padding-left: 16px;
+  }
+}

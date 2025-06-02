@@ -1,0 +1,15 @@
+<mat-toolbar color="primary" class="main-toolbar">
+  <span class="toolbar-title">{{ title }}</span>
+  <span class="spacer"></span>
+  <div class="toolbar-user" [matMenuTriggerFor]="userMenu">
+    <div class="user-info">
+      <span class="user-name">Juan Diego</span>
+      <span class="user-email">jrodriguez&#64;ecorporacion.com</span>
+    </div>
+    <mat-icon>account_circle</mat-icon>
+  </div>
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item>Perfil</button>
+    <button mat-menu-item>Cerrar sesión</button>
+  </mat-menu>
+</mat-toolbar>

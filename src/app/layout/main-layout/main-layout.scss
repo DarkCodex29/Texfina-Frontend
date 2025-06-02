@@ -12,12 +12,38 @@ mat-sidenav-content {
   margin: 0;
 }
 
+.main-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+app-toolbar {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
 .responsive-container {
+  flex: 1 1 auto;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
   padding: 0;
   margin: 0;
-  box-sizing: border-box;
+}
+
+@media (max-width: 959px) {
+  .main-content-wrapper,
+  .responsive-container {
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+  }
 }
 
 // Ajuste para que el contenido del home ocupe todo el espacio
@@ -27,6 +53,8 @@ mat-sidenav-content {
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  justify-content: stretch;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0;
+  margin: 0;
 }

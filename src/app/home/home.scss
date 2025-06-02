@@ -1,0 +1,47 @@
+.home-root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 100%;
+  width: 100%;
+  padding: 40px 0 0 0;
+}
+
+.home-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 32px;
+  color: #222;
+}
+
+.home-logos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.texfina-logo {
+  max-width: 420px;
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+.ebim-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.ebim-text {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+.ebim-logo {
+  max-width: 160px;
+  width: 100%;
+}

@@ -12,22 +12,11 @@
 
   <!-- Contenido principal -->
   <mat-sidenav-content>
-    <!-- Toolbar responsive -->
-    <mat-toolbar color="primary">
-      <button
-        mat-icon-button
-        (click)="sidenav.toggle()"
-        *ngIf="isHandset$ | async"
-      >
-        <mat-icon>menu</mat-icon>
-      </button>
-      <span>Texfina Web</span>
-      <span class="spacer"></span>
-      <!-- Links o acciones adicionales -->
-    </mat-toolbar>
-
-    <div class="responsive-container">
-      <router-outlet></router-outlet>
+    <div class="main-content-wrapper">
+      <app-toolbar></app-toolbar>
+      <div class="responsive-container">
+        <router-outlet></router-outlet>
+      </div>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
