@@ -47,12 +47,10 @@ export class EditarProveedorDialogComponent {
     this.isEditMode = !data.esNuevo;
 
     this.proveedorForm = this.fb.group({
-      ruc: ['', [Validators.required]],
       empresa: ['', [Validators.required]],
-      direccion: [''],
+      ruc: ['', [Validators.required]],
       contacto: [''],
-      telefono: [''],
-      email: ['', [Validators.email]],
+      direccion: [''],
     });
 
     if (this.isEditMode && data.proveedor) {
@@ -66,8 +64,6 @@ export class EditarProveedorDialogComponent {
       empresa: proveedor.empresa || '',
       direccion: proveedor.direccion || '',
       contacto: proveedor.contacto || '',
-      telefono: proveedor.telefono || '',
-      email: proveedor.email || '',
     });
   }
 
@@ -85,8 +81,6 @@ export class EditarProveedorDialogComponent {
         ruc: formData.ruc,
         direccion: formData.direccion,
         contacto: formData.contacto,
-        telefono: formData.telefono,
-        email: formData.email,
       };
 
       if (this.isEditMode) {

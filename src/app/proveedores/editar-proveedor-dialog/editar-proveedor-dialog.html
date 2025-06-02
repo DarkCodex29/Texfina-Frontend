@@ -52,40 +52,15 @@
         </mat-form-field>
       </div>
 
-      <!-- Cuarta fila - Representante y Teléfono -->
-      <div class="form-row form-row-two">
+      <!-- Cuarta fila - Contacto -->
+      <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Representante</mat-label>
+          <mat-label>Contacto</mat-label>
           <input
             matInput
             formControlName="contacto"
-            placeholder="Ingrese el representante"
+            placeholder="Ingrese el contacto"
           />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Teléfono</mat-label>
-          <input
-            matInput
-            formControlName="telefono"
-            placeholder="Ingrese el teléfono"
-          />
-        </mat-form-field>
-      </div>
-
-      <!-- Quinta fila - Correo -->
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Correo</mat-label>
-          <input
-            matInput
-            formControlName="email"
-            type="email"
-            placeholder="Ingrese el correo electrónico"
-          />
-          <mat-error *ngIf="proveedorForm.get('email')?.hasError('email')">
-            Ingrese un correo electrónico válido
-          </mat-error>
         </mat-form-field>
       </div>
     </div>

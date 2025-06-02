@@ -52,6 +52,7 @@ export class MaterialesComponent implements OnInit {
     'cantidad',
     'unidad',
     'fecha_registro',
+    'precio',
     'acciones',
   ];
 

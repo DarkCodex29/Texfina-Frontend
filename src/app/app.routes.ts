@@ -28,7 +28,7 @@ export const routes: Routes = [
           import('./dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
-        path: 'materiales',
+        path: 'insumos',
         loadComponent: () =>
           import('./materiales/materiales.component').then(
             (m) => m.MaterialesComponent

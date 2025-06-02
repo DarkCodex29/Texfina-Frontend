@@ -12,15 +12,15 @@
     <li>
       <div class="sidebar-section" (click)="toggleSection('maestro')">
         <img src="assets/icons/master.svg" class="sidebar-icon" alt="Maestro" />
-        <span>Maestro</span>
+        <span>Maestros</span>
         <mat-icon class="arrow" [class.open]="openSection === 'maestro'"
           >expand_more</mat-icon
         >
       </div>
       <ul *ngIf="openSection === 'maestro'" class="sidebar-submenu">
         <li>
-          <a routerLink="/dashboard/materiales" routerLinkActive="active"
-            >Materiales</a
+          <a routerLink="/dashboard/insumos" routerLinkActive="active"
+            >Insumos</a
           >
         </li>
         <li>
@@ -28,64 +28,91 @@
             >Proveedores</a
           >
         </li>
+        <li>
+          <a routerLink="/dashboard/almacenes" routerLinkActive="active"
+            >Almacenes</a
+          >
+        </li>
+        <li>
+          <a routerLink="/dashboard/recetas" routerLinkActive="active"
+            >Recetas</a
+          >
+        </li>
       </ul>
     </li>
     <li>
-      <div class="sidebar-section" (click)="toggleSection('configuracion')">
+      <div class="sidebar-section" (click)="toggleSection('movimientos')">
         <img
-          src="assets/icons/settings.svg"
+          src="assets/icons/clipboard.svg"
           class="sidebar-icon"
-          alt="Configuración"
+          alt="Movimientos"
         />
-        <span>Configuración</span>
-        <mat-icon class="arrow" [class.open]="openSection === 'configuracion'"
+        <span>Movimientos</span>
+        <mat-icon class="arrow" [class.open]="openSection === 'movimientos'"
           >expand_more</mat-icon
         >
       </div>
-      <ul *ngIf="openSection === 'configuracion'" class="sidebar-submenu">
+      <ul *ngIf="openSection === 'movimientos'" class="sidebar-submenu">
+        <li>
+          <a routerLink="/dashboard/ingresos" routerLinkActive="active"
+            >Ingresos</a
+          >
+        </li>
+        <li>
+          <a routerLink="/dashboard/consumos" routerLinkActive="active"
+            >Consumos</a
+          >
+        </li>
+        <li>
+          <a routerLink="/dashboard/lotes" routerLinkActive="active">Lotes</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <div class="sidebar-section" (click)="toggleSection('consultas')">
+        <img src="assets/icons/file.svg" class="sidebar-icon" alt="Consultas" />
+        <span>Consultas</span>
+        <mat-icon class="arrow" [class.open]="openSection === 'consultas'"
+          >expand_more</mat-icon
+        >
+      </div>
+      <ul *ngIf="openSection === 'consultas'" class="sidebar-submenu">
+        <li>
+          <a routerLink="/dashboard/stock" routerLinkActive="active">Stock</a>
+        </li>
+        <li>
+          <a routerLink="/dashboard/reportes" routerLinkActive="active"
+            >Reportes</a
+          >
+        </li>
+      </ul>
+    </li>
+    <li>
+      <div class="sidebar-section" (click)="toggleSection('administracion')">
+        <img
+          src="assets/icons/settings.svg"
+          class="sidebar-icon"
+          alt="Administración"
+        />
+        <span>Administración</span>
+        <mat-icon class="arrow" [class.open]="openSection === 'administracion'"
+          >expand_more</mat-icon
+        >
+      </div>
+      <ul *ngIf="openSection === 'administracion'" class="sidebar-submenu">
         <li>
           <a routerLink="/dashboard/usuarios" routerLinkActive="active"
             >Usuarios</a
           >
         </li>
         <li>
-          <a routerLink="/perfiles" routerLinkActive="active">Perfiles</a>
-        </li>
-      </ul>
-    </li>
-    <li>
-      <div class="sidebar-section" (click)="toggleSection('operaciones')">
-        <img
-          src="assets/icons/clipboard.svg"
-          class="sidebar-icon"
-          alt="Operaciones"
-        />
-        <span>Operaciones</span>
-        <mat-icon class="arrow" [class.open]="openSection === 'operaciones'"
-          >expand_more</mat-icon
-        >
-      </div>
-      <ul *ngIf="openSection === 'operaciones'" class="sidebar-submenu">
-        <li>
-          <a routerLink="/ingreso-materiales" routerLinkActive="active"
-            >Ingreso de materiales</a
+          <a routerLink="/dashboard/roles" routerLinkActive="active"
+            >Roles y Permisos</a
           >
         </li>
-        <li><a routerLink="/pesaje" routerLinkActive="active">Pesaje</a></li>
-      </ul>
-    </li>
-    <li>
-      <div class="sidebar-section" (click)="toggleSection('reportes')">
-        <img src="assets/icons/file.svg" class="sidebar-icon" alt="Reportes" />
-        <span>Reportes</span>
-        <mat-icon class="arrow" [class.open]="openSection === 'reportes'"
-          >expand_more</mat-icon
-        >
-      </div>
-      <ul *ngIf="openSection === 'reportes'" class="sidebar-submenu">
         <li>
-          <a routerLink="/consulta-stock" routerLinkActive="active"
-            >Consulta stock</a
+          <a routerLink="/dashboard/configuracion" routerLinkActive="active"
+            >Configuración</a
           >
         </li>
       </ul>

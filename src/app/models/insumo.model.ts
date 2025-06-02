@@ -96,8 +96,6 @@ export interface Proveedor {
   empresa?: string;
   ruc?: string;
   contacto?: string;
-  telefono?: string;
-  email?: string;
   direccion?: string;
   created_at?: Date;
   updated_at?: Date;

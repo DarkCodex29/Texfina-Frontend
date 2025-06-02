@@ -42,13 +42,10 @@ export class Proveedores implements OnInit {
   proveedores: Proveedor[] = [];
   filtrosForm: FormGroup;
   displayedColumns: string[] = [
-    'codigo',
+    'empresa',
     'ruc',
-    'razon_social',
+    'contacto',
     'direccion',
-    'representante',
-    'telefono',
-    'correo',
     'acciones',
   ];
 
@@ -58,9 +55,9 @@ export class Proveedores implements OnInit {
     private fb: FormBuilder
   ) {
     this.filtrosForm = this.fb.group({
-      codigo: [''],
+      empresa: [''],
       ruc: [''],
-      razon_social: [''],
+      contacto: [''],
     });
   }
 
