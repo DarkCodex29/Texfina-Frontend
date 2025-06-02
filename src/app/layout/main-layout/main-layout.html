@@ -1,20 +1,20 @@
 <!-- Layout principal responsive -->
-<mat-sidenav-container class="app-container">
+<mat-sidenav-container class="main-layout">
   <!-- Sidenav responsive -->
   <mat-sidenav
     #sidenav
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="!(isHandset$ | async)"
-    class="app-sidenav"
+    class="sidebar"
   >
     <app-sidebar></app-sidebar>
   </mat-sidenav>
 
   <!-- Contenido principal -->
-  <mat-sidenav-content>
-    <div class="main-content-wrapper">
-      <app-toolbar></app-toolbar>
-      <div class="responsive-container">
+  <mat-sidenav-content class="content-container">
+    <app-toolbar></app-toolbar>
+    <div class="content">
+      <div class="content-wrapper">
         <router-outlet></router-outlet>
       </div>
     </div>

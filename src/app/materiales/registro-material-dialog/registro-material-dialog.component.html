@@ -1,0 +1,152 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">{{ tituloModal }}</h2>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form
+    [formGroup]="materialForm"
+    (ngSubmit)="onSubmit()"
+    class="material-form"
+  >
+    <div class="form-content">
+      <!-- Primera fila -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Código</mat-label>
+          <input
+            matInput
+            formControlName="codigo"
+            placeholder="Ingrese el código"
+          />
+          <mat-error *ngIf="materialForm.get('codigo')?.hasError('required')">
+            El código es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Segunda fila -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Descripción de material</mat-label>
+          <input
+            matInput
+            formControlName="descripcion_material"
+            placeholder="Ingrese la descripción"
+          />
+          <mat-error
+            *ngIf="
+              materialForm.get('descripcion_material')?.hasError('required')
+            "
+          >
+            La descripción es requerida
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Tercera fila -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Proveedor</mat-label>
+          <input
+            matInput
+            formControlName="proveedor"
+            placeholder="Ingrese el proveedor"
+          />
+          <mat-error
+            *ngIf="materialForm.get('proveedor')?.hasError('required')"
+          >
+            El proveedor es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Cuarta fila - dos campos -->
+      <div class="form-row form-row-two">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Almacén</mat-label>
+          <input
+            matInput
+            formControlName="almacen"
+            placeholder="Ingrese el almacén"
+          />
+          <mat-error *ngIf="materialForm.get('almacen')?.hasError('required')">
+            El almacén es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Unidad de medida base</mat-label>
+          <mat-select formControlName="unidad_medida_base">
+            <mat-option
+              *ngFor="let unidad of unidades"
+              [value]="unidad.id_unidad"
+            >
+              {{ unidad.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error
+            *ngIf="materialForm.get('unidad_medida_base')?.hasError('required')"
+          >
+            La unidad de medida es requerida
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Quinta fila - tres campos -->
+      <div class="form-row form-row-three">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Tipo de material</mat-label>
+          <mat-select formControlName="tipo_material">
+            <mat-option
+              *ngFor="let unidad of unidades"
+              [value]="unidad.id_unidad"
+            >
+              {{ unidad.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error
+            *ngIf="materialForm.get('tipo_material')?.hasError('required')"
+          >
+            El tipo de material es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Código EAN1</mat-label>
+          <input
+            matInput
+            formControlName="codigo_ean1"
+            placeholder="Código EAN1"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Código EAN2</mat-label>
+          <input
+            matInput
+            formControlName="codigo_ean2"
+            placeholder="Código EAN2"
+          />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="dialog-actions">
+      <button mat-button type="button" (click)="onCancel()" class="btn-cancel">
+        Cancelar
+      </button>
+      <button
+        mat-raised-button
+        type="submit"
+        [disabled]="!materialForm.valid"
+        [ngClass]="esEdicion ? 'btn-save' : 'btn-register'"
+      >
+        {{ textoBotonPrincipal }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,386 @@
+.materiales-container {
+  padding: 1.5rem;
+  background-color: #f5f7fa;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
+
+  .page-title {
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin: 0;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+
+    .btn-agregar {
+      background-color: transparent;
+      border: 1px solid #6c757d;
+      color: #6c757d;
+
+      &:hover {
+        background-color: #6c757d;
+        color: white;
+      }
+    }
+
+    .btn-ingreso {
+      background-color: #7c3aed;
+      color: white;
+
+      &:hover {
+        background-color: #6d28d9;
+      }
+    }
+
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+// Estilos para la tarjeta de filtros
+.filtros-card {
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  flex-shrink: 0;
+
+  .filtros-form {
+    padding: 1rem;
+
+    .filtros-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+      flex-wrap: wrap;
+
+      .filtro-field {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .filtro-buttons {
+        display: flex;
+        gap: 0.5rem;
+        align-items: flex-end;
+
+        .btn-buscar {
+          background-color: #7c3aed;
+          color: white;
+          height: 56px;
+          padding: 0 2rem;
+          margin-bottom: 1.25rem;
+
+          &:hover {
+            background-color: #6d28d9;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estilos para la tabla
+.tabla-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  .table-container {
+    overflow-x: auto;
+    flex: 1;
+
+    .materiales-table {
+      width: 100%;
+      height: 100%;
+
+      .mat-mdc-header-cell {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        padding: 1rem 0.75rem;
+      }
+
+      .mat-mdc-cell {
+        padding: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+        color: #495057;
+      }
+
+      .mat-mdc-row {
+        &:hover {
+          background-color: #f8f9fa;
+        }
+      }
+
+      // Estilos específicos para iconos de acciones
+      .btn-ver {
+        .icon-ver {
+          color: #17a2b8;
+        }
+
+        &:hover .icon-ver {
+          color: #138496;
+        }
+      }
+
+      .btn-editar {
+        .icon-editar {
+          color: #ffc107;
+        }
+
+        &:hover .icon-editar {
+          color: #e0a800;
+        }
+      }
+    }
+  }
+
+  .pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    flex-shrink: 0;
+
+    .pagination-info {
+      color: #6c757d;
+      font-size: 0.875rem;
+    }
+
+    .pagination-buttons {
+      display: flex;
+      gap: 0.5rem;
+
+      button {
+        &:disabled {
+          opacity: 0.5;
+        }
+      }
+    }
+  }
+}
+
+// Responsive design completo
+@media (max-width: 1200px) {
+  .materiales-container {
+    padding: 1.25rem;
+  }
+
+  .page-header {
+    .page-title {
+      font-size: 1.6rem;
+    }
+
+    .action-buttons {
+      gap: 0.75rem;
+    }
+  }
+}
+
+@media (max-width: 960px) {
+  .materiales-container {
+    padding: 1rem;
+  }
+
+  .page-header {
+    .page-title {
+      font-size: 1.5rem;
+    }
+  }
+
+  .filtros-row {
+    gap: 0.75rem;
+
+    .filtro-field {
+      min-width: 180px;
+    }
+  }
+
+  .table-container {
+    .materiales-table {
+      .mat-mdc-header-cell,
+      .mat-mdc-cell {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .materiales-container {
+    padding: 0.75rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+
+    .page-title {
+      font-size: 1.4rem;
+      text-align: center;
+    }
+
+    .action-buttons {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+
+  .filtros-row {
+    flex-direction: column;
+    gap: 1rem;
+
+    .filtro-field {
+      min-width: auto;
+      width: 100%;
+    }
+
+    .filtro-buttons {
+      justify-content: center;
+      width: 100%;
+
+      .btn-buscar {
+        width: 100%;
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+
+    .materiales-table {
+      min-width: 600px;
+      font-size: 0.85rem;
+
+      .mat-mdc-header-cell,
+      .mat-mdc-cell {
+        padding: 0.5rem 0.25rem;
+      }
+    }
+  }
+
+  .pagination-container {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .materiales-container {
+    padding: 0.5rem;
+  }
+
+  .page-header {
+    .page-title {
+      font-size: 1.3rem;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+      gap: 0.5rem;
+
+      button {
+        width: 100%;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .filtros-card {
+    margin-bottom: 1rem;
+
+    .filtros-form {
+      padding: 0.75rem;
+    }
+  }
+
+  .table-container {
+    .materiales-table {
+      min-width: 500px;
+      font-size: 0.8rem;
+
+      .mat-mdc-header-cell,
+      .mat-mdc-cell {
+        padding: 0.4rem 0.2rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .materiales-container {
+    padding: 0.5rem;
+  }
+
+  .page-header {
+    .page-title {
+      font-size: 1.2rem;
+    }
+  }
+
+  .filtros-form {
+    padding: 0.5rem;
+  }
+
+  .table-container {
+    .materiales-table {
+      min-width: 450px;
+      font-size: 0.75rem;
+
+      .mat-mdc-header-cell,
+      .mat-mdc-cell {
+        padding: 0.3rem 0.15rem;
+      }
+    }
+  }
+
+  .pagination-container {
+    padding: 0.5rem;
+
+    .pagination-info {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .page-header {
+    .page-title {
+      font-size: 1.1rem;
+    }
+  }
+
+  .table-container {
+    .materiales-table {
+      min-width: 400px;
+      font-size: 0.7rem;
+    }
+  }
+}
+

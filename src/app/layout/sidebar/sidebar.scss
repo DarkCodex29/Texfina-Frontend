@@ -1,130 +1,193 @@
 .sidebar {
   background: #fff;
   height: 100vh;
-  width: 240px;
-  min-width: 200px;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   padding: 0;
+  border-right: 1px solid #e9ecef;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.03);
+  overflow: hidden !important;
 }
 
 .sidebar-logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 80px;
-  padding: 16px 0 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+  height: 64px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f2f5;
+  flex-shrink: 0;
 }
+
 .sidebar-logo img {
-  max-height: 48px;
-  max-width: 180px;
+  max-height: 32px;
+  max-width: 130px;
   object-fit: contain;
 }
 
 .sidebar-menu {
   list-style: none;
-  padding: 0 0 0 0;
+  padding: 4px 6px 0 6px;
   margin: 0;
   flex: 1;
+  overflow: hidden !important;
+  max-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-menu > li {
-  margin: 0;
+  margin: 1px 0;
+  flex-shrink: 0;
 }
 
 .sidebar-menu a {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
-  color: #222;
+  gap: 8px;
+  padding: 6px 10px;
+  color: #495057;
   text-decoration: none;
-  font-size: 1rem;
-  border-radius: 6px;
-  transition: background 0.2s, color 0.2s;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.sidebar-menu a.active,
-.sidebar-menu a:hover {
-  background: #f5f7fa;
+.sidebar-menu a.active {
+  background: #e3f2fd;
   color: #1976d2;
+  font-weight: 600;
+}
+
+.sidebar-menu a:hover:not(.active) {
+  background: #f8f9fa;
+  color: #343a40;
 }
 
 .sidebar-icon {
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
   flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.sidebar-menu a.active .sidebar-icon,
+.sidebar-menu a:hover .sidebar-icon {
+  opacity: 1;
 }
 
 .sidebar-section {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
+  gap: 8px;
+  padding: 6px 10px;
   cursor: pointer;
   font-weight: 500;
-  color: #222;
+  font-size: 0.85rem;
+  color: #495057;
   user-select: none;
-  border-radius: 6px;
-  transition: background 0.2s, color 0.2s;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
 }
+
 .sidebar-section:hover,
 .sidebar-section:focus {
-  background: #f5f7fa;
-  color: #1976d2;
+  background: #f8f9fa;
+  color: #343a40;
 }
 
 .arrow {
   margin-left: auto;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
+  font-size: 14px;
+  color: #6c757d;
+  flex-shrink: 0;
 }
+
 .arrow.open {
   transform: rotate(180deg);
 }
 
 .sidebar-submenu {
   list-style: none;
-  padding: 0 0 0 40px;
+  padding: 0 0 2px 30px;
   margin: 0;
   background: none;
-}
-.sidebar-submenu li a {
-  font-size: 0.97rem;
-  padding: 8px 0;
-  color: #444;
-  border-radius: 4px;
-}
-.sidebar-submenu li a.active,
-.sidebar-submenu li a:hover {
-  color: #1976d2;
-  background: #e3eafc;
+  overflow: hidden !important;
+  flex-shrink: 0;
 }
 
+.sidebar-submenu li {
+  margin: 1px 0;
+  flex-shrink: 0;
+}
+
+.sidebar-submenu li a {
+  font-size: 0.8rem;
+  font-weight: 400;
+  padding: 4px 8px;
+  color: #6c757d;
+  border-radius: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sidebar-submenu li a.active {
+  color: #1976d2;
+  background: #e3f2fd;
+  font-weight: 500;
+}
+
+.sidebar-submenu li a:hover:not(.active) {
+  color: #495057;
+  background: #f1f3f4;
+}
+
+// Responsive
 @media (max-width: 800px) {
   .sidebar {
-    width: 64px;
-    min-width: 64px;
+    width: 56px;
+    min-width: 56px;
     padding: 0;
   }
-  .sidebar-logo img {
-    max-width: 48px;
-    max-height: 48px;
+
+  .sidebar-logo {
+    height: 56px;
+    padding: 4px 0;
   }
+
+  .sidebar-logo img {
+    max-width: 36px;
+    max-height: 36px;
+  }
+
   .sidebar-menu a span,
   .sidebar-section span {
     display: none;
   }
+
   .sidebar-section {
-    padding: 12px 12px;
+    padding: 8px;
+    justify-content: center;
   }
+
   .sidebar-menu a {
-    padding: 12px 12px;
+    padding: 8px;
+    justify-content: center;
   }
+
   .sidebar-submenu {
-    padding-left: 16px;
+    display: none;
+  }
+
+  .arrow {
+    display: none;
   }
 }

@@ -1,0 +1,90 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">Ingreso de material</h2>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="ingresoForm" (ngSubmit)="onSubmit()" class="ingreso-form">
+    <div class="form-content">
+      <!-- Primera fila - Stock actual y nueva cantidad -->
+      <div class="form-row form-row-two">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Stock actual</mat-label>
+          <input matInput formControlName="stock_actual" readonly />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Ingresa nueva cantidad</mat-label>
+          <input
+            matInput
+            formControlName="nueva_cantidad"
+            type="number"
+            placeholder="0"
+          />
+          <mat-error
+            *ngIf="ingresoForm.get('nueva_cantidad')?.hasError('required')"
+          >
+            La cantidad es requerida
+          </mat-error>
+          <mat-error *ngIf="ingresoForm.get('nueva_cantidad')?.hasError('min')">
+            La cantidad debe ser mayor a 0
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Segunda fila - Código y Material -->
+      <div class="form-row form-row-two">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Código</mat-label>
+          <input matInput formControlName="codigo" readonly />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Material</mat-label>
+          <mat-select formControlName="material">
+            <mat-option
+              *ngFor="let material of materiales"
+              [value]="material.nombre"
+            >
+              {{ material.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Tercera fila - Proveedor y Lote -->
+      <div class="form-row form-row-two">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Proveedor</mat-label>
+          <input matInput formControlName="proveedor" readonly />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Lote</mat-label>
+          <input
+            matInput
+            formControlName="lote"
+            placeholder="Ingrese el lote"
+          />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="dialog-actions">
+      <button mat-button type="button" (click)="onCancel()" class="btn-cancel">
+        Cancelar
+      </button>
+      <button
+        mat-raised-button
+        type="submit"
+        [disabled]="!ingresoForm.valid"
+        class="btn-ingresar"
+      >
+        Ingresar
+      </button>
+    </div>
+  </form>
+</div>

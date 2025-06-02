@@ -1,0 +1,82 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">Detalle de material</h2>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="detalle-content">
+    <!-- Primera fila - Código y Lote -->
+    <div class="form-row form-row-two">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Código</mat-label>
+        <input matInput [value]="detalleCompleto.codigo" readonly />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Lote</mat-label>
+        <input matInput [value]="detalleCompleto.lote" readonly />
+      </mat-form-field>
+    </div>
+
+    <!-- Segunda fila - Descripción de material -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Descripción de material</mat-label>
+        <input
+          matInput
+          [value]="detalleCompleto.descripcion_material"
+          readonly
+        />
+      </mat-form-field>
+    </div>
+
+    <!-- Tercera fila - Proveedor -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Proveedor</mat-label>
+        <input matInput [value]="detalleCompleto.proveedor" readonly />
+      </mat-form-field>
+    </div>
+
+    <!-- Cuarta fila - Almacén y Unidad de medida base -->
+    <div class="form-row form-row-two">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Almacén</mat-label>
+        <input matInput [value]="detalleCompleto.almacen" readonly />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Unidad de medida base</mat-label>
+        <mat-select [value]="detalleCompleto.unidad_medida_base" disabled>
+          <mat-option value="KG">Kilogramo</mat-option>
+          <mat-option value="LT">Litro</mat-option>
+          <mat-option value="UN">Unidad</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Quinta fila - Tipo de material, Código EAN1 y EAN2 -->
+    <div class="form-row form-row-three">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Tipo de material</mat-label>
+        <mat-select [value]="detalleCompleto.tipo_material" disabled>
+          <mat-option value="KG">Kilogramo</mat-option>
+          <mat-option value="LT">Litro</mat-option>
+          <mat-option value="UN">Unidad</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Código EAN1</mat-label>
+        <input matInput [value]="detalleCompleto.codigo_ean1" readonly />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Código EAN2</mat-label>
+        <input matInput [value]="detalleCompleto.codigo_ean2" readonly />
+      </mat-form-field>
+    </div>
+  </div>
+</div>

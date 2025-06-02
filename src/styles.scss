@@ -3,19 +3,29 @@
 @use "@angular/material" as mat;
 @use "sass:map";
 
-// Definición de breakpoints
+// Definición de breakpoints mejorados
 $breakpoints: (
   xs: 0,
-  sm: 600px,
-  md: 960px,
-  lg: 1280px,
-  xl: 1920px,
+  sm: 480px,
+  md: 768px,
+  lg: 960px,
+  xl: 1200px,
+  xxl: 1440px,
 );
 
 // Mixins para media queries
 @mixin respond-to($breakpoint) {
   @if map.has-key($breakpoints, $breakpoint) {
     @media (min-width: map.get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  }
+}
+
+@mixin respond-to-max($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map.get($breakpoints, $breakpoint);
+    @media (max-width: #{$breakpoint-value - 1px}) {
       @content;
     }
   }
@@ -43,14 +53,78 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  line-height: 1.5;
 }
 
-// Clases de utilidad responsive
+// Eliminar scrollbars del mat-sidenav-container y sidebar
+mat-sidenav-container {
+  overflow: hidden !important;
+}
+
+mat-sidenav {
+  overflow: hidden !important;
+}
+
+mat-sidenav-content {
+  overflow: hidden !important;
+}
+
+// Reglas específicas para el sidebar
+.sidebar {
+  overflow: hidden !important;
+
+  * {
+    overflow: hidden !important;
+  }
+}
+
+.sidebar-menu {
+  overflow: hidden !important;
+
+  li,
+  a {
+    overflow: visible !important;
+  }
+}
+
+// Personalización de scrollbars para webkit
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+
+  &:hover {
+    background: #a1a1a1;
+  }
+}
+
+// Para Firefox
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+// Clases de utilidad responsive mejoradas
 .responsive-container {
   width: 100%;
   padding-right: 1rem;
@@ -60,6 +134,8 @@ body {
 
   @include respond-to("sm") {
     max-width: 540px;
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
   }
   @include respond-to("md") {
     max-width: 720px;
@@ -70,9 +146,12 @@ body {
   @include respond-to("xl") {
     max-width: 1140px;
   }
+  @include respond-to("xxl") {
+    max-width: 1320px;
+  }
 }
 
-// Utilidades Flexbox
+// Utilidades Flexbox mejoradas
 .d-flex {
   display: flex !important;
 }
@@ -101,7 +180,73 @@ body {
   flex-wrap: wrap !important;
 }
 
-// Grid responsive
+.flex-grow-1 {
+  flex-grow: 1 !important;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0 !important;
+}
+
+// Utilidades de espaciado responsive
+.p-0 {
+  padding: 0 !important;
+}
+.p-1 {
+  padding: 0.25rem !important;
+}
+.p-2 {
+  padding: 0.5rem !important;
+}
+.p-3 {
+  padding: 1rem !important;
+}
+.p-4 {
+  padding: 1.5rem !important;
+}
+.p-5 {
+  padding: 3rem !important;
+}
+
+.m-0 {
+  margin: 0 !important;
+}
+.m-1 {
+  margin: 0.25rem !important;
+}
+.m-2 {
+  margin: 0.5rem !important;
+}
+.m-3 {
+  margin: 1rem !important;
+}
+.m-4 {
+  margin: 1.5rem !important;
+}
+.m-5 {
+  margin: 3rem !important;
+}
+
+// Utilidades de texto responsive
+.text-center {
+  text-align: center !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Grid responsive mejorado
 .grid-container {
   display: grid;
   gap: 1rem;
@@ -109,6 +254,8 @@ body {
 
   @include respond-to("sm") {
     grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
   }
 
   @include respond-to("md") {
@@ -117,5 +264,54 @@ body {
 
   @include respond-to("lg") {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  @include respond-to("xl") {
+    gap: 2rem;
+    padding: 2rem;
+  }
+}
+
+// Utilidades de visibilidad responsive
+.d-none {
+  display: none !important;
+}
+
+@include respond-to-max("sm") {
+  .d-sm-none {
+    display: none !important;
+  }
+}
+
+@include respond-to-max("md") {
+  .d-md-none {
+    display: none !important;
+  }
+}
+
+@include respond-to-max("lg") {
+  .d-lg-none {
+    display: none !important;
+  }
+}
+
+// Estilos para elementos de formulario responsive
+.form-responsive {
+  .mat-mdc-form-field {
+    width: 100%;
+  }
+}
+
+// Asegurar que las tablas sean responsive
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// Estilos para botones responsive
+.btn-responsive {
+  @include respond-to-max("sm") {
+    width: 100%;
+    margin-bottom: 0.5rem;
   }
 }

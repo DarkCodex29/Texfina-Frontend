@@ -1,0 +1,188 @@
+.dialog-container {
+  padding: 0;
+  margin: 0;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #fafafa;
+
+  .dialog-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .close-button {
+    color: #666;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+}
+
+.material-form {
+  .form-content {
+    padding: 2rem;
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+
+      .form-field {
+        flex: 1;
+      }
+
+      &.form-row-two {
+        .form-field {
+          flex: 1;
+        }
+      }
+
+      &.form-row-three {
+        .form-field {
+          flex: 1;
+        }
+      }
+    }
+
+    // Estilos específicos para los campos de formulario
+    .mat-mdc-form-field {
+      width: 100%;
+
+      .mat-mdc-form-field-label {
+        color: #555;
+      }
+
+      .mat-mdc-input-element {
+        color: #333;
+      }
+
+      &.mat-focused .mat-mdc-form-field-label {
+        color: #7c3aed;
+      }
+
+      .mat-mdc-form-field-outline-thick {
+        color: #7c3aed;
+      }
+    }
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+
+  .btn-cancel {
+    color: #666;
+    border: 1px solid #ddd;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+
+  .btn-register {
+    background-color: #6c757d;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #5a6268;
+    }
+
+    &:disabled {
+      background-color: #e9ecef;
+      color: #6c757d;
+    }
+  }
+
+  .btn-save {
+    background-color: #7c3aed;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #6d28d9;
+    }
+
+    &:disabled {
+      background-color: #e9ecef;
+      color: #6c757d;
+    }
+  }
+}
+
+// Media queries para responsividad
+@media (max-width: 768px) {
+  .dialog-container {
+    margin: 0.5rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .dialog-header {
+    padding: 1rem 1.5rem;
+
+    .dialog-title {
+      font-size: 1.1rem;
+    }
+  }
+
+  .material-form {
+    .form-content {
+      padding: 1.5rem;
+
+      .form-row {
+        flex-direction: column;
+        margin-bottom: 1rem;
+
+        &.form-row-two,
+        &.form-row-three {
+          flex-direction: column;
+        }
+      }
+    }
+  }
+
+  .dialog-actions {
+    padding: 1rem 1.5rem;
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-container {
+    margin: 0.25rem;
+  }
+
+  .dialog-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .material-form {
+    .form-content {
+      padding: 1rem;
+    }
+  }
+
+  .dialog-actions {
+    padding: 0.75rem 1rem;
+  }
+}

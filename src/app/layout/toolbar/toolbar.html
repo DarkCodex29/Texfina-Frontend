@@ -1,15 +1,17 @@
-<mat-toolbar color="primary" class="main-toolbar">
-  <span class="toolbar-title">{{ title }}</span>
+<mat-toolbar class="main-toolbar">
+  <!-- Logo solo visible en móvil -->
+  <div class="toolbar-logos">
+    <img src="assets/logo.svg" alt="Texfina" class="toolbar-logo" />
+  </div>
+
   <span class="spacer"></span>
-  <div class="toolbar-user" [matMenuTriggerFor]="userMenu">
+
+  <!-- Usuario -->
+  <div class="toolbar-user">
     <div class="user-info">
       <span class="user-name">Juan Diego</span>
       <span class="user-email">jrodriguez&#64;ecorporacion.com</span>
     </div>
     <mat-icon>account_circle</mat-icon>
   </div>
-  <mat-menu #userMenu="matMenu">
-    <button mat-menu-item>Perfil</button>
-    <button mat-menu-item>Cerrar sesión</button>
-  </mat-menu>
 </mat-toolbar>
