@@ -112,14 +112,38 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
     overflow: hidden;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
 
     .table-container {
       overflow-x: auto;
-      min-height: 600px;
+      overflow-y: auto;
+      max-height: 500px;
 
       .usuarios-table {
         width: 100%;
         background-color: white;
+        table-layout: fixed;
+
+        .mat-column-username {
+          width: 140px;
+        }
+        .mat-column-email {
+          width: 200px;
+        }
+        .mat-column-id_rol {
+          width: 120px;
+        }
+        .mat-column-activo {
+          width: 80px;
+        }
+        .mat-column-last_login {
+          width: 140px;
+        }
+        .mat-column-acciones {
+          width: 100px;
+        }
 
         // ===== HEADERS =====
         .mat-mdc-header-cell {
@@ -130,6 +154,9 @@
           padding: 0.75rem;
           border-bottom: 2px solid #e0e0e0;
           text-align: left;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         // ===== FILAS =====
@@ -156,6 +183,9 @@
             padding: 0.3rem;
             border-bottom: none;
             color: #333;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
 
             // ===== BADGES DE ESTADO =====
             .estado-badge {
