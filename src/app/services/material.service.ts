@@ -307,7 +307,7 @@ export class MaterialService {
     { id_clase: 'ENVASE_BOL', familia: 'Envases', sub_familia: 'Bolsas' },
   ];
 
-  // ===== ALMACENES =====
+  // ===== ALMACENES (ALINEADOS CON BD) =====
   private almacenes: Almacen[] = [
     {
       id_almacen: 1,
@@ -678,6 +678,158 @@ export class MaterialService {
 
     if (filtros.rol) {
       resultados = resultados.filter((u) => u.id_rol === filtros.rol);
+    }
+
+    return of(resultados);
+  }
+
+  // ============================================================================
+  // MÉTODOS CRUD PARA ALMACENES
+  // ============================================================================
+  crearAlmacen(almacen: Almacen): Observable<Almacen> {
+    const nuevoId =
+      Math.max(...this.almacenes.map((a) => a.id_almacen || 0)) + 1;
+    const nuevoAlmacen: Almacen = {
+      ...almacen,
+      id_almacen: nuevoId,
+    };
+    this.almacenes.push(nuevoAlmacen);
+    return of(nuevoAlmacen);
+  }
+
+  actualizarAlmacen(id: number, almacen: Almacen): Observable<Almacen> {
+    const index = this.almacenes.findIndex((a) => a.id_almacen === id);
+    if (index !== -1) {
+      this.almacenes[index] = { ...almacen, id_almacen: id };
+      return of(this.almacenes[index]);
+    }
+    throw new Error('Almacén no encontrado');
+  }
+
+  // ============================================================================
+  // MÉTODOS CRUD PARA CLASES
+  // ============================================================================
+  crearClase(clase: Clase): Observable<Clase> {
+    // Verificar que el ID de clase no exista
+    const claseExiste = this.clases.find((c) => c.id_clase === clase.id_clase);
+    if (claseExiste) {
+      throw new Error('Ya existe una clase con este código');
+    }
+
+    const nuevaClase: Clase = {
+      ...clase,
+      id_clase: clase.id_clase.toUpperCase(), // Asegurar mayúsculas
+    };
+    this.clases.push(nuevaClase);
+    return of(nuevaClase);
+  }
+
+  actualizarClase(id: string, clase: Clase): Observable<Clase> {
+    const index = this.clases.findIndex((c) => c.id_clase === id);
+    if (index !== -1) {
+      this.clases[index] = {
+        ...clase,
+        id_clase: id, // Mantener el ID original
+      };
+      return of(this.clases[index]);
+    }
+    throw new Error('Clase no encontrada');
+  }
+
+  eliminarClase(id: string): Observable<boolean> {
+    // Verificar que no haya insumos usando esta clase
+    const insumosConClase = this.materiales.filter((m) => m.id_clase === id);
+    if (insumosConClase.length > 0) {
+      throw new Error(
+        'No se puede eliminar la clase porque hay insumos asociados'
+      );
+    }
+
+    const index = this.clases.findIndex((c) => c.id_clase === id);
+    if (index !== -1) {
+      this.clases.splice(index, 1);
+      return of(true);
+    }
+    return of(false);
+  }
+
+  buscarClases(filtros: {
+    familia?: string;
+    sub_familia?: string;
+  }): Observable<Clase[]> {
+    let resultados = [...this.clases];
+
+    if (filtros.familia) {
+      resultados = resultados.filter((c) =>
+        c.familia.toLowerCase().includes(filtros.familia!.toLowerCase())
+      );
+    }
+
+    if (filtros.sub_familia) {
+      resultados = resultados.filter((c) =>
+        c.sub_familia.toLowerCase().includes(filtros.sub_familia!.toLowerCase())
+      );
+    }
+
+    return of(resultados);
+  }
+
+  // ============================================================================
+  // MÉTODOS CRUD PARA UNIDADES
+  // ============================================================================
+  crearUnidad(unidad: Unidad): Observable<Unidad> {
+    // Verificar que el ID de unidad no exista
+    const unidadExiste = this.unidades.find(
+      (u) => u.id_unidad === unidad.id_unidad
+    );
+    if (unidadExiste) {
+      throw new Error('Ya existe una unidad con este código');
+    }
+
+    const nuevaUnidad: Unidad = {
+      ...unidad,
+      id_unidad: unidad.id_unidad.toUpperCase(), // Asegurar mayúsculas
+    };
+    this.unidades.push(nuevaUnidad);
+    return of(nuevaUnidad);
+  }
+
+  actualizarUnidad(id: string, unidad: Unidad): Observable<Unidad> {
+    const index = this.unidades.findIndex((u) => u.id_unidad === id);
+    if (index !== -1) {
+      this.unidades[index] = {
+        ...unidad,
+        id_unidad: id, // Mantener el ID original
+      };
+      return of(this.unidades[index]);
+    }
+    throw new Error('Unidad no encontrada');
+  }
+
+  eliminarUnidad(id: string): Observable<boolean> {
+    // Verificar que no haya insumos usando esta unidad
+    const insumosConUnidad = this.materiales.filter((m) => m.id_unidad === id);
+    if (insumosConUnidad.length > 0) {
+      throw new Error(
+        'No se puede eliminar la unidad porque hay insumos asociados'
+      );
+    }
+
+    const index = this.unidades.findIndex((u) => u.id_unidad === id);
+    if (index !== -1) {
+      this.unidades.splice(index, 1);
+      return of(true);
+    }
+    return of(false);
+  }
+
+  buscarUnidades(filtros: { descripcion?: string }): Observable<Unidad[]> {
+    let resultados = [...this.unidades];
+
+    if (filtros.descripcion) {
+      resultados = resultados.filter((u) =>
+        u.nombre.toLowerCase().includes(filtros.descripcion!.toLowerCase())
+      );
     }
 
     return of(resultados);

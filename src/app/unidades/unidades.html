@@ -1,0 +1,123 @@
+<div class="unidades-container">
+  <div class="page-header">
+    <h1 class="page-title">Gestión de unidades</h1>
+    <div class="action-buttons">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="abrirNuevaUnidad()"
+        class="btn-agregar"
+      >
+        <mat-icon>add_circle_outline</mat-icon>
+        Agregar unidad
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros de búsqueda -->
+  <mat-card class="filtros-card">
+    <form [formGroup]="filtrosForm" (ngSubmit)="buscar()" class="filtros-form">
+      <div class="filtros-row">
+        <mat-form-field appearance="outline" class="filtro-field">
+          <mat-label>Descripción</mat-label>
+          <input
+            matInput
+            formControlName="descripcion"
+            placeholder="Ingresa la descripción"
+          />
+        </mat-form-field>
+
+        <div class="filtro-buttons">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="btn-buscar"
+          >
+            <mat-icon>search</mat-icon>
+            Buscar
+          </button>
+        </div>
+      </div>
+    </form>
+  </mat-card>
+
+  <!-- Tabla de resultados -->
+  <mat-card class="tabla-card">
+    <div class="table-container">
+      <table mat-table [dataSource]="unidades" class="unidades-table" matSort>
+        <!-- Columna Código -->
+        <ng-container matColumnDef="codigo">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            mat-sort-header
+            class="th-codigo"
+          >
+            Código
+          </th>
+          <td mat-cell *matCellDef="let unidad" class="td-codigo">
+            {{ unidad.id_unidad }}
+          </td>
+        </ng-container>
+
+        <!-- Columna Descripción -->
+        <ng-container matColumnDef="descripcion">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            mat-sort-header
+            class="th-descripcion"
+          >
+            Descripción
+          </th>
+          <td mat-cell *matCellDef="let unidad" class="td-descripcion">
+            {{ unidad.nombre }}
+          </td>
+        </ng-container>
+
+        <!-- Columna Acciones -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="th-acciones">
+            Acciones
+          </th>
+          <td mat-cell *matCellDef="let unidad" class="td-acciones">
+            <div class="action-buttons">
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="verDetalle(unidad)"
+                matTooltip="Ver detalle"
+                class="btn-detalle"
+              >
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="accent"
+                (click)="editarUnidad(unidad)"
+                matTooltip="Editar"
+                class="btn-editar"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+
+      <!-- Mensaje cuando no hay datos -->
+      <div *ngIf="unidades.length === 0" class="no-data">
+        <mat-icon>straighten</mat-icon>
+        <p>No se encontraron unidades</p>
+        <button mat-raised-button color="primary" (click)="abrirNuevaUnidad()">
+          <mat-icon>add</mat-icon>
+          Agregar primera unidad
+        </button>
+      </div>
+    </div>
+  </mat-card>
+</div>

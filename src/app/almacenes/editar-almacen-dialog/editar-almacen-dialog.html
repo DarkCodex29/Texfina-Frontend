@@ -1,0 +1,62 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">
+      {{ esNuevo ? 'Nuevo almacén' : 'Editar almacén' }}
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="almacenForm" (ngSubmit)="onSubmit()" class="dialog-form">
+    <div class="form-content">
+      <!-- Primera fila - Nombre -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Nombre *</mat-label>
+          <input
+            matInput
+            formControlName="nombre"
+            placeholder="Ingrese el nombre del almacén"
+          />
+          <mat-error *ngIf="almacenForm.get('nombre')?.hasError('required')">
+            El nombre es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Segunda fila - Ubicación -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Ubicación</mat-label>
+          <input
+            matInput
+            formControlName="ubicacion"
+            placeholder="Ingrese la ubicación del almacén"
+          />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button
+        mat-button
+        type="button"
+        (click)="onCancel()"
+        class="btn-cancelar"
+      >
+        Cancelar
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="!almacenForm.valid"
+        class="btn-guardar"
+      >
+        <mat-icon>save</mat-icon>
+        {{ esNuevo ? 'Crear' : 'Actualizar' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -264,3 +264,13 @@ export interface IngresoFormDto {
   lote?: string;
   fecha_expiracion?: Date;
 }
+
+export interface AlmacenFormDto {
+  nombre: string;
+  ubicacion?: string;
+}
+
+export interface UnidadFormDto {
+  id_unidad: string;
+  nombre: string;
+}

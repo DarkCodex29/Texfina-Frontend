@@ -1,0 +1,64 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">
+      {{ esNuevo ? 'Nueva unidad' : 'Editar unidad' }}
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="unidadForm" (ngSubmit)="onSubmit()" class="dialog-form">
+    <div class="form-content">
+      <!-- Código -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Código *</mat-label>
+          <input
+            matInput
+            formControlName="id_unidad"
+            placeholder="Ej: KG, LT, UN"
+            style="text-transform: uppercase"
+          />
+          <mat-hint>Solo letras mayúsculas, números y guiones bajos</mat-hint>
+          <mat-error *ngIf="idUnidadErrors">{{ idUnidadErrors }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Nombre -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Nombre *</mat-label>
+          <input
+            matInput
+            formControlName="nombre"
+            placeholder="Ej: Kilogramo, Litro, Unidad"
+          />
+          <mat-hint>Nombre descriptivo de la unidad</mat-hint>
+          <mat-error *ngIf="nombreErrors">{{ nombreErrors }}</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button
+        mat-button
+        type="button"
+        (click)="onCancel()"
+        class="btn-cancelar"
+      >
+        Cancelar
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="!unidadForm.valid"
+        class="btn-guardar"
+      >
+        <mat-icon>save</mat-icon>
+        {{ esNuevo ? 'Crear' : 'Actualizar' }}
+      </button>
+    </div>
+  </form>
+</div>

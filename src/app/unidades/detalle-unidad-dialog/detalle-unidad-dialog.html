@@ -1,0 +1,93 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">Detalle de unidad</h2>
+    <button mat-icon-button (click)="onClose()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <div class="info-grid">
+      <!-- Código -->
+      <div class="info-item">
+        <div class="info-label">
+          <mat-icon class="label-icon">tag</mat-icon>
+          Código
+        </div>
+        <div class="info-value codigo">{{ unidad.id_unidad }}</div>
+      </div>
+
+      <!-- Nombre -->
+      <div class="info-item">
+        <div class="info-label">
+          <mat-icon class="label-icon">straighten</mat-icon>
+          Nombre
+        </div>
+        <div class="info-value">{{ unidad.nombre }}</div>
+      </div>
+    </div>
+
+    <mat-divider class="divider"></mat-divider>
+
+    <!-- Información adicional -->
+    <div class="additional-info">
+      <h3 class="section-title">
+        <mat-icon>info_outline</mat-icon>
+        Información adicional
+      </h3>
+      <div class="info-text">
+        Esta unidad de medida se utiliza para cuantificar insumos en el sistema.
+        Asegúrate de que esté correctamente configurada para mantener la
+        consistencia en las mediciones.
+      </div>
+
+      <!-- Ejemplos de uso -->
+      <div class="usage-examples">
+        <h4 class="examples-title">
+          <mat-icon>lightbulb_outline</mat-icon>
+          Ejemplos de uso
+        </h4>
+        <div class="examples-list">
+          <div class="example-item" *ngIf="unidad.id_unidad === 'KG'">
+            <span class="example-text">Peso de materiales sólidos</span>
+          </div>
+          <div class="example-item" *ngIf="unidad.id_unidad === 'LT'">
+            <span class="example-text">Volumen de líquidos</span>
+          </div>
+          <div class="example-item" *ngIf="unidad.id_unidad === 'UN'">
+            <span class="example-text">Cantidad de elementos individuales</span>
+          </div>
+          <div class="example-item" *ngIf="unidad.id_unidad === 'MT'">
+            <span class="example-text">Longitud de materiales</span>
+          </div>
+          <div class="example-item" *ngIf="unidad.id_unidad === 'M2'">
+            <span class="example-text">Área de superficies</span>
+          </div>
+          <div class="example-item" *ngIf="unidad.id_unidad === 'M3'">
+            <span class="example-text">Volumen de espacios</span>
+          </div>
+          <div
+            class="example-item"
+            *ngIf="!['KG', 'LT', 'UN', 'MT', 'M2', 'M3'].includes(unidad.id_unidad)"
+          >
+            <span class="example-text"
+              >Medición de {{ unidad.nombre.toLowerCase() }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onClose()"
+      class="btn-cerrar"
+    >
+      <mat-icon>check</mat-icon>
+      Entendido
+    </button>
+  </div>
+</div>
