@@ -57,6 +57,42 @@ export const routes: Routes = [
         path: 'lotes',
         loadComponent: () => import('./lotes/lotes').then((m) => m.Lotes),
       },
+      {
+        path: 'ingresos',
+        loadComponent: () =>
+          import('./ingresos/ingresos').then((m) => m.IngresosComponent),
+      },
+      {
+        path: 'logs',
+        loadComponent: () => import('./logs/logs').then((m) => m.LogsComponent),
+      },
+      {
+        path: 'roles',
+        loadComponent: () =>
+          import('./roles/roles').then((m) => m.RolesComponent),
+      },
+      {
+        path: 'configuracion',
+        loadComponent: () =>
+          import('./configuracion/configuracion').then(
+            (m) => m.ConfiguracionComponent
+          ),
+      },
+      {
+        path: 'consumos',
+        loadComponent: () =>
+          import('./consumos/consumos').then((m) => m.ConsumosComponent),
+      },
+      {
+        path: 'stock',
+        loadComponent: () =>
+          import('./stock/stock').then((m) => m.StockComponent),
+      },
+      {
+        path: 'reportes',
+        loadComponent: () =>
+          import('./reportes/reportes').then((m) => m.ReportesComponent),
+      },
     ],
   },
 ];

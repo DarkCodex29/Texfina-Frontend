@@ -26,6 +26,7 @@ import {
   AlmacenFormDto,
   UnidadFormDto,
   LoteFormDto,
+  LogEvento,
 } from '../models/insumo.model';
 
 @Injectable({
@@ -1010,18 +1011,514 @@ export class MaterialService {
   }
 
   // ============================================================================
-  // MÉTODOS FALTANTES PARA INGRESOS
+  // MÉTODOS PARA INGRESOS
   // ============================================================================
-  registrarIngreso(ingreso: any): Observable<any> {
-    // TODO: Implementar registro de ingreso en la API
-    return of({
-      success: true,
-      message: 'Ingreso registrado correctamente',
-      data: {
-        id: Date.now(),
-        ...ingreso,
-        fecha_ingreso: new Date(),
+
+  getIngresos(): Observable<Ingreso[]> {
+    if (this.useApi) {
+      return this.apiService.getIngresos().pipe(
+        map((response: any) => response.data || response),
+        catchError(() => of(this.getIngresosMock()))
+      );
+    }
+    return of(this.getIngresosMock());
+  }
+
+  private getIngresosMock(): Ingreso[] {
+    return [
+      {
+        id_ingreso: 1,
+        id_insumo: 1,
+        id_insumo_proveedor: 1,
+        fecha: new Date('2024-05-15'),
+        presentacion: 'Tambor de 200L',
+        id_unidad: 'LT',
+        cantidad: 200,
+        id_lote: 1,
+        precio_total_formula: 2500.0,
+        precio_unitario_historico: 12.5,
+        numero_remision: 'REM-2024-001',
+        orden_compra: 'OC-2024-001',
+        estado: 'PROCESADO',
       },
+      {
+        id_ingreso: 2,
+        id_insumo: 2,
+        id_insumo_proveedor: 2,
+        fecha: new Date('2024-05-20'),
+        presentacion: 'Saco de 25kg',
+        id_unidad: 'KG',
+        cantidad: 25,
+        id_lote: 2,
+        precio_total_formula: 850.0,
+        precio_unitario_historico: 34.0,
+        numero_remision: 'REM-2024-002',
+        orden_compra: 'OC-2024-002',
+        estado: 'PROCESADO',
+      },
+      {
+        id_ingreso: 3,
+        id_insumo: 3,
+        id_insumo_proveedor: 3,
+        fecha: new Date('2024-05-25'),
+        presentacion: 'Bidón de 20L',
+        id_unidad: 'LT',
+        cantidad: 20,
+        id_lote: 3,
+        precio_total_formula: 420.0,
+        precio_unitario_historico: 21.0,
+        numero_remision: 'REM-2024-003',
+        orden_compra: 'OC-2024-003',
+        estado: 'PENDIENTE',
+      },
+      {
+        id_ingreso: 4,
+        id_insumo: 4,
+        id_insumo_proveedor: 4,
+        fecha: new Date('2024-05-28'),
+        presentacion: 'Caja de 12 unidades',
+        id_unidad: 'UN',
+        cantidad: 12,
+        id_lote: 4,
+        precio_total_formula: 180.0,
+        precio_unitario_historico: 15.0,
+        numero_remision: 'REM-2024-004',
+        orden_compra: 'OC-2024-004',
+        estado: 'PROCESADO',
+      },
+      {
+        id_ingreso: 5,
+        id_insumo: 5,
+        id_insumo_proveedor: 5,
+        fecha: new Date('2024-05-30'),
+        presentacion: 'Tambor de 100L',
+        id_unidad: 'LT',
+        cantidad: 100,
+        id_lote: 5,
+        precio_total_formula: 1200.0,
+        precio_unitario_historico: 12.0,
+        numero_remision: 'REM-2024-005',
+        orden_compra: 'OC-2024-005',
+        estado: 'ANULADO',
+      },
+    ];
+  }
+
+  buscarIngresos(filtros: {
+    insumo?: string;
+    numero_remision?: string;
+    orden_compra?: string;
+    estado?: string;
+  }): Observable<Ingreso[]> {
+    if (this.useApi) {
+      return this.apiService.buscarIngresos(filtros).pipe(
+        map((response: any) => response.data || response),
+        catchError(() => this.buscarIngresosMock(filtros))
+      );
+    }
+    return this.buscarIngresosMock(filtros);
+  }
+
+  private buscarIngresosMock(filtros: {
+    insumo?: string;
+    numero_remision?: string;
+    orden_compra?: string;
+    estado?: string;
+  }): Observable<Ingreso[]> {
+    let resultados = this.getIngresosMock();
+
+    if (filtros.insumo) {
+      resultados = resultados.filter((ingreso) => {
+        const insumo = this.getMaterialesMock().find(
+          (m) => m.id_insumo === ingreso.id_insumo
+        );
+        return insumo?.nombre
+          ?.toLowerCase()
+          .includes(filtros.insumo!.toLowerCase());
+      });
+    }
+
+    if (filtros.numero_remision) {
+      resultados = resultados.filter((ingreso) =>
+        (ingreso.numero_remision || '')
+          .toLowerCase()
+          .includes(filtros.numero_remision!.toLowerCase())
+      );
+    }
+
+    if (filtros.orden_compra) {
+      resultados = resultados.filter((ingreso) =>
+        (ingreso.orden_compra || '')
+          .toLowerCase()
+          .includes(filtros.orden_compra!.toLowerCase())
+      );
+    }
+
+    if (filtros.estado) {
+      resultados = resultados.filter(
+        (ingreso) => ingreso.estado === filtros.estado
+      );
+    }
+
+    return of(resultados);
+  }
+
+  crearIngreso(ingreso: Ingreso): Observable<Ingreso> {
+    if (this.useApi) {
+      return this.apiService
+        .crearIngreso(ingreso)
+        .pipe(map((response: any) => response.data || response));
+    }
+    console.log('Creando ingreso:', ingreso);
+    return of({ ...ingreso, id_ingreso: Date.now() });
+  }
+
+  actualizarIngreso(ingreso: Ingreso): Observable<Ingreso> {
+    if (this.useApi) {
+      return this.apiService
+        .actualizarIngreso(ingreso)
+        .pipe(map((response: any) => response.data || response));
+    }
+    console.log('Actualizando ingreso:', ingreso);
+    return of(ingreso);
+  }
+
+  // ============================================================================
+  // MÉTODOS PARA LOGS Y AUDITORÍA
+  // ============================================================================
+
+  getLogs(): Observable<LogEvento[]> {
+    if (this.useApi) {
+      return this.apiService.getLogs().pipe(
+        map((response: any) => response.data || response),
+        catchError(() => of(this.getLogsMock()))
+      );
+    }
+    return of(this.getLogsMock());
+  }
+
+  private getLogsMock(): LogEvento[] {
+    return [
+      {
+        id: 1,
+        id_usuario: 1,
+        accion: 'LOGIN',
+        descripcion: 'Usuario administrador inició sesión exitosamente',
+        ip_origen: '192.168.1.100',
+        modulo: 'SESIONES',
+        tabla_afectada: 'SESION',
+        timestamp: new Date('2024-05-30 09:00:00'),
+      },
+      {
+        id: 2,
+        id_usuario: 1,
+        accion: 'CREAR',
+        descripcion: 'Creó un nuevo insumo: Colorante Azul Marino',
+        ip_origen: '192.168.1.100',
+        modulo: 'INSUMOS',
+        tabla_afectada: 'INSUMO',
+        timestamp: new Date('2024-05-30 09:15:30'),
+      },
+      {
+        id: 3,
+        id_usuario: 2,
+        accion: 'EDITAR',
+        descripcion: 'Modificó datos del proveedor: Químicos del Pacífico SAC',
+        ip_origen: '192.168.1.105',
+        modulo: 'PROVEEDORES',
+        tabla_afectada: 'PROVEEDOR',
+        timestamp: new Date('2024-05-30 10:22:15'),
+      },
+      {
+        id: 4,
+        id_usuario: 1,
+        accion: 'ELIMINAR',
+        descripcion: 'Eliminó usuario: operario_temporal (ID: 15)',
+        ip_origen: '192.168.1.100',
+        modulo: 'USUARIOS',
+        tabla_afectada: 'USUARIO',
+        timestamp: new Date('2024-05-30 11:45:00'),
+      },
+      {
+        id: 5,
+        id_usuario: 3,
+        accion: 'CONSULTAR',
+        descripcion: 'Consultó stock del almacén principal',
+        ip_origen: '192.168.1.120',
+        modulo: 'STOCK',
+        tabla_afectada: 'STOCK',
+        timestamp: new Date('2024-05-30 14:30:45'),
+      },
+      {
+        id: 6,
+        id_usuario: 2,
+        accion: 'CREAR',
+        descripcion: 'Registró nuevo lote: LT2024011 para Acetona Industrial',
+        ip_origen: '192.168.1.105',
+        modulo: 'LOTES',
+        tabla_afectada: 'LOTE',
+        timestamp: new Date('2024-05-30 15:10:20'),
+      },
+      {
+        id: 7,
+        id_usuario: 1,
+        accion: 'CONFIGURAR',
+        descripcion: 'Modificó permisos del rol SUPERVISOR',
+        ip_origen: '192.168.1.100',
+        modulo: 'CONFIGURACION',
+        tabla_afectada: 'ROL_PERMISO',
+        timestamp: new Date('2024-05-30 16:05:30'),
+      },
+      {
+        id: 8,
+        id_usuario: 4,
+        accion: 'EXPORTAR',
+        descripcion: 'Exportó reporte de insumos del mes de mayo',
+        ip_origen: '192.168.1.130',
+        modulo: 'INSUMOS',
+        tabla_afectada: 'INSUMO',
+        timestamp: new Date('2024-05-30 16:45:10'),
+      },
+      {
+        id: 9,
+        id_usuario: 2,
+        accion: 'EDITAR',
+        descripcion: 'Actualizó stock del lote LT2024001',
+        ip_origen: '192.168.1.105',
+        modulo: 'STOCK',
+        tabla_afectada: 'STOCK',
+        timestamp: new Date('2024-05-30 17:20:55'),
+      },
+      {
+        id: 10,
+        id_usuario: 1,
+        accion: 'BACKUP',
+        descripcion: 'Realizó respaldo completo de la base de datos',
+        ip_origen: '192.168.1.100',
+        modulo: 'CONFIGURACION',
+        tabla_afectada: 'SISTEMA',
+        timestamp: new Date('2024-05-30 18:00:00'),
+      },
+      {
+        id: 11,
+        id_usuario: 3,
+        accion: 'LOGIN',
+        descripcion: 'Usuario operario inició sesión',
+        ip_origen: '192.168.1.120',
+        modulo: 'SESIONES',
+        tabla_afectada: 'SESION',
+        timestamp: new Date('2024-05-31 08:00:15'),
+      },
+      {
+        id: 12,
+        id_usuario: 3,
+        accion: 'CREAR',
+        descripcion: 'Registró ingreso de mercadería: Remisión #R-2024-0156',
+        ip_origen: '192.168.1.120',
+        modulo: 'INGRESOS',
+        tabla_afectada: 'INGRESO',
+        timestamp: new Date('2024-05-31 09:30:40'),
+      },
+      {
+        id: 13,
+        id_usuario: 5,
+        accion: 'CONSULTAR',
+        descripcion: 'Consultó historial de consumos del área de producción',
+        ip_origen: '192.168.1.140',
+        modulo: 'CONSUMOS',
+        tabla_afectada: 'CONSUMO',
+        timestamp: new Date('2024-05-31 10:15:25'),
+      },
+      {
+        id: 14,
+        id_usuario: 1,
+        accion: 'CREAR',
+        descripcion: 'Creó nueva receta: Mezcla Base para Tintas Offset',
+        ip_origen: '192.168.1.100',
+        modulo: 'RECETAS',
+        tabla_afectada: 'RECETA',
+        timestamp: new Date('2024-05-31 11:45:10'),
+      },
+      {
+        id: 15,
+        id_usuario: 2,
+        accion: 'LOGOUT',
+        descripcion: 'Usuario supervisor cerró sesión',
+        ip_origen: '192.168.1.105',
+        modulo: 'SESIONES',
+        tabla_afectada: 'SESION',
+        timestamp: new Date('2024-05-31 17:30:00'),
+      },
+    ];
+  }
+
+  buscarLogs(filtros: {
+    usuario?: number;
+    modulo?: string;
+    accion?: string;
+    tabla_afectada?: string;
+    ip_origen?: string;
+    fecha_desde?: Date;
+    fecha_hasta?: Date;
+    descripcion?: string;
+  }): Observable<LogEvento[]> {
+    if (this.useApi) {
+      return this.apiService.buscarLogs(filtros).pipe(
+        map((response: any) => response.data || response),
+        catchError(() => this.buscarLogsMock(filtros))
+      );
+    }
+    return this.buscarLogsMock(filtros);
+  }
+
+  private buscarLogsMock(filtros: {
+    usuario?: number;
+    modulo?: string;
+    accion?: string;
+    tabla_afectada?: string;
+    ip_origen?: string;
+    fecha_desde?: Date;
+    fecha_hasta?: Date;
+    descripcion?: string;
+  }): Observable<LogEvento[]> {
+    let resultados = this.getLogsMock();
+
+    // Filtrar por usuario
+    if (filtros.usuario) {
+      resultados = resultados.filter(
+        (log) => log.id_usuario === filtros.usuario
+      );
+    }
+
+    // Filtrar por módulo
+    if (filtros.modulo) {
+      resultados = resultados.filter((log) =>
+        log.modulo?.toLowerCase().includes(filtros.modulo!.toLowerCase())
+      );
+    }
+
+    // Filtrar por acción
+    if (filtros.accion) {
+      resultados = resultados.filter((log) =>
+        log.accion?.toLowerCase().includes(filtros.accion!.toLowerCase())
+      );
+    }
+
+    // Filtrar por tabla afectada
+    if (filtros.tabla_afectada) {
+      resultados = resultados.filter((log) =>
+        log.tabla_afectada
+          ?.toLowerCase()
+          .includes(filtros.tabla_afectada!.toLowerCase())
+      );
+    }
+
+    // Filtrar por IP de origen
+    if (filtros.ip_origen) {
+      resultados = resultados.filter((log) =>
+        log.ip_origen?.includes(filtros.ip_origen!)
+      );
+    }
+
+    // Filtrar por rango de fechas
+    if (filtros.fecha_desde) {
+      const fechaDesde = new Date(filtros.fecha_desde);
+      resultados = resultados.filter((log) => {
+        if (!log.timestamp) return false;
+        const fechaLog = new Date(log.timestamp);
+        return fechaLog >= fechaDesde;
+      });
+    }
+
+    if (filtros.fecha_hasta) {
+      const fechaHasta = new Date(filtros.fecha_hasta);
+      fechaHasta.setHours(23, 59, 59, 999); // Incluir todo el día
+      resultados = resultados.filter((log) => {
+        if (!log.timestamp) return false;
+        const fechaLog = new Date(log.timestamp);
+        return fechaLog <= fechaHasta;
+      });
+    }
+
+    // Filtrar por descripción
+    if (filtros.descripcion) {
+      resultados = resultados.filter((log) =>
+        log.descripcion
+          ?.toLowerCase()
+          .includes(filtros.descripcion!.toLowerCase())
+      );
+    }
+
+    // Ordenar por fecha descendente (más recientes primero)
+    resultados.sort((a, b) => {
+      if (!a.timestamp || !b.timestamp) return 0;
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     });
+
+    return of(resultados);
+  }
+
+  // Método para registrar eventos de log (simulado)
+  registrarLog(evento: {
+    id_usuario?: number;
+    accion: string;
+    descripcion: string;
+    modulo: string;
+    tabla_afectada?: string;
+    ip_origen?: string;
+  }): Observable<LogEvento> {
+    const nuevoLog: LogEvento = {
+      id: Math.floor(Math.random() * 10000),
+      timestamp: new Date(),
+      ...evento,
+    };
+
+    if (this.useApi) {
+      return this.apiService
+        .registrarLog(nuevoLog)
+        .pipe(catchError(() => of(nuevoLog)));
+    }
+
+    console.log('Log registrado (mock):', nuevoLog);
+    return of(nuevoLog);
+  }
+
+  // Método para exportar logs (simulado)
+  exportarLogs(filtros?: any): Observable<Blob> {
+    const logs = this.getLogsMock();
+    const csvContent = this.convertirLogsACSV(logs);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    return of(blob);
+  }
+
+  private convertirLogsACSV(logs: LogEvento[]): string {
+    const headers = [
+      'ID',
+      'Fecha y Hora',
+      'Usuario',
+      'Acción',
+      'Módulo',
+      'Tabla Afectada',
+      'Descripción',
+      'IP Origen',
+    ];
+
+    const csvRows = [headers.join(',')];
+
+    logs.forEach((log) => {
+      const row = [
+        log.id || '',
+        log.timestamp ? new Date(log.timestamp).toLocaleString('es-PE') : '',
+        log.id_usuario || '',
+        log.accion || '',
+        log.modulo || '',
+        log.tabla_afectada || '',
+        `"${log.descripcion || ''}"`, // Comillas para textos con comas
+        log.ip_origen || '',
+      ];
+      csvRows.push(row.join(','));
+    });
+
+    return csvRows.join('\n');
   }
 }

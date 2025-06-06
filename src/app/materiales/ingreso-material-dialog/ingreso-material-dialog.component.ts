@@ -81,7 +81,7 @@ export class IngresoMaterialDialogComponent implements OnInit {
         stock_actual: formValue.stock_actual,
       };
 
-      this.materialService.registrarIngreso(ingreso as any).subscribe({
+      this.materialService.crearIngreso(ingreso as any).subscribe({
         next: (resultado: any) => {
           this.dialogRef.close(resultado);
         },

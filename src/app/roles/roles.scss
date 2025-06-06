@@ -1,0 +1,330 @@
+.page-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+
+  .header-content {
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      font-weight: 600;
+      color: #1a1a1a;
+
+      mat-icon {
+        font-size: 32px;
+        color: #2196f3;
+      }
+    }
+
+    .page-description {
+      margin: 0;
+      color: #666;
+      font-size: 16px;
+    }
+  }
+
+  .header-actions {
+    .btn-crear {
+      background: #2196f3;
+      color: white;
+      font-weight: 500;
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+/* Filtros */
+.filtros-container {
+  margin-bottom: 24px;
+
+  .filtros-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .mat-mdc-card-header {
+      .mat-mdc-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 18px;
+        font-weight: 500;
+        color: #333;
+
+        mat-icon {
+          color: #666;
+        }
+      }
+    }
+
+    .filtros-row {
+      display: grid;
+      grid-template-columns: 1fr 200px 150px;
+      gap: 16px;
+      margin-bottom: 16px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+
+      .filtro-field {
+        width: 100%;
+      }
+    }
+
+    .filtros-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}
+
+/* Tabla */
+.tabla-container {
+  margin-bottom: 24px;
+
+  .tabla-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .mat-mdc-card-header {
+      .mat-mdc-card-title {
+        font-size: 18px;
+        font-weight: 500;
+        color: #333;
+      }
+    }
+
+    .table-container {
+      overflow-x: auto;
+
+      .tabla-roles {
+        width: 100%;
+
+        .mat-mdc-header-cell {
+          font-weight: 600;
+          color: #333;
+          background-color: #f8f9fa;
+        }
+
+        .mat-mdc-cell {
+          padding: 16px 8px;
+        }
+
+        // Columna Rol
+        .rol-info {
+          .rol-nombre {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+          }
+
+          .rol-descripcion {
+            font-size: 12px;
+            color: #666;
+          }
+        }
+
+        // Columna Usuarios
+        .usuarios-count {
+          display: inline-block;
+          background: #e3f2fd;
+          color: #1976d2;
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        // Columna Permisos
+        .permisos-chips {
+          display: flex;
+          gap: 4px;
+          flex-wrap: wrap;
+
+          .chip-permiso {
+            background: #f5f5f5;
+            color: #666;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 500;
+          }
+
+          .chip-mas {
+            background: #e0e0e0;
+            color: #333;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 500;
+          }
+        }
+
+        // Columna Estado
+        .estado-badge {
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 500;
+
+          &.activo {
+            background: #e8f5e8;
+            color: #2e7d32;
+          }
+
+          &.inactivo {
+            background: #ffebee;
+            color: #c62828;
+          }
+        }
+
+        // Columna Acciones
+        .acciones {
+          display: flex;
+          gap: 4px;
+
+          button {
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+
+            mat-icon {
+              font-size: 18px;
+            }
+          }
+        }
+      }
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 48px 24px;
+      color: #666;
+
+      mat-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+      }
+
+      p {
+        margin: 0;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+/* Estadísticas */
+.estadisticas-container {
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+
+    .stat-card {
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+
+        mat-icon {
+          font-size: 24px;
+          color: white;
+        }
+
+        &.admin {
+          background: linear-gradient(135deg, #2196f3, #1976d2);
+        }
+
+        &.permisos {
+          background: linear-gradient(135deg, #ff9800, #f57c00);
+        }
+
+        &.usuarios {
+          background: linear-gradient(135deg, #4caf50, #388e3c);
+        }
+
+        &.activos {
+          background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+        }
+      }
+
+      .stat-content {
+        .stat-number {
+          font-size: 24px;
+          font-weight: 700;
+          color: #333;
+          margin-bottom: 4px;
+        }
+
+        .stat-label {
+          font-size: 14px;
+          color: #666;
+        }
+      }
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+
+    .header-actions {
+      align-self: stretch;
+
+      .btn-crear {
+        width: 100%;
+      }
+    }
+  }
+
+  .tabla-container .tabla-card .table-container {
+    .tabla-roles {
+      .mat-mdc-cell,
+      .mat-mdc-header-cell {
+        padding: 12px 4px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,234 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon>admin_panel_settings</mat-icon>
+        Roles y Permisos
+      </h1>
+      <p class="page-description">
+        Gestión de roles de usuarios y permisos del sistema
+      </p>
+    </div>
+    <div class="header-actions">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="abrirDialogoCrear()"
+        class="btn-crear"
+      >
+        <mat-icon>add</mat-icon>
+        Nuevo Rol
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-container">
+    <mat-card class="filtros-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>filter_list</mat-icon>
+          Filtros de Búsqueda
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="filtros-row">
+          <mat-form-field appearance="outline" class="filtro-field">
+            <mat-label>Buscar rol</mat-label>
+            <input
+              matInput
+              [(ngModel)]="filtros.rol"
+              placeholder="Nombre del rol..."
+              (keyup.enter)="buscar()"
+            />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filtro-field">
+            <mat-label>Tipo</mat-label>
+            <mat-select [(ngModel)]="filtros.tipo">
+              <mat-option value="">Todos los tipos</mat-option>
+              <mat-option value="ADMIN">Administrador</mat-option>
+              <mat-option value="SUPERVISOR">Supervisor</mat-option>
+              <mat-option value="OPERARIO">Operario</mat-option>
+              <mat-option value="CONSULTOR">Consultor</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filtro-field">
+            <mat-label>Estado</mat-label>
+            <mat-select [(ngModel)]="filtros.activo">
+              <mat-option value="">Todos</mat-option>
+              <mat-option value="true">Activos</mat-option>
+              <mat-option value="false">Inactivos</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="filtros-actions">
+          <button mat-raised-button color="primary" (click)="buscar()">
+            <mat-icon>search</mat-icon>
+            Buscar
+          </button>
+          <button mat-button (click)="limpiarFiltros()">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Tabla de Roles -->
+  <div class="tabla-container">
+    <mat-card class="tabla-card">
+      <mat-card-header>
+        <mat-card-title>Lista de Roles ({{ roles.length }})</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="roles" class="tabla-roles">
+            <!-- Columna Rol -->
+            <ng-container matColumnDef="rol">
+              <th mat-header-cell *matHeaderCellDef>Rol</th>
+              <td mat-cell *matCellDef="let rol">
+                <div class="rol-info">
+                  <div class="rol-nombre">{{ rol.id_rol }}</div>
+                  <div class="rol-descripcion">{{ rol.descripcion }}</div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Usuarios -->
+            <ng-container matColumnDef="usuarios">
+              <th mat-header-cell *matHeaderCellDef>Usuarios Asignados</th>
+              <td mat-cell *matCellDef="let rol">
+                <span class="usuarios-count"
+                  >{{ contarUsuariosPorRol(rol.id_rol) }}</span
+                >
+              </td>
+            </ng-container>
+
+            <!-- Columna Permisos -->
+            <ng-container matColumnDef="permisos">
+              <th mat-header-cell *matHeaderCellDef>Permisos</th>
+              <td mat-cell *matCellDef="let rol">
+                <div class="permisos-chips">
+                  <span
+                    *ngFor="let permiso of obtenerPermisosPorRol(rol.id_rol) | slice:0:3"
+                    class="chip-permiso"
+                  >
+                    {{ permiso.nombre }}
+                  </span>
+                  <span
+                    *ngIf="obtenerPermisosPorRol(rol.id_rol).length > 3"
+                    class="chip-mas"
+                  >
+                    +{{ obtenerPermisosPorRol(rol.id_rol).length - 3 }}
+                  </span>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Estado -->
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let rol">
+                <span
+                  class="estado-badge"
+                  [class.activo]="rol.activo"
+                  [class.inactivo]="!rol.activo"
+                >
+                  {{ rol.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let rol">
+                <div class="acciones">
+                  <button
+                    mat-icon-button
+                    (click)="abrirDialogoDetalle(rol)"
+                    matTooltip="Ver detalles"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    (click)="abrirDialogoEditar(rol)"
+                    matTooltip="Editar rol"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    (click)="abrirDialogoPermisos(rol)"
+                    matTooltip="Gestionar permisos"
+                    color="accent"
+                  >
+                    <mat-icon>security</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columnasTabla"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnasTabla;"></tr>
+          </table>
+        </div>
+
+        <div *ngIf="roles.length === 0" class="no-data">
+          <mat-icon>admin_panel_settings</mat-icon>
+          <p>No se encontraron roles</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="estadisticas-container">
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <div class="stat-icon admin">
+          <mat-icon>admin_panel_settings</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ totalRoles }}</div>
+          <div class="stat-label">Total Roles</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <div class="stat-icon permisos">
+          <mat-icon>security</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ totalPermisos }}</div>
+          <div class="stat-label">Total Permisos</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <div class="stat-icon usuarios">
+          <mat-icon>group</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ usuariosConRol }}</div>
+          <div class="stat-label">Usuarios con Rol</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <div class="stat-icon activos">
+          <mat-icon>verified_user</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ rolesActivos }}</div>
+          <div class="stat-label">Roles Activos</div>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</div>

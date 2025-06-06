@@ -367,4 +367,102 @@ export class ApiService {
       headers: this.getHeaders(),
     });
   }
+
+  // ============================================================================
+  // LOGS Y AUDITORÍA
+  // ============================================================================
+
+  getLogs(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/logs`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  buscarLogs(filtros: any): Observable<ApiResponse<any[]>> {
+    let params = new HttpParams();
+
+    if (filtros.usuario) {
+      params = params.set('usuario', filtros.usuario.toString());
+    }
+    if (filtros.modulo) {
+      params = params.set('modulo', filtros.modulo);
+    }
+    if (filtros.accion) {
+      params = params.set('accion', filtros.accion);
+    }
+    if (filtros.tabla_afectada) {
+      params = params.set('tabla_afectada', filtros.tabla_afectada);
+    }
+    if (filtros.ip_origen) {
+      params = params.set('ip_origen', filtros.ip_origen);
+    }
+    if (filtros.fecha_desde) {
+      params = params.set('fecha_desde', filtros.fecha_desde.toISOString());
+    }
+    if (filtros.fecha_hasta) {
+      params = params.set('fecha_hasta', filtros.fecha_hasta.toISOString());
+    }
+    if (filtros.descripcion) {
+      params = params.set('descripcion', filtros.descripcion);
+    }
+
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/logs/buscar`, {
+      headers: this.getHeaders(),
+      params,
+    });
+  }
+
+  registrarLog(evento: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/logs`, evento, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  // ============================================================================
+  // INGRESOS
+  // ============================================================================
+
+  getIngresos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/ingresos`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  buscarIngresos(filtros: any): Observable<any[]> {
+    let params = new HttpParams();
+
+    if (filtros.insumo) {
+      params = params.set('insumo', filtros.insumo);
+    }
+    if (filtros.numero_remision) {
+      params = params.set('numero_remision', filtros.numero_remision);
+    }
+    if (filtros.orden_compra) {
+      params = params.set('orden_compra', filtros.orden_compra);
+    }
+    if (filtros.estado) {
+      params = params.set('estado', filtros.estado);
+    }
+
+    return this.http.get<any[]>(`${this.baseUrl}/ingresos/buscar`, {
+      headers: this.getHeaders(),
+      params,
+    });
+  }
+
+  crearIngreso(ingreso: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ingresos`, ingreso, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  actualizarIngreso(ingreso: any): Observable<any> {
+    return this.http.put(
+      `${this.baseUrl}/ingresos/${ingreso.id_ingreso}`,
+      ingreso,
+      {
+        headers: this.getHeaders(),
+      }
+    );
+  }
 }
