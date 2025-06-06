@@ -1,24 +1,26 @@
-<div class="page-container">
+<div class="configuracion-container">
+  <!-- Header de la página -->
   <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">
-        <mat-icon>settings</mat-icon>
-        Configuración del Sistema
-      </h1>
-      <p class="page-description">
-        Gestión de parámetros y configuraciones generales del sistema
-      </p>
-    </div>
-    <div class="header-actions">
+    <h1 class="page-title">Configuración del Sistema</h1>
+    <div class="action-buttons">
       <button
         mat-raised-button
         color="primary"
         (click)="guardarConfiguracion()"
-        [disabled]="!haycambios"
+        [disabled]="!hayCambios"
         class="btn-guardar"
       >
         <mat-icon>save</mat-icon>
         Guardar Cambios
+      </button>
+      <button
+        mat-stroked-button
+        color="accent"
+        (click)="exportarConfiguracion()"
+        class="btn-exportar"
+      >
+        <mat-icon>download</mat-icon>
+        Exportar
       </button>
     </div>
   </div>
@@ -28,6 +30,7 @@
     <!-- TAB: Configuración General -->
     <mat-tab label="General">
       <div class="tab-content">
+        <!-- Tarjeta Información de la Empresa -->
         <mat-card class="config-card">
           <mat-card-header>
             <mat-card-title>
@@ -57,11 +60,11 @@
 
               <mat-form-field appearance="outline">
                 <mat-label>Dirección</mat-label>
-                <textarea
+                <input
                   matInput
                   [(ngModel)]="configuracion.empresa.direccion"
                   (ngModelChange)="marcarCambios()"
-                ></textarea>
+                />
               </mat-form-field>
 
               <mat-form-field appearance="outline">
@@ -95,6 +98,7 @@
           </mat-card-content>
         </mat-card>
 
+        <!-- Tarjeta Configuración del Sistema -->
         <mat-card class="config-card">
           <mat-card-header>
             <mat-card-title>
@@ -158,16 +162,14 @@
                 </mat-select>
               </mat-form-field>
 
-              <div class="checkbox-config">
+              <div class="checkbox-grid">
                 <mat-checkbox
                   [(ngModel)]="configuracion.sistema.modo_oscuro"
                   (ngModelChange)="marcarCambios()"
                 >
                   Modo Oscuro por Defecto
                 </mat-checkbox>
-              </div>
 
-              <div class="checkbox-config">
                 <mat-checkbox
                   [(ngModel)]="configuracion.sistema.notificaciones_email"
                   (ngModelChange)="marcarCambios()"
@@ -201,10 +203,6 @@
                   [(ngModel)]="configuracion.inventario.umbral_stock_minimo"
                   (ngModelChange)="marcarCambios()"
                 />
-                <mat-hint
-                  >Porcentaje del stock inicial para considerar como
-                  mínimo</mat-hint
-                >
               </mat-form-field>
 
               <mat-form-field appearance="outline">
@@ -215,9 +213,6 @@
                   [(ngModel)]="configuracion.inventario.dias_alerta_vencimiento"
                   (ngModelChange)="marcarCambios()"
                 />
-                <mat-hint
-                  >Días antes del vencimiento para mostrar alerta</mat-hint
-                >
               </mat-form-field>
 
               <mat-form-field appearance="outline">
@@ -238,25 +233,21 @@
                 </mat-select>
               </mat-form-field>
 
-              <div class="checkbox-config">
+              <div class="checkbox-grid">
                 <mat-checkbox
                   [(ngModel)]="configuracion.inventario.permitir_stock_negativo"
                   (ngModelChange)="marcarCambios()"
                 >
                   Permitir Stock Negativo
                 </mat-checkbox>
-              </div>
 
-              <div class="checkbox-config">
                 <mat-checkbox
                   [(ngModel)]="configuracion.inventario.alertas_automaticas"
                   (ngModelChange)="marcarCambios()"
                 >
                   Alertas Automáticas de Stock
                 </mat-checkbox>
-              </div>
 
-              <div class="checkbox-config">
                 <mat-checkbox
                   [(ngModel)]="configuracion.inventario.auditoria_movimientos"
                   (ngModelChange)="marcarCambios()"
@@ -290,9 +281,6 @@
                   [(ngModel)]="configuracion.seguridad.tiempo_sesion"
                   (ngModelChange)="marcarCambios()"
                 />
-                <mat-hint
-                  >Tiempo de inactividad antes del cierre automático</mat-hint
-                >
               </mat-form-field>
 
               <mat-form-field appearance="outline">
@@ -303,10 +291,6 @@
                   [(ngModel)]="configuracion.seguridad.intentos_login"
                   (ngModelChange)="marcarCambios()"
                 />
-                <mat-hint
-                  >Número máximo de intentos fallidos antes del
-                  bloqueo</mat-hint
-                >
               </mat-form-field>
 
               <mat-form-field appearance="outline">
@@ -319,43 +303,35 @@
                 />
               </mat-form-field>
 
-              <div class="checkbox-config">
+              <div class="checkbox-grid">
                 <mat-checkbox
                   [(ngModel)]="configuracion.seguridad.requiere_mayusculas"
                   (ngModelChange)="marcarCambios()"
                 >
                   Requiere Mayúsculas en Contraseña
                 </mat-checkbox>
-              </div>
 
-              <div class="checkbox-config">
                 <mat-checkbox
                   [(ngModel)]="configuracion.seguridad.requiere_numeros"
                   (ngModelChange)="marcarCambios()"
                 >
                   Requiere Números en Contraseña
                 </mat-checkbox>
-              </div>
 
-              <div class="checkbox-config">
                 <mat-checkbox
                   [(ngModel)]="configuracion.seguridad.requiere_simbolos"
                   (ngModelChange)="marcarCambios()"
                 >
                   Requiere Símbolos en Contraseña
                 </mat-checkbox>
-              </div>
 
-              <div class="checkbox-config">
                 <mat-checkbox
                   [(ngModel)]="configuracion.seguridad.doble_factor"
                   (ngModelChange)="marcarCambios()"
                 >
                   Autenticación de Doble Factor
                 </mat-checkbox>
-              </div>
 
-              <div class="checkbox-config">
                 <mat-checkbox
                   [(ngModel)]="configuracion.seguridad.log_accesos"
                   (ngModelChange)="marcarCambios()"
@@ -382,20 +358,19 @@
           <mat-card-content>
             <div class="config-grid">
               <mat-form-field appearance="outline">
-                <mat-label>Frecuencia de Respaldo</mat-label>
+                <mat-label>Frecuencia</mat-label>
                 <mat-select
                   [(ngModel)]="configuracion.respaldos.frecuencia"
                   (ngModelChange)="marcarCambios()"
                 >
-                  <mat-option value="diario">Diario</mat-option>
-                  <mat-option value="semanal">Semanal</mat-option>
-                  <mat-option value="mensual">Mensual</mat-option>
-                  <mat-option value="manual">Solo Manual</mat-option>
+                  <mat-option value="DIARIO">Diario</mat-option>
+                  <mat-option value="SEMANAL">Semanal</mat-option>
+                  <mat-option value="MENSUAL">Mensual</mat-option>
                 </mat-select>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Hora de Respaldo</mat-label>
+                <mat-label>Hora de Ejecución</mat-label>
                 <input
                   matInput
                   type="time"
@@ -412,14 +387,10 @@
                   [(ngModel)]="configuracion.respaldos.dias_retencion"
                   (ngModelChange)="marcarCambios()"
                 />
-                <mat-hint
-                  >Días que se mantendrán los respaldos antes de
-                  eliminarlos</mat-hint
-                >
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Ruta de Respaldos</mat-label>
+                <mat-label>Ruta de Almacenamiento</mat-label>
                 <input
                   matInput
                   [(ngModel)]="configuracion.respaldos.ruta"
@@ -427,16 +398,14 @@
                 />
               </mat-form-field>
 
-              <div class="checkbox-config">
+              <div class="checkbox-grid">
                 <mat-checkbox
                   [(ngModel)]="configuracion.respaldos.compresion"
                   (ngModelChange)="marcarCambios()"
                 >
-                  Comprimir Respaldos
+                  Habilitar Compresión
                 </mat-checkbox>
-              </div>
 
-              <div class="checkbox-config">
                 <mat-checkbox
                   [(ngModel)]="configuracion.respaldos.notificar_email"
                   (ngModelChange)="marcarCambios()"
@@ -446,17 +415,23 @@
               </div>
             </div>
 
+            <!-- Acciones de respaldo -->
             <div class="backup-actions">
               <button
                 mat-raised-button
-                color="accent"
+                color="primary"
                 (click)="crearRespaldoManual()"
+                class="btn-respaldo"
               >
                 <mat-icon>backup</mat-icon>
-                Crear Respaldo Ahora
+                Crear Respaldo Manual
               </button>
-
-              <button mat-button (click)="verHistorialRespaldos()">
+              <button
+                mat-stroked-button
+                color="accent"
+                (click)="verHistorialRespaldos()"
+                class="btn-historial"
+              >
                 <mat-icon>history</mat-icon>
                 Ver Historial
               </button>
@@ -467,16 +442,42 @@
     </mat-tab>
   </mat-tab-group>
 
-  <!-- Estado de Configuración -->
-  <div class="estado-config" *ngIf="hayChangios || guardandoConfig">
+  <!-- Resumen estadístico -->
+  <div class="resumen-container">
+    <div class="resumen-grid">
+      <mat-card class="resumen-card">
+        <div class="resumen-content">
+          <div class="resumen-number">{{ tabActual + 1 }}</div>
+          <div class="resumen-label">Sección Actual</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="resumen-card">
+        <div class="resumen-content">
+          <div class="resumen-number">{{ hayCambios ? 'Sí' : 'No' }}</div>
+          <div class="resumen-label">Cambios Pendientes</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="resumen-card">
+        <div class="resumen-content">
+          <div class="resumen-number">4</div>
+          <div class="resumen-label">Secciones Total</div>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Estado de configuración flotante -->
+  <div class="estado-config" *ngIf="hayCambios || guardandoConfig">
     <mat-card class="estado-card">
       <div class="estado-content">
         <mat-icon *ngIf="guardandoConfig" class="loading">autorenew</mat-icon>
-        <mat-icon *ngIf="hayChangios && !guardandoConfig" color="warn"
+        <mat-icon *ngIf="hayCambios && !guardandoConfig" color="warn"
           >edit</mat-icon
         >
         <span *ngIf="guardandoConfig">Guardando configuración...</span>
-        <span *ngIf="hayChangios && !guardandoConfig"
+        <span *ngIf="hayCambios && !guardandoConfig"
           >Hay cambios sin guardar</span
         >
       </div>

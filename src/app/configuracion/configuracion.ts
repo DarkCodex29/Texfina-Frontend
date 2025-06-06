@@ -9,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 export interface ConfiguracionSistema {
   empresa: {
@@ -70,28 +70,20 @@ export interface ConfiguracionSistema {
     MatInputModule,
     MatSelectModule,
     MatCheckboxModule,
+    MatSnackBarModule,
   ],
-  template: `<div>Configuración del Sistema - Módulo en desarrollo</div>`,
-  styles: [
-    `
-      div {
-        padding: 20px;
-        text-align: center;
-        font-size: 24px;
-        color: #666;
-      }
-    `,
-  ],
+  templateUrl: './configuracion.html',
+  styleUrls: ['./configuracion.scss'],
 })
 export class ConfiguracionComponent implements OnInit {
   configuracion: ConfiguracionSistema = {
     empresa: {
-      nombre: 'Texfina S.A.',
+      nombre: 'Texfina Industries',
       ruc: '20123456789',
-      direccion: 'Av. Industrial 123, Lima, Perú',
+      direccion: 'Av. Textil 123, Lima, Perú',
       telefono: '+51 1 234-5678',
-      email: 'contacto@texfina.com',
-      sitio_web: 'https://www.texfina.com',
+      email: 'info@texfina.com',
+      sitio_web: 'www.texfina.com',
     },
     sistema: {
       zona_horaria: 'America/Lima',
@@ -110,8 +102,8 @@ export class ConfiguracionComponent implements OnInit {
       auditoria_movimientos: true,
     },
     seguridad: {
-      tiempo_sesion: 120,
-      intentos_login: 5,
+      tiempo_sesion: 480,
+      intentos_login: 3,
       longitud_password: 8,
       requiere_mayusculas: true,
       requiere_numeros: true,
@@ -120,20 +112,19 @@ export class ConfiguracionComponent implements OnInit {
       log_accesos: true,
     },
     respaldos: {
-      frecuencia: 'diario',
+      frecuencia: 'DIARIO',
       hora: '02:00',
       dias_retencion: 30,
-      ruta: '/backups/texfina',
+      ruta: '/backup/texfina',
       compresion: true,
       notificar_email: true,
     },
   };
 
   configuracionOriginal: ConfiguracionSistema = {} as ConfiguracionSistema;
-  haycambios = false;
+  hayCambios = false;
   guardandoConfig = false;
   tabActual = 0;
-  hayChangios = false;
 
   constructor(private snackBar: MatSnackBar) {}
 
@@ -142,14 +133,12 @@ export class ConfiguracionComponent implements OnInit {
   }
 
   cargarConfiguracion(): void {
-    // Simular carga desde API
+    // Simular carga de configuración
     this.configuracionOriginal = JSON.parse(JSON.stringify(this.configuracion));
-    console.log('Configuración cargada:', this.configuracion);
   }
 
   marcarCambios(): void {
-    this.haycambios = this.hayCambiosPendientes();
-    this.hayChangios = this.haycambios;
+    this.hayCambios = true;
   }
 
   hayCambiosPendientes(): boolean {
@@ -160,47 +149,47 @@ export class ConfiguracionComponent implements OnInit {
   }
 
   guardarConfiguracion(): void {
-    if (!this.haycambios) {
-      return;
-    }
-
     this.guardandoConfig = true;
 
-    // Simular guardado en API
+    // Simular guardado
     setTimeout(() => {
+      this.guardandoConfig = false;
+      this.hayCambios = false;
       this.configuracionOriginal = JSON.parse(
         JSON.stringify(this.configuracion)
       );
-      this.haycambios = false;
-      this.hayChangios = false;
-      this.guardandoConfig = false;
 
       this.snackBar.open('Configuración guardada exitosamente', 'Cerrar', {
         duration: 3000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
         panelClass: ['snackbar-success'],
       });
     }, 2000);
   }
 
   crearRespaldoManual(): void {
-    this.snackBar.open('Iniciando respaldo manual...', 'Cerrar', {
-      duration: 3000,
-      panelClass: ['snackbar-info'],
+    this.snackBar.open('Creando respaldo manual...', 'Cerrar', {
+      duration: 2000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
     });
 
-    // Simular proceso de respaldo
     setTimeout(() => {
       this.snackBar.open('Respaldo creado exitosamente', 'Cerrar', {
         duration: 3000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
         panelClass: ['snackbar-success'],
       });
-    }, 5000);
+    }, 2000);
   }
 
   verHistorialRespaldos(): void {
-    console.log('Ver historial de respaldos');
-    this.snackBar.open('Funcionalidad en desarrollo', 'Cerrar', {
+    this.snackBar.open('Abriendo historial de respaldos...', 'Cerrar', {
       duration: 2000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
     });
   }
 
@@ -226,21 +215,26 @@ export class ConfiguracionComponent implements OnInit {
         };
         break;
     }
-    this.marcarCambios();
+    this.hayCambios = this.hayCambiosPendientes();
   }
 
   exportarConfiguracion(): void {
-    const configJson = JSON.stringify(this.configuracion, null, 2);
-    const blob = new Blob([configJson], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'configuracion-texfina.json';
-    link.click();
-    window.URL.revokeObjectURL(url);
+    const dataStr = JSON.stringify(this.configuracion, null, 2);
+    const dataUri =
+      'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
 
-    this.snackBar.open('Configuración exportada', 'Cerrar', {
-      duration: 2000,
+    const exportFileDefaultName = 'configuracion-texfina.json';
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+
+    this.snackBar.open('Configuración exportada exitosamente', 'Cerrar', {
+      duration: 3000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
+      panelClass: ['snackbar-success'],
     });
   }
 
@@ -248,18 +242,23 @@ export class ConfiguracionComponent implements OnInit {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = (e: any) => {
         try {
-          const config = JSON.parse(e.target?.result as string);
-          this.configuracion = { ...this.configuracion, ...config };
-          this.marcarCambios();
-          this.snackBar.open('Configuración importada', 'Cerrar', {
-            duration: 2000,
+          const importedConfig = JSON.parse(e.target.result);
+          this.configuracion = { ...this.configuracion, ...importedConfig };
+          this.hayCambios = true;
+
+          this.snackBar.open('Configuración importada exitosamente', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
             panelClass: ['snackbar-success'],
           });
         } catch (error) {
-          this.snackBar.open('Error al importar configuración', 'Cerrar', {
+          this.snackBar.open('Error al importar la configuración', 'Cerrar', {
             duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
             panelClass: ['snackbar-error'],
           });
         }
