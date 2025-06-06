@@ -36,7 +36,7 @@ import { Proveedor } from '../../models/insumo.model';
 })
 export class EditarProveedorDialogComponent {
   proveedorForm: FormGroup;
-  isEditMode: boolean = false;
+  isEditMode = false;
 
   constructor(
     private fb: FormBuilder,

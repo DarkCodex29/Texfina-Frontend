@@ -4,8 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-editar-usuario-dialog',
   imports: [],
   templateUrl: './editar-usuario-dialog.html',
-  styleUrl: './editar-usuario-dialog.scss'
+  styleUrl: './editar-usuario-dialog.scss',
 })
-export class EditarUsuarioDialog {
-
-}
+export class EditarUsuarioDialogComponent {}

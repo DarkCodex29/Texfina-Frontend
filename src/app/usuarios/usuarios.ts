@@ -13,7 +13,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { MaterialService } from '../services/material.service';
 import { Usuario, Rol, TipoUsuario } from '../models/insumo.model';
-import { DetalleUsuarioDialog } from './detalle-usuario-dialog/detalle-usuario-dialog';
+import { DetalleUsuarioDialogComponent } from './detalle-usuario-dialog/detalle-usuario-dialog';
 
 @Component({
   selector: 'app-usuarios',
@@ -34,7 +34,7 @@ import { DetalleUsuarioDialog } from './detalle-usuario-dialog/detalle-usuario-d
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.scss',
 })
-export class Usuarios implements OnInit {
+export class UsuariosComponent implements OnInit {
   usuarios: Usuario[] = [];
   roles: Rol[] = [];
   tiposUsuario: TipoUsuario[] = [];
@@ -138,7 +138,7 @@ export class Usuarios implements OnInit {
   }
 
   verDetalle(usuario: Usuario): void {
-    const dialogRef = this.dialog.open(DetalleUsuarioDialog, {
+    this.dialog.open(DetalleUsuarioDialogComponent, {
       width: '600px',
       data: {
         usuario: usuario,

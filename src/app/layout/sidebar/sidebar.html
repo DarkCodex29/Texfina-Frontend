@@ -10,13 +10,20 @@
       </a>
     </li>
     <li>
-      <div class="sidebar-section" (click)="toggleSection('maestro')">
+      <button
+        class="sidebar-section"
+        (click)="toggleSection('maestro')"
+        (keydown.enter)="toggleSection('maestro')"
+        (keydown.space)="toggleSection('maestro')"
+        [attr.aria-expanded]="openSection === 'maestro'"
+        aria-label="Menú Maestros"
+      >
         <img src="assets/icons/master.svg" class="sidebar-icon" alt="Maestro" />
         <span>Maestros</span>
         <mat-icon class="arrow" [class.open]="openSection === 'maestro'"
           >expand_more</mat-icon
         >
-      </div>
+      </button>
       <ul *ngIf="openSection === 'maestro'" class="sidebar-submenu">
         <li>
           <a routerLink="/dashboard/insumos" routerLinkActive="active"
@@ -62,7 +69,14 @@
       </ul>
     </li>
     <li>
-      <div class="sidebar-section" (click)="toggleSection('movimientos')">
+      <button
+        class="sidebar-section"
+        (click)="toggleSection('movimientos')"
+        (keydown.enter)="toggleSection('movimientos')"
+        (keydown.space)="toggleSection('movimientos')"
+        [attr.aria-expanded]="openSection === 'movimientos'"
+        aria-label="Menú Movimientos"
+      >
         <img
           src="assets/icons/clipboard.svg"
           class="sidebar-icon"
@@ -72,7 +86,7 @@
         <mat-icon class="arrow" [class.open]="openSection === 'movimientos'"
           >expand_more</mat-icon
         >
-      </div>
+      </button>
       <ul *ngIf="openSection === 'movimientos'" class="sidebar-submenu">
         <li>
           <a routerLink="/dashboard/ingresos" routerLinkActive="active"
@@ -90,13 +104,20 @@
       </ul>
     </li>
     <li>
-      <div class="sidebar-section" (click)="toggleSection('consultas')">
+      <button
+        class="sidebar-section"
+        (click)="toggleSection('consultas')"
+        (keydown.enter)="toggleSection('consultas')"
+        (keydown.space)="toggleSection('consultas')"
+        [attr.aria-expanded]="openSection === 'consultas'"
+        aria-label="Menú Consultas"
+      >
         <img src="assets/icons/file.svg" class="sidebar-icon" alt="Consultas" />
         <span>Consultas</span>
         <mat-icon class="arrow" [class.open]="openSection === 'consultas'"
           >expand_more</mat-icon
         >
-      </div>
+      </button>
       <ul *ngIf="openSection === 'consultas'" class="sidebar-submenu">
         <li>
           <a routerLink="/dashboard/stock" routerLinkActive="active">Stock</a>
@@ -109,7 +130,14 @@
       </ul>
     </li>
     <li>
-      <div class="sidebar-section" (click)="toggleSection('administracion')">
+      <button
+        class="sidebar-section"
+        (click)="toggleSection('administracion')"
+        (keydown.enter)="toggleSection('administracion')"
+        (keydown.space)="toggleSection('administracion')"
+        [attr.aria-expanded]="openSection === 'administracion'"
+        aria-label="Menú Administración"
+      >
         <img
           src="assets/icons/settings.svg"
           class="sidebar-icon"
@@ -119,7 +147,7 @@
         <mat-icon class="arrow" [class.open]="openSection === 'administracion'"
           >expand_more</mat-icon
         >
-      </div>
+      </button>
       <ul *ngIf="openSection === 'administracion'" class="sidebar-submenu">
         <li>
           <a routerLink="/dashboard/usuarios" routerLinkActive="active"

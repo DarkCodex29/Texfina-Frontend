@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.scss'],
 })
-export class Sidebar {
+export class SidebarComponent {
   openSection: string | null = null;
 
   toggleSection(section: string) {

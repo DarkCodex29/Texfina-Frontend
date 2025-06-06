@@ -25,13 +25,13 @@ import { Usuario, Rol, TipoUsuario } from '../../models/insumo.model';
   templateUrl: './detalle-usuario-dialog.html',
   styleUrl: './detalle-usuario-dialog.scss',
 })
-export class DetalleUsuarioDialog {
+export class DetalleUsuarioDialogComponent {
   usuario: Usuario;
   roles: Rol[];
   tiposUsuario: TipoUsuario[];
 
   constructor(
-    public dialogRef: MatDialogRef<DetalleUsuarioDialog>,
+    public dialogRef: MatDialogRef<DetalleUsuarioDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       usuario: Usuario;

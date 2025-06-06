@@ -38,7 +38,7 @@ import { EditarProveedorDialogComponent } from './editar-proveedor-dialog/editar
   templateUrl: './proveedores.html',
   styleUrls: ['./proveedores.scss'],
 })
-export class Proveedores implements OnInit {
+export class ProveedoresComponent implements OnInit {
   proveedores: Proveedor[] = [];
   filtrosForm: FormGroup;
   displayedColumns: string[] = [

@@ -17,7 +17,7 @@ export interface Unidad {
 export interface Almacen {
   id_almacen?: number;
   nombre: string;
-  ubicacion?: string;
+  ubicacion: string; // NOT NULL en BD - corregido
 }
 
 // ===== SISTEMA DE USUARIOS Y PERMISOS =====
@@ -35,14 +35,14 @@ export interface TipoUsuario {
 
 export interface Usuario {
   id_usuario?: number;
-  username: string;
+  username: string; // UNIQUE NOT NULL
   email?: string;
   password_hash?: string;
   id_rol?: string;
   id_tipo_usuario?: number;
-  activo?: boolean;
-  created_at?: Date;
-  last_login?: Date;
+  activo?: boolean; // BIT DEFAULT 1
+  created_at?: Date; // DATETIME2 DEFAULT GETDATE()
+  last_login?: Date; // DATETIME2
 
   // Relaciones
   rol?: Rol;
@@ -66,11 +66,11 @@ export interface RolPermiso {
 }
 
 export interface Sesion {
-  id_sesion: string; // UNIQUEIDENTIFIER
+  id_sesion: string; // UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID()
   id_usuario?: number;
-  inicio?: Date;
-  fin?: Date;
-  cerrada_automaticamente?: boolean;
+  inicio?: Date; // DATETIME2
+  fin?: Date; // DATETIME2
+  cerrada_automaticamente?: boolean; // BIT
 
   // Relaciones
   usuario?: Usuario;
@@ -79,12 +79,12 @@ export interface Sesion {
 export interface LogEvento {
   id?: number;
   id_usuario?: number;
-  accion?: string;
-  descripcion?: string;
-  ip_origen?: string;
-  modulo?: string;
-  tabla_afectada?: string;
-  timestamp?: Date;
+  accion?: string; // NVARCHAR(100)
+  descripcion?: string; // NVARCHAR(500)
+  ip_origen?: string; // NVARCHAR(50)
+  modulo?: string; // NVARCHAR(100)
+  tabla_afectada?: string; // NVARCHAR(100)
+  timestamp?: Date; // DATETIME2 DEFAULT GETDATE()
 
   // Relaciones
   usuario?: Usuario;
@@ -93,26 +93,26 @@ export interface LogEvento {
 // ===== PROVEEDORES =====
 export interface Proveedor {
   id_proveedor?: number;
-  empresa?: string;
-  ruc?: string;
-  contacto?: string;
-  direccion?: string;
-  created_at?: Date;
-  updated_at?: Date;
+  empresa?: string; // NVARCHAR(200)
+  ruc?: string; // NVARCHAR(20)
+  contacto?: string; // NVARCHAR(200)
+  direccion?: string; // NVARCHAR(500)
+  created_at?: Date; // DATETIME2 DEFAULT GETDATE()
+  updated_at?: Date; // DATETIME2 DEFAULT GETDATE()
 }
 
 // ===== INSUMOS Y MATERIALES =====
 export interface Insumo {
   id_insumo?: number;
-  id_fox?: string;
-  nombre: string;
+  id_fox?: string; // NVARCHAR(50)
+  nombre: string; // NVARCHAR(200) NOT NULL
   id_clase?: string;
-  peso_unitario?: number;
+  peso_unitario?: number; // FLOAT
   id_unidad?: string;
-  presentacion?: string;
-  precio_unitario?: number;
-  created_at?: Date;
-  updated_at?: Date;
+  presentacion?: string; // NVARCHAR(100)
+  precio_unitario?: number; // FLOAT
+  created_at?: Date; // DATETIME2 DEFAULT GETDATE()
+  updated_at?: Date; // DATETIME2 DEFAULT GETDATE()
 
   // Relaciones
   clase?: Clase;
@@ -125,7 +125,7 @@ export interface InsumoProveedor {
   id?: number;
   id_insumo?: number;
   id_proveedor?: number;
-  precio_unitario?: number;
+  precio_unitario?: number; // FLOAT
 
   // Relaciones
   insumo?: Insumo;
@@ -135,14 +135,14 @@ export interface InsumoProveedor {
 // ===== LOTES Y STOCK =====
 export interface Lote {
   id_lote?: number;
-  id_insumo?: number;
-  lote?: string;
-  ubicacion?: string;
-  stock_inicial?: number;
-  stock_actual?: number;
-  fecha_expiracion?: Date;
-  precio_total?: number;
-  estado_lote?: string;
+  id_insumo: number; // INT REFERENCES INSUMO - NOT NULL
+  lote: string; // NVARCHAR(100) - NOT NULL
+  ubicacion: string; // NVARCHAR(200) - NOT NULL
+  stock_inicial: number; // FLOAT - NOT NULL
+  stock_actual: number; // FLOAT - NOT NULL
+  fecha_expiracion?: Date; // DATE - Puede ser NULL
+  precio_total: number; // FLOAT - NOT NULL
+  estado_lote: string; // NVARCHAR(50) - NOT NULL
 
   // Relaciones
   insumo?: Insumo;
@@ -151,13 +151,13 @@ export interface Lote {
 export interface Stock {
   id_stock?: number;
   id_insumo?: number;
-  presentacion?: string;
+  presentacion?: string; // NVARCHAR(100)
   id_unidad?: string;
-  cantidad?: number;
+  cantidad?: number; // FLOAT
   id_lote?: number;
   id_almacen?: number;
-  fecha_entrada?: Date;
-  fecha_salida?: Date;
+  fecha_entrada?: Date; // DATETIME2
+  fecha_salida?: Date; // DATETIME2
 
   // Relaciones
   insumo?: Insumo;
@@ -171,16 +171,16 @@ export interface Ingreso {
   id_ingreso?: number;
   id_insumo?: number;
   id_insumo_proveedor?: number;
-  fecha?: Date;
-  presentacion?: string;
+  fecha?: Date; // DATE
+  presentacion?: string; // NVARCHAR(100)
   id_unidad?: string;
-  cantidad?: number;
+  cantidad?: number; // FLOAT
   id_lote?: number;
-  precio_total_formula?: number;
-  precio_unitario_historico?: number;
-  numero_remision?: string;
-  orden_compra?: string;
-  estado?: string;
+  precio_total_formula?: number; // FLOAT
+  precio_unitario_historico?: number; // FLOAT
+  numero_remision?: string; // NVARCHAR(50)
+  orden_compra?: string; // NVARCHAR(50)
+  estado?: string; // NVARCHAR(50)
 
   // Relaciones
   insumo?: Insumo;
@@ -192,11 +192,11 @@ export interface Ingreso {
 export interface Consumo {
   id_consumo?: number;
   id_insumo?: number;
-  area?: string;
-  fecha?: Date;
-  cantidad?: number;
+  area?: string; // NVARCHAR(100)
+  fecha?: Date; // DATE
+  cantidad?: number; // FLOAT
   id_lote?: number;
-  estado?: string;
+  estado?: string; // NVARCHAR(50)
 
   // Relaciones
   insumo?: Insumo;
@@ -206,7 +206,7 @@ export interface Consumo {
 // ===== RECETAS =====
 export interface Receta {
   id_receta?: number;
-  nombre: string;
+  nombre: string; // NVARCHAR(200) NOT NULL
 
   // Relaciones
   detalles?: RecetaDetalle[];
@@ -216,9 +216,9 @@ export interface RecetaDetalle {
   id?: number;
   id_receta?: number;
   id_insumo?: number;
-  proporcion?: number;
-  orden?: number;
-  tipo_medida?: string;
+  proporcion?: number; // FLOAT
+  orden?: number; // INT
+  tipo_medida?: string; // NVARCHAR(50)
 
   // Relaciones
   receta?: Receta;
@@ -267,7 +267,7 @@ export interface IngresoFormDto {
 
 export interface AlmacenFormDto {
   nombre: string;
-  ubicacion?: string;
+  ubicacion: string; // Alineado con BD - NOT NULL
 }
 
 export interface UnidadFormDto {
@@ -276,12 +276,82 @@ export interface UnidadFormDto {
 }
 
 export interface LoteFormDto {
-  id_insumo?: number;
-  lote?: string;
-  ubicacion?: string;
-  stock_inicial?: number;
-  stock_actual?: number;
-  fecha_expiracion?: Date;
-  precio_total?: number;
-  estado_lote?: string;
+  id_insumo: number; // Required
+  lote: string; // Required
+  ubicacion: string; // Required
+  stock_inicial: number; // Required
+  stock_actual: number; // Required
+  fecha_expiracion?: Date; // Optional
+  precio_total: number; // Required
+  estado_lote: string; // Required
+}
+
+// ===== INTERFACES PARA ESTADOS Y CATÁLOGOS =====
+export interface EstadoLote {
+  ACTIVO: 'ACTIVO';
+  AGOTADO: 'AGOTADO';
+  VENCIDO: 'VENCIDO';
+}
+
+export interface EstadoIngreso {
+  PENDIENTE: 'PENDIENTE';
+  RECIBIDO: 'RECIBIDO';
+  PARCIAL: 'PARCIAL';
+  CANCELADO: 'CANCELADO';
+}
+
+export interface EstadoConsumo {
+  PENDIENTE: 'PENDIENTE';
+  CONFIRMADO: 'CONFIRMADO';
+  CANCELADO: 'CANCELADO';
+}
+
+export interface TipoRol {
+  ADMIN: 'ADMIN';
+  SUPERVISOR: 'SUPERVISOR';
+  OPERARIO: 'OPERARIO';
+  CONSULTOR: 'CONSULTOR';
+}
+
+// ===== INTERFACES PARA REPORTES Y ANÁLISIS =====
+export interface StockResumen {
+  totalItems: number;
+  valorTotal: number;
+  itemsCriticos: number;
+  itemsBajos: number;
+  ultimaActualizacion: Date;
+}
+
+export interface ReporteInventario {
+  id_insumo: number;
+  codigo_fox: string;
+  nombre: string;
+  clase: string;
+  almacen: string;
+  stock_actual: number;
+  valor_unitario: number;
+  valor_total: number;
+  estado_stock: 'CRITICO' | 'BAJO' | 'NORMAL' | 'ALTO';
+  ultimo_movimiento: Date;
+}
+
+export interface ReporteMovimiento {
+  id: number;
+  fecha: Date;
+  tipo: 'INGRESO' | 'CONSUMO' | 'AJUSTE';
+  insumo: string;
+  cantidad: number;
+  almacen: string;
+  usuario: string;
+  observaciones?: string;
+}
+
+export interface AnalisisRotacion {
+  id_insumo: number;
+  nombre: string;
+  categoria_abc: 'A' | 'B' | 'C';
+  rotacion_mensual: number;
+  dias_promedio_stock: number;
+  valor_inventario: number;
+  clasificacion: 'RAPIDA' | 'MEDIA' | 'LENTA';
 }

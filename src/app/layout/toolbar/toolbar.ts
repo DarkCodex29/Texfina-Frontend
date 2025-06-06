@@ -19,7 +19,7 @@ import { filter } from 'rxjs/operators';
   templateUrl: './toolbar.html',
   styleUrls: ['./toolbar.scss'],
 })
-export class Toolbar {
+export class ToolbarComponent {
   title = 'Inicio';
 
   constructor(private router: Router) {

@@ -20,7 +20,7 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('./dashboard/dashboard').then((m) => m.Dashboard),
+          import('./dashboard/dashboard').then((m) => m.DashboardComponent),
       },
       {
         path: 'insumos',
@@ -32,12 +32,14 @@ export const routes: Routes = [
       {
         path: 'proveedores',
         loadComponent: () =>
-          import('./proveedores/proveedores').then((m) => m.Proveedores),
+          import('./proveedores/proveedores').then(
+            (m) => m.ProveedoresComponent
+          ),
       },
       {
         path: 'usuarios',
         loadComponent: () =>
-          import('./usuarios/usuarios').then((m) => m.Usuarios),
+          import('./usuarios/usuarios').then((m) => m.UsuariosComponent),
       },
       {
         path: 'almacenes',

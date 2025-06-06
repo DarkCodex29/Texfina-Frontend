@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { Sidebar } from '../sidebar/sidebar';
-import { Toolbar } from '../toolbar/toolbar';
+import { SidebarComponent } from '../sidebar/sidebar';
+import { ToolbarComponent } from '../toolbar/toolbar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,8 +23,8 @@ import { map, shareReplay } from 'rxjs/operators';
     MatButtonModule,
     MatIconModule,
     MatListModule,
-    Sidebar,
-    Toolbar,
+    SidebarComponent,
+    ToolbarComponent,
   ],
   templateUrl: './main-layout.html',
   styleUrls: ['./main-layout.scss'],

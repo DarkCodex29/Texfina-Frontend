@@ -14,7 +14,7 @@ export class LotesService {
   // MÉTODOS PRINCIPALES - USANDO API REAL
   // ============================================================================
 
-  getLotes(pagina: number = 1, tamaño: number = 10): Observable<any> {
+  getLotes(pagina = 1, tamaño = 10): Observable<any> {
     return this.apiService.getLotes(pagina, tamaño).pipe(
       catchError(() =>
         of({
@@ -46,7 +46,7 @@ export class LotesService {
       );
   }
 
-  getLotesPorVencer(diasAlerta: number = 30): Observable<any[]> {
+  getLotesPorVencer(diasAlerta = 30): Observable<any[]> {
     return this.apiService.getLotesPorVencer(diasAlerta).pipe(
       catchError(() => {
         const fechaLimite = new Date();

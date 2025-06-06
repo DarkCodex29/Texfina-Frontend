@@ -4,7 +4,7 @@
   <mat-sidenav
     #sidenav
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
-    [opened]="!(isHandset$ | async)"
+    [opened]="(isHandset$ | async) === false"
     class="sidebar"
   >
     <app-sidebar></app-sidebar>

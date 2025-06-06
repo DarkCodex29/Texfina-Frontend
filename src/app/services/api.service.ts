@@ -143,8 +143,8 @@ export class ApiService {
   // ============================================================================
 
   getInsumos(
-    pagina: number = 1,
-    tamaño: number = 10,
+    pagina = 1,
+    tamaño = 10,
     filtros?: any
   ): Observable<ApiResponse<any[]>> {
     let params = new HttpParams()
@@ -184,7 +184,7 @@ export class ApiService {
     );
   }
 
-  getInsumosBajoStock(umbral: number = 10): Observable<any[]> {
+  getInsumosBajoStock(umbral = 10): Observable<any[]> {
     const params = new HttpParams().set('umbral', umbral.toString());
     return this.http.get<any[]>(`${this.baseUrl}/insumos/bajo-stock`, {
       headers: this.getHeaders(),
@@ -197,8 +197,8 @@ export class ApiService {
   // ============================================================================
 
   getProveedores(
-    pagina: number = 1,
-    tamaño: number = 10
+    pagina = 1,
+    tamaño = 10
   ): Observable<ApiResponse<any[]>> {
     const params = new HttpParams()
       .set('pagina', pagina.toString())
@@ -238,8 +238,8 @@ export class ApiService {
   // ============================================================================
 
   getLotes(
-    pagina: number = 1,
-    tamaño: number = 10
+    pagina = 1,
+    tamaño = 10
   ): Observable<ApiResponse<any[]>> {
     const params = new HttpParams()
       .set('pagina', pagina.toString())
@@ -263,7 +263,7 @@ export class ApiService {
     });
   }
 
-  getLotesPorVencer(diasAlerta: number = 30): Observable<any[]> {
+  getLotesPorVencer(diasAlerta = 30): Observable<any[]> {
     const params = new HttpParams().set('diasAlerta', diasAlerta.toString());
     return this.http.get<any[]>(`${this.baseUrl}/lotes/por-vencer`, {
       headers: this.getHeaders(),
@@ -291,8 +291,8 @@ export class ApiService {
   // ============================================================================
 
   getStocks(
-    pagina: number = 1,
-    tamaño: number = 10
+    pagina = 1,
+    tamaño = 10
   ): Observable<ApiResponse<any[]>> {
     const params = new HttpParams()
       .set('pagina', pagina.toString())
@@ -316,7 +316,7 @@ export class ApiService {
     });
   }
 
-  getStocksBajoMinimo(umbral: number = 10): Observable<any[]> {
+  getStocksBajoMinimo(umbral = 10): Observable<any[]> {
     const params = new HttpParams().set('umbral', umbral.toString());
     return this.http.get<any[]>(`${this.baseUrl}/stocks/bajo-minimo`, {
       headers: this.getHeaders(),

@@ -95,6 +95,10 @@
   transition: all 0.2s ease;
   white-space: nowrap;
   overflow: hidden;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
 }
 
 .sidebar-section:hover,
