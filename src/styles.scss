@@ -103,51 +103,65 @@
     cursor: not-allowed;
   }
 
-  // Botón principal (Rojo Carmesí)
+  // Botón principal (Azul Marino)
   &.btn-primary {
-    background-color: var(--texfina-primary);
-    color: white;
-    box-shadow: var(--texfina-shadow-sm);
-
-    &:hover:not(:disabled) {
-      background-color: var(--texfina-primary-dark);
-      box-shadow: var(--texfina-shadow-md);
-    }
-  }
-
-  // Botón secundario (Azul Marino)
-  &.btn-secondary {
     background-color: var(--texfina-secondary);
     color: white;
-    box-shadow: var(--texfina-shadow-sm);
+    box-shadow: 0 2px 8px rgba(18, 30, 102, 0.2);
+    transform: translateY(0);
+    transition: all 0.2s ease;
 
     &:hover:not(:disabled) {
       background-color: var(--texfina-secondary-dark);
-      box-shadow: var(--texfina-shadow-md);
+      box-shadow: 0 4px 16px rgba(18, 30, 102, 0.3);
+      transform: translateY(-1px);
     }
   }
 
-  // Botón outline principal
-  &.btn-outline-primary {
-    background-color: transparent;
-    color: var(--texfina-primary);
-    border: 1px solid var(--texfina-primary);
+  // Botón secundario (Rojo Carmesí)
+  &.btn-secondary {
+    background-color: var(--texfina-primary);
+    color: white;
+    box-shadow: 0 2px 8px rgba(189, 33, 38, 0.2);
+    transform: translateY(0);
+    transition: all 0.2s ease;
 
     &:hover:not(:disabled) {
-      background-color: var(--texfina-primary);
-      color: white;
+      background-color: var(--texfina-primary-dark);
+      box-shadow: 0 4px 16px rgba(189, 33, 38, 0.3);
+      transform: translateY(-1px);
     }
   }
 
-  // Botón outline secundario
-  &.btn-outline-secondary {
+  // Botón outline principal (Azul)
+  &.btn-outline {
     background-color: transparent;
     color: var(--texfina-secondary);
-    border: 1px solid var(--texfina-secondary);
+    border: 2px solid var(--texfina-secondary);
+    transform: translateY(0);
+    transition: all 0.2s ease;
 
     &:hover:not(:disabled) {
       background-color: var(--texfina-secondary);
       color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(18, 30, 102, 0.2);
+    }
+  }
+
+  // Botón outline secundario (Rojo)
+  &.btn-outline-secondary {
+    background-color: transparent;
+    color: var(--texfina-primary);
+    border: 2px solid var(--texfina-primary);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-primary);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(189, 33, 38, 0.2);
     }
   }
 
@@ -571,6 +585,18 @@ html {
   white-space: nowrap;
 }
 
+.font-medium {
+  font-weight: 500 !important;
+}
+
+.font-semibold {
+  font-weight: 600 !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
+
 // Grid responsive mejorado
 .grid-container {
   display: grid;
@@ -764,6 +790,639 @@ html {
         align-items: flex-end;
         margin-bottom: 1.25rem;
       }
+    }
+  }
+}
+
+// ============================================================================
+// CLASES ADICIONALES PARA FILTROS Y TABLAS
+// ============================================================================
+
+// Tarjeta de filtros
+.filters-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--texfina-border-light);
+  margin-bottom: var(--texfina-spacing-xl);
+  padding: var(--texfina-spacing-xl);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(
+      90deg,
+      var(--texfina-secondary),
+      var(--texfina-primary)
+    );
+  }
+
+  .filters-title {
+    font-size: var(--texfina-font-size-lg);
+    font-weight: 600;
+    color: var(--texfina-text-primary);
+    margin-bottom: var(--texfina-spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--texfina-spacing-sm);
+
+    mat-icon {
+      color: var(--texfina-secondary);
+      font-size: 24px;
+    }
+  }
+
+  .filters-form {
+    width: 100%;
+  }
+
+  .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--texfina-spacing-lg);
+    align-items: end;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: var(--texfina-spacing-md);
+    }
+  }
+
+  .filter-group {
+    position: relative;
+
+    mat-form-field {
+      width: 100%;
+
+      .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+      }
+
+      .mat-mdc-form-field-icon-prefix,
+      .mat-mdc-form-field-icon-suffix {
+        mat-icon {
+          color: var(--texfina-secondary);
+        }
+      }
+    }
+  }
+
+  .filters-actions {
+    display: flex;
+    gap: var(--texfina-spacing-md);
+    justify-content: flex-end;
+    margin-top: var(--texfina-spacing-xl);
+    padding-top: var(--texfina-spacing-lg);
+    border-top: 1px solid var(--texfina-border-light);
+
+    @media (max-width: 768px) {
+      justify-content: stretch;
+      flex-direction: column;
+
+      .btn-texfina {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      flex-wrap: wrap;
+
+      .btn-texfina {
+        flex: 1;
+        min-width: 120px;
+      }
+    }
+  }
+}
+
+// Header de tabla mejorado
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--texfina-spacing-lg);
+  border-bottom: 1px solid var(--texfina-border-light);
+  background-color: var(--texfina-bg-secondary);
+
+  .table-title {
+    margin: 0;
+    font-size: var(--texfina-font-size-lg);
+    font-weight: 600;
+  }
+
+  .table-actions {
+    display: flex;
+    gap: var(--texfina-spacing-md);
+    align-items: center;
+  }
+}
+
+// Footer de tabla mejorado
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--texfina-spacing-lg);
+  border-top: 1px solid var(--texfina-border-light);
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+
+  .pagination-info {
+    font-size: var(--texfina-font-size-sm);
+    color: var(--texfina-text-secondary);
+    font-weight: 500;
+  }
+
+  .pagination-controls {
+    display: flex;
+    gap: var(--texfina-spacing-sm);
+    align-items: center;
+
+    .pagination-button {
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px !important;
+      border-radius: 8px !important;
+      border: 2px solid var(--texfina-border) !important;
+      background: white !important;
+      color: var(--texfina-text-secondary) !important;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+
+      &:hover:not(:disabled) {
+        border-color: var(--texfina-secondary) !important;
+        color: var(--texfina-secondary) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(18, 30, 102, 0.15) !important;
+      }
+
+      &:disabled {
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+
+      &.active {
+        background: var(--texfina-secondary) !important;
+        color: white !important;
+        border-color: var(--texfina-secondary) !important;
+      }
+
+      .mat-icon,
+      mat-icon {
+        font-size: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        color: inherit !important;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-md);
+    text-align: center;
+
+    .pagination-controls {
+      justify-content: center;
+    }
+  }
+}
+
+// Tabla de datos mejorada
+.data-table {
+  width: 100%;
+  background: white;
+
+  .mat-mdc-header-cell {
+    background-color: var(--texfina-bg-secondary);
+    color: var(--texfina-text-primary);
+    font-weight: 600;
+    font-size: var(--texfina-font-size-sm);
+    padding: var(--texfina-spacing-lg);
+    border-bottom: 2px solid var(--texfina-border);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .mat-mdc-row {
+    min-height: 64px;
+    border-bottom: 1px solid var(--texfina-border-light);
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: var(--texfina-bg-secondary) !important;
+    }
+
+    .mat-mdc-cell {
+      font-size: var(--texfina-font-size-sm);
+      padding: var(--texfina-spacing-lg);
+      color: var(--texfina-text-primary);
+      vertical-align: middle;
+    }
+  }
+}
+
+// Botones de acción mejorados
+.action-buttons {
+  display: flex;
+  gap: var(--texfina-spacing-sm);
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-action {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative;
+  overflow: hidden;
+  padding: 0 !important;
+
+  &.btn-view {
+    background: linear-gradient(
+      135deg,
+      var(--texfina-secondary),
+      var(--texfina-secondary-dark)
+    ) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(18, 30, 102, 0.2);
+
+    &:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 20px rgba(18, 30, 102, 0.3) !important;
+    }
+
+    &:active {
+      transform: translateY(0) !important;
+    }
+  }
+
+  &.btn-edit {
+    background: linear-gradient(
+      135deg,
+      var(--texfina-success),
+      #15803d
+    ) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+
+    &:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3) !important;
+    }
+
+    &:active {
+      transform: translateY(0) !important;
+    }
+  }
+
+  &.btn-delete {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+
+    &:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3) !important;
+    }
+
+    &:active {
+      transform: translateY(0) !important;
+    }
+  }
+
+  .mat-icon,
+  mat-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    z-index: 1;
+    color: inherit !important;
+  }
+
+  // Efecto de brillo al hover
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s;
+    z-index: 0;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+}
+
+// Personalización de Material Design form fields
+.mat-mdc-form-field {
+  width: 100%;
+
+  .mat-mdc-text-field-wrapper {
+    border-radius: 8px !important;
+    background-color: white;
+    transition: all 0.2s ease;
+
+    .mdc-notched-outline {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: var(--texfina-border) !important;
+        border-width: 2px !important;
+        transition: all 0.2s ease;
+      }
+    }
+
+    &:hover:not(.mdc-text-field--focused) {
+      .mdc-notched-outline {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: var(--texfina-secondary-light) !important;
+        }
+      }
+    }
+
+    &.mdc-text-field--focused {
+      .mdc-notched-outline {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: var(--texfina-secondary) !important;
+          border-width: 2px !important;
+          box-shadow: 0 0 0 3px rgba(18, 30, 102, 0.1);
+        }
+      }
+    }
+  }
+
+  .mat-mdc-floating-label {
+    color: var(--texfina-text-secondary) !important;
+    font-weight: 500;
+
+    &.mdc-floating-label--float-above {
+      color: var(--texfina-secondary) !important;
+    }
+  }
+
+  .mat-mdc-form-field-icon-prefix,
+  .mat-mdc-form-field-icon-suffix {
+    color: var(--texfina-secondary);
+
+    mat-icon {
+      color: var(--texfina-secondary);
+      font-size: 20px;
+    }
+  }
+
+  // Estilos para select
+  .mat-mdc-select {
+    .mat-mdc-select-value {
+      color: var(--texfina-text-primary);
+    }
+
+    .mat-mdc-select-arrow {
+      color: var(--texfina-secondary);
+    }
+  }
+
+  // Estilos para input
+  .mat-mdc-input-element {
+    color: var(--texfina-text-primary);
+
+    &::placeholder {
+      color: var(--texfina-text-muted);
+    }
+  }
+}
+
+// Panel de select personalizado
+.mat-mdc-select-panel {
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid var(--texfina-border);
+
+  .mat-mdc-option {
+    &:hover {
+      background-color: var(--texfina-secondary-bg) !important;
+    }
+
+    &.mat-mdc-option-active {
+      background-color: var(--texfina-secondary) !important;
+      color: white !important;
+    }
+  }
+}
+
+// Mejoras para el header de página
+.page-header {
+  .header-content {
+    .page-subtitle {
+      margin-top: var(--texfina-spacing-xs);
+      font-size: var(--texfina-font-size-sm);
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: var(--texfina-spacing-md);
+    align-items: center;
+
+    .btn-texfina {
+      min-width: 160px;
+      height: 48px;
+      font-size: var(--texfina-font-size-sm);
+      font-weight: 600;
+      letter-spacing: 0.25px;
+      border-radius: 12px;
+      padding: 0 var(--texfina-spacing-lg);
+      position: relative;
+      overflow: hidden;
+
+      &.btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--texfina-secondary),
+          var(--texfina-secondary-dark)
+        );
+        color: white;
+        border: none;
+        box-shadow: 0 4px 16px rgba(18, 30, 102, 0.25);
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(18, 30, 102, 0.35);
+        }
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+          );
+          transition: left 0.6s;
+        }
+
+        &:hover::before {
+          left: 100%;
+        }
+      }
+
+      &.btn-success {
+        background: linear-gradient(135deg, var(--texfina-success), #15803d);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 16px rgba(34, 197, 94, 0.25);
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35);
+        }
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+          );
+          transition: left 0.6s;
+        }
+
+        &:hover::before {
+          left: 100%;
+        }
+      }
+
+      mat-icon {
+        font-size: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+        margin-right: var(--texfina-spacing-xs);
+        z-index: 1;
+        position: relative;
+      }
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+
+      .btn-texfina {
+        width: 100%;
+        min-width: unset;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      flex-wrap: wrap;
+
+      .btn-texfina {
+        flex: 1;
+        min-width: 140px;
+      }
+    }
+  }
+}
+
+// Responsive para header de página
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--texfina-spacing-lg);
+  }
+}
+
+// Asegurar que los iconos de Material se muestren correctamente
+.material-icons,
+.mat-icon {
+  font-family: "Material Icons" !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  font-size: 24px !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  display: inline-block !important;
+  white-space: nowrap !important;
+  word-wrap: normal !important;
+  direction: ltr !important;
+  -webkit-font-feature-settings: "liga" !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+// Corrección específica para botones
+button {
+  .material-icons,
+  .mat-icon {
+    vertical-align: middle !important;
+  }
+}
+
+// Corrección para action buttons
+.action-buttons {
+  .btn-action {
+    .material-icons,
+    .mat-icon {
+      font-size: 20px !important;
+      width: 20px !important;
+      height: 20px !important;
+    }
+  }
+}
+
+// Corrección para pagination buttons
+.pagination-controls {
+  .pagination-button {
+    .material-icons,
+    .mat-icon {
+      font-size: 20px !important;
+      width: 20px !important;
+      height: 20px !important;
     }
   }
 }

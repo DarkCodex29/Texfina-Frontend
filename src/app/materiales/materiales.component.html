@@ -12,7 +12,6 @@
       </div>
       <div class="header-actions">
         <button
-          mat-raised-button
           class="btn-texfina btn-primary"
           (click)="abrirRegistroMaterial()"
         >
@@ -20,7 +19,6 @@
           Agregar Insumo
         </button>
         <button
-          mat-raised-button
           class="btn-texfina btn-success"
           (click)="abrirIngresoMaterial()"
         >
@@ -32,61 +30,67 @@
 
     <!-- Filtros de búsqueda -->
     <div class="filters-card">
+      <div class="filters-title">
+        <mat-icon>filter_list</mat-icon>
+        Filtros de Búsqueda
+      </div>
+
       <form
         [formGroup]="filtrosForm"
         (ngSubmit)="buscar()"
         class="filters-form"
       >
         <div class="filters-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>Código</mat-label>
-            <input
-              matInput
-              formControlName="codigo"
-              placeholder="Buscar por código"
-            />
-            <mat-icon matPrefix>tag</mat-icon>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Descripción</mat-label>
-            <input
-              matInput
-              formControlName="descripcion"
-              placeholder="Buscar por descripción"
-            />
-            <mat-icon matPrefix>description</mat-icon>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Proveedor</mat-label>
-            <input
-              matInput
-              formControlName="proveedor"
-              placeholder="Buscar por proveedor"
-            />
-            <mat-icon matPrefix>business</mat-icon>
-          </mat-form-field>
-
-          <div class="filters-actions">
-            <button
-              mat-raised-button
-              class="btn-texfina btn-primary"
-              type="submit"
-            >
-              <mat-icon>search</mat-icon>
-              Buscar
-            </button>
-            <button
-              mat-stroked-button
-              class="btn-texfina btn-outline"
-              type="button"
-              (click)="limpiarFiltros()"
-            >
-              <mat-icon>clear</mat-icon>
-              Limpiar
-            </button>
+          <div class="filter-group">
+            <mat-form-field appearance="outline">
+              <mat-label>Código</mat-label>
+              <input
+                matInput
+                formControlName="codigo"
+                placeholder="Buscar por código"
+              />
+              <mat-icon matPrefix>tag</mat-icon>
+            </mat-form-field>
           </div>
+
+          <div class="filter-group">
+            <mat-form-field appearance="outline">
+              <mat-label>Descripción</mat-label>
+              <input
+                matInput
+                formControlName="descripcion"
+                placeholder="Buscar por descripción"
+              />
+              <mat-icon matPrefix>description</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="filter-group">
+            <mat-form-field appearance="outline">
+              <mat-label>Proveedor</mat-label>
+              <input
+                matInput
+                formControlName="proveedor"
+                placeholder="Buscar por proveedor"
+              />
+              <mat-icon matPrefix>business</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="filters-actions">
+          <button class="btn-texfina btn-primary" type="submit">
+            <mat-icon>search</mat-icon>
+            Buscar
+          </button>
+          <button
+            class="btn-texfina btn-outline"
+            type="button"
+            (click)="limpiarFiltros()"
+          >
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
         </div>
       </form>
     </div>
@@ -179,7 +183,6 @@
             <td mat-cell *matCellDef="let material">
               <div class="action-buttons">
                 <button
-                  mat-icon-button
                   class="btn-action btn-view"
                   (click)="verDetalle(material)"
                   matTooltip="Ver detalle"
@@ -187,7 +190,6 @@
                   <mat-icon>visibility</mat-icon>
                 </button>
                 <button
-                  mat-icon-button
                   class="btn-action btn-edit"
                   (click)="editarMaterial(material)"
                   matTooltip="Editar"
@@ -209,14 +211,10 @@
           <span class="text-texfina text-muted">Página 1 de 10</span>
         </div>
         <div class="pagination-controls">
-          <button
-            mat-icon-button
-            class="btn-texfina btn-neutral btn-sm"
-            disabled
-          >
+          <button class="pagination-button" disabled>
             <mat-icon>chevron_left</mat-icon>
           </button>
-          <button mat-icon-button class="btn-texfina btn-neutral btn-sm">
+          <button class="pagination-button">
             <mat-icon>chevron_right</mat-icon>
           </button>
         </div>

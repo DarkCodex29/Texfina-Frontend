@@ -4,19 +4,17 @@
 
 /* Usar clases globales de Texfina - sin estilos locales que interfieran */
 
-/* Estilos específicos para la tabla de materiales usando variables Texfina */
+/* Solo estilos muy específicos para la celda de material */
 .material-cell {
-  display: flex;
-  flex-direction: column;
-  gap: var(--texfina-spacing-xs);
-
   .material-name {
     font-weight: 600;
-    font-size: 0.875rem;
+    line-height: 1.2;
   }
 
   .material-class {
     font-size: 0.75rem;
+    line-height: 1.2;
+    margin-top: 2px;
   }
 }
 
