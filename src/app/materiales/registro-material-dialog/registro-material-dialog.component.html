@@ -1,36 +1,32 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2 class="dialog-title">{{ tituloModal }}</h2>
-    <button mat-icon-button mat-dialog-close class="close-button">
-      <mat-icon>close</mat-icon>
-    </button>
+    <h2 class="dialog-title">
+      {{ esEdicion ? "Editar" : "Registrar" }} Material
+    </h2>
+    <p class="dialog-subtitle">
+      Complete los campos para {{ esEdicion ? "actualizar" : "registrar" }} un
+      material
+    </p>
   </div>
 
-  <form
-    [formGroup]="materialForm"
-    (ngSubmit)="onSubmit()"
-    class="material-form"
-  >
-    <div class="form-content">
-      <!-- Primera fila - Código Fox -->
+  <div class="dialog-content">
+    <form [formGroup]="materialForm">
+      <!-- Primera fila: Información básica -->
       <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Código Fox *</mat-label>
-          <input matInput formControlName="id_fox" placeholder="Ej: QUIM001" />
+        <mat-form-field appearance="outline">
+          <mat-label>Código Fox</mat-label>
+          <input matInput formControlName="id_fox" placeholder="Ej: ALG001" />
           <mat-error *ngIf="materialForm.get('id_fox')?.hasError('required')">
-            El código Fox es requerido
+            El código es requerido
           </mat-error>
         </mat-form-field>
-      </div>
 
-      <!-- Segunda fila - Nombre -->
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Nombre del material *</mat-label>
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre del Material</mat-label>
           <input
             matInput
             formControlName="nombre"
-            placeholder="Ej: Ácido Acético"
+            placeholder="Ej: Algodón Peinado"
           />
           <mat-error *ngIf="materialForm.get('nombre')?.hasError('required')">
             El nombre es requerido
@@ -38,48 +34,20 @@
         </mat-form-field>
       </div>
 
-      <!-- Tercera fila - Clase -->
+      <!-- Segunda fila: Clase y unidad -->
       <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Clase *</mat-label>
+        <mat-form-field appearance="outline">
+          <mat-label>Clase</mat-label>
           <mat-select formControlName="id_clase">
-            <mat-option value="">Seleccione una clase</mat-option>
             <mat-option *ngFor="let clase of clases" [value]="clase.id_clase">
               {{ clase.familia }} - {{ clase.sub_familia }}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="materialForm.get('id_clase')?.hasError('required')">
-            La clase es requerida
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <!-- Cuarta fila - Peso unitario y Unidad -->
-      <div class="form-row form-row-two">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Peso unitario *</mat-label>
-          <input
-            matInput
-            type="number"
-            formControlName="peso_unitario"
-            placeholder="1.0"
-            step="0.01"
-            min="0"
-          />
-          <mat-error
-            *ngIf="materialForm.get('peso_unitario')?.hasError('required')"
-          >
-            El peso unitario es requerido
-          </mat-error>
-          <mat-error *ngIf="materialForm.get('peso_unitario')?.hasError('min')">
-            El peso debe ser mayor a 0
-          </mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Unidad *</mat-label>
+        <mat-form-field appearance="outline">
+          <mat-label>Unidad</mat-label>
           <mat-select formControlName="id_unidad">
-            <mat-option value="">Seleccione una unidad</mat-option>
             <mat-option
               *ngFor="let unidad of unidades"
               [value]="unidad.id_unidad"
@@ -87,66 +55,55 @@
               {{ unidad.nombre }}
             </mat-option>
           </mat-select>
-          <mat-error
-            *ngIf="materialForm.get('id_unidad')?.hasError('required')"
-          >
-            La unidad es requerida
-          </mat-error>
         </mat-form-field>
       </div>
 
-      <!-- Quinta fila - Presentación -->
+      <!-- Tercera fila: Peso unitario y presentación -->
       <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Presentación *</mat-label>
+        <mat-form-field appearance="outline">
+          <mat-label>Peso Unitario</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="peso_unitario"
+            placeholder="Ej: 1.5"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Presentación</mat-label>
           <input
             matInput
             formControlName="presentacion"
-            placeholder="Ej: Bidón 20L, Bolsa 25Kg"
+            placeholder="Ej: Rollo 50kg"
           />
-          <mat-error
-            *ngIf="materialForm.get('presentacion')?.hasError('required')"
-          >
-            La presentación es requerida
-          </mat-error>
         </mat-form-field>
-      </div>
 
-      <!-- Sexta fila - Precio unitario -->
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Precio unitario</mat-label>
+        <mat-form-field appearance="outline">
+          <mat-label>Precio Unitario</mat-label>
           <input
             matInput
             type="number"
             formControlName="precio_unitario"
-            placeholder="0.00"
-            step="0.01"
-            min="0"
+            placeholder="Ej: 15.50"
           />
-          <span matTextPrefix>S/ </span>
-          <mat-error
-            *ngIf="materialForm.get('precio_unitario')?.hasError('min')"
-          >
-            El precio debe ser mayor o igual a 0
-          </mat-error>
+          <span matPrefix>S/ &nbsp;</span>
         </mat-form-field>
       </div>
-    </div>
+    </form>
+  </div>
 
-    <!-- Botones de acción -->
-    <div class="dialog-actions">
-      <button mat-button type="button" (click)="onCancel()" class="btn-cancel">
-        Cancelar
-      </button>
-      <button
-        mat-raised-button
-        type="submit"
-        [disabled]="!materialForm.valid"
-        [ngClass]="esEdicion ? 'btn-save' : 'btn-register'"
-      >
-        {{ textoBotonPrincipal }}
-      </button>
-    </div>
-  </form>
+  <div class="dialog-actions">
+    <button mat-button class="btn-cancelar" (click)="onCancel()">
+      Cancelar
+    </button>
+    <button
+      mat-raised-button
+      class="btn-guardar"
+      [disabled]="materialForm.invalid"
+      (click)="onSubmit()"
+    >
+      {{ esEdicion ? "Actualizar" : "Registrar" }}
+    </button>
+  </div>
 </div>

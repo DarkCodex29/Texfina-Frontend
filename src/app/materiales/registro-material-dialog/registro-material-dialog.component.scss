@@ -1,80 +1,42 @@
 .dialog-container {
-  padding: 0;
-  margin: 0;
-  background-color: white;
-  border-radius: 8px;
-  overflow: hidden;
+  padding: 24px;
+  max-width: 900px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .dialog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e0e0e0;
-  background-color: #fafafa;
+  margin-bottom: 24px;
 
   .dialog-title {
-    margin: 0;
-    font-size: 1.25rem;
+    font-size: 24px;
     font-weight: 500;
-    color: #333;
+    color: #2c3e50;
+    margin: 0;
   }
 
-  .close-button {
-    color: #666;
-
-    &:hover {
-      background-color: #f0f0f0;
-    }
+  .dialog-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin: 4px 0 0 0;
   }
 }
 
-.material-form {
-  .form-content {
-    padding: 2rem;
+.dialog-content {
+  flex: 1;
+  overflow: auto;
 
-    .form-row {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
 
-      .form-field {
-        flex: 1;
-      }
-
-      &.form-row-two {
-        .form-field {
-          flex: 1;
-        }
-      }
-
-      &.form-row-three {
-        .form-field {
-          flex: 1;
-        }
-      }
-    }
-
-    // Estilos específicos para los campos de formulario
-    .mat-mdc-form-field {
-      width: 100%;
-
-      .mat-mdc-form-field-label {
-        color: #555;
-      }
-
-      .mat-mdc-input-element {
-        color: #333;
-      }
-
-      &.mat-focused .mat-mdc-form-field-label {
-        color: #7c3aed;
-      }
-
-      .mat-mdc-form-field-outline-thick {
-        color: #7c3aed;
-      }
+    mat-form-field {
+      flex: 1;
+      min-width: 200px;
     }
   }
 }
@@ -82,45 +44,29 @@
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  padding: 1.5rem 2rem;
-  border-top: 1px solid #e0e0e0;
-  background-color: #fafafa;
+  gap: 16px;
+  margin-top: 24px;
 
-  .btn-cancel {
-    color: #666;
-    border: 1px solid #ddd;
+  .btn-cancelar {
+    background-color: transparent;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
 
     &:hover {
-      background-color: #f0f0f0;
+      background-color: #f1f5f9;
     }
   }
 
-  .btn-register {
-    background-color: #6c757d;
-    color: white;
-
-    &:hover:not(:disabled) {
-      background-color: #5a6268;
-    }
-
-    &:disabled {
-      background-color: #e9ecef;
-      color: #6c757d;
-    }
-  }
-
-  .btn-save {
+  .btn-guardar {
     background-color: #7c3aed;
     color: white;
 
-    &:hover:not(:disabled) {
+    &:hover {
       background-color: #6d28d9;
     }
 
     &:disabled {
-      background-color: #e9ecef;
-      color: #6c757d;
+      background-color: #c4b5fd;
     }
   }
 }
@@ -141,19 +87,10 @@
     }
   }
 
-  .material-form {
-    .form-content {
-      padding: 1.5rem;
-
-      .form-row {
-        flex-direction: column;
-        margin-bottom: 1rem;
-
-        &.form-row-two,
-        &.form-row-three {
-          flex-direction: column;
-        }
-      }
+  .dialog-content {
+    .form-row {
+      flex-direction: column;
+      margin-bottom: 1rem;
     }
   }
 
@@ -176,8 +113,8 @@
     padding: 0.75rem 1rem;
   }
 
-  .material-form {
-    .form-content {
+  .dialog-content {
+    .form-row {
       padding: 1rem;
     }
   }

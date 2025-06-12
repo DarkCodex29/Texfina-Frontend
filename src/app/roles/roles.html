@@ -1,4 +1,4 @@
-<div class="roles-container">
+<div class="roles-container page-container">
   <!-- Header de la página -->
   <div class="page-header">
     <h1 class="page-title">Gestión de Roles y Permisos</h1>
@@ -72,112 +72,114 @@
     </div>
   </mat-card>
 
-  <!-- Tarjeta de tabla -->
-  <mat-card class="tabla-card">
-    <div class="table-container">
-      <table mat-table [dataSource]="roles" class="roles-table">
-        <!-- Columna Código -->
-        <ng-container matColumnDef="codigo">
-          <th mat-header-cell *matHeaderCellDef>Código</th>
-          <td mat-cell *matCellDef="let rol">{{ rol.id_rol }}</td>
-        </ng-container>
+  <!-- Tabla de roles -->
+  <div class="page-content">
+    <mat-card class="table-card">
+      <div class="table-container">
+        <table mat-table [dataSource]="roles" class="roles-table">
+          <!-- Columna Código -->
+          <ng-container matColumnDef="codigo">
+            <th mat-header-cell *matHeaderCellDef>Código</th>
+            <td mat-cell *matCellDef="let rol">{{ rol.id_rol }}</td>
+          </ng-container>
 
-        <!-- Columna Rol -->
-        <ng-container matColumnDef="rol">
-          <th mat-header-cell *matHeaderCellDef>Rol</th>
-          <td mat-cell *matCellDef="let rol">
-            <div class="rol-info">
-              <div class="rol-nombre">{{ rol.id_rol }}</div>
-              <div class="rol-descripcion">{{ rol.descripcion }}</div>
-            </div>
-          </td>
-        </ng-container>
+          <!-- Columna Rol -->
+          <ng-container matColumnDef="rol">
+            <th mat-header-cell *matHeaderCellDef>Rol</th>
+            <td mat-cell *matCellDef="let rol">
+              <div class="rol-info">
+                <div class="rol-nombre">{{ rol.id_rol }}</div>
+                <div class="rol-descripcion">{{ rol.descripcion }}</div>
+              </div>
+            </td>
+          </ng-container>
 
-        <!-- Columna Usuarios -->
-        <ng-container matColumnDef="usuarios">
-          <th mat-header-cell *matHeaderCellDef>Usuarios</th>
-          <td mat-cell *matCellDef="let rol">
-            <span class="usuarios-count">
-              {{ contarUsuariosPorRol(rol.id_rol) }}
-            </span>
-          </td>
-        </ng-container>
+          <!-- Columna Usuarios -->
+          <ng-container matColumnDef="usuarios">
+            <th mat-header-cell *matHeaderCellDef>Usuarios</th>
+            <td mat-cell *matCellDef="let rol">
+              <span class="usuarios-count">
+                {{ contarUsuariosPorRol(rol.id_rol) }}
+              </span>
+            </td>
+          </ng-container>
 
-        <!-- Columna Permisos -->
-        <ng-container matColumnDef="permisos">
-          <th mat-header-cell *matHeaderCellDef>Permisos</th>
-          <td mat-cell *matCellDef="let rol">
-            <div class="permisos-info">
-              {{ obtenerPermisosPorRol(rol.id_rol).length }} permisos
-            </div>
-          </td>
-        </ng-container>
+          <!-- Columna Permisos -->
+          <ng-container matColumnDef="permisos">
+            <th mat-header-cell *matHeaderCellDef>Permisos</th>
+            <td mat-cell *matCellDef="let rol">
+              <div class="permisos-info">
+                {{ obtenerPermisosPorRol(rol.id_rol).length }} permisos
+              </div>
+            </td>
+          </ng-container>
 
-        <!-- Columna Estado -->
-        <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef>Estado</th>
-          <td mat-cell *matCellDef="let rol">
-            <span
-              class="estado-badge"
-              [ngClass]="rol.activo ? 'estado-activo' : 'estado-inactivo'"
-            >
-              {{ rol.activo ? 'Activo' : 'Inactivo' }}
-            </span>
-          </td>
-        </ng-container>
+          <!-- Columna Estado -->
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let rol">
+              <span
+                class="estado-badge"
+                [ngClass]="rol.activo ? 'estado-activo' : 'estado-inactivo'"
+              >
+                {{ rol.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+          </ng-container>
 
-        <!-- Columna Acciones -->
-        <ng-container matColumnDef="acciones">
-          <th mat-header-cell *matHeaderCellDef>Acciones</th>
-          <td mat-cell *matCellDef="let rol">
-            <button
-              mat-icon-button
-              class="btn-ver"
-              (click)="abrirDialogoDetalle(rol)"
-              matTooltip="Ver detalle"
-            >
-              <mat-icon class="icon-ver">visibility</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              class="btn-editar"
-              (click)="abrirDialogoEditar(rol)"
-              matTooltip="Editar rol"
-            >
-              <mat-icon class="icon-editar">edit</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              class="btn-permisos"
-              (click)="abrirDialogoPermisos(rol)"
-              matTooltip="Gestionar permisos"
-            >
-              <mat-icon class="icon-permisos">security</mat-icon>
-            </button>
-          </td>
-        </ng-container>
+          <!-- Columna Acciones -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let rol">
+              <button
+                mat-icon-button
+                class="btn-ver"
+                (click)="abrirDialogoDetalle(rol)"
+                matTooltip="Ver detalle"
+              >
+                <mat-icon class="icon-ver">visibility</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="btn-editar"
+                (click)="abrirDialogoEditar(rol)"
+                matTooltip="Editar rol"
+              >
+                <mat-icon class="icon-editar">edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="btn-permisos"
+                (click)="abrirDialogoPermisos(rol)"
+                matTooltip="Gestionar permisos"
+              >
+                <mat-icon class="icon-permisos">security</mat-icon>
+              </button>
+            </td>
+          </ng-container>
 
-        <!-- Definición de headers y filas -->
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-      </table>
-    </div>
-
-    <!-- Paginación -->
-    <div class="pagination-container">
-      <div class="pagination-info">
-        Página 1 de 1 ({{ roles.length }} roles)
+          <!-- Definición de headers y filas -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
       </div>
-      <div class="pagination-buttons">
-        <button mat-icon-button disabled>
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <button mat-icon-button disabled>
-          <mat-icon>chevron_right</mat-icon>
-        </button>
+
+      <!-- Paginación -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          Página 1 de 1 ({{ roles.length }} roles)
+        </div>
+        <div class="pagination-buttons">
+          <button mat-icon-button disabled>
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button mat-icon-button disabled>
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
       </div>
-    </div>
-  </mat-card>
+    </mat-card>
+  </div>
 
   <!-- Resumen estadístico -->
   <div class="resumen-container">

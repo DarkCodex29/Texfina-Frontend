@@ -1,4 +1,4 @@
-<div class="stock-container">
+<div class="stock-container page-container">
   <!-- Header de la página -->
   <div class="page-header">
     <h1 class="page-title">Consulta de Stock</h1>
@@ -161,128 +161,131 @@
   </mat-card>
 
   <!-- Tabla de stock -->
-  <mat-card class="table-card">
-    <mat-card-header>
-      <mat-card-title>Stock de Materiales</mat-card-title>
-      <mat-card-subtitle>
-        Mostrando {{ stocksFiltrados.length }} de {{ stocks.length }} registros
-      </mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="table-container">
-        <table mat-table [dataSource]="stocksFiltrados" class="stock-table">
-          <!-- Columna Código -->
-          <ng-container matColumnDef="codigo">
-            <th mat-header-cell *matHeaderCellDef>Código Fox</th>
-            <td mat-cell *matCellDef="let stock">
-              <span class="codigo-cell"
-                >{{ formatearCodigo(stock.codigo_fox) }}</span
-              >
-            </td>
-          </ng-container>
-
-          <!-- Columna Material -->
-          <ng-container matColumnDef="material">
-            <th mat-header-cell *matHeaderCellDef>Material</th>
-            <td mat-cell *matCellDef="let stock">
-              <div class="material-cell">
-                <div class="material-name">{{ stock.nombre }}</div>
-                <div class="material-unit">{{ stock.unidad }}</div>
-              </div>
-            </td>
-          </ng-container>
-
-          <!-- Columna Almacén -->
-          <ng-container matColumnDef="almacen">
-            <th mat-header-cell *matHeaderCellDef>Almacén</th>
-            <td mat-cell *matCellDef="let stock">
-              <span class="almacen-cell">{{ stock.almacen }}</span>
-            </td>
-          </ng-container>
-
-          <!-- Columna Clase -->
-          <ng-container matColumnDef="clase">
-            <th mat-header-cell *matHeaderCellDef>Clase</th>
-            <td mat-cell *matCellDef="let stock">
-              <span class="clase-cell">{{ stock.clase }}</span>
-            </td>
-          </ng-container>
-
-          <!-- Columna Stock Actual -->
-          <ng-container matColumnDef="stock_actual">
-            <th mat-header-cell *matHeaderCellDef>Stock Actual</th>
-            <td mat-cell *matCellDef="let stock">
-              <div class="stock-cell">
-                <div class="stock-value">
-                  {{ formatearNumero(stock.stock_actual) }}
-                </div>
-                <div class="stock-limits">
-                  Min: {{ formatearNumero(stock.stock_minimo) }} | Max: {{
-                  formatearNumero(stock.stock_maximo) }}
-                </div>
-              </div>
-            </td>
-          </ng-container>
-
-          <!-- Columna Estado -->
-          <ng-container matColumnDef="estado">
-            <th mat-header-cell *matHeaderCellDef>Estado</th>
-            <td mat-cell *matCellDef="let stock">
-              <div
-                class="estado-chip"
-                [class]="getColorEstado(stock.estado_stock)"
-              >
-                {{ stock.estado_stock }}
-              </div>
-            </td>
-          </ng-container>
-
-          <!-- Columna Valor Total -->
-          <ng-container matColumnDef="valor_total">
-            <th mat-header-cell *matHeaderCellDef>Valor Total</th>
-            <td mat-cell *matCellDef="let stock">
-              <div class="valor-cell">
-                <div class="valor-total">
-                  {{ formatearMoneda(stock.valor_total) }}
-                </div>
-                <div class="costo-unitario">
-                  {{ formatearMoneda(stock.costo_unitario) }} / {{ stock.unidad
-                  }}
-                </div>
-              </div>
-            </td>
-          </ng-container>
-
-          <!-- Columna Último Movimiento -->
-          <ng-container matColumnDef="ultimo_movimiento">
-            <th mat-header-cell *matHeaderCellDef>Último Movimiento</th>
-            <td mat-cell *matCellDef="let stock">
-              <div class="movimiento-cell">
-                <div class="fecha">
-                  {{ formatearFecha(stock.fecha_ultimo_movimiento) }}
-                </div>
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="verMovimientos(stock)"
-                  matTooltip="Ver historial de movimientos"
+  <div class="page-content">
+    <mat-card class="tabla-card">
+      <mat-card-header>
+        <mat-card-title>Stock de Materiales</mat-card-title>
+        <mat-card-subtitle>
+          Mostrando {{ stocksFiltrados.length }} de {{ stocks.length }}
+          registros
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="stocksFiltrados" class="stock-table">
+            <!-- Columna Código -->
+            <ng-container matColumnDef="codigo">
+              <th mat-header-cell *matHeaderCellDef>Código Fox</th>
+              <td mat-cell *matCellDef="let stock">
+                <span class="codigo-cell"
+                  >{{ formatearCodigo(stock.codigo_fox) }}</span
                 >
-                  <mat-icon>history</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+            <!-- Columna Material -->
+            <ng-container matColumnDef="material">
+              <th mat-header-cell *matHeaderCellDef>Material</th>
+              <td mat-cell *matCellDef="let stock">
+                <div class="material-cell">
+                  <div class="material-name">{{ stock.nombre }}</div>
+                  <div class="material-unit">{{ stock.unidad }}</div>
+                </div>
+              </td>
+            </ng-container>
 
-        <!-- Mensaje cuando no hay datos -->
-        <div *ngIf="stocksFiltrados.length === 0" class="no-data">
-          <h3>No se encontraron registros de stock</h3>
-          <p>Ajuste los filtros de búsqueda para obtener resultados</p>
+            <!-- Columna Almacén -->
+            <ng-container matColumnDef="almacen">
+              <th mat-header-cell *matHeaderCellDef>Almacén</th>
+              <td mat-cell *matCellDef="let stock">
+                <span class="almacen-cell">{{ stock.almacen }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Clase -->
+            <ng-container matColumnDef="clase">
+              <th mat-header-cell *matHeaderCellDef>Clase</th>
+              <td mat-cell *matCellDef="let stock">
+                <span class="clase-cell">{{ stock.clase }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Stock Actual -->
+            <ng-container matColumnDef="stock_actual">
+              <th mat-header-cell *matHeaderCellDef>Stock Actual</th>
+              <td mat-cell *matCellDef="let stock">
+                <div class="stock-cell">
+                  <div class="stock-value">
+                    {{ formatearNumero(stock.stock_actual) }}
+                  </div>
+                  <div class="stock-limits">
+                    Min: {{ formatearNumero(stock.stock_minimo) }} | Max: {{
+                    formatearNumero(stock.stock_maximo) }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Estado -->
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let stock">
+                <div
+                  class="estado-chip"
+                  [class]="getColorEstado(stock.estado_stock)"
+                >
+                  {{ stock.estado_stock }}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Valor Total -->
+            <ng-container matColumnDef="valor_total">
+              <th mat-header-cell *matHeaderCellDef>Valor Total</th>
+              <td mat-cell *matCellDef="let stock">
+                <div class="valor-cell">
+                  <div class="valor-total">
+                    {{ formatearMoneda(stock.valor_total) }}
+                  </div>
+                  <div class="costo-unitario">
+                    {{ formatearMoneda(stock.costo_unitario) }} / {{
+                    stock.unidad }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Último Movimiento -->
+            <ng-container matColumnDef="ultimo_movimiento">
+              <th mat-header-cell *matHeaderCellDef>Último Movimiento</th>
+              <td mat-cell *matCellDef="let stock">
+                <div class="movimiento-cell">
+                  <div class="fecha">
+                    {{ formatearFecha(stock.fecha_ultimo_movimiento) }}
+                  </div>
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    (click)="verMovimientos(stock)"
+                    matTooltip="Ver historial de movimientos"
+                  >
+                    <mat-icon>history</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <!-- Mensaje cuando no hay datos -->
+          <div *ngIf="stocksFiltrados.length === 0" class="no-data">
+            <h3>No se encontraron registros de stock</h3>
+            <p>Ajuste los filtros de búsqueda para obtener resultados</p>
+          </div>
         </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>

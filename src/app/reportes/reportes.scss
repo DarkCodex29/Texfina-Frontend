@@ -1,10 +1,13 @@
 /* Contenedor principal */
 .reportes-container {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  background: #f8f9fa;
-  min-height: 100vh;
+  padding: 1.5rem;
+  background-color: #f5f7fa;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // Importante para contener el scroll
 }
 
 /* Header de la página */
@@ -262,32 +265,16 @@
 
 /* Tabs de reportes */
 .reportes-tabs {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
 
-  ::ng-deep .mat-tab-group {
-    .mat-tab-header {
-      border-bottom: 1px solid #e5e7eb;
-
-      .mat-tab-label {
-        font-weight: 500;
-        color: #6b7280;
-
-        &.mat-tab-label-active {
-          color: #7c3aed;
-        }
-      }
-
-      .mat-ink-bar {
-        background-color: #7c3aed;
-      }
-    }
-
-    .mat-tab-body-content {
-      padding: 0;
-    }
-  }
+::ng-deep .mat-mdc-tab-body-wrapper {
+  flex: 1;
+  overflow: hidden;
 }
 
 /* Tarjeta de tabla */
@@ -550,4 +537,21 @@
       }
     }
   }
+}
+
+/* Estilos para la tabla - MÁXIMA DENSIDAD */
+.tabla-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0; // Importante para que flex funcione correctamente
+}
+
+.table-container {
+  flex: 1;
+  overflow: auto;
+  min-height: 0; // Importante para que flex funcione correctamente
 }

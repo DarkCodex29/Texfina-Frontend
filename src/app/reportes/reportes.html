@@ -1,4 +1,4 @@
-<div class="reportes-container">
+<div class="reportes-container page-container">
   <!-- Header de la página -->
   <div class="page-header">
     <h1 class="page-title">Reportes y Analytics</h1>
@@ -161,237 +161,241 @@
   ></mat-progress-bar>
 
   <!-- Contenido de reportes por tabs -->
-  <mat-tab-group class="reportes-tabs" *ngIf="!cargandoReporte">
-    <!-- Tab Reporte de Inventario -->
-    <mat-tab
-      label="Inventario Valorizado"
-      *ngIf="filtrosForm.value.tipo_reporte === 'inventario'"
-    >
-      <mat-card class="table-card">
-        <mat-card-header>
-          <mat-card-title>Reporte de Inventario Valorizado</mat-card-title>
-          <mat-card-subtitle>
-            Mostrando {{ reporteInventario.length }} items
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="table-container">
-            <table
-              mat-table
-              [dataSource]="reporteInventario"
-              class="reportes-table"
-            >
-              <!-- Columna Código -->
-              <ng-container matColumnDef="codigo">
-                <th mat-header-cell *matHeaderCellDef>Código Fox</th>
-                <td mat-cell *matCellDef="let item">
-                  <span class="codigo-cell">{{ item.codigo_fox }}</span>
-                </td>
-              </ng-container>
+  <div class="page-content">
+    <mat-tab-group class="reportes-tabs" *ngIf="!cargandoReporte">
+      <!-- Tab Reporte de Inventario -->
+      <mat-tab
+        label="Inventario Valorizado"
+        *ngIf="filtrosForm.value.tipo_reporte === 'inventario'"
+      >
+        <mat-card class="table-card">
+          <mat-card-header>
+            <mat-card-title>Reporte de Inventario Valorizado</mat-card-title>
+            <mat-card-subtitle>
+              Mostrando {{ reporteInventario.length }} items
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="table-container">
+              <table
+                mat-table
+                [dataSource]="reporteInventario"
+                class="reportes-table"
+              >
+                <!-- Columna Código -->
+                <ng-container matColumnDef="codigo">
+                  <th mat-header-cell *matHeaderCellDef>Código Fox</th>
+                  <td mat-cell *matCellDef="let item">
+                    <span class="codigo-cell">{{ item.codigo_fox }}</span>
+                  </td>
+                </ng-container>
 
-              <!-- Columna Material -->
-              <ng-container matColumnDef="material">
-                <th mat-header-cell *matHeaderCellDef>Material</th>
-                <td mat-cell *matCellDef="let item">
-                  <div class="material-cell">
-                    <div class="material-name">{{ item.nombre }}</div>
-                  </div>
-                </td>
-              </ng-container>
+                <!-- Columna Material -->
+                <ng-container matColumnDef="material">
+                  <th mat-header-cell *matHeaderCellDef>Material</th>
+                  <td mat-cell *matCellDef="let item">
+                    <div class="material-cell">
+                      <div class="material-name">{{ item.nombre }}</div>
+                    </div>
+                  </td>
+                </ng-container>
 
-              <!-- Columna Almacén -->
-              <ng-container matColumnDef="almacen">
-                <th mat-header-cell *matHeaderCellDef>Almacén</th>
-                <td mat-cell *matCellDef="let item">
-                  <span class="almacen-cell">{{ item.almacen }}</span>
-                </td>
-              </ng-container>
+                <!-- Columna Almacén -->
+                <ng-container matColumnDef="almacen">
+                  <th mat-header-cell *matHeaderCellDef>Almacén</th>
+                  <td mat-cell *matCellDef="let item">
+                    <span class="almacen-cell">{{ item.almacen }}</span>
+                  </td>
+                </ng-container>
 
-              <!-- Columna Clase -->
-              <ng-container matColumnDef="clase">
-                <th mat-header-cell *matHeaderCellDef>Clase</th>
-                <td mat-cell *matCellDef="let item">
-                  <span class="clase-cell">{{ item.clase }}</span>
-                </td>
-              </ng-container>
+                <!-- Columna Clase -->
+                <ng-container matColumnDef="clase">
+                  <th mat-header-cell *matHeaderCellDef>Clase</th>
+                  <td mat-cell *matCellDef="let item">
+                    <span class="clase-cell">{{ item.clase }}</span>
+                  </td>
+                </ng-container>
 
-              <!-- Columna Stock -->
-              <ng-container matColumnDef="stock_actual">
-                <th mat-header-cell *matHeaderCellDef>Stock Actual</th>
-                <td mat-cell *matCellDef="let item">
-                  <span class="stock-cell"
-                    >{{ formatearNumero(item.stock_actual) }}</span
-                  >
-                </td>
-              </ng-container>
+                <!-- Columna Stock -->
+                <ng-container matColumnDef="stock_actual">
+                  <th mat-header-cell *matHeaderCellDef>Stock Actual</th>
+                  <td mat-cell *matCellDef="let item">
+                    <span class="stock-cell"
+                      >{{ formatearNumero(item.stock_actual) }}</span
+                    >
+                  </td>
+                </ng-container>
 
-              <!-- Columna Valor Total -->
-              <ng-container matColumnDef="valor_total">
-                <th mat-header-cell *matHeaderCellDef>Valor Total</th>
-                <td mat-cell *matCellDef="let item">
-                  <span class="valor-cell"
-                    >{{ formatearMoneda(item.valor_total) }}</span
-                  >
-                </td>
-              </ng-container>
+                <!-- Columna Valor Total -->
+                <ng-container matColumnDef="valor_total">
+                  <th mat-header-cell *matHeaderCellDef>Valor Total</th>
+                  <td mat-cell *matCellDef="let item">
+                    <span class="valor-cell"
+                      >{{ formatearMoneda(item.valor_total) }}</span
+                    >
+                  </td>
+                </ng-container>
 
-              <!-- Columna Rotación -->
-              <ng-container matColumnDef="rotacion">
-                <th mat-header-cell *matHeaderCellDef>Rotación</th>
-                <td mat-cell *matCellDef="let item">
-                  <span
-                    class="rotacion-cell"
-                    [class]="getColorRotacion(item.rotacion)"
-                  >
-                    {{ item.rotacion }}x
-                  </span>
-                </td>
-              </ng-container>
+                <!-- Columna Rotación -->
+                <ng-container matColumnDef="rotacion">
+                  <th mat-header-cell *matHeaderCellDef>Rotación</th>
+                  <td mat-cell *matCellDef="let item">
+                    <span
+                      class="rotacion-cell"
+                      [class]="getColorRotacion(item.rotacion)"
+                    >
+                      {{ item.rotacion }}x
+                    </span>
+                  </td>
+                </ng-container>
 
-              <!-- Columna Días Inventario -->
-              <ng-container matColumnDef="dias_inventario">
-                <th mat-header-cell *matHeaderCellDef>Días Inventario</th>
-                <td mat-cell *matCellDef="let item">
-                  <span class="dias-cell">{{ item.dias_inventario }} días</span>
-                </td>
-              </ng-container>
+                <!-- Columna Días Inventario -->
+                <ng-container matColumnDef="dias_inventario">
+                  <th mat-header-cell *matHeaderCellDef>Días Inventario</th>
+                  <td mat-cell *matCellDef="let item">
+                    <span class="dias-cell"
+                      >{{ item.dias_inventario }} días</span
+                    >
+                  </td>
+                </ng-container>
 
-              <tr
-                mat-header-row
-                *matHeaderRowDef="displayedColumnsInventario"
-              ></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: displayedColumnsInventario;"
-              ></tr>
-            </table>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-tab>
+                <tr
+                  mat-header-row
+                  *matHeaderRowDef="displayedColumnsInventario"
+                ></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumnsInventario;"
+                ></tr>
+              </table>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
 
-    <!-- Tab Movimientos -->
-    <mat-tab
-      label="Movimientos de Stock"
-      *ngIf="filtrosForm.value.tipo_reporte === 'movimientos'"
-    >
-      <mat-card class="table-card">
-        <mat-card-header>
-          <mat-card-title>Movimientos de Stock</mat-card-title>
-          <mat-card-subtitle>
-            Mostrando {{ reporteMovimientos.length }} movimientos
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="table-container">
-            <table
-              mat-table
-              [dataSource]="reporteMovimientos"
-              class="reportes-table"
-            >
-              <!-- Columna Fecha -->
-              <ng-container matColumnDef="fecha">
-                <th mat-header-cell *matHeaderCellDef>Fecha</th>
-                <td mat-cell *matCellDef="let mov">
-                  <span class="fecha-cell"
-                    >{{ formatearFecha(mov.fecha) }}</span
-                  >
-                </td>
-              </ng-container>
+      <!-- Tab Movimientos -->
+      <mat-tab
+        label="Movimientos de Stock"
+        *ngIf="filtrosForm.value.tipo_reporte === 'movimientos'"
+      >
+        <mat-card class="table-card">
+          <mat-card-header>
+            <mat-card-title>Movimientos de Stock</mat-card-title>
+            <mat-card-subtitle>
+              Mostrando {{ reporteMovimientos.length }} movimientos
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="table-container">
+              <table
+                mat-table
+                [dataSource]="reporteMovimientos"
+                class="reportes-table"
+              >
+                <!-- Columna Fecha -->
+                <ng-container matColumnDef="fecha">
+                  <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                  <td mat-cell *matCellDef="let mov">
+                    <span class="fecha-cell"
+                      >{{ formatearFecha(mov.fecha) }}</span
+                    >
+                  </td>
+                </ng-container>
 
-              <!-- Columna Tipo -->
-              <ng-container matColumnDef="tipo">
-                <th mat-header-cell *matHeaderCellDef>Tipo</th>
-                <td mat-cell *matCellDef="let mov">
-                  <span
-                    class="tipo-cell"
-                    [class]="getColorMovimiento(mov.tipo_movimiento)"
-                  >
-                    {{ mov.tipo_movimiento }}
-                  </span>
-                </td>
-              </ng-container>
+                <!-- Columna Tipo -->
+                <ng-container matColumnDef="tipo">
+                  <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                  <td mat-cell *matCellDef="let mov">
+                    <span
+                      class="tipo-cell"
+                      [class]="getColorMovimiento(mov.tipo_movimiento)"
+                    >
+                      {{ mov.tipo_movimiento }}
+                    </span>
+                  </td>
+                </ng-container>
 
-              <!-- Columna Código -->
-              <ng-container matColumnDef="codigo">
-                <th mat-header-cell *matHeaderCellDef>Código</th>
-                <td mat-cell *matCellDef="let mov">
-                  <span class="codigo-cell">{{ mov.codigo_fox }}</span>
-                </td>
-              </ng-container>
+                <!-- Columna Código -->
+                <ng-container matColumnDef="codigo">
+                  <th mat-header-cell *matHeaderCellDef>Código</th>
+                  <td mat-cell *matCellDef="let mov">
+                    <span class="codigo-cell">{{ mov.codigo_fox }}</span>
+                  </td>
+                </ng-container>
 
-              <!-- Columna Material -->
-              <ng-container matColumnDef="material">
-                <th mat-header-cell *matHeaderCellDef>Material</th>
-                <td mat-cell *matCellDef="let mov">
-                  <span class="material-cell">{{ mov.material }}</span>
-                </td>
-              </ng-container>
+                <!-- Columna Material -->
+                <ng-container matColumnDef="material">
+                  <th mat-header-cell *matHeaderCellDef>Material</th>
+                  <td mat-cell *matCellDef="let mov">
+                    <span class="material-cell">{{ mov.material }}</span>
+                  </td>
+                </ng-container>
 
-              <!-- Columna Cantidad -->
-              <ng-container matColumnDef="cantidad">
-                <th mat-header-cell *matHeaderCellDef>Cantidad</th>
-                <td mat-cell *matCellDef="let mov">
-                  <span
-                    class="cantidad-cell"
-                    [class]="mov.cantidad >= 0 ? 'positiva' : 'negativa'"
-                  >
-                    {{ formatearCantidad(mov.cantidad) }}
-                  </span>
-                </td>
-              </ng-container>
+                <!-- Columna Cantidad -->
+                <ng-container matColumnDef="cantidad">
+                  <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+                  <td mat-cell *matCellDef="let mov">
+                    <span
+                      class="cantidad-cell"
+                      [class]="mov.cantidad >= 0 ? 'positiva' : 'negativa'"
+                    >
+                      {{ formatearCantidad(mov.cantidad) }}
+                    </span>
+                  </td>
+                </ng-container>
 
-              <!-- Columna Almacén -->
-              <ng-container matColumnDef="almacen">
-                <th mat-header-cell *matHeaderCellDef>Almacén</th>
-                <td mat-cell *matCellDef="let mov">
-                  <span class="almacen-cell">{{ mov.almacen }}</span>
-                </td>
-              </ng-container>
+                <!-- Columna Almacén -->
+                <ng-container matColumnDef="almacen">
+                  <th mat-header-cell *matHeaderCellDef>Almacén</th>
+                  <td mat-cell *matCellDef="let mov">
+                    <span class="almacen-cell">{{ mov.almacen }}</span>
+                  </td>
+                </ng-container>
 
-              <!-- Columna Usuario -->
-              <ng-container matColumnDef="usuario">
-                <th mat-header-cell *matHeaderCellDef>Usuario</th>
-                <td mat-cell *matCellDef="let mov">
-                  <span class="usuario-cell">{{ mov.usuario }}</span>
-                </td>
-              </ng-container>
+                <!-- Columna Usuario -->
+                <ng-container matColumnDef="usuario">
+                  <th mat-header-cell *matHeaderCellDef>Usuario</th>
+                  <td mat-cell *matCellDef="let mov">
+                    <span class="usuario-cell">{{ mov.usuario }}</span>
+                  </td>
+                </ng-container>
 
-              <tr
-                mat-header-row
-                *matHeaderRowDef="displayedColumnsMovimientos"
-              ></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: displayedColumnsMovimientos;"
-              ></tr>
-            </table>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-tab>
+                <tr
+                  mat-header-row
+                  *matHeaderRowDef="displayedColumnsMovimientos"
+                ></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumnsMovimientos;"
+                ></tr>
+              </table>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
 
-    <!-- Tabs adicionales para otros tipos de reportes -->
-    <mat-tab
-      label="En Desarrollo"
-      *ngIf="filtrosForm.value.tipo_reporte === 'rotacion'"
-    >
-      <div class="coming-soon">
-        <h3>Análisis de Rotación</h3>
-        <p>Este reporte estará disponible próximamente</p>
-      </div>
-    </mat-tab>
+      <!-- Tabs adicionales para otros tipos de reportes -->
+      <mat-tab
+        label="En Desarrollo"
+        *ngIf="filtrosForm.value.tipo_reporte === 'rotacion'"
+      >
+        <div class="coming-soon">
+          <h3>Análisis de Rotación</h3>
+          <p>Este reporte estará disponible próximamente</p>
+        </div>
+      </mat-tab>
 
-    <mat-tab
-      label="En Desarrollo"
-      *ngIf="filtrosForm.value.tipo_reporte === 'valorizado'"
-    >
-      <div class="coming-soon">
-        <h3>Inventario Valorizado Avanzado</h3>
-        <p>Este reporte estará disponible próximamente</p>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+      <mat-tab
+        label="En Desarrollo"
+        *ngIf="filtrosForm.value.tipo_reporte === 'valorizado'"
+      >
+        <div class="coming-soon">
+          <h3>Inventario Valorizado Avanzado</h3>
+          <p>Este reporte estará disponible próximamente</p>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
 
   <!-- Mensaje cuando no hay datos -->
   <div

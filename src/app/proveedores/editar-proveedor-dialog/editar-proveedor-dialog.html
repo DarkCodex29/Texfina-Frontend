@@ -1,83 +1,80 @@
 <div class="dialog-container">
   <div class="dialog-header">
     <h2 class="dialog-title">
-      {{ isEditMode ? 'Editar proveedor' : 'Agregar proveedor' }}
+      {{isEditMode ? 'Editar' : 'Registrar'}} Proveedor
     </h2>
-    <button mat-icon-button mat-dialog-close class="close-button">
-      <mat-icon>close</mat-icon>
-    </button>
+    <p class="dialog-subtitle">
+      Complete los campos para {{isEditMode ? 'actualizar' : 'registrar'}} un
+      proveedor
+    </p>
   </div>
 
-  <form
-    [formGroup]="proveedorForm"
-    (ngSubmit)="onSubmit()"
-    class="proveedor-form"
-  >
-    <div class="form-content">
-      <!-- Primera fila - RUC -->
+  <div class="dialog-content">
+    <form [formGroup]="proveedorForm">
+      <!-- Primera fila: Empresa y RUC -->
       <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>RUC</mat-label>
-          <input matInput formControlName="ruc" placeholder="Ingrese el RUC" />
-          <mat-error *ngIf="proveedorForm.get('ruc')?.hasError('required')">
-            El RUC es requerido
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <!-- Segunda fila - Razón social -->
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Razón social</mat-label>
+        <mat-form-field appearance="outline">
+          <mat-label>Empresa</mat-label>
           <input
             matInput
             formControlName="empresa"
-            placeholder="Ingrese la razón social"
+            placeholder="Nombre de la empresa"
           />
           <mat-error *ngIf="proveedorForm.get('empresa')?.hasError('required')">
-            La razón social es requerida
+            El nombre de la empresa es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>RUC</mat-label>
+          <input matInput formControlName="ruc" placeholder="Ej: 20123456789" />
+          <mat-error *ngIf="proveedorForm.get('ruc')?.hasError('required')">
+            El RUC es requerido
+          </mat-error>
+          <mat-error *ngIf="proveedorForm.get('ruc')?.hasError('pattern')">
+            El RUC debe tener 11 dígitos
           </mat-error>
         </mat-form-field>
       </div>
 
-      <!-- Tercera fila - Dirección -->
+      <!-- Segunda fila: Contacto -->
       <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Dirección</mat-label>
-          <input
-            matInput
-            formControlName="direccion"
-            placeholder="Ingrese la dirección"
-          />
-        </mat-form-field>
-      </div>
-
-      <!-- Cuarta fila - Contacto -->
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Contacto</mat-label>
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre de Contacto</mat-label>
           <input
             matInput
             formControlName="contacto"
-            placeholder="Ingrese el contacto"
+            placeholder="Nombre y apellido"
           />
         </mat-form-field>
       </div>
-    </div>
 
-    <!-- Botones de acción -->
-    <div class="dialog-actions">
-      <button mat-button type="button" (click)="onCancel()" class="btn-cancel">
-        Cancelar
-      </button>
-      <button
-        mat-raised-button
-        type="submit"
-        [disabled]="!proveedorForm.valid"
-        [ngClass]="isEditMode ? 'btn-save' : 'btn-create'"
-      >
-        {{ isEditMode ? 'Editar' : 'Crear' }}
-      </button>
-    </div>
-  </form>
+      <!-- Tercera fila: Dirección -->
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Dirección</mat-label>
+          <textarea
+            matInput
+            formControlName="direccion"
+            placeholder="Dirección completa"
+            rows="3"
+          ></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-actions">
+    <button mat-button class="btn-cancelar" (click)="onCancel()">
+      Cancelar
+    </button>
+    <button
+      mat-raised-button
+      class="btn-guardar"
+      [disabled]="proveedorForm.invalid"
+      (click)="onSubmit()"
+    >
+      {{isEditMode ? 'Actualizar' : 'Registrar'}}
+    </button>
+  </div>
 </div>

@@ -1,205 +1,55 @@
-.roles-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+// ============================================================================
+// ROLES - ESTILOS ESPECÍFICOS (SIN LAYOUT)
+// ============================================================================
 
-/* Header de la página */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+// Solo estilos específicos de la tabla de roles
+.roles-table {
+  width: 100%;
+  background-color: white;
 
-  .page-title {
-    color: #333;
-    font-size: 24px;
-    font-weight: 500;
-    margin: 0;
+  .mat-mdc-header-cell {
+    background-color: #fafafa;
+    color: #666;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.75rem;
+    border-bottom: 2px solid #e0e0e0;
   }
 
-  .action-buttons {
-    .btn-agregar {
-      background: #7c3aed;
-      color: white;
-      padding: 8px 16px;
-      font-weight: 500;
+  .mat-mdc-row {
+    height: 48px;
+    border-bottom: 1px solid #f0f0f0;
 
-      &:hover {
-        background: #6d28d9;
-      }
+    &:hover {
+      background-color: #f8f9fa !important;
     }
-  }
-}
 
-/* Tarjeta de filtros */
-.filtros-card {
-  margin-bottom: 20px;
-  padding: 16px;
+    .mat-mdc-cell {
+      font-size: 0.875rem;
+      padding: 0.75rem;
+      color: #333;
 
-  .filtros-form {
-    .filtros-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-
-      .filtro-field {
-        flex: 1;
-        min-width: 200px;
-      }
-
-      .filtro-buttons {
+      .action-buttons {
         display: flex;
-        gap: 10px;
-
-        .btn-buscar {
-          background: #7c3aed;
-          color: white;
-
-          &:hover {
-            background: #6d28d9;
-          }
-        }
-
-        .btn-limpiar {
-          color: #7c3aed;
-          border-color: #7c3aed;
-
-          &:hover {
-            background: rgba(124, 58, 237, 0.1);
-          }
-        }
-      }
-    }
-  }
-}
-
-/* Tarjeta de tabla */
-.tabla-card {
-  padding: 16px;
-
-  .table-container {
-    overflow-x: auto;
-
-    .roles-table {
-      width: 100%;
-      background: white;
-
-      th {
-        font-weight: 600;
-        color: #374151;
-        background: #f9fafb;
+        gap: 0.5rem;
+        justify-content: center;
       }
 
-      td {
-        padding: 12px 8px;
-        border-bottom: 1px solid #e5e7eb;
-      }
-
-      tr:hover {
-        background-color: rgba(124, 58, 237, 0.05);
-      }
-
-      .rol-info {
-        .rol-nombre {
-          font-weight: 600;
-          color: #111827;
-          margin-bottom: 4px;
-        }
-
-        .rol-descripcion {
-          font-size: 12px;
-          color: #6b7280;
-        }
-      }
-
-      .usuarios-count {
-        display: inline-block;
-        background: #7c3aed;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 500;
-        min-width: 20px;
-        text-align: center;
-      }
-
-      .permisos-info {
-        color: #374151;
-        font-size: 14px;
-      }
-
-      .estado-badge {
-        padding: 4px 12px;
-        border-radius: 16px;
-        font-size: 12px;
-        font-weight: 500;
-        display: inline-block;
-
-        &.estado-activo {
-          background: #d1fae5;
-          color: #065f46;
-        }
-
-        &.estado-inactivo {
-          background: #fee2e2;
-          color: #991b1b;
-        }
-      }
-
-      .btn-ver {
-        .icon-ver {
-          color: #0ea5e9;
-        }
-
-        &:hover {
-          background: rgba(14, 165, 233, 0.1);
-        }
-      }
-
+      .btn-ver,
       .btn-editar {
-        .icon-editar {
-          color: #f59e0b;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+
+        &.btn-ver {
+          background-color: #e0f2fe;
+          color: #0284c7;
         }
 
-        &:hover {
-          background: rgba(245, 158, 11, 0.1);
+        &.btn-editar {
+          background-color: #ecfdf5;
+          color: #059669;
         }
-      }
-
-      .btn-permisos {
-        .icon-permisos {
-          color: #7c3aed;
-        }
-
-        &:hover {
-          background: rgba(124, 58, 237, 0.1);
-        }
-      }
-    }
-  }
-
-  .pagination-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #e5e7eb;
-
-    .pagination-info {
-      color: #6b7280;
-      font-size: 14px;
-    }
-
-    .pagination-buttons {
-      display: flex;
-      gap: 8px;
-
-      button[disabled] {
-        color: #d1d5db;
       }
     }
   }
@@ -241,39 +91,5 @@
         transition: all 0.3s ease;
       }
     }
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .roles-container {
-    padding: 10px;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .filtros-row {
-    flex-direction: column;
-    align-items: stretch;
-
-    .filtro-field {
-      min-width: unset;
-    }
-
-    .filtro-buttons {
-      justify-content: stretch;
-
-      button {
-        flex: 1;
-      }
-    }
-  }
-
-  .resumen-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }

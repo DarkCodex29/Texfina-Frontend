@@ -1,4 +1,4 @@
-<div class="proveedores-container">
+<div class="proveedores-container page-container">
   <div class="page-header">
     <h1 class="page-title">Listado de proveedores</h1>
     <div class="action-buttons">
@@ -67,7 +67,8 @@
   </mat-card>
 
   <!-- Tabla de proveedores -->
-  <mat-card class="tabla-card">
+  <div class="page-content">
+    <mat-card class="table-card">
     <div class="table-container">
       <table mat-table [dataSource]="proveedores" class="proveedores-table">
         <!-- Columna Empresa -->
@@ -145,4 +146,5 @@
       </div>
     </div>
   </mat-card>
+  </div>
 </div>

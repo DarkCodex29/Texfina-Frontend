@@ -1,4 +1,4 @@
-<div class="logs-container">
+<div class="logs-container page-container">
   <!-- Header de la página -->
   <div class="page-header">
     <h1 class="page-title">Auditoría y Logs del Sistema</h1>
@@ -145,152 +145,154 @@
     </form>
   </mat-card>
 
-  <!-- Tarjeta de tabla de logs -->
-  <mat-card class="tabla-card">
-    <div class="table-container">
-      <table mat-table [dataSource]="logs" class="logs-table" matSort>
-        <!-- Columna Timestamp -->
-        <ng-container matColumnDef="timestamp">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header
-            class="th-timestamp"
-          >
-            Fecha y Hora
-          </th>
-          <td mat-cell *matCellDef="let log" class="td-timestamp">
-            <div class="timestamp-info">
-              <span class="fecha">{{ formatearFecha(log.timestamp) }}</span>
-            </div>
-          </td>
-        </ng-container>
-
-        <!-- Columna Usuario -->
-        <ng-container matColumnDef="usuario">
-          <th mat-header-cell *matHeaderCellDef class="th-usuario">Usuario</th>
-          <td mat-cell *matCellDef="let log" class="td-usuario">
-            <div class="usuario-info">
-              <mat-icon class="user-icon">person</mat-icon>
-              <span class="user-name"
-                >{{ getNombreUsuario(log.id_usuario) }}</span
-              >
-            </div>
-          </td>
-        </ng-container>
-
-        <!-- Columna Acción -->
-        <ng-container matColumnDef="accion">
-          <th mat-header-cell *matHeaderCellDef class="th-accion">Acción</th>
-          <td mat-cell *matCellDef="let log" class="td-accion">
-            <mat-chip-set>
-              <mat-chip
-                [class]="'chip-' + getColorAccion(log.accion)"
-                [class.severity]="getNivelSeveridad(log.accion)"
-              >
-                {{ log.accion }}
-              </mat-chip>
-            </mat-chip-set>
-          </td>
-        </ng-container>
-
-        <!-- Columna Módulo -->
-        <ng-container matColumnDef="modulo">
-          <th mat-header-cell *matHeaderCellDef class="th-modulo">Módulo</th>
-          <td mat-cell *matCellDef="let log" class="td-modulo">
-            <span class="modulo-badge">{{ log.modulo || '-' }}</span>
-          </td>
-        </ng-container>
-
-        <!-- Columna Tabla Afectada -->
-        <ng-container matColumnDef="tabla_afectada">
-          <th mat-header-cell *matHeaderCellDef class="th-tabla">Tabla</th>
-          <td mat-cell *matCellDef="let log" class="td-tabla">
-            <code class="table-name">{{ log.tabla_afectada || '-' }}</code>
-          </td>
-        </ng-container>
-
-        <!-- Columna Descripción -->
-        <ng-container matColumnDef="descripcion">
-          <th mat-header-cell *matHeaderCellDef class="th-descripcion">
-            Descripción
-          </th>
-          <td mat-cell *matCellDef="let log" class="td-descripcion">
-            <span
-              class="descripcion-text"
-              [matTooltip]="log.descripcion"
-              matTooltipClass="custom-tooltip"
+  <!-- Tabla de logs -->
+  <div class="page-content">
+    <mat-card class="table-card">
+      <div class="table-container">
+        <table mat-table [dataSource]="logs" class="logs-table" matSort>
+          <!-- Columna Timestamp -->
+          <ng-container matColumnDef="timestamp">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              class="th-timestamp"
             >
-              {{ log.descripcion || '-' }}
-            </span>
-          </td>
-        </ng-container>
+              Fecha y Hora
+            </th>
+            <td mat-cell *matCellDef="let log" class="td-timestamp">
+              <div class="timestamp-info">
+                <span class="fecha">{{ formatearFecha(log.timestamp) }}</span>
+              </div>
+            </td>
+          </ng-container>
 
-        <!-- Columna IP -->
-        <ng-container matColumnDef="ip_origen">
-          <th mat-header-cell *matHeaderCellDef class="th-ip">IP Origen</th>
-          <td mat-cell *matCellDef="let log" class="td-ip">
-            <code class="ip-address">{{ log.ip_origen || '-' }}</code>
-          </td>
-        </ng-container>
+          <!-- Columna Usuario -->
+          <ng-container matColumnDef="usuario">
+            <th mat-header-cell *matHeaderCellDef class="th-usuario">Usuario</th>
+            <td mat-cell *matCellDef="let log" class="td-usuario">
+              <div class="usuario-info">
+                <mat-icon class="user-icon">person</mat-icon>
+                <span class="user-name"
+                  >{{ getNombreUsuario(log.id_usuario) }}</span
+                >
+              </div>
+            </td>
+          </ng-container>
 
-        <!-- Columna Acciones -->
-        <ng-container matColumnDef="acciones">
-          <th mat-header-cell *matHeaderCellDef class="th-acciones">
-            Acciones
-          </th>
-          <td mat-cell *matCellDef="let log" class="td-acciones">
-            <div class="action-buttons">
-              <button
-                mat-icon-button
-                (click)="verDetalleLogs(log)"
-                matTooltip="Ver detalle completo"
-                class="btn-detalle"
+          <!-- Columna Acción -->
+          <ng-container matColumnDef="accion">
+            <th mat-header-cell *matHeaderCellDef class="th-accion">Acción</th>
+            <td mat-cell *matCellDef="let log" class="td-accion">
+              <mat-chip-set>
+                <mat-chip
+                  [class]="'chip-' + getColorAccion(log.accion)"
+                  [class.severity]="getNivelSeveridad(log.accion)"
+                >
+                  {{ log.accion }}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <!-- Columna Módulo -->
+          <ng-container matColumnDef="modulo">
+            <th mat-header-cell *matHeaderCellDef class="th-modulo">Módulo</th>
+            <td mat-cell *matCellDef="let log" class="td-modulo">
+              <span class="modulo-badge">{{ log.modulo || '-' }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Tabla Afectada -->
+          <ng-container matColumnDef="tabla_afectada">
+            <th mat-header-cell *matHeaderCellDef class="th-tabla">Tabla</th>
+            <td mat-cell *matCellDef="let log" class="td-tabla">
+              <code class="table-name">{{ log.tabla_afectada || '-' }}</code>
+            </td>
+          </ng-container>
+
+          <!-- Columna Descripción -->
+          <ng-container matColumnDef="descripcion">
+            <th mat-header-cell *matHeaderCellDef class="th-descripcion">
+              Descripción
+            </th>
+            <td mat-cell *matCellDef="let log" class="td-descripcion">
+              <span
+                class="descripcion-text"
+                [matTooltip]="log.descripcion"
+                matTooltipClass="custom-tooltip"
               >
-                <mat-icon>visibility</mat-icon>
-              </button>
-            </div>
-          </td>
-        </ng-container>
+                {{ log.descripcion || '-' }}
+              </span>
+            </td>
+          </ng-container>
 
-        <!-- Headers y filas -->
-        <tr
-          mat-header-row
-          *matHeaderRowDef="displayedColumns; sticky: true"
-        ></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
+          <!-- Columna IP -->
+          <ng-container matColumnDef="ip_origen">
+            <th mat-header-cell *matHeaderCellDef class="th-ip">IP Origen</th>
+            <td mat-cell *matCellDef="let log" class="td-ip">
+              <code class="ip-address">{{ log.ip_origen || '-' }}</code>
+            </td>
+          </ng-container>
 
-      <!-- Estado sin datos -->
-      <div *ngIf="logs.length === 0" class="no-data">
-        <mat-icon>assignment</mat-icon>
-        <p>No se encontraron logs con los filtros aplicados</p>
-        <button mat-raised-button color="primary" (click)="limpiarFiltros()">
-          <mat-icon>refresh</mat-icon>
-          Mostrar todos los logs
-        </button>
-      </div>
-    </div>
+          <!-- Columna Acciones -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef class="th-acciones">
+              Acciones
+            </th>
+            <td mat-cell *matCellDef="let log" class="td-acciones">
+              <div class="action-buttons">
+                <button
+                  mat-icon-button
+                  (click)="verDetalleLogs(log)"
+                  matTooltip="Ver detalle completo"
+                  class="btn-detalle"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
 
-    <!-- Información de paginación -->
-    <div class="pagination-container">
-      <div class="pagination-info">
-        <span>Mostrando {{ logs.length }} registros</span>
+          <!-- Headers y filas -->
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Estado sin datos -->
+        <div *ngIf="logs.length === 0" class="no-data">
+          <mat-icon>assignment</mat-icon>
+          <p>No se encontraron logs con los filtros aplicados</p>
+          <button mat-raised-button color="primary" (click)="limpiarFiltros()">
+            <mat-icon>refresh</mat-icon>
+            Mostrar todos los logs
+          </button>
+        </div>
       </div>
-      <div class="pagination-buttons">
-        <button mat-icon-button disabled>
-          <mat-icon>first_page</mat-icon>
-        </button>
-        <button mat-icon-button disabled>
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <button mat-icon-button disabled>
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-        <button mat-icon-button disabled>
-          <mat-icon>last_page</mat-icon>
-        </button>
+
+      <!-- Información de paginación -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          <span>Mostrando {{ logs.length }} registros</span>
+        </div>
+        <div class="pagination-buttons">
+          <button mat-icon-button disabled>
+            <mat-icon>first_page</mat-icon>
+          </button>
+          <button mat-icon-button disabled>
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button mat-icon-button disabled>
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+          <button mat-icon-button disabled>
+            <mat-icon>last_page</mat-icon>
+          </button>
+        </div>
       </div>
-    </div>
-  </mat-card>
+    </mat-card>
+  </div>
 </div>

@@ -1,4 +1,4 @@
-<div class="lotes-container">
+<div class="lotes-container page-container">
   <div class="page-header">
     <h1 class="page-title">Gestión de lotes</h1>
     <div class="action-buttons">
@@ -77,192 +77,201 @@
     </form>
   </mat-card>
 
-  <!-- Tabla de resultados -->
-  <mat-card class="tabla-card">
-    <div class="table-container">
-      <table mat-table [dataSource]="lotes" class="lotes-table" matSort>
-        <!-- Columna Lote -->
-        <ng-container matColumnDef="lote">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header class="th-lote">
-            Lote
-          </th>
-          <td mat-cell *matCellDef="let lote" class="td-lote">
-            <div class="lote-info">
-              <span class="lote-codigo">{{ lote.lote }}</span>
-              <span
-                class="lote-alert"
-                *ngIf="isLoteVencido(lote)"
-                matTooltip="Lote vencido"
-              >
-                <mat-icon class="icon-vencido">warning</mat-icon>
-              </span>
-              <span
-                class="lote-alert"
-                *ngIf="isLotePorVencer(lote)"
-                matTooltip="Por vencer en 30 días"
-              >
-                <mat-icon class="icon-por-vencer">schedule</mat-icon>
-              </span>
-            </div>
-          </td>
-        </ng-container>
-
-        <!-- Columna Insumo -->
-        <ng-container matColumnDef="insumo">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header
-            class="th-insumo"
-          >
-            Insumo
-          </th>
-          <td mat-cell *matCellDef="let lote" class="td-insumo">
-            {{ getInsumoNombre(lote.id_insumo) }}
-          </td>
-        </ng-container>
-
-        <!-- Columna Ubicación -->
-        <ng-container matColumnDef="ubicacion">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header
-            class="th-ubicacion"
-          >
-            Ubicación
-          </th>
-          <td mat-cell *matCellDef="let lote" class="td-ubicacion">
-            {{ lote.ubicacion || 'Sin ubicación' }}
-          </td>
-        </ng-container>
-
-        <!-- Columna Stock Actual -->
-        <ng-container matColumnDef="stock_actual">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header
-            class="th-stock"
-          >
-            Stock
-          </th>
-          <td mat-cell *matCellDef="let lote" class="td-stock">
-            <div class="stock-info">
-              <span
-                class="stock-value"
-                [class]="'stock-' + getStockStatus(lote)"
-              >
-                {{ lote.stock_actual || 0 }}
-              </span>
-              <span class="stock-inicial">/ {{ lote.stock_inicial || 0 }}</span>
-            </div>
-          </td>
-        </ng-container>
-
-        <!-- Columna Fecha Expiración -->
-        <ng-container matColumnDef="fecha_expiracion">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header
-            class="th-fecha"
-          >
-            Vencimiento
-          </th>
-          <td mat-cell *matCellDef="let lote" class="td-fecha">
-            <span
-              *ngIf="lote.fecha_expiracion; else noFecha"
-              [class]="{
-                'fecha-vencida': isLoteVencido(lote),
-                'fecha-por-vencer': isLotePorVencer(lote)
-              }"
+  <!-- Tabla de lotes -->
+  <div class="page-content">
+    <mat-card class="table-card">
+      <div class="table-container">
+        <table mat-table [dataSource]="lotes" class="lotes-table" matSort>
+          <!-- Columna Lote -->
+          <ng-container matColumnDef="lote">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              class="th-lote"
             >
-              {{ lote.fecha_expiracion | date: 'dd/MM/yyyy' }}
-            </span>
-            <ng-template #noFecha>
-              <span class="fecha-sin-vencimiento">Sin vencimiento</span>
-            </ng-template>
-          </td>
-        </ng-container>
+              Lote
+            </th>
+            <td mat-cell *matCellDef="let lote" class="td-lote">
+              <div class="lote-info">
+                <span class="lote-codigo">{{ lote.lote }}</span>
+                <span
+                  class="lote-alert"
+                  *ngIf="isLoteVencido(lote)"
+                  matTooltip="Lote vencido"
+                >
+                  <mat-icon class="icon-vencido">warning</mat-icon>
+                </span>
+                <span
+                  class="lote-alert"
+                  *ngIf="isLotePorVencer(lote)"
+                  matTooltip="Por vencer en 30 días"
+                >
+                  <mat-icon class="icon-por-vencer">schedule</mat-icon>
+                </span>
+              </div>
+            </td>
+          </ng-container>
 
-        <!-- Columna Estado -->
-        <ng-container matColumnDef="estado">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header
-            class="th-estado"
-          >
-            Estado
-          </th>
-          <td mat-cell *matCellDef="let lote" class="td-estado">
-            <mat-chip-set>
-              <mat-chip
-                [class]="'chip-' + getEstadoColor(lote.estado_lote)"
-                class="estado-chip"
+          <!-- Columna Insumo -->
+          <ng-container matColumnDef="insumo">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              class="th-insumo"
+            >
+              Insumo
+            </th>
+            <td mat-cell *matCellDef="let lote" class="td-insumo">
+              {{ getInsumoNombre(lote.id_insumo) }}
+            </td>
+          </ng-container>
+
+          <!-- Columna Ubicación -->
+          <ng-container matColumnDef="ubicacion">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              class="th-ubicacion"
+            >
+              Ubicación
+            </th>
+            <td mat-cell *matCellDef="let lote" class="td-ubicacion">
+              {{ lote.ubicacion || 'Sin ubicación' }}
+            </td>
+          </ng-container>
+
+          <!-- Columna Stock Actual -->
+          <ng-container matColumnDef="stock_actual">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              class="th-stock"
+            >
+              Stock
+            </th>
+            <td mat-cell *matCellDef="let lote" class="td-stock">
+              <div class="stock-info">
+                <span
+                  class="stock-value"
+                  [class]="'stock-' + getStockStatus(lote)"
+                >
+                  {{ lote.stock_actual || 0 }}
+                </span>
+                <span class="stock-inicial"
+                  >/ {{ lote.stock_inicial || 0 }}</span
+                >
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Columna Fecha Expiración -->
+          <ng-container matColumnDef="fecha_expiracion">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              class="th-fecha"
+            >
+              Vencimiento
+            </th>
+            <td mat-cell *matCellDef="let lote" class="td-fecha">
+              <span
+                *ngIf="lote.fecha_expiracion; else noFecha"
+                [class]="{
+                  'fecha-vencida': isLoteVencido(lote),
+                  'fecha-por-vencer': isLotePorVencer(lote)
+                }"
               >
-                {{ lote.estado_lote || 'Sin estado' }}
-              </mat-chip>
-            </mat-chip-set>
-          </td>
-        </ng-container>
+                {{ lote.fecha_expiracion | date: 'dd/MM/yyyy' }}
+              </span>
+              <ng-template #noFecha>
+                <span class="fecha-sin-vencimiento">Sin vencimiento</span>
+              </ng-template>
+            </td>
+          </ng-container>
 
-        <!-- Columna Acciones -->
-        <ng-container matColumnDef="acciones">
-          <th mat-header-cell *matHeaderCellDef class="th-acciones">
-            Acciones
-          </th>
-          <td mat-cell *matCellDef="let lote" class="td-acciones">
-            <div class="action-buttons">
-              <button
-                mat-icon-button
-                color="primary"
-                (click)="verDetalle(lote)"
-                matTooltip="Ver detalle"
-                class="btn-detalle"
-              >
-                <mat-icon>visibility</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                color="accent"
-                (click)="editarLote(lote)"
-                matTooltip="Editar"
-                class="btn-editar"
-              >
-                <mat-icon>edit</mat-icon>
-              </button>
-            </div>
-          </td>
-        </ng-container>
+          <!-- Columna Estado -->
+          <ng-container matColumnDef="estado">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              class="th-estado"
+            >
+              Estado
+            </th>
+            <td mat-cell *matCellDef="let lote" class="td-estado">
+              <mat-chip-set>
+                <mat-chip
+                  [class]="'chip-' + getEstadoColor(lote.estado_lote)"
+                  class="estado-chip"
+                >
+                  {{ lote.estado_lote || 'Sin estado' }}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-      </table>
+          <!-- Columna Acciones -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef class="th-acciones">
+              Acciones
+            </th>
+            <td mat-cell *matCellDef="let lote" class="td-acciones">
+              <div class="action-buttons">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="verDetalle(lote)"
+                  matTooltip="Ver detalle"
+                  class="btn-detalle"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  color="accent"
+                  (click)="editarLote(lote)"
+                  matTooltip="Editar"
+                  class="btn-editar"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
 
-      <!-- Mensaje cuando no hay datos -->
-      <div *ngIf="lotes.length === 0" class="no-data">
-        <mat-icon>inventory_2</mat-icon>
-        <p>No se encontraron lotes</p>
-        <button mat-raised-button color="primary" (click)="abrirNuevoLote()">
-          <mat-icon>add</mat-icon>
-          Crear primer lote
-        </button>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+
+        <!-- Mensaje cuando no hay datos -->
+        <div *ngIf="lotes.length === 0" class="no-data">
+          <mat-icon>inventory_2</mat-icon>
+          <p>No se encontraron lotes</p>
+          <button mat-raised-button color="primary" (click)="abrirNuevoLote()">
+            <mat-icon>add</mat-icon>
+            Crear primer lote
+          </button>
+        </div>
       </div>
-    </div>
 
-    <!-- Paginación -->
-    <div class="pagination-container">
-      <span class="pagination-info">Página 1 de 10</span>
-      <div class="pagination-buttons">
-        <button mat-icon-button>
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <button mat-icon-button>
-          <mat-icon>chevron_right</mat-icon>
-        </button>
+      <!-- Paginación -->
+      <div class="pagination-container">
+        <span class="pagination-info">Página 1 de 10</span>
+        <div class="pagination-buttons">
+          <button mat-icon-button>
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button mat-icon-button>
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
       </div>
-    </div>
-  </mat-card>
+    </mat-card>
+  </div>
 </div>

@@ -315,3 +315,60 @@ html {
     margin-bottom: 0.5rem;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Layout genérico de páginas (consistencia en todas las vistas)
+// ---------------------------------------------------------------------------
+.page-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  padding: 1.5rem;
+  background-color: #f5f7fa;
+  overflow: hidden;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
+
+  .page-title {
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin: 0;
+  }
+}
+
+.page-content {
+  flex: 1;
+  min-height: 0; // Importante para que el hijo flex pueda scrollear
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // Importante para contener el scroll
+}
+
+.table-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+
+  .table-container {
+    flex: 1;
+    overflow: auto;
+    min-height: 0; // Importante para que flex funcione correctamente
+  }
+}
+
+// Aseguramos que cualquier card con la clase legacy `.tabla-card` adopte el nuevo comportamiento
+.tabla-card {
+  @extend .table-card;
+}

@@ -1,4 +1,4 @@
-<div class="usuarios-container">
+<div class="usuarios-container page-container">
   <!-- Header de la página -->
   <div class="page-header">
     <h1 class="page-title">Gestión de Usuarios</h1>
@@ -71,109 +71,113 @@
     </form>
   </mat-card>
 
-  <!-- Tarjeta de tabla -->
-  <mat-card class="tabla-card">
-    <div class="table-container">
-      <table mat-table [dataSource]="usuarios" class="usuarios-table">
-        <!-- Columna Código -->
-        <ng-container matColumnDef="codigo">
-          <th mat-header-cell *matHeaderCellDef>Código</th>
-          <td mat-cell *matCellDef="let usuario">
-            {{ formatearCodigo(usuario.id_usuario) }}
-          </td>
-        </ng-container>
+  <!-- Tabla de usuarios -->
+  <div class="page-content">
+    <mat-card class="table-card">
+      <div class="table-container">
+        <table mat-table [dataSource]="usuarios" class="usuarios-table">
+          <!-- Columna Código -->
+          <ng-container matColumnDef="codigo">
+            <th mat-header-cell *matHeaderCellDef>Código</th>
+            <td mat-cell *matCellDef="let usuario">
+              {{ formatearCodigo(usuario.id_usuario) }}
+            </td>
+          </ng-container>
 
-        <!-- Columna Usuario -->
-        <ng-container matColumnDef="username">
-          <th mat-header-cell *matHeaderCellDef>Usuario</th>
-          <td mat-cell *matCellDef="let usuario">{{ usuario.username }}</td>
-        </ng-container>
+          <!-- Columna Usuario -->
+          <ng-container matColumnDef="username">
+            <th mat-header-cell *matHeaderCellDef>Usuario</th>
+            <td mat-cell *matCellDef="let usuario">{{ usuario.username }}</td>
+          </ng-container>
 
-        <!-- Columna Email -->
-        <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef>Email</th>
-          <td mat-cell *matCellDef="let usuario">{{ usuario.email || '-' }}</td>
-        </ng-container>
+          <!-- Columna Email -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let usuario">
+              {{ usuario.email || '-' }}
+            </td>
+          </ng-container>
 
-        <!-- Columna Rol -->
-        <ng-container matColumnDef="rol">
-          <th mat-header-cell *matHeaderCellDef>Rol</th>
-          <td mat-cell *matCellDef="let usuario">
-            {{ obtenerNombreRol(usuario.id_rol) }}
-          </td>
-        </ng-container>
+          <!-- Columna Rol -->
+          <ng-container matColumnDef="rol">
+            <th mat-header-cell *matHeaderCellDef>Rol</th>
+            <td mat-cell *matCellDef="let usuario">
+              {{ obtenerNombreRol(usuario.id_rol) }}
+            </td>
+          </ng-container>
 
-        <!-- Columna Tipo -->
-        <ng-container matColumnDef="tipo">
-          <th mat-header-cell *matHeaderCellDef>Tipo</th>
-          <td mat-cell *matCellDef="let usuario">
-            {{ obtenerNombreTipo(usuario.id_tipo_usuario) }}
-          </td>
-        </ng-container>
+          <!-- Columna Tipo -->
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef>Tipo</th>
+            <td mat-cell *matCellDef="let usuario">
+              {{ obtenerNombreTipo(usuario.id_tipo_usuario) }}
+            </td>
+          </ng-container>
 
-        <!-- Columna Estado -->
-        <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef>Estado</th>
-          <td mat-cell *matCellDef="let usuario">
-            <span
-              class="estado-badge"
-              [ngClass]="usuario.activo ? 'estado-activo' : 'estado-inactivo'"
-            >
-              {{ usuario.activo ? 'Activo' : 'Inactivo' }}
-            </span>
-          </td>
-        </ng-container>
+          <!-- Columna Estado -->
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let usuario">
+              <span
+                class="estado-badge"
+                [ngClass]="usuario.activo ? 'estado-activo' : 'estado-inactivo'"
+              >
+                {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+          </ng-container>
 
-        <!-- Columna Último ingreso -->
-        <ng-container matColumnDef="ultimo_ingreso">
-          <th mat-header-cell *matHeaderCellDef>Último ingreso</th>
-          <td mat-cell *matCellDef="let usuario">
-            {{ formatearFecha(usuario.last_login) }}
-          </td>
-        </ng-container>
+          <!-- Columna Último ingreso -->
+          <ng-container matColumnDef="ultimo_ingreso">
+            <th mat-header-cell *matHeaderCellDef>Último ingreso</th>
+            <td mat-cell *matCellDef="let usuario">
+              {{ formatearFecha(usuario.last_login) }}
+            </td>
+          </ng-container>
 
-        <!-- Columna Acciones -->
-        <ng-container matColumnDef="acciones">
-          <th mat-header-cell *matHeaderCellDef>Acciones</th>
-          <td mat-cell *matCellDef="let usuario">
-            <button
-              mat-icon-button
-              class="btn-ver"
-              (click)="verDetalle(usuario)"
-              matTooltip="Ver detalle"
-            >
-              <mat-icon class="icon-ver">visibility</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              class="btn-editar"
-              (click)="editarUsuario(usuario)"
-              matTooltip="Editar usuario"
-            >
-              <mat-icon class="icon-editar">edit</mat-icon>
-            </button>
-          </td>
-        </ng-container>
+          <!-- Columna Acciones -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let usuario">
+              <button
+                mat-icon-button
+                class="btn-ver"
+                (click)="verDetalle(usuario)"
+                matTooltip="Ver detalle"
+              >
+                <mat-icon class="icon-ver">visibility</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="btn-editar"
+                (click)="editarUsuario(usuario)"
+                matTooltip="Editar usuario"
+              >
+                <mat-icon class="icon-editar">edit</mat-icon>
+              </button>
+            </td>
+          </ng-container>
 
-        <!-- Definición de headers y filas -->
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-      </table>
-    </div>
-
-    <!-- Paginación -->
-    <div class="pagination-container">
-      <div class="pagination-info">
-        Página 1 de 1 ({{ usuarios.length }} usuarios)
+          <!-- Definición de headers y filas -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
       </div>
-      <div class="pagination-buttons">
-        <button mat-icon-button disabled>
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <button mat-icon-button disabled>
-          <mat-icon>chevron_right</mat-icon>
-        </button>
+
+      <!-- Paginación -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          Página 1 de 1 ({{ usuarios.length }} usuarios)
+        </div>
+        <div class="pagination-buttons">
+          <button mat-icon-button disabled>
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button mat-icon-button disabled>
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
       </div>
-    </div>
-  </mat-card>
+    </mat-card>
+  </div>
 </div>
