@@ -3,6 +3,331 @@
 @use "@angular/material" as mat;
 @use "sass:map";
 
+// ============================================================================
+// SISTEMA DE DISEÑO TEXFINA - COLORES EMPRESARIALES
+// ============================================================================
+
+// Variables de colores empresariales
+:root {
+  // Colores principales de la empresa
+  --texfina-primary: #bd2126; // Rojo Carmesí (Principal)
+  --texfina-secondary: #121e66; // Azul Marino Oscuro (Secundario)
+  --texfina-neutral: #989594; // Gris Cemento (Neutro)
+
+  // Variaciones del color principal (Rojo Carmesí)
+  --texfina-primary-light: #d63a3f; // Rojo más claro
+  --texfina-primary-dark: #9a1b1f; // Rojo más oscuro
+  --texfina-primary-bg: #fdf2f2; // Fondo muy claro
+
+  // Variaciones del color secundario (Azul Marino)
+  --texfina-secondary-light: #1e2a7a; // Azul más claro
+  --texfina-secondary-dark: #0f1852; // Azul más oscuro
+  --texfina-secondary-bg: #f1f2f8; // Fondo muy claro
+
+  // Variaciones del color neutro (Gris)
+  --texfina-neutral-light: #b5b3b2; // Gris más claro
+  --texfina-neutral-dark: #7a7876; // Gris más oscuro
+  --texfina-neutral-bg: #f8f8f7; // Fondo muy claro
+
+  // Colores de estado (basados en la paleta empresarial)
+  --texfina-success: #16a34a; // Verde para éxito
+  --texfina-warning: #d97706; // Naranja para advertencia
+  --texfina-error: var(--texfina-primary); // Usar rojo empresarial para errores
+  --texfina-info: var(--texfina-secondary); // Usar azul empresarial para info
+
+  // Colores de texto
+  --texfina-text-primary: #1f2937; // Texto principal
+  --texfina-text-secondary: var(--texfina-neutral); // Texto secundario
+  --texfina-text-muted: #9ca3af; // Texto deshabilitado
+
+  // Colores de fondo
+  --texfina-bg-primary: #ffffff; // Fondo principal
+  --texfina-bg-secondary: #f9fafb; // Fondo secundario
+  --texfina-bg-tertiary: #f3f4f6; // Fondo terciario
+
+  // Bordes
+  --texfina-border-light: #e5e7eb; // Borde claro
+  --texfina-border-medium: #d1d5db; // Borde medio
+  --texfina-border-dark: var(--texfina-neutral); // Borde oscuro
+
+  // Sombras
+  --texfina-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --texfina-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --texfina-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  // Tipografía
+  --texfina-font-family: "Roboto", "Helvetica Neue", sans-serif;
+  --texfina-font-size-xs: 0.75rem; // 12px
+  --texfina-font-size-sm: 0.875rem; // 14px
+  --texfina-font-size-base: 1rem; // 16px
+  --texfina-font-size-lg: 1.125rem; // 18px
+  --texfina-font-size-xl: 1.25rem; // 20px
+  --texfina-font-size-2xl: 1.5rem; // 24px
+  --texfina-font-size-3xl: 1.875rem; // 30px
+
+  // Espaciado
+  --texfina-spacing-xs: 0.25rem; // 4px
+  --texfina-spacing-sm: 0.5rem; // 8px
+  --texfina-spacing-md: 1rem; // 16px
+  --texfina-spacing-lg: 1.5rem; // 24px
+  --texfina-spacing-xl: 2rem; // 32px
+  --texfina-spacing-2xl: 3rem; // 48px
+
+  // Radios de borde
+  --texfina-radius-sm: 4px;
+  --texfina-radius-md: 8px;
+  --texfina-radius-lg: 12px;
+  --texfina-radius-xl: 16px;
+}
+
+// ============================================================================
+// CLASES UTILITARIAS DEL SISTEMA DE DISEÑO TEXFINA
+// ============================================================================
+
+// Botones del sistema Texfina
+.btn-texfina {
+  font-family: var(--texfina-font-family);
+  font-weight: 500;
+  border-radius: var(--texfina-radius-md);
+  padding: var(--texfina-spacing-sm) var(--texfina-spacing-lg);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--texfina-spacing-xs);
+  text-decoration: none;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  // Botón principal (Rojo Carmesí)
+  &.btn-primary {
+    background-color: var(--texfina-primary);
+    color: white;
+    box-shadow: var(--texfina-shadow-sm);
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-primary-dark);
+      box-shadow: var(--texfina-shadow-md);
+    }
+  }
+
+  // Botón secundario (Azul Marino)
+  &.btn-secondary {
+    background-color: var(--texfina-secondary);
+    color: white;
+    box-shadow: var(--texfina-shadow-sm);
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-secondary-dark);
+      box-shadow: var(--texfina-shadow-md);
+    }
+  }
+
+  // Botón outline principal
+  &.btn-outline-primary {
+    background-color: transparent;
+    color: var(--texfina-primary);
+    border: 1px solid var(--texfina-primary);
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-primary);
+      color: white;
+    }
+  }
+
+  // Botón outline secundario
+  &.btn-outline-secondary {
+    background-color: transparent;
+    color: var(--texfina-secondary);
+    border: 1px solid var(--texfina-secondary);
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-secondary);
+      color: white;
+    }
+  }
+
+  // Botón neutro
+  &.btn-neutral {
+    background-color: var(--texfina-neutral);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-neutral-dark);
+    }
+  }
+
+  // Botón de éxito
+  &.btn-success {
+    background-color: var(--texfina-success);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #15803d;
+    }
+  }
+
+  // Botón de advertencia
+  &.btn-warning {
+    background-color: var(--texfina-warning);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #c2410c;
+    }
+  }
+
+  // Tamaños de botones
+  &.btn-sm {
+    padding: var(--texfina-spacing-xs) var(--texfina-spacing-md);
+    font-size: var(--texfina-font-size-sm);
+  }
+
+  &.btn-lg {
+    padding: var(--texfina-spacing-md) var(--texfina-spacing-xl);
+    font-size: var(--texfina-font-size-lg);
+  }
+}
+
+// Cards del sistema Texfina
+.card-texfina {
+  background-color: var(--texfina-bg-primary);
+  border-radius: var(--texfina-radius-lg);
+  box-shadow: var(--texfina-shadow-md);
+  border: 1px solid var(--texfina-border-light);
+  overflow: hidden;
+
+  .card-header {
+    background-color: var(--texfina-bg-secondary);
+    padding: var(--texfina-spacing-lg);
+    border-bottom: 1px solid var(--texfina-border-light);
+
+    .card-title {
+      margin: 0;
+      font-size: var(--texfina-font-size-xl);
+      font-weight: 600;
+      color: var(--texfina-text-primary);
+    }
+
+    .card-subtitle {
+      margin: var(--texfina-spacing-xs) 0 0 0;
+      font-size: var(--texfina-font-size-sm);
+      color: var(--texfina-text-secondary);
+    }
+  }
+
+  .card-content {
+    padding: var(--texfina-spacing-lg);
+  }
+
+  .card-footer {
+    background-color: var(--texfina-bg-secondary);
+    padding: var(--texfina-spacing-lg);
+    border-top: 1px solid var(--texfina-border-light);
+  }
+}
+
+// Badges del sistema Texfina
+.badge-texfina {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--texfina-spacing-xs) var(--texfina-spacing-sm);
+  border-radius: var(--texfina-radius-xl);
+  font-size: var(--texfina-font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.badge-primary {
+    background-color: var(--texfina-primary-bg);
+    color: var(--texfina-primary);
+  }
+
+  &.badge-secondary {
+    background-color: var(--texfina-secondary-bg);
+    color: var(--texfina-secondary);
+  }
+
+  &.badge-success {
+    background-color: #dcfce7;
+    color: var(--texfina-success);
+  }
+
+  &.badge-warning {
+    background-color: #fef3c7;
+    color: var(--texfina-warning);
+  }
+
+  &.badge-neutral {
+    background-color: var(--texfina-neutral-bg);
+    color: var(--texfina-neutral-dark);
+  }
+}
+
+// Colores de texto
+.text-texfina {
+  &.text-primary {
+    color: var(--texfina-primary) !important;
+  }
+  &.text-secondary {
+    color: var(--texfina-secondary) !important;
+  }
+  &.text-neutral {
+    color: var(--texfina-neutral) !important;
+  }
+  &.text-success {
+    color: var(--texfina-success) !important;
+  }
+  &.text-warning {
+    color: var(--texfina-warning) !important;
+  }
+  &.text-muted {
+    color: var(--texfina-text-muted) !important;
+  }
+}
+
+// Colores de fondo
+.bg-texfina {
+  &.bg-primary {
+    background-color: var(--texfina-primary) !important;
+  }
+  &.bg-secondary {
+    background-color: var(--texfina-secondary) !important;
+  }
+  &.bg-neutral {
+    background-color: var(--texfina-neutral) !important;
+  }
+  &.bg-primary-light {
+    background-color: var(--texfina-primary-bg) !important;
+  }
+  &.bg-secondary-light {
+    background-color: var(--texfina-secondary-bg) !important;
+  }
+  &.bg-neutral-light {
+    background-color: var(--texfina-neutral-bg) !important;
+  }
+}
+
+// Bordes
+.border-texfina {
+  &.border-primary {
+    border-color: var(--texfina-primary) !important;
+  }
+  &.border-secondary {
+    border-color: var(--texfina-secondary) !important;
+  }
+  &.border-neutral {
+    border-color: var(--texfina-neutral) !important;
+  }
+  &.border-light {
+    border-color: var(--texfina-border-light) !important;
+  }
+}
+
 // Definición de breakpoints mejorados
 $breakpoints: (
   xs: 0,
@@ -317,30 +642,42 @@ html {
 }
 
 // ---------------------------------------------------------------------------
-// Layout genérico de páginas (consistencia en todas las vistas)
+// Layout genérico de páginas (consistencia en todas las vistas) - SISTEMA TEXFINA
 // ---------------------------------------------------------------------------
 .page-container {
   display: flex;
   flex-direction: column;
   flex: 1;
   height: 100%;
-  padding: 1.5rem;
-  background-color: #f5f7fa;
+  padding: var(--texfina-spacing-lg);
+  background-color: var(--texfina-bg-secondary);
   overflow: hidden;
+  font-family: var(--texfina-font-family);
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--texfina-spacing-lg);
   flex-shrink: 0;
+  background-color: var(--texfina-bg-primary);
+  padding: var(--texfina-spacing-lg);
+  border-radius: var(--texfina-radius-lg);
+  box-shadow: var(--texfina-shadow-md);
+  border: 1px solid var(--texfina-border-light);
 
   .page-title {
-    font-size: 1.75rem;
-    font-weight: 500;
-    color: #2c3e50;
+    font-size: var(--texfina-font-size-3xl);
+    font-weight: 600;
+    color: var(--texfina-text-primary);
     margin: 0;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: var(--texfina-spacing-sm);
+    align-items: center;
   }
 }
 
@@ -358,17 +695,75 @@ html {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-  border-radius: 8px !important;
+  background-color: var(--texfina-bg-primary);
+  box-shadow: var(--texfina-shadow-md) !important;
+  border-radius: var(--texfina-radius-lg) !important;
+  border: 1px solid var(--texfina-border-light);
 
   .table-container {
     flex: 1;
     overflow: auto;
     min-height: 0; // Importante para que flex funcione correctamente
   }
+
+  // Headers de tabla con estilo Texfina
+  .mat-mdc-header-cell {
+    background-color: var(--texfina-bg-secondary) !important;
+    color: var(--texfina-text-secondary) !important;
+    font-weight: 600 !important;
+    font-size: var(--texfina-font-size-sm) !important;
+    border-bottom: 2px solid var(--texfina-border-light) !important;
+  }
+
+  // Filas de tabla con estilo Texfina
+  .mat-mdc-row {
+    border-bottom: 1px solid var(--texfina-border-light) !important;
+
+    &:hover {
+      background-color: var(--texfina-bg-secondary) !important;
+    }
+
+    .mat-mdc-cell {
+      color: var(--texfina-text-primary) !important;
+      font-size: var(--texfina-font-size-sm) !important;
+    }
+  }
 }
 
 // Aseguramos que cualquier card con la clase legacy `.tabla-card` adopte el nuevo comportamiento
 .tabla-card {
   @extend .table-card;
+}
+
+// Filtros card con estilo Texfina
+.filtros-card {
+  background-color: var(--texfina-bg-primary);
+  border-radius: var(--texfina-radius-lg);
+  box-shadow: var(--texfina-shadow-md);
+  border: 1px solid var(--texfina-border-light);
+  margin-bottom: var(--texfina-spacing-lg);
+  flex-shrink: 0;
+
+  .filtros-form {
+    padding: var(--texfina-spacing-lg);
+
+    .filtros-row {
+      display: flex;
+      gap: var(--texfina-spacing-md);
+      align-items: flex-end;
+      flex-wrap: wrap;
+
+      .filtro-field {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .filtro-buttons {
+        display: flex;
+        gap: var(--texfina-spacing-sm);
+        align-items: flex-end;
+        margin-bottom: 1.25rem;
+      }
+    }
+  }
 }

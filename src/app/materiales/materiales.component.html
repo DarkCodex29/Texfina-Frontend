@@ -1,108 +1,131 @@
-<div class="materiales-container page-container">
-  <div class="page-header">
-    <h1 class="page-title">Registro de insumos</h1>
-    <div class="action-buttons">
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="abrirRegistroMaterial()"
-        class="btn-agregar"
-      >
-        <mat-icon>add_circle_outline</mat-icon>
-        Agregar insumo
-      </button>
-      <button
-        mat-raised-button
-        color="accent"
-        (click)="abrirIngresoMaterial()"
-        class="btn-ingreso"
-      >
-        <mat-icon>add_box</mat-icon>
-        Registrar ingreso
-      </button>
+<div class="page-container">
+  <div class="page-content">
+    <!-- Header de la página -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title text-texfina text-primary">
+          Registro de Insumos
+        </h1>
+        <p class="page-subtitle text-texfina text-muted">
+          Gestiona el catálogo de materiales e insumos
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          mat-raised-button
+          class="btn-texfina btn-primary"
+          (click)="abrirRegistroMaterial()"
+        >
+          <mat-icon>add_circle_outline</mat-icon>
+          Agregar Insumo
+        </button>
+        <button
+          mat-raised-button
+          class="btn-texfina btn-success"
+          (click)="abrirIngresoMaterial()"
+        >
+          <mat-icon>add_box</mat-icon>
+          Registrar Ingreso
+        </button>
+      </div>
     </div>
-  </div>
 
-  <!-- Filtros de búsqueda -->
-  <mat-card class="filtros-card">
-    <form [formGroup]="filtrosForm" (ngSubmit)="buscar()" class="filtros-form">
-      <div class="filtros-row">
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Código</mat-label>
-          <input
-            matInput
-            formControlName="codigo"
-            placeholder="Ingresa el código"
-          />
-        </mat-form-field>
+    <!-- Filtros de búsqueda -->
+    <div class="filters-card">
+      <form
+        [formGroup]="filtrosForm"
+        (ngSubmit)="buscar()"
+        class="filters-form"
+      >
+        <div class="filters-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Código</mat-label>
+            <input
+              matInput
+              formControlName="codigo"
+              placeholder="Buscar por código"
+            />
+            <mat-icon matPrefix>tag</mat-icon>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Descripción</mat-label>
-          <input
-            matInput
-            formControlName="descripcion"
-            placeholder="Ingresa la descripción"
-          />
-        </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Descripción</mat-label>
+            <input
+              matInput
+              formControlName="descripcion"
+              placeholder="Buscar por descripción"
+            />
+            <mat-icon matPrefix>description</mat-icon>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Proveedor</mat-label>
-          <input
-            matInput
-            formControlName="proveedor"
-            placeholder="Ingresa el nombre de proveedor"
-          />
-        </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Proveedor</mat-label>
+            <input
+              matInput
+              formControlName="proveedor"
+              placeholder="Buscar por proveedor"
+            />
+            <mat-icon matPrefix>business</mat-icon>
+          </mat-form-field>
 
-        <div class="filtro-buttons">
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            class="btn-buscar"
+          <div class="filters-actions">
+            <button
+              mat-raised-button
+              class="btn-texfina btn-primary"
+              type="submit"
+            >
+              <mat-icon>search</mat-icon>
+              Buscar
+            </button>
+            <button
+              mat-stroked-button
+              class="btn-texfina btn-outline"
+              type="button"
+              (click)="limpiarFiltros()"
+            >
+              <mat-icon>clear</mat-icon>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tabla de insumos -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3 class="table-title text-texfina text-primary">Lista de Insumos</h3>
+        <div class="table-actions">
+          <span class="text-texfina text-muted"
+            >{{ materiales.length }} registros</span
           >
-            <mat-icon>search</mat-icon>
-            Buscar
-          </button>
-          <button
-            mat-stroked-button
-            color="accent"
-            type="button"
-            (click)="limpiarFiltros()"
-            class="btn-limpiar"
-          >
-            <mat-icon>clear</mat-icon>
-            Limpiar
-          </button>
         </div>
       </div>
-    </form>
-  </mat-card>
 
-  <!-- Tabla de insumos -->
-  <div class="page-content">
-    <mat-card class="table-card">
       <div class="table-container">
-        <table mat-table [dataSource]="materiales" class="materiales-table">
+        <table mat-table [dataSource]="materiales" class="data-table">
           <!-- Columna Código Fox -->
           <ng-container matColumnDef="id_fox">
             <th mat-header-cell *matHeaderCellDef>Código Fox</th>
             <td mat-cell *matCellDef="let material">
-              {{ material.id_fox || "-" }}
+              <span class="badge-texfina badge-neutral">
+                {{ material.id_fox || "-" }}
+              </span>
             </td>
           </ng-container>
 
           <!-- Columna Nombre -->
           <ng-container matColumnDef="nombre">
             <th mat-header-cell *matHeaderCellDef>Nombre</th>
-            <td mat-cell *matCellDef="let material">{{ material.nombre }}</td>
-          </ng-container>
-
-          <!-- Columna Clase -->
-          <ng-container matColumnDef="id_clase">
-            <th mat-header-cell *matHeaderCellDef>Clase</th>
             <td mat-cell *matCellDef="let material">
-              {{ material.id_clase || "-" }}
+              <div class="material-cell">
+                <div class="material-name text-texfina text-primary">
+                  {{ material.nombre }}
+                </div>
+                <div class="material-class text-texfina text-muted">
+                  {{ material.id_clase || "Sin clase" }}
+                </div>
+              </div>
             </td>
           </ng-container>
 
@@ -110,7 +133,9 @@
           <ng-container matColumnDef="peso_unitario">
             <th mat-header-cell *matHeaderCellDef>Peso Unitario</th>
             <td mat-cell *matCellDef="let material">
-              {{ material.peso_unitario || "-" }}
+              <span class="text-texfina text-secondary">
+                {{ material.peso_unitario || "-" }}
+              </span>
             </td>
           </ng-container>
 
@@ -118,7 +143,9 @@
           <ng-container matColumnDef="id_unidad">
             <th mat-header-cell *matHeaderCellDef>Unidad</th>
             <td mat-cell *matCellDef="let material">
-              {{ material.id_unidad || "-" }}
+              <span class="badge-texfina badge-secondary">
+                {{ material.id_unidad || "-" }}
+              </span>
             </td>
           </ng-container>
 
@@ -126,7 +153,9 @@
           <ng-container matColumnDef="presentacion">
             <th mat-header-cell *matHeaderCellDef>Presentación</th>
             <td mat-cell *matCellDef="let material">
-              {{ material.presentacion || "-" }}
+              <span class="text-texfina text-secondary">
+                {{ material.presentacion || "-" }}
+              </span>
             </td>
           </ng-container>
 
@@ -134,11 +163,13 @@
           <ng-container matColumnDef="precio_unitario">
             <th mat-header-cell *matHeaderCellDef>Precio Unitario</th>
             <td mat-cell *matCellDef="let material">
-              {{
-                material.precio_unitario
-                  ? "S/ " + material.precio_unitario.toFixed(2)
-                  : "-"
-              }}
+              <span class="text-texfina text-primary font-medium">
+                {{
+                  material.precio_unitario
+                    ? "S/ " + material.precio_unitario.toFixed(2)
+                    : "-"
+                }}
+              </span>
             </td>
           </ng-container>
 
@@ -149,19 +180,19 @@
               <div class="action-buttons">
                 <button
                   mat-icon-button
+                  class="btn-action btn-view"
                   (click)="verDetalle(material)"
-                  class="btn-ver"
                   matTooltip="Ver detalle"
                 >
-                  <mat-icon class="icon-ver">visibility</mat-icon>
+                  <mat-icon>visibility</mat-icon>
                 </button>
                 <button
                   mat-icon-button
+                  class="btn-action btn-edit"
                   (click)="editarMaterial(material)"
-                  class="btn-editar"
                   matTooltip="Editar"
                 >
-                  <mat-icon class="icon-editar">edit</mat-icon>
+                  <mat-icon>edit</mat-icon>
                 </button>
               </div>
             </td>
@@ -173,17 +204,23 @@
       </div>
 
       <!-- Paginación -->
-      <div class="pagination-container">
-        <span class="pagination-info">Página 1 de 10</span>
-        <div class="pagination-buttons">
-          <button mat-icon-button>
+      <div class="table-footer">
+        <div class="pagination-info">
+          <span class="text-texfina text-muted">Página 1 de 10</span>
+        </div>
+        <div class="pagination-controls">
+          <button
+            mat-icon-button
+            class="btn-texfina btn-neutral btn-sm"
+            disabled
+          >
             <mat-icon>chevron_left</mat-icon>
           </button>
-          <button mat-icon-button>
+          <button mat-icon-button class="btn-texfina btn-neutral btn-sm">
             <mat-icon>chevron_right</mat-icon>
           </button>
         </div>
       </div>
-    </mat-card>
+    </div>
   </div>
 </div>

@@ -2,61 +2,47 @@
 // MATERIALES - ESTILOS ESPECÍFICOS (SIN LAYOUT)
 // ============================================================================
 
-// Solo estilos específicos de la tabla de materiales
-.materiales-table {
-  width: 100%;
-  background-color: white;
+/* Usar clases globales de Texfina - sin estilos locales que interfieran */
 
-  .mat-mdc-header-cell {
-    background-color: #fafafa;
-    color: #666;
+/* Estilos específicos para la tabla de materiales usando variables Texfina */
+.material-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--texfina-spacing-xs);
+
+  .material-name {
     font-weight: 600;
     font-size: 0.875rem;
-    padding: 0.75rem;
-    border-bottom: 2px solid #e0e0e0;
   }
 
-  .mat-mdc-row {
-    height: 48px;
-    border-bottom: 1px solid #f0f0f0;
+  .material-class {
+    font-size: 0.75rem;
+  }
+}
+
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--texfina-border-radius);
+  transition: all 0.2s ease;
+
+  &.btn-view {
+    background-color: var(--texfina-secondary-light);
+    color: var(--texfina-secondary);
 
     &:hover {
-      background-color: #f8f9fa !important;
+      background-color: var(--texfina-secondary);
+      color: white;
     }
+  }
 
-    .mat-mdc-cell {
-      font-size: 0.875rem;
-      padding: 0.75rem;
-      color: #333;
+  &.btn-edit {
+    background-color: var(--texfina-success-light);
+    color: var(--texfina-success);
 
-      .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: center;
-      }
-
-      .btn-ver,
-      .btn-editar,
-      .btn-ingreso {
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-
-        &.btn-ver {
-          background-color: #e0f2fe;
-          color: #0284c7;
-        }
-
-        &.btn-editar {
-          background-color: #ecfdf5;
-          color: #059669;
-        }
-
-        &.btn-ingreso {
-          background-color: #fef3c7;
-          color: #d97706;
-        }
-      }
+    &:hover {
+      background-color: var(--texfina-success);
+      color: white;
     }
   }
 }

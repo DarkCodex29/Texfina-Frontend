@@ -1,486 +1,473 @@
-<div class="configuracion-container page-container">
-  <!-- Header de la página -->
-  <div class="page-header">
-    <h1 class="page-title">Configuración del Sistema</h1>
-    <div class="action-buttons">
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="guardarConfiguracion()"
-        [disabled]="!hayCambios"
-        class="btn-guardar"
-      >
-        <mat-icon>save</mat-icon>
-        Guardar Cambios
-      </button>
-      <button
-        mat-stroked-button
-        color="accent"
-        (click)="exportarConfiguracion()"
-        class="btn-exportar"
-      >
-        <mat-icon>download</mat-icon>
-        Exportar
-      </button>
-    </div>
-  </div>
-
-  <!-- Tabs de Configuración -->
-  <mat-tab-group [(selectedIndex)]="tabActual" class="config-tabs">
-    <!-- TAB: Configuración General -->
-    <mat-tab label="General">
-      <div class="tab-content">
-        <!-- Tarjeta Información de la Empresa -->
-        <mat-card class="config-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>business</mat-icon>
-              Información de la Empresa
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="config-grid">
-              <mat-form-field appearance="outline">
-                <mat-label>Nombre de la Empresa</mat-label>
-                <input
-                  matInput
-                  [(ngModel)]="configuracion.empresa.nombre"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>RUC</mat-label>
-                <input
-                  matInput
-                  [(ngModel)]="configuracion.empresa.ruc"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Dirección</mat-label>
-                <input
-                  matInput
-                  [(ngModel)]="configuracion.empresa.direccion"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Teléfono</mat-label>
-                <input
-                  matInput
-                  [(ngModel)]="configuracion.empresa.telefono"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Email</mat-label>
-                <input
-                  matInput
-                  type="email"
-                  [(ngModel)]="configuracion.empresa.email"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Sitio Web</mat-label>
-                <input
-                  matInput
-                  [(ngModel)]="configuracion.empresa.sitio_web"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <!-- Tarjeta Configuración del Sistema -->
-        <mat-card class="config-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>tune</mat-icon>
-              Configuración del Sistema
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="config-grid">
-              <mat-form-field appearance="outline">
-                <mat-label>Zona Horaria</mat-label>
-                <mat-select
-                  [(ngModel)]="configuracion.sistema.zona_horaria"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  <mat-option value="America/Lima"
-                    >America/Lima (UTC-5)</mat-option
-                  >
-                  <mat-option value="America/Bogota"
-                    >America/Bogota (UTC-5)</mat-option
-                  >
-                  <mat-option value="America/Mexico_City"
-                    >America/Mexico_City (UTC-6)</mat-option
-                  >
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Idioma por Defecto</mat-label>
-                <mat-select
-                  [(ngModel)]="configuracion.sistema.idioma"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  <mat-option value="es">Español</mat-option>
-                  <mat-option value="en">English</mat-option>
-                  <mat-option value="pt">Português</mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Formato de Fecha</mat-label>
-                <mat-select
-                  [(ngModel)]="configuracion.sistema.formato_fecha"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  <mat-option value="DD/MM/YYYY">DD/MM/YYYY</mat-option>
-                  <mat-option value="MM/DD/YYYY">MM/DD/YYYY</mat-option>
-                  <mat-option value="YYYY-MM-DD">YYYY-MM-DD</mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Moneda</mat-label>
-                <mat-select
-                  [(ngModel)]="configuracion.sistema.moneda"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  <mat-option value="PEN">Soles (S/)</mat-option>
-                  <mat-option value="USD">Dólares ($)</mat-option>
-                  <mat-option value="EUR">Euros (€)</mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <div class="checkbox-grid">
-                <mat-checkbox
-                  [(ngModel)]="configuracion.sistema.modo_oscuro"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Modo Oscuro por Defecto
-                </mat-checkbox>
-
-                <mat-checkbox
-                  [(ngModel)]="configuracion.sistema.notificaciones_email"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Notificaciones por Email
-                </mat-checkbox>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
+<div class="page-container">
+  <div class="page-content">
+    <!-- Header de la página -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title text-texfina text-primary">
+          Configuración del Sistema
+        </h1>
+        <p class="page-subtitle text-texfina text-muted">
+          Gestiona la configuración general del sistema
+        </p>
       </div>
-    </mat-tab>
-
-    <!-- TAB: Inventario -->
-    <mat-tab label="Inventario">
-      <div class="tab-content">
-        <mat-card class="config-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>inventory</mat-icon>
-              Configuración de Inventario
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="config-grid">
-              <mat-form-field appearance="outline">
-                <mat-label>Umbral de Stock Mínimo (%)</mat-label>
-                <input
-                  matInput
-                  type="number"
-                  [(ngModel)]="configuracion.inventario.umbral_stock_minimo"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Días para Alerta de Vencimiento</mat-label>
-                <input
-                  matInput
-                  type="number"
-                  [(ngModel)]="configuracion.inventario.dias_alerta_vencimiento"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Método de Valoración</mat-label>
-                <mat-select
-                  [(ngModel)]="configuracion.inventario.metodo_valoracion"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  <mat-option value="FIFO"
-                    >FIFO (Primero en Entrar, Primero en Salir)</mat-option
-                  >
-                  <mat-option value="LIFO"
-                    >LIFO (Último en Entrar, Primero en Salir)</mat-option
-                  >
-                  <mat-option value="PROMEDIO"
-                    >Costo Promedio Ponderado</mat-option
-                  >
-                </mat-select>
-              </mat-form-field>
-
-              <div class="checkbox-grid">
-                <mat-checkbox
-                  [(ngModel)]="configuracion.inventario.permitir_stock_negativo"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Permitir Stock Negativo
-                </mat-checkbox>
-
-                <mat-checkbox
-                  [(ngModel)]="configuracion.inventario.alertas_automaticas"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Alertas Automáticas de Stock
-                </mat-checkbox>
-
-                <mat-checkbox
-                  [(ngModel)]="configuracion.inventario.auditoria_movimientos"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Auditoría de Movimientos
-                </mat-checkbox>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </mat-tab>
-
-    <!-- TAB: Seguridad -->
-    <mat-tab label="Seguridad">
-      <div class="tab-content">
-        <mat-card class="config-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>security</mat-icon>
-              Configuración de Seguridad
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="config-grid">
-              <mat-form-field appearance="outline">
-                <mat-label>Tiempo de Sesión (minutos)</mat-label>
-                <input
-                  matInput
-                  type="number"
-                  [(ngModel)]="configuracion.seguridad.tiempo_sesion"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Intentos de Login Fallidos</mat-label>
-                <input
-                  matInput
-                  type="number"
-                  [(ngModel)]="configuracion.seguridad.intentos_login"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Longitud Mínima de Contraseña</mat-label>
-                <input
-                  matInput
-                  type="number"
-                  [(ngModel)]="configuracion.seguridad.longitud_password"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <div class="checkbox-grid">
-                <mat-checkbox
-                  [(ngModel)]="configuracion.seguridad.requiere_mayusculas"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Requiere Mayúsculas en Contraseña
-                </mat-checkbox>
-
-                <mat-checkbox
-                  [(ngModel)]="configuracion.seguridad.requiere_numeros"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Requiere Números en Contraseña
-                </mat-checkbox>
-
-                <mat-checkbox
-                  [(ngModel)]="configuracion.seguridad.requiere_simbolos"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Requiere Símbolos en Contraseña
-                </mat-checkbox>
-
-                <mat-checkbox
-                  [(ngModel)]="configuracion.seguridad.doble_factor"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Autenticación de Doble Factor
-                </mat-checkbox>
-
-                <mat-checkbox
-                  [(ngModel)]="configuracion.seguridad.log_accesos"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Registrar Log de Accesos
-                </mat-checkbox>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </mat-tab>
-
-    <!-- TAB: Respaldos -->
-    <mat-tab label="Respaldos">
-      <div class="tab-content">
-        <mat-card class="config-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>backup</mat-icon>
-              Configuración de Respaldos
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="config-grid">
-              <mat-form-field appearance="outline">
-                <mat-label>Frecuencia</mat-label>
-                <mat-select
-                  [(ngModel)]="configuracion.respaldos.frecuencia"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  <mat-option value="DIARIO">Diario</mat-option>
-                  <mat-option value="SEMANAL">Semanal</mat-option>
-                  <mat-option value="MENSUAL">Mensual</mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Hora de Ejecución</mat-label>
-                <input
-                  matInput
-                  type="time"
-                  [(ngModel)]="configuracion.respaldos.hora"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Días de Retención</mat-label>
-                <input
-                  matInput
-                  type="number"
-                  [(ngModel)]="configuracion.respaldos.dias_retencion"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Ruta de Almacenamiento</mat-label>
-                <input
-                  matInput
-                  [(ngModel)]="configuracion.respaldos.ruta"
-                  (ngModelChange)="marcarCambios()"
-                />
-              </mat-form-field>
-
-              <div class="checkbox-grid">
-                <mat-checkbox
-                  [(ngModel)]="configuracion.respaldos.compresion"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Habilitar Compresión
-                </mat-checkbox>
-
-                <mat-checkbox
-                  [(ngModel)]="configuracion.respaldos.notificar_email"
-                  (ngModelChange)="marcarCambios()"
-                >
-                  Notificar por Email
-                </mat-checkbox>
-              </div>
-            </div>
-
-            <!-- Acciones de respaldo -->
-            <div class="backup-actions">
-              <button
-                mat-raised-button
-                color="primary"
-                (click)="crearRespaldoManual()"
-                class="btn-respaldo"
-              >
-                <mat-icon>backup</mat-icon>
-                Crear Respaldo Manual
-              </button>
-              <button
-                mat-stroked-button
-                color="accent"
-                (click)="verHistorialRespaldos()"
-                class="btn-historial"
-              >
-                <mat-icon>history</mat-icon>
-                Ver Historial
-              </button>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
-
-  <!-- Resumen estadístico -->
-  <div class="resumen-container">
-    <div class="resumen-grid">
-      <mat-card class="resumen-card">
-        <div class="resumen-content">
-          <div class="resumen-number">{{ tabActual + 1 }}</div>
-          <div class="resumen-label">Sección Actual</div>
-        </div>
-      </mat-card>
-
-      <mat-card class="resumen-card">
-        <div class="resumen-content">
-          <div class="resumen-number">{{ hayCambios ? 'Sí' : 'No' }}</div>
-          <div class="resumen-label">Cambios Pendientes</div>
-        </div>
-      </mat-card>
-
-      <mat-card class="resumen-card">
-        <div class="resumen-content">
-          <div class="resumen-number">4</div>
-          <div class="resumen-label">Secciones Total</div>
-        </div>
-      </mat-card>
-    </div>
-  </div>
-
-  <!-- Estado de configuración flotante -->
-  <div class="estado-config" *ngIf="hayCambios || guardandoConfig">
-    <mat-card class="estado-card">
-      <div class="estado-content">
-        <mat-icon *ngIf="guardandoConfig" class="loading">autorenew</mat-icon>
-        <mat-icon *ngIf="hayCambios && !guardandoConfig" color="warn"
-          >edit</mat-icon
+      <div class="header-actions">
+        <button
+          mat-raised-button
+          class="btn-texfina btn-primary"
+          (click)="guardarConfiguracion()"
+          [disabled]="!hayCambios"
         >
-        <span *ngIf="guardandoConfig">Guardando configuración...</span>
-        <span *ngIf="hayCambios && !guardandoConfig"
-          >Hay cambios sin guardar</span
+          <mat-icon>save</mat-icon>
+          Guardar Cambios
+        </button>
+        <button
+          mat-stroked-button
+          class="btn-texfina btn-outline"
+          (click)="exportarConfiguracion()"
         >
+          <mat-icon>download</mat-icon>
+          Exportar
+        </button>
       </div>
-    </mat-card>
+    </div>
+
+    <!-- Tabs de Configuración -->
+    <div class="table-card">
+      <mat-tab-group [(selectedIndex)]="tabActual" class="config-tabs">
+        <!-- TAB: Configuración General -->
+        <mat-tab label="General">
+          <div class="tab-content">
+            <!-- Tarjeta Información de la Empresa -->
+            <div class="card-texfina">
+              <div class="card-header">
+                <div class="card-title">
+                  <mat-icon class="text-texfina text-primary"
+                    >business</mat-icon
+                  >
+                  <span class="text-texfina text-primary"
+                    >Información de la Empresa</span
+                  >
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="config-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Nombre de la Empresa</mat-label>
+                    <input
+                      matInput
+                      [(ngModel)]="configuracion.empresa.nombre"
+                      (ngModelChange)="marcarCambios()"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>RUC</mat-label>
+                    <input
+                      matInput
+                      [(ngModel)]="configuracion.empresa.ruc"
+                      (ngModelChange)="marcarCambios()"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Dirección</mat-label>
+                    <input
+                      matInput
+                      [(ngModel)]="configuracion.empresa.direccion"
+                      (ngModelChange)="marcarCambios()"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Teléfono</mat-label>
+                    <input
+                      matInput
+                      [(ngModel)]="configuracion.empresa.telefono"
+                      (ngModelChange)="marcarCambios()"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Email</mat-label>
+                    <input
+                      matInput
+                      type="email"
+                      [(ngModel)]="configuracion.empresa.email"
+                      (ngModelChange)="marcarCambios()"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Sitio Web</mat-label>
+                    <input
+                      matInput
+                      [(ngModel)]="configuracion.empresa.sitio_web"
+                      (ngModelChange)="marcarCambios()"
+                    />
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tarjeta Configuración del Sistema -->
+            <div class="card-texfina">
+              <div class="card-header">
+                <div class="card-title">
+                  <mat-icon class="text-texfina text-primary">tune</mat-icon>
+                  <span class="text-texfina text-primary"
+                    >Configuración del Sistema</span
+                  >
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="config-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Zona Horaria</mat-label>
+                    <mat-select
+                      [(ngModel)]="configuracion.sistema.zona_horaria"
+                      (ngModelChange)="marcarCambios()"
+                    >
+                      <mat-option value="America/Lima"
+                        >America/Lima (UTC-5)</mat-option
+                      >
+                      <mat-option value="America/Bogota"
+                        >America/Bogota (UTC-5)</mat-option
+                      >
+                      <mat-option value="America/Mexico_City"
+                        >America/Mexico_City (UTC-6)</mat-option
+                      >
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Idioma por Defecto</mat-label>
+                    <mat-select
+                      [(ngModel)]="configuracion.sistema.idioma"
+                      (ngModelChange)="marcarCambios()"
+                    >
+                      <mat-option value="es">Español</mat-option>
+                      <mat-option value="en">English</mat-option>
+                      <mat-option value="pt">Português</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Formato de Fecha</mat-label>
+                    <mat-select
+                      [(ngModel)]="configuracion.sistema.formato_fecha"
+                      (ngModelChange)="marcarCambios()"
+                    >
+                      <mat-option value="DD/MM/YYYY">DD/MM/YYYY</mat-option>
+                      <mat-option value="MM/DD/YYYY">MM/DD/YYYY</mat-option>
+                      <mat-option value="YYYY-MM-DD">YYYY-MM-DD</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Moneda</mat-label>
+                    <mat-select
+                      [(ngModel)]="configuracion.sistema.moneda"
+                      (ngModelChange)="marcarCambios()"
+                    >
+                      <mat-option value="PEN">Soles (S/)</mat-option>
+                      <mat-option value="USD">Dólares ($)</mat-option>
+                      <mat-option value="EUR">Euros (€)</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <div class="checkbox-grid">
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.sistema.modo_oscuro"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Modo Oscuro por Defecto
+                    </mat-checkbox>
+
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.sistema.notificaciones_email"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Notificaciones por Email
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- TAB: Inventario -->
+        <mat-tab label="Inventario">
+          <div class="tab-content">
+            <div class="card-texfina">
+              <div class="card-header">
+                <div class="card-title">
+                  <mat-icon class="text-texfina text-primary"
+                    >inventory</mat-icon
+                  >
+                  <span class="text-texfina text-primary"
+                    >Configuración de Inventario</span
+                  >
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="config-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Umbral de Stock Mínimo (%)</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [(ngModel)]="configuracion.inventario.umbral_stock_minimo"
+                      (ngModelChange)="marcarCambios()"
+                      min="0"
+                      max="100"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Días para Alerta de Vencimiento</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [(ngModel)]="configuracion.inventario.dias_alerta_vencimiento"
+                      (ngModelChange)="marcarCambios()"
+                      min="1"
+                      max="365"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Método de Valoración</mat-label>
+                    <mat-select
+                      [(ngModel)]="configuracion.inventario.metodo_valoracion"
+                      (ngModelChange)="marcarCambios()"
+                    >
+                      <mat-option value="FIFO"
+                        >FIFO (Primero en Entrar, Primero en Salir)</mat-option
+                      >
+                      <mat-option value="LIFO"
+                        >LIFO (Último en Entrar, Primero en Salir)</mat-option
+                      >
+                      <mat-option value="PROMEDIO"
+                        >Costo Promedio Ponderado</mat-option
+                      >
+                    </mat-select>
+                  </mat-form-field>
+
+                  <div class="checkbox-grid">
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.inventario.permitir_stock_negativo"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Permitir Stock Negativo
+                    </mat-checkbox>
+
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.inventario.alertas_automaticas"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Alertas Automáticas
+                    </mat-checkbox>
+
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.inventario.auditoria_movimientos"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Auditoría de Movimientos
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- TAB: Seguridad -->
+        <mat-tab label="Seguridad">
+          <div class="tab-content">
+            <div class="card-texfina">
+              <div class="card-header">
+                <div class="card-title">
+                  <mat-icon class="text-texfina text-primary"
+                    >security</mat-icon
+                  >
+                  <span class="text-texfina text-primary"
+                    >Configuración de Seguridad</span
+                  >
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="config-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Tiempo de Sesión (minutos)</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [(ngModel)]="configuracion.seguridad.tiempo_sesion"
+                      (ngModelChange)="marcarCambios()"
+                      min="5"
+                      max="480"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Intentos de Login</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [(ngModel)]="configuracion.seguridad.intentos_login"
+                      (ngModelChange)="marcarCambios()"
+                      min="3"
+                      max="10"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Longitud Mínima de Contraseña</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [(ngModel)]="configuracion.seguridad.longitud_password"
+                      (ngModelChange)="marcarCambios()"
+                      min="6"
+                      max="20"
+                    />
+                  </mat-form-field>
+
+                  <div class="checkbox-grid">
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.seguridad.requiere_mayusculas"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Requiere Mayúsculas
+                    </mat-checkbox>
+
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.seguridad.requiere_numeros"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Requiere Números
+                    </mat-checkbox>
+
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.seguridad.requiere_simbolos"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Requiere Símbolos
+                    </mat-checkbox>
+
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.seguridad.doble_factor"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Autenticación de Doble Factor
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- TAB: Respaldos -->
+        <mat-tab label="Respaldos">
+          <div class="tab-content">
+            <div class="card-texfina">
+              <div class="card-header">
+                <div class="card-title">
+                  <mat-icon class="text-texfina text-primary">backup</mat-icon>
+                  <span class="text-texfina text-primary"
+                    >Configuración de Respaldos</span
+                  >
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="config-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Frecuencia de Respaldo</mat-label>
+                    <mat-select
+                      [(ngModel)]="configuracion.respaldos.frecuencia"
+                      (ngModelChange)="marcarCambios()"
+                    >
+                      <mat-option value="DIARIO">Diario</mat-option>
+                      <mat-option value="SEMANAL">Semanal</mat-option>
+                      <mat-option value="MENSUAL">Mensual</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Hora de Respaldo</mat-label>
+                    <input
+                      matInput
+                      type="time"
+                      [(ngModel)]="configuracion.respaldos.hora"
+                      (ngModelChange)="marcarCambios()"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Días de Retención</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [(ngModel)]="configuracion.respaldos.dias_retencion"
+                      (ngModelChange)="marcarCambios()"
+                      min="7"
+                      max="365"
+                    />
+                  </mat-form-field>
+
+                  <div class="checkbox-grid">
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.respaldos.compresion"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Habilitar Compresión
+                    </mat-checkbox>
+
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.respaldos.notificar_email"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Notificar por Email
+                    </mat-checkbox>
+                  </div>
+                </div>
+
+                <div class="backup-actions">
+                  <button
+                    mat-raised-button
+                    class="btn-texfina btn-success"
+                    (click)="crearRespaldoManual()"
+                  >
+                    <mat-icon>backup</mat-icon>
+                    Crear Respaldo Ahora
+                  </button>
+                  <button
+                    mat-stroked-button
+                    class="btn-texfina btn-outline"
+                    (click)="verHistorialRespaldos()"
+                  >
+                    <mat-icon>history</mat-icon>
+                    Ver Historial
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
   </div>
 </div>

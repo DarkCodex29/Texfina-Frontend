@@ -5,7 +5,7 @@
     <div class="action-buttons">
       <button
         mat-raised-button
-        class="btn-agregar"
+        class="btn-texfina btn-primary"
         (click)="abrirNuevoUsuario()"
       >
         <mat-icon>add</mat-icon>
@@ -50,7 +50,7 @@
           <button
             mat-raised-button
             type="button"
-            class="btn-buscar"
+            class="btn-texfina btn-primary"
             (click)="buscar()"
           >
             <mat-icon>search</mat-icon>
@@ -58,10 +58,9 @@
           </button>
           <button
             mat-stroked-button
-            color="accent"
             type="button"
+            class="btn-texfina btn-outline-primary"
             (click)="limpiarFiltros()"
-            class="btn-limpiar"
           >
             <mat-icon>clear</mat-icon>
             Limpiar
@@ -80,14 +79,20 @@
           <ng-container matColumnDef="codigo">
             <th mat-header-cell *matHeaderCellDef>Código</th>
             <td mat-cell *matCellDef="let usuario">
-              {{ formatearCodigo(usuario.id_usuario) }}
+              <span class="badge-texfina badge-neutral">
+                {{ formatearCodigo(usuario.id_usuario) }}
+              </span>
             </td>
           </ng-container>
 
           <!-- Columna Usuario -->
           <ng-container matColumnDef="username">
             <th mat-header-cell *matHeaderCellDef>Usuario</th>
-            <td mat-cell *matCellDef="let usuario">{{ usuario.username }}</td>
+            <td mat-cell *matCellDef="let usuario">
+              <strong class="text-texfina text-primary"
+                >{{ usuario.username }}</strong
+              >
+            </td>
           </ng-container>
 
           <!-- Columna Email -->
@@ -102,7 +107,9 @@
           <ng-container matColumnDef="rol">
             <th mat-header-cell *matHeaderCellDef>Rol</th>
             <td mat-cell *matCellDef="let usuario">
-              {{ obtenerNombreRol(usuario.id_rol) }}
+              <span class="badge-texfina badge-secondary">
+                {{ obtenerNombreRol(usuario.id_rol) }}
+              </span>
             </td>
           </ng-container>
 
@@ -119,8 +126,8 @@
             <th mat-header-cell *matHeaderCellDef>Estado</th>
             <td mat-cell *matCellDef="let usuario">
               <span
-                class="estado-badge"
-                [ngClass]="usuario.activo ? 'estado-activo' : 'estado-inactivo'"
+                class="badge-texfina"
+                [ngClass]="usuario.activo ? 'badge-success' : 'badge-warning'"
               >
                 {{ usuario.activo ? 'Activo' : 'Inactivo' }}
               </span>
@@ -131,7 +138,9 @@
           <ng-container matColumnDef="ultimo_ingreso">
             <th mat-header-cell *matHeaderCellDef>Último ingreso</th>
             <td mat-cell *matCellDef="let usuario">
-              {{ formatearFecha(usuario.last_login) }}
+              <span class="text-texfina text-muted">
+                {{ formatearFecha(usuario.last_login) }}
+              </span>
             </td>
           </ng-container>
 
@@ -139,22 +148,24 @@
           <ng-container matColumnDef="acciones">
             <th mat-header-cell *matHeaderCellDef>Acciones</th>
             <td mat-cell *matCellDef="let usuario">
-              <button
-                mat-icon-button
-                class="btn-ver"
-                (click)="verDetalle(usuario)"
-                matTooltip="Ver detalle"
-              >
-                <mat-icon class="icon-ver">visibility</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                class="btn-editar"
-                (click)="editarUsuario(usuario)"
-                matTooltip="Editar usuario"
-              >
-                <mat-icon class="icon-editar">edit</mat-icon>
-              </button>
+              <div class="action-buttons">
+                <button
+                  mat-icon-button
+                  class="btn-texfina btn-secondary btn-sm"
+                  (click)="verDetalle(usuario)"
+                  matTooltip="Ver detalle"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  class="btn-texfina btn-success btn-sm"
+                  (click)="editarUsuario(usuario)"
+                  matTooltip="Editar usuario"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </div>
             </td>
           </ng-container>
 
@@ -166,14 +177,22 @@
 
       <!-- Paginación -->
       <div class="pagination-container">
-        <div class="pagination-info">
+        <div class="pagination-info text-texfina text-muted">
           Página 1 de 1 ({{ usuarios.length }} usuarios)
         </div>
         <div class="pagination-buttons">
-          <button mat-icon-button disabled>
+          <button
+            mat-icon-button
+            class="btn-texfina btn-neutral btn-sm"
+            disabled
+          >
             <mat-icon>chevron_left</mat-icon>
           </button>
-          <button mat-icon-button disabled>
+          <button
+            mat-icon-button
+            class="btn-texfina btn-neutral btn-sm"
+            disabled
+          >
             <mat-icon>chevron_right</mat-icon>
           </button>
         </div>

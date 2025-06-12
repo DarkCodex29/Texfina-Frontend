@@ -73,11 +73,9 @@ export class StockComponent implements OnInit {
     'codigo',
     'material',
     'almacen',
-    'clase',
     'stock_actual',
     'estado',
-    'valor_total',
-    'ultimo_movimiento',
+    'valor',
   ];
 
   // Estadísticas
@@ -362,5 +360,35 @@ export class StockComponent implements OnInit {
   getNombreClase(id: number): string {
     const clase = this.clases.find((c) => c.id_clase === id);
     return clase ? clase.nombre : 'N/A';
+  }
+
+  getEstadoStockClass(estado: string): string {
+    switch (estado) {
+      case 'CRITICO':
+        return 'stock-critico';
+      case 'BAJO':
+        return 'stock-bajo';
+      case 'NORMAL':
+        return 'stock-normal';
+      case 'ALTO':
+        return 'stock-alto';
+      default:
+        return 'stock-normal';
+    }
+  }
+
+  getEstadoBadgeClass(estado: string): string {
+    switch (estado) {
+      case 'CRITICO':
+        return 'badge-primary';
+      case 'BAJO':
+        return 'badge-warning';
+      case 'NORMAL':
+        return 'badge-success';
+      case 'ALTO':
+        return 'badge-secondary';
+      default:
+        return 'badge-neutral';
+    }
   }
 }

@@ -5,10 +5,10 @@
     <div class="action-buttons">
       <button
         mat-raised-button
-        color="primary"
+        class="btn-texfina btn-primary"
         (click)="exportarExcel()"
-        class="btn-exportar"
       >
+        <mat-icon>file_download</mat-icon>
         Exportar Excel
       </button>
     </div>
@@ -16,59 +16,61 @@
 
   <!-- Cards de resumen -->
   <div class="summary-cards">
-    <mat-card class="summary-card">
-      <mat-card-content>
-        <div class="card-content">
-          <div class="card-value">{{ formatearNumero(totalItems) }}</div>
-          <div class="card-label">Total de Items</div>
+    <div class="card-texfina">
+      <div class="card-content">
+        <div class="summary-value text-texfina text-primary">
+          {{ formatearNumero(totalItems) }}
         </div>
-      </mat-card-content>
-    </mat-card>
+        <div class="summary-label text-texfina text-muted">Total de Items</div>
+      </div>
+    </div>
 
-    <mat-card class="summary-card">
-      <mat-card-content>
-        <div class="card-content">
-          <div class="card-value">
-            {{ formatearMoneda(valorTotalInventario) }}
-          </div>
-          <div class="card-label">Valor Total Inventario</div>
+    <div class="card-texfina">
+      <div class="card-content">
+        <div class="summary-value text-texfina text-secondary">
+          {{ formatearMoneda(valorTotalInventario) }}
         </div>
-      </mat-card-content>
-    </mat-card>
+        <div class="summary-label text-texfina text-muted">
+          Valor Total Inventario
+        </div>
+      </div>
+    </div>
 
-    <mat-card class="summary-card warning">
-      <mat-card-content>
-        <div class="card-content">
-          <div class="card-value">{{ formatearNumero(itemsCriticos) }}</div>
-          <div class="card-label">Items Críticos</div>
+    <div class="card-texfina warning-card">
+      <div class="card-content">
+        <div class="summary-value text-texfina text-warning">
+          {{ formatearNumero(itemsCriticos) }}
         </div>
-      </mat-card-content>
-    </mat-card>
+        <div class="summary-label text-texfina text-muted">Items Críticos</div>
+      </div>
+    </div>
 
-    <mat-card class="summary-card attention">
-      <mat-card-content>
-        <div class="card-content">
-          <div class="card-value">{{ formatearNumero(itemsBajos) }}</div>
-          <div class="card-label">Items con Stock Bajo</div>
+    <div class="card-texfina attention-card">
+      <div class="card-content">
+        <div class="summary-value text-texfina text-warning">
+          {{ formatearNumero(itemsBajos) }}
         </div>
-      </mat-card-content>
-    </mat-card>
+        <div class="summary-label text-texfina text-muted">
+          Items con Stock Bajo
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Filtros -->
-  <mat-card class="filters-card">
-    <mat-card-header>
-      <mat-card-title>Filtros de Búsqueda</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="filtrosForm" class="filters-form">
-        <div class="filters-row">
-          <mat-form-field appearance="outline">
+  <mat-card class="filtros-card">
+    <div class="card-header">
+      <h3 class="card-title">Filtros de Búsqueda</h3>
+    </div>
+    <div class="card-content">
+      <form [formGroup]="filtrosForm" class="filtros-form">
+        <div class="filtros-row">
+          <mat-form-field appearance="outline" class="filtro-field">
             <mat-label>Código Fox</mat-label>
             <input matInput formControlName="codigo" placeholder="Ej: ALG001" />
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="filtro-field">
             <mat-label>Nombre del Material</mat-label>
             <input
               matInput
@@ -77,7 +79,7 @@
             />
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="filtro-field">
             <mat-label>Almacén</mat-label>
             <mat-select formControlName="almacen">
               <mat-option value="">Todos los almacenes</mat-option>
@@ -90,7 +92,7 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="filtro-field">
             <mat-label>Clase</mat-label>
             <mat-select formControlName="clase">
               <mat-option value="">Todas las clases</mat-option>
@@ -104,8 +106,8 @@
           </mat-form-field>
         </div>
 
-        <div class="filters-row">
-          <mat-form-field appearance="outline">
+        <div class="filtros-row">
+          <mat-form-field appearance="outline" class="filtro-field">
             <mat-label>Estado de Stock</mat-label>
             <mat-select formControlName="estado_stock">
               <mat-option value="">Todos los estados</mat-option>
@@ -116,7 +118,7 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="filtro-field">
             <mat-label>Stock Mínimo</mat-label>
             <input
               matInput
@@ -126,7 +128,7 @@
             />
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="filtro-field">
             <mat-label>Stock Máximo</mat-label>
             <input
               matInput
@@ -136,48 +138,48 @@
             />
           </mat-form-field>
 
-          <div class="filter-actions">
+          <div class="filtro-buttons">
             <button
               mat-raised-button
-              color="primary"
+              class="btn-texfina btn-primary"
               (click)="buscar()"
-              class="btn-buscar"
             >
+              <mat-icon>search</mat-icon>
               Buscar
             </button>
 
             <button
               mat-stroked-button
-              color="accent"
+              class="btn-texfina btn-outline-primary"
               (click)="limpiarFiltros()"
-              class="btn-limpiar"
             >
+              <mat-icon>clear</mat-icon>
               Limpiar
             </button>
           </div>
         </div>
       </form>
-    </mat-card-content>
+    </div>
   </mat-card>
 
   <!-- Tabla de stock -->
   <div class="page-content">
-    <mat-card class="tabla-card">
-      <mat-card-header>
-        <mat-card-title>Stock de Materiales</mat-card-title>
-        <mat-card-subtitle>
+    <mat-card class="table-card">
+      <div class="card-header">
+        <h3 class="card-title">Stock de Materiales</h3>
+        <p class="card-subtitle">
           Mostrando {{ stocksFiltrados.length }} de {{ stocks.length }}
           registros
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
+        </p>
+      </div>
+      <div class="card-content">
         <div class="table-container">
           <table mat-table [dataSource]="stocksFiltrados" class="stock-table">
             <!-- Columna Código -->
             <ng-container matColumnDef="codigo">
               <th mat-header-cell *matHeaderCellDef>Código Fox</th>
               <td mat-cell *matCellDef="let stock">
-                <span class="codigo-cell"
+                <span class="badge-texfina badge-neutral"
                   >{{ formatearCodigo(stock.codigo_fox) }}</span
                 >
               </td>
@@ -188,8 +190,12 @@
               <th mat-header-cell *matHeaderCellDef>Material</th>
               <td mat-cell *matCellDef="let stock">
                 <div class="material-cell">
-                  <div class="material-name">{{ stock.nombre }}</div>
-                  <div class="material-unit">{{ stock.unidad }}</div>
+                  <div class="material-name text-texfina text-primary">
+                    {{ stock.nombre }}
+                  </div>
+                  <div class="material-unit text-texfina text-muted">
+                    {{ stock.unidad }}
+                  </div>
                 </div>
               </td>
             </ng-container>
@@ -198,15 +204,9 @@
             <ng-container matColumnDef="almacen">
               <th mat-header-cell *matHeaderCellDef>Almacén</th>
               <td mat-cell *matCellDef="let stock">
-                <span class="almacen-cell">{{ stock.almacen }}</span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Clase -->
-            <ng-container matColumnDef="clase">
-              <th mat-header-cell *matHeaderCellDef>Clase</th>
-              <td mat-cell *matCellDef="let stock">
-                <span class="clase-cell">{{ stock.clase }}</span>
+                <span class="badge-texfina badge-secondary"
+                  >{{ stock.almacen }}</span
+                >
               </td>
             </ng-container>
 
@@ -214,15 +214,12 @@
             <ng-container matColumnDef="stock_actual">
               <th mat-header-cell *matHeaderCellDef>Stock Actual</th>
               <td mat-cell *matCellDef="let stock">
-                <div class="stock-cell">
-                  <div class="stock-value">
-                    {{ formatearNumero(stock.stock_actual) }}
-                  </div>
-                  <div class="stock-limits">
-                    Min: {{ formatearNumero(stock.stock_minimo) }} | Max: {{
-                    formatearNumero(stock.stock_maximo) }}
-                  </div>
-                </div>
+                <span
+                  class="stock-value"
+                  [ngClass]="getEstadoStockClass(stock.estado_stock)"
+                >
+                  {{ formatearNumero(stock.stock_actual) }}
+                </span>
               </td>
             </ng-container>
 
@@ -230,62 +227,31 @@
             <ng-container matColumnDef="estado">
               <th mat-header-cell *matHeaderCellDef>Estado</th>
               <td mat-cell *matCellDef="let stock">
-                <div
-                  class="estado-chip"
-                  [class]="getColorEstado(stock.estado_stock)"
+                <span
+                  class="badge-texfina"
+                  [ngClass]="getEstadoBadgeClass(stock.estado_stock)"
                 >
                   {{ stock.estado_stock }}
-                </div>
+                </span>
               </td>
             </ng-container>
 
-            <!-- Columna Valor Total -->
-            <ng-container matColumnDef="valor_total">
+            <!-- Columna Valor -->
+            <ng-container matColumnDef="valor">
               <th mat-header-cell *matHeaderCellDef>Valor Total</th>
               <td mat-cell *matCellDef="let stock">
-                <div class="valor-cell">
-                  <div class="valor-total">
-                    {{ formatearMoneda(stock.valor_total) }}
-                  </div>
-                  <div class="costo-unitario">
-                    {{ formatearMoneda(stock.costo_unitario) }} / {{
-                    stock.unidad }}
-                  </div>
-                </div>
+                <span class="text-texfina text-primary"
+                  >{{ formatearMoneda(stock.valor_total) }}</span
+                >
               </td>
             </ng-container>
 
-            <!-- Columna Último Movimiento -->
-            <ng-container matColumnDef="ultimo_movimiento">
-              <th mat-header-cell *matHeaderCellDef>Último Movimiento</th>
-              <td mat-cell *matCellDef="let stock">
-                <div class="movimiento-cell">
-                  <div class="fecha">
-                    {{ formatearFecha(stock.fecha_ultimo_movimiento) }}
-                  </div>
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    (click)="verMovimientos(stock)"
-                    matTooltip="Ver historial de movimientos"
-                  >
-                    <mat-icon>history</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
+            <!-- Definición de headers y filas -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
-
-          <!-- Mensaje cuando no hay datos -->
-          <div *ngIf="stocksFiltrados.length === 0" class="no-data">
-            <h3>No se encontraron registros de stock</h3>
-            <p>Ajuste los filtros de búsqueda para obtener resultados</p>
-          </div>
         </div>
-      </mat-card-content>
+      </div>
     </mat-card>
   </div>
 </div>

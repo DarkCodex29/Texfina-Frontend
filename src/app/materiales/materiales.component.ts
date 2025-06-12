@@ -48,7 +48,6 @@ export class MaterialesComponent implements OnInit {
   displayedColumns: string[] = [
     'id_fox',
     'nombre',
-    'id_clase',
     'peso_unitario',
     'id_unidad',
     'presentacion',

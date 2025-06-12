@@ -7,32 +7,32 @@
   width: 100%;
   background-color: white;
 
-  .mat-mdc-header-cell {
+      .mat-mdc-header-cell {
     background-color: #fafafa;
     color: #666;
-    font-weight: 600;
-    font-size: 0.875rem;
-    padding: 0.75rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 0.75rem;
     border-bottom: 2px solid #e0e0e0;
-  }
+      }
 
-  .mat-mdc-row {
+      .mat-mdc-row {
     height: 48px;
     border-bottom: 1px solid #f0f0f0;
 
-    &:hover {
-      background-color: #f8f9fa !important;
-    }
+        &:hover {
+          background-color: #f8f9fa !important;
+        }
 
     .mat-mdc-cell {
       font-size: 0.875rem;
       padding: 0.75rem;
       color: #333;
 
-      .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: center;
+        .action-buttons {
+          display: flex;
+          gap: 0.5rem;
+          justify-content: center;
       }
 
       .btn-ver {
@@ -41,7 +41,7 @@
         border-radius: 6px;
         background-color: #e0f2fe;
         color: #0284c7;
+          }
+        }
       }
-    }
-  }
 }
