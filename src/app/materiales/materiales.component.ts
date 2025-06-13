@@ -23,7 +23,15 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatCardModule } from '@angular/material/card';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  takeUntil,
+  finalize,
+  delay,
+} from 'rxjs';
 import { MaterialService } from '../services/material.service';
 import { Insumo, Proveedor } from '../models/insumo.model';
 import { RegistroMaterialDialogComponent } from './registro-material-dialog/registro-material-dialog.component';
@@ -48,6 +56,7 @@ import { DetalleMaterialDialogComponent } from './detalle-material-dialog/detall
     MatCardModule,
     MatSortModule,
     MatTooltipModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './materiales.component.html',
   styleUrls: ['./materiales.component.scss'],
@@ -62,6 +71,12 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
   filtrosExpanded: boolean = true;
   private destroy$ = new Subject<void>();
 
+  // Estados de carga y error
+  isLoading: boolean = false;
+  isLoadingProveedores: boolean = false;
+  hasError: boolean = false;
+  errorMessage: string = '';
+
   displayedColumns: string[] = [
     'id_fox',
     'nombre',
@@ -74,6 +89,18 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get materialesFiltrados(): Insumo[] {
     return this.dataSource.data;
+  }
+
+  get isEmpty(): boolean {
+    return !this.isLoading && this.materiales.length === 0 && !this.hasError;
+  }
+
+  get isFilteredEmpty(): boolean {
+    return (
+      !this.isLoading &&
+      this.dataSource.data.length === 0 &&
+      this.materiales.length > 0
+    );
   }
 
   constructor(
@@ -115,16 +142,70 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cargarMateriales(): void {
-    this.materialService.getMateriales().subscribe((materiales) => {
-      this.materiales = materiales;
-      this.dataSource.data = [...materiales];
-    });
+    this.isLoading = true;
+    this.hasError = false;
+    this.errorMessage = '';
+
+    console.log(
+      '🔄 Iniciando carga de materiales - isLoading:',
+      this.isLoading
+    );
+
+    this.materialService
+      .getMateriales()
+      .pipe(
+        // Delay artificial para demostrar el skeleton (remover en producción)
+        delay(1500),
+        finalize(() => {
+          this.isLoading = false;
+          console.log('✅ Carga completada - isLoading:', this.isLoading);
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (materiales) => {
+          console.log('📦 Materiales cargados:', materiales.length);
+          this.materiales = materiales;
+          this.dataSource.data = [...materiales];
+        },
+        error: (error) => {
+          console.error('❌ Error al cargar materiales:', error);
+          this.hasError = true;
+          this.errorMessage =
+            'Error al cargar los materiales. Por favor, intenta nuevamente.';
+          this.materiales = [];
+          this.dataSource.data = [];
+        },
+      });
   }
 
   cargarProveedores(): void {
-    this.materialService.getProveedores().subscribe((proveedores) => {
-      this.proveedores = proveedores;
-    });
+    this.isLoadingProveedores = true;
+
+    this.materialService
+      .getProveedores()
+      .pipe(
+        // Delay artificial para demostrar el skeleton (remover en producción)
+        delay(1000),
+        finalize(() => {
+          this.isLoadingProveedores = false;
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (proveedores) => {
+          this.proveedores = proveedores;
+        },
+        error: (error) => {
+          console.error('Error al cargar proveedores:', error);
+          this.proveedores = [];
+        },
+      });
+  }
+
+  reintentarCarga(): void {
+    this.cargarMateriales();
+    this.cargarProveedores();
   }
 
   aplicarFiltros(): void {

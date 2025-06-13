@@ -1,0 +1,360 @@
+// ============================================================================
+// SKELETON COMPONENT - ESTILOS
+// ============================================================================
+
+.skeleton-wrapper {
+  width: 100%;
+}
+
+// ============================================================================
+// SKELETON PARA TABLAS
+// ============================================================================
+
+.skeleton-table {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 12px;
+
+  &.skeleton-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 2px solid #e2e8f0;
+    padding: 18px 16px;
+    min-height: 60px;
+  }
+
+  &.skeleton-data-row {
+    border-bottom: 1px solid #f1f5f9;
+    min-height: 72px;
+    transition: background-color 0.2s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: #f8fafc;
+    }
+  }
+}
+
+.skeleton-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+
+  &.skeleton-header-cell {
+    justify-content: center;
+  }
+}
+
+.skeleton-line {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  border-radius: 8px;
+  animation: skeleton-shimmer 2s infinite ease-in-out;
+
+  &.skeleton-header-line {
+    height: 18px;
+    background: linear-gradient(90deg, #cbd5e1 25%, #e2e8f0 50%, #cbd5e1 75%);
+    background-size: 200% 100%;
+    border-radius: 6px;
+  }
+
+  &.skeleton-text {
+    height: 20px;
+    border-radius: 6px;
+  }
+
+  &.skeleton-subtext {
+    height: 14px;
+    opacity: 0.6;
+    margin-top: 4px;
+    border-radius: 4px;
+  }
+
+  &.skeleton-badge {
+    height: 28px;
+    border-radius: 14px;
+    background: linear-gradient(90deg, #e0e7ff 25%, #c7d2fe 50%, #e0e7ff 75%);
+    background-size: 200% 100%;
+  }
+
+  &.skeleton-price {
+    height: 22px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #dcfce7 25%, #bbf7d0 50%, #dcfce7 75%);
+    background-size: 200% 100%;
+    font-weight: 600;
+  }
+
+  &.skeleton-actions {
+    height: 36px;
+    width: 80px !important;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%);
+    background-size: 200% 100%;
+  }
+}
+
+// ============================================================================
+// SKELETON PARA CARDS
+// ============================================================================
+
+.skeleton-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-card-header {
+  margin-bottom: 20px;
+
+  .skeleton-title {
+    height: 28px;
+    width: 75%;
+    margin-bottom: 12px;
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    border-radius: 8px;
+    animation: skeleton-shimmer 2s infinite ease-in-out;
+  }
+
+  .skeleton-subtitle {
+    height: 18px;
+    width: 55%;
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    border-radius: 6px;
+    animation: skeleton-shimmer 2s infinite ease-in-out;
+    opacity: 0.7;
+  }
+}
+
+.skeleton-card-content {
+  .skeleton-content-line {
+    height: 18px;
+    margin-bottom: 12px;
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    border-radius: 6px;
+    animation: skeleton-shimmer 2s infinite ease-in-out;
+
+    &:nth-child(1) {
+      width: 92%;
+    }
+    &:nth-child(2) {
+      width: 78%;
+    }
+    &:nth-child(3) {
+      width: 88%;
+    }
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// ============================================================================
+// SKELETON PARA FILTROS
+// ============================================================================
+
+.skeleton-filters {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-filters-header {
+  margin-bottom: 20px;
+
+  .skeleton-filter-title {
+    height: 24px;
+    width: 220px;
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    border-radius: 8px;
+    animation: skeleton-shimmer 2s infinite ease-in-out;
+  }
+}
+
+.skeleton-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skeleton-filter-input {
+  .skeleton-input {
+    height: 56px;
+    background: linear-gradient(90deg, #f8fafc 25%, #f1f5f9 50%, #f8fafc 75%);
+    background-size: 200% 100%;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    animation: skeleton-shimmer 2s infinite ease-in-out;
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(90deg, #cbd5e1 25%, #e2e8f0 50%, #cbd5e1 75%);
+      background-size: 200% 100%;
+      border-radius: 4px;
+      animation: skeleton-shimmer 2s infinite ease-in-out;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 48px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60%;
+      height: 16px;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      border-radius: 4px;
+      animation: skeleton-shimmer 2s infinite ease-in-out;
+    }
+  }
+}
+
+// ============================================================================
+// ANIMACIONES
+// ============================================================================
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Animación de entrada suave
+.skeleton-wrapper {
+  animation: fadeInSkeleton 0.3s ease-out;
+}
+
+@keyframes fadeInSkeleton {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+
+@media (max-width: 768px) {
+  .skeleton-row {
+    padding: 12px;
+    gap: 8px;
+
+    &.skeleton-header {
+      padding: 16px 12px;
+      min-height: 56px;
+    }
+
+    &.skeleton-data-row {
+      min-height: 64px;
+    }
+  }
+
+  .skeleton-line {
+    &.skeleton-text {
+      height: 18px;
+    }
+
+    &.skeleton-subtext {
+      height: 12px;
+    }
+
+    &.skeleton-badge {
+      height: 24px;
+    }
+
+    &.skeleton-actions {
+      height: 32px;
+      width: 60px !important;
+    }
+  }
+
+  .skeleton-card {
+    padding: 20px;
+  }
+
+  .skeleton-filters {
+    padding: 20px;
+  }
+}
+
+// ============================================================================
+// VARIACIONES DE COLOR PARA DIFERENTES TIPOS
+// ============================================================================
+
+.skeleton-table {
+  // Variación para materiales
+  &.materials-skeleton {
+    .skeleton-badge {
+      background: linear-gradient(90deg, #dbeafe 25%, #bfdbfe 50%, #dbeafe 75%);
+      background-size: 200% 100%;
+    }
+
+    .skeleton-price {
+      background: linear-gradient(90deg, #d1fae5 25%, #a7f3d0 50%, #d1fae5 75%);
+      background-size: 200% 100%;
+    }
+  }
+
+  // Variación para proveedores
+  &.providers-skeleton {
+    .skeleton-badge {
+      background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%);
+      background-size: 200% 100%;
+    }
+  }
+
+  // Variación para almacenes
+  &.warehouses-skeleton {
+    .skeleton-badge {
+      background: linear-gradient(90deg, #dcfce7 25%, #bbf7d0 50%, #dcfce7 75%);
+      background-size: 200% 100%;
+    }
+  }
+}

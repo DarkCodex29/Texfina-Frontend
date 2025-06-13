@@ -4,6 +4,39 @@
 
 /* Usar clases globales de Texfina - sin estilos locales que interfieran */
 
+/* Layout específico para filtros de almacenes */
+app-almacenes .filters-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+app-almacenes .filter-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+app-almacenes .btn-clear-filters {
+  min-width: 140px;
+  height: 48px;
+}
+
+/* Responsive para filtros */
+@media (max-width: 1200px) {
+  app-almacenes .filters-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  app-almacenes .filters-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Solo estilos muy específicos para la celda de almacén */
 .almacen-cell {
   .almacen-name {

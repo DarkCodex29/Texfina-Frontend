@@ -789,6 +789,7 @@ html {
   }
 
   .table-container {
+    position: relative;
     flex: 1;
     overflow: auto;
     min-height: 0; // Importante para que flex funcione correctamente
@@ -2592,6 +2593,342 @@ app-almacenes {
     .btn-texfina {
       flex: 1;
       min-width: 120px;
+    }
+  }
+}
+
+// ============================================================================
+// ESTADOS DE CARGA, ERROR Y VACÍO
+// ============================================================================
+
+.loading-state,
+.error-state,
+.empty-state,
+.filtered-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 300px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  border: 2px dashed #e2e8f0;
+  margin: 20px 0;
+}
+
+.loading-state {
+  border-color: var(--texfina-secondary);
+  background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .loading-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--texfina-primary);
+  }
+
+  .loading-subtitle {
+    font-size: 0.875rem;
+    margin: 0;
+    color: var(--texfina-text-muted);
+  }
+
+  mat-spinner {
+    margin-bottom: 8px;
+  }
+}
+
+.error-state {
+  border-color: var(--texfina-error);
+  background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+
+  .error-icon {
+    font-size: 48px;
+    color: var(--texfina-error);
+    margin-bottom: 16px;
+  }
+
+  .error-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--texfina-error);
+  }
+
+  .error-subtitle {
+    font-size: 0.875rem;
+    margin: 0 0 24px 0;
+    color: var(--texfina-text-muted);
+    max-width: 400px;
+  }
+}
+
+.empty-state {
+  border-color: var(--texfina-neutral);
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+
+  .empty-icon {
+    font-size: 64px;
+    color: var(--texfina-neutral);
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+
+  .empty-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--texfina-primary);
+  }
+
+  .empty-subtitle {
+    font-size: 1rem;
+    margin: 0 0 32px 0;
+    color: var(--texfina-text-muted);
+    max-width: 500px;
+    line-height: 1.5;
+  }
+}
+
+.filtered-empty-state {
+  border-color: var(--texfina-warning);
+  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+
+  .filtered-empty-icon {
+    font-size: 48px;
+    color: var(--texfina-warning);
+    margin-bottom: 16px;
+  }
+
+  .filtered-empty-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--texfina-primary);
+  }
+
+  .filtered-empty-subtitle {
+    font-size: 0.875rem;
+    margin: 0 0 24px 0;
+    color: var(--texfina-text-muted);
+    max-width: 400px;
+  }
+}
+
+// Animaciones para los estados
+.loading-state,
+.error-state,
+.empty-state,
+.filtered-empty-state {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive para estados
+@media (max-width: 768px) {
+  .loading-state,
+  .error-state,
+  .empty-state,
+  .filtered-empty-state {
+    padding: 40px 16px;
+    min-height: 250px;
+  }
+
+  .empty-state {
+    .empty-icon {
+      font-size: 48px;
+    }
+
+    .empty-title {
+      font-size: 1.25rem;
+    }
+
+    .empty-subtitle {
+      font-size: 0.875rem;
+    }
+  }
+
+  .error-state {
+    .error-icon {
+      font-size: 40px;
+    }
+  }
+
+  .filtered-empty-state {
+    .filtered-empty-icon {
+      font-size: 40px;
+    }
+  }
+}
+
+// Skeleton loading styles para filas de tabla
+.skeleton-row {
+  .table-cell {
+    padding: 12px 16px;
+    vertical-align: middle;
+  }
+
+  .skeleton-line {
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite ease-in-out;
+    margin-bottom: 4px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &.skeleton-badge {
+      height: 28px;
+      width: 80%;
+      background: linear-gradient(90deg, #e3f2fd 25%, #bbdefb 50%, #e3f2fd 75%);
+      background-size: 200% 100%;
+    }
+
+    &.skeleton-text {
+      height: 20px;
+      width: 85%;
+    }
+
+    &.skeleton-subtext {
+      height: 14px;
+      width: 60%;
+      margin-top: 4px;
+    }
+
+    &.skeleton-price {
+      height: 22px;
+      width: 85%;
+      background: linear-gradient(90deg, #e8f5e8 25%, #c8e6c8 50%, #e8f5e8 75%);
+      background-size: 200% 100%;
+    }
+
+    &.skeleton-actions {
+      height: 36px;
+      width: 60px;
+      background: linear-gradient(90deg, #fff3e0 25%, #ffcc02 50%, #fff3e0 75%);
+      background-size: 200% 100%;
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Skeleton loading styles para filas de tabla
+.skeleton-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 10;
+
+  .skeleton-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; // Forzar anchos fijos
+
+    // Definir anchos específicos para cada columna
+    td:nth-child(1) {
+      width: 140px;
+    } // Código Fox
+    td:nth-child(2) {
+      width: 220px;
+    } // Nombre
+    td:nth-child(3) {
+      width: 120px;
+    } // Peso Unit.
+    td:nth-child(4) {
+      width: 110px;
+    } // Unidad
+    td:nth-child(5) {
+      width: 160px;
+    } // Presentación
+    td:nth-child(6) {
+      width: 130px;
+    } // Precio Unit.
+    td:nth-child(7) {
+      width: 120px;
+    } // Acciones
+  }
+}
+
+.skeleton-row {
+  .table-cell {
+    padding: 12px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .skeleton-line {
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite ease-in-out;
+    margin-bottom: 4px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &.skeleton-badge {
+      height: 28px;
+      width: 90%; // Ajustar para que se vea mejor
+      background: linear-gradient(90deg, #e3f2fd 25%, #bbdefb 50%, #e3f2fd 75%);
+      background-size: 200% 100%;
+    }
+
+    &.skeleton-text {
+      height: 20px;
+      width: 95%; // Ajustar para que se vea mejor
+    }
+
+    &.skeleton-subtext {
+      height: 14px;
+      width: 70%; // Ajustar para que se vea mejor
+      margin-top: 4px;
+    }
+
+    &.skeleton-price {
+      height: 22px;
+      width: 90%; // Ajustar para que se vea mejor
+      background: linear-gradient(90deg, #e8f5e8 25%, #c8e6c8 50%, #e8f5e8 75%);
+      background-size: 200% 100%;
+    }
+
+    &.skeleton-actions {
+      height: 36px;
+      width: 80px; // Ancho fijo para botones
+      background: linear-gradient(90deg, #fff3e0 25%, #ffcc02 50%, #fff3e0 75%);
+      background-size: 200% 100%;
     }
   }
 }
