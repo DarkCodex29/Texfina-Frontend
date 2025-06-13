@@ -262,8 +262,8 @@
   }
 
   &.badge-secondary {
-    background-color: var(--texfina-secondary-bg);
-    color: var(--texfina-secondary);
+    background-color: var(--texfina-secondary);
+    color: white;
   }
 
   &.badge-success {
@@ -679,6 +679,14 @@ html {
   background-color: var(--texfina-bg-secondary);
   overflow: hidden;
   font-family: var(--texfina-font-family);
+
+  // Accesibilidad móvil - permitir scroll libre
+  @media (max-width: 480px) {
+    padding: 8px;
+    height: auto; // Permitir que crezca según contenido
+    min-height: 100vh;
+    overflow: visible; // Permitir scroll natural
+  }
 }
 
 .page-header {
@@ -692,6 +700,28 @@ html {
   border-radius: var(--texfina-radius-lg);
   box-shadow: var(--texfina-shadow-md);
   border: 1px solid var(--texfina-border-light);
+
+  // Accesibilidad móvil - reducir tamaño
+  @media (max-width: 480px) {
+    padding: 12px;
+    margin-bottom: 12px;
+    flex-direction: column;
+    gap: 8px;
+
+    .page-title {
+      font-size: 1.5rem !important;
+    }
+
+    .action-buttons {
+      width: 100%;
+      justify-content: stretch;
+
+      .btn-texfina {
+        flex: 1;
+        min-height: 44px;
+      }
+    }
+  }
 
   .page-title {
     font-size: var(--texfina-font-size-3xl);
@@ -713,6 +743,12 @@ html {
   display: flex;
   flex-direction: column;
   overflow: hidden; // Importante para contener el scroll
+
+  // Accesibilidad móvil - permitir scroll natural del contenido
+  @media (max-width: 480px) {
+    overflow: visible;
+    min-height: auto;
+  }
 }
 
 .table-card {
@@ -722,23 +758,157 @@ html {
   flex-direction: column;
   overflow: hidden;
   background-color: var(--texfina-bg-primary);
-  box-shadow: var(--texfina-shadow-md) !important;
-  border-radius: var(--texfina-radius-lg) !important;
-  border: 1px solid var(--texfina-border-light);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+  border-radius: 12px !important;
+  border: 2px solid #e2e8f0;
+
+  // Mejoras para móviles
+  @media (max-width: 480px) {
+    border-radius: 8px !important;
+    margin: 0 -4px; // Compensar el padding del container
+  }
+
+  // Container que incluye headers y tabla para scroll unificado
+  .table-with-headers {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    // En móviles, este contenedor debe manejar el scroll horizontal
+    @media (max-width: 480px) {
+      overflow-x: auto;
+      overflow-y: visible;
+
+      // Headers y tabla tienen el mismo ancho mínimo
+      .column-headers,
+      .table-container {
+        min-width: 800px !important;
+      }
+    }
+  }
 
   .table-container {
     flex: 1;
     overflow: auto;
     min-height: 0; // Importante para que flex funcione correctamente
+
+    // Scroll suave en todas las direcciones
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+
+    // En móviles, no debe tener scroll horizontal (lo maneja el padre)
+    @media (max-width: 480px) {
+      overflow-x: visible; // El scroll horizontal lo maneja .table-with-headers
+      overflow-y: auto;
+
+      .data-table,
+      .mat-mdc-table {
+        width: 100%;
+      }
+    }
+
+    // Custom scrollbar para mejor apariencia
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--texfina-bg-secondary);
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--texfina-border);
+      border-radius: 3px;
+
+      &:hover {
+        background: var(--texfina-text-secondary);
+      }
+    }
+  }
+
+  // Asegurar que la tabla sea completamente responsive
+  @media (max-width: 320px) {
+    .table-container {
+      // En pantallas extremadamente pequeñas, permitir scroll horizontal si es necesario
+      overflow-x: auto;
+
+      .data-table,
+      .mat-mdc-table,
+      .column-headers,
+      .header-row {
+        min-width: 800px !important; // Mismo ancho mínimo que pantallas de 480px
+      }
+    }
   }
 
   // Headers de tabla con estilo Texfina
   .mat-mdc-header-cell {
-    background-color: var(--texfina-bg-secondary) !important;
-    color: var(--texfina-text-secondary) !important;
-    font-weight: 600 !important;
-    font-size: var(--texfina-font-size-sm) !important;
-    border-bottom: 2px solid var(--texfina-border-light) !important;
+    background: var(--texfina-bg-secondary) !important;
+    color: #1a1a1a !important;
+    font-weight: 700;
+    font-size: var(--texfina-font-size-sm);
+    padding: 12px 8px !important;
+    border-bottom: 2px solid var(--texfina-border);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    height: 48px !important;
+    vertical-align: middle;
+    position: relative;
+
+    // Estilos para las flechas de ordenamiento
+    &.mat-sort-header-sorted {
+      color: #000000 !important;
+      background: #f1f5f9 !important;
+
+      .mat-sort-header-button {
+        color: #000000 !important;
+        font-weight: 800 !important;
+      }
+    }
+
+    .mat-sort-header-arrow {
+      color: var(--texfina-secondary) !important;
+      margin: 0 0 0 8px !important;
+    }
+
+    &:hover {
+      background: #f8fafc !important;
+      color: #000000 !important;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      .mat-sort-header-button {
+        color: #000000 !important;
+      }
+    }
+
+    // Mejorar la visibilidad de las flechas
+    .mat-sort-header-container {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .mat-sort-header-button {
+      border: none !important;
+      background: transparent !important;
+      color: #1a1a1a !important;
+      font: inherit !important;
+      font-weight: 700 !important;
+      text-align: left !important;
+      padding: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      width: 100% !important;
+    }
+
+    .mat-sort-header-indicator {
+      color: var(--texfina-secondary) !important;
+      opacity: 1 !important;
+    }
   }
 
   // Filas de tabla con estilo Texfina
@@ -769,6 +939,44 @@ html {
   border: 1px solid var(--texfina-border-light);
   margin-bottom: var(--texfina-spacing-lg);
   flex-shrink: 0;
+
+  // Accesibilidad móvil - hacer filtros más compactos y colapsables
+  @media (max-width: 480px) {
+    margin-bottom: 8px;
+
+    .filtros-form {
+      padding: 12px !important;
+
+      .filtros-row {
+        gap: 8px;
+
+        .filtro-buttons {
+          width: 100%;
+          justify-content: stretch;
+
+          // Asegurar que el botón de limpiar sea visible completo
+          .btn-clear-filters {
+            width: 100% !important;
+            height: 44px !important;
+            min-width: auto !important;
+            flex: 1;
+          }
+        }
+      }
+    }
+
+    // Hacer que el card de filtros sea colapsable por defecto en móviles
+    &.mat-expansion-panel {
+      .mat-expansion-panel-header {
+        padding: 8px 12px;
+        height: 44px;
+      }
+
+      .mat-expansion-panel-content .mat-expansion-panel-body {
+        padding: 8px 12px 12px;
+      }
+    }
+  }
 
   .filtros-form {
     padding: var(--texfina-spacing-lg);
@@ -804,10 +1012,10 @@ html {
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--texfina-border-light);
-  margin-bottom: var(--texfina-spacing-xl);
-  padding: var(--texfina-spacing-xl);
+  margin-bottom: 16px;
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease;
 
   &::before {
     content: "";
@@ -823,7 +1031,73 @@ html {
     );
   }
 
-  .filters-title {
+  &.expanded {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  &:not(.expanded) {
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+
+  .filters-header {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(18, 30, 102, 0.02);
+      border-radius: 8px;
+      margin: -8px;
+      padding: 8px;
+    }
+
+    .filters-title {
+      font-size: var(--texfina-font-size-lg);
+      font-weight: 600;
+      color: var(--texfina-text-primary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: space-between;
+
+      mat-icon {
+        color: var(--texfina-secondary);
+        font-size: 24px;
+      }
+
+      .expand-icon {
+        margin-left: auto;
+        transition: transform 0.3s ease;
+        color: var(--texfina-text-secondary);
+        font-size: 20px;
+
+        &.rotated {
+          transform: rotate(180deg);
+          color: var(--texfina-secondary);
+        }
+      }
+    }
+
+    .filter-subtitle {
+      font-size: var(--texfina-font-size-sm);
+      color: var(--texfina-text-secondary);
+      font-style: italic;
+      margin-left: 32px;
+      margin-top: 4px;
+      display: block;
+    }
+  }
+
+  .filters-content {
+    margin-top: 16px;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  // Mantener compatibilidad con el estilo anterior
+  .filters-title:not(.filters-header .filters-title) {
     font-size: var(--texfina-font-size-lg);
     font-weight: 600;
     color: var(--texfina-text-primary);
@@ -845,29 +1119,91 @@ html {
   .filters-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--texfina-spacing-lg);
-    align-items: end;
+    gap: 16px;
+    align-items: center;
+
+    // Para el nuevo diseño con botón de limpiar
+    &:has(.filter-actions) {
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 16px;
+      align-items: center;
+    }
 
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
-      gap: var(--texfina-spacing-md);
+      gap: 16px;
+
+      &:has(.filter-actions) {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
+  .filter-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @media (max-width: 768px) {
+      justify-content: stretch;
+      margin-top: 16px;
+      align-items: center;
     }
   }
 
   .filter-group {
     position: relative;
+    width: 100%;
 
-    mat-form-field {
-      width: 100%;
+    .simple-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0 16px;
+      transition: all 0.3s ease;
+      height: 56px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
-      .mat-mdc-form-field-subscript-wrapper {
-        display: none;
+      &:hover {
+        border-color: var(--texfina-secondary);
+        box-shadow: 0 4px 12px rgba(18, 30, 102, 0.15);
+        transform: translateY(-1px);
       }
 
-      .mat-mdc-form-field-icon-prefix,
-      .mat-mdc-form-field-icon-suffix {
-        mat-icon {
-          color: var(--texfina-secondary);
+      &:focus-within {
+        border-color: var(--texfina-secondary);
+        box-shadow: 0 0 0 4px rgba(18, 30, 102, 0.1),
+          0 4px 12px rgba(18, 30, 102, 0.15);
+        transform: translateY(-1px);
+      }
+
+      .input-icon {
+        color: var(--texfina-secondary);
+        margin-right: 12px;
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+
+      .simple-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 16px;
+        color: var(--texfina-text-primary);
+        padding: 0;
+        height: 100%;
+
+        &::placeholder {
+          color: var(--texfina-text-muted);
+          opacity: 0.7;
+        }
+
+        &:focus::placeholder {
+          opacity: 0.5;
         }
       }
     }
@@ -902,14 +1238,120 @@ html {
   }
 }
 
+// Animaciones para el card expansible
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 500px;
+  }
+}
+
+// Estilos simplificados para campos de filtro
+.filters-card {
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  transition: all 0.3s ease !important;
+
+  &:hover {
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .card-header {
+    border-bottom: 2px solid #f1f5f9 !important;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%) !important;
+    border-radius: 10px 10px 0 0 !important;
+  }
+}
+
+// Botón de limpiar filtros
+.btn-clear-filters {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  border-radius: 10px !important;
+  border: 2px solid var(--texfina-primary) !important;
+  background: linear-gradient(135deg, white, #fef7f7) !important;
+  color: var(--texfina-primary) !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  &:hover {
+    border-color: var(--texfina-primary) !important;
+    background: linear-gradient(
+      135deg,
+      var(--texfina-primary),
+      #a01e22
+    ) !important;
+    color: white !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(189, 33, 38, 0.25);
+
+    &::before {
+      left: 100%;
+    }
+  }
+
+  &:active {
+    transform: translateY(-1px) scale(1.04);
+  }
+
+  .mat-icon {
+    font-size: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+    z-index: 1;
+    position: relative;
+  }
+
+  @media (max-width: 768px) {
+    width: 100% !important;
+    height: 48px !important;
+    min-width: auto !important;
+  }
+}
+
 // Header de tabla mejorado
 .table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--texfina-spacing-lg);
-  border-bottom: 1px solid var(--texfina-border-light);
-  background-color: var(--texfina-bg-secondary);
+  padding: 16px;
+  border-bottom: 2px solid #e2e8f0;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  min-height: 64px;
+  border-radius: 12px 12px 0 0;
 
   .table-title {
     margin: 0;
@@ -919,8 +1361,208 @@ html {
 
   .table-actions {
     display: flex;
-    gap: var(--texfina-spacing-md);
+    gap: 12px;
     align-items: center;
+  }
+}
+
+// Encabezados de columna integrados
+.column-headers {
+  background: var(--texfina-bg-secondary);
+  border-bottom: 2px solid var(--texfina-border);
+  border-radius: 12px 12px 0 0;
+
+  // Accesibilidad móvil - reducir altura de headers
+  @media (max-width: 480px) {
+    .header-row {
+      min-height: 36px;
+    }
+
+    .header-col {
+      padding: 6px 4px !important;
+      font-size: 0.7rem !important;
+      min-height: 36px;
+
+      .sort-icon {
+        font-size: 14px !important;
+        width: 14px !important;
+        height: 14px !important;
+      }
+    }
+  }
+
+  .header-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 0.8fr 0.8fr 1.2fr 1fr 1fr;
+    gap: 12px;
+    padding: 0;
+    align-items: center;
+
+    .header-col {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      color: #1a1a1a;
+      font-weight: 700;
+      font-size: var(--texfina-font-size-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+
+      // Alineación natural según el tipo de contenido
+      &.codigo-col {
+        justify-content: flex-start;
+      }
+      &.nombre-col {
+        justify-content: flex-start;
+      }
+      &.peso-col {
+        justify-content: center;
+      }
+      &.unidad-col {
+        justify-content: center;
+      }
+      &.presentacion-col {
+        justify-content: flex-start;
+      }
+      &.precio-col {
+        justify-content: flex-end;
+      }
+      &.acciones-col {
+        justify-content: center;
+        cursor: default;
+      }
+
+      &:hover {
+        background: #f8fafc;
+        color: #000000;
+      }
+
+      span {
+        flex: 1;
+      }
+
+      .sort-icon {
+        font-size: 18px !important;
+        width: 18px !important;
+        height: 18px !important;
+        color: var(--texfina-secondary);
+        margin-left: 4px;
+        opacity: 0.7;
+        transition: all 0.2s ease;
+      }
+
+      &:hover .sort-icon {
+        opacity: 1;
+        color: var(--texfina-primary);
+      }
+
+      &.acciones-col {
+        cursor: default;
+        text-align: center;
+        justify-content: center;
+
+        &:hover {
+          background: transparent;
+        }
+      }
+    }
+  }
+
+  // Responsive design para tablets y laptops pequeñas
+  @media (max-width: 1200px) {
+    .header-row {
+      grid-template-columns: 0.9fr 1.9fr 0.8fr 0.8fr 1.1fr 1fr 1fr;
+      gap: 10px;
+    }
+  }
+
+  // Responsive design para tablets
+  @media (max-width: 1024px) {
+    .header-row {
+      grid-template-columns: 0.8fr 1.8fr 0.7fr 0.7fr 1fr 0.9fr 0.9fr;
+      gap: 8px;
+    }
+
+    .header-col {
+      padding: 10px 8px !important;
+      font-size: 13px !important;
+
+      .sort-icon {
+        font-size: 18px !important;
+        width: 18px !important;
+        height: 18px !important;
+      }
+    }
+  }
+
+  // Responsive design para móviles grandes
+  @media (max-width: 768px) {
+    .header-row {
+      grid-template-columns: 0.7fr 1.6fr 0.6fr 0.5fr 0.9fr 0.8fr 0.8fr;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .header-col {
+      padding: 8px 6px !important;
+
+      .sort-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+      }
+
+      // Headers ya están centrados por defecto
+    }
+  }
+
+  // Responsive design para móviles pequeños
+  @media (max-width: 480px) {
+    .header-row {
+      grid-template-columns: 0.8fr 2fr 0.7fr 0.6fr 1fr 0.8fr 0.8fr;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .header-col {
+      padding: 8px 4px !important;
+      min-height: 40px;
+
+      .sort-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+      }
+
+      // Headers ya están centrados por defecto
+    }
+  }
+
+  // Responsive design para pantallas muy pequeñas (320px)
+  @media (max-width: 360px) {
+    .header-row {
+      grid-template-columns: 0.5fr 1.3fr 0.4fr 0.4fr 0.6fr 0.5fr 0.5fr;
+      gap: 2px;
+      font-size: 9px;
+    }
+
+    .header-col {
+      padding: 4px 2px !important;
+
+      .sort-icon {
+        font-size: 12px !important;
+        width: 12px !important;
+        height: 12px !important;
+      }
+
+      // Ocultar iconos de ordenamiento en pantallas muy pequeñas
+      &.peso-col .sort-icon {
+        display: none;
+      }
+    }
   }
 }
 
@@ -929,9 +1571,34 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--texfina-spacing-lg);
-  border-top: 1px solid var(--texfina-border-light);
+  padding: 8px 16px;
+  border-top: 2px solid #e2e8f0;
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  min-height: 48px;
+  border-radius: 0 0 12px 12px;
+
+  // Accesibilidad móvil - reducir altura
+  @media (max-width: 480px) {
+    min-height: 40px;
+    padding: 6px 12px;
+
+    .pagination-info {
+      font-size: 0.75rem !important;
+    }
+
+    .pagination-controls .pagination-button {
+      width: 28px !important;
+      height: 28px !important;
+      min-width: 28px !important;
+
+      .mat-icon,
+      mat-icon {
+        font-size: 14px !important;
+        width: 14px !important;
+        height: 14px !important;
+      }
+    }
+  }
 
   .pagination-info {
     font-size: var(--texfina-font-size-sm);
@@ -941,15 +1608,15 @@ html {
 
   .pagination-controls {
     display: flex;
-    gap: var(--texfina-spacing-sm);
+    gap: 4px;
     align-items: center;
 
     .pagination-button {
-      width: 40px !important;
-      height: 40px !important;
-      min-width: 40px !important;
-      border-radius: 8px !important;
-      border: 2px solid var(--texfina-border) !important;
+      width: 32px !important;
+      height: 32px !important;
+      min-width: 32px !important;
+      border-radius: 6px !important;
+      border: 1px solid var(--texfina-border) !important;
       background: white !important;
       color: var(--texfina-text-secondary) !important;
       cursor: pointer;
@@ -958,33 +1625,37 @@ html {
       align-items: center !important;
       justify-content: center !important;
       padding: 0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
       &:hover:not(:disabled) {
         border-color: var(--texfina-secondary) !important;
+        background: var(--texfina-secondary-bg) !important;
         color: var(--texfina-secondary) !important;
         transform: translateY(-1px) !important;
-        box-shadow: 0 4px 12px rgba(18, 30, 102, 0.15) !important;
+        box-shadow: 0 3px 8px rgba(18, 30, 102, 0.2) !important;
       }
 
       &:disabled {
-        opacity: 0.5 !important;
+        opacity: 0.3 !important;
         cursor: not-allowed !important;
         transform: none !important;
-        box-shadow: none !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
       }
 
       &.active {
         background: var(--texfina-secondary) !important;
         color: white !important;
         border-color: var(--texfina-secondary) !important;
+        box-shadow: 0 2px 6px rgba(18, 30, 102, 0.25);
+        font-weight: 600;
       }
 
       .mat-icon,
       mat-icon {
-        font-size: 20px !important;
-        width: 20px !important;
-        height: 20px !important;
-        line-height: 20px !important;
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+        line-height: 16px !important;
         color: inherit !important;
       }
     }
@@ -992,8 +1663,9 @@ html {
 
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: var(--texfina-spacing-md);
+    gap: 6px;
     text-align: center;
+    padding: 8px;
 
     .pagination-controls {
       justify-content: center;
@@ -1005,22 +1677,25 @@ html {
 .data-table {
   width: 100%;
   background: white;
+  border: none;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
 
-  .mat-mdc-header-cell {
-    background-color: var(--texfina-bg-secondary);
-    color: var(--texfina-text-primary);
-    font-weight: 600;
-    font-size: var(--texfina-font-size-sm);
-    padding: var(--texfina-spacing-lg);
-    border-bottom: 2px solid var(--texfina-border);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  // Ocultar headers nativos de Material
+  .mat-mdc-header-row {
+    display: none !important;
   }
 
+  // Filas de datos alineadas con grid
   .mat-mdc-row {
-    min-height: 64px;
+    display: grid !important;
+    grid-template-columns: 1fr 2fr 0.8fr 0.8fr 1.2fr 1fr 1fr;
+    gap: 12px;
+    min-height: 52px !important;
     border-bottom: 1px solid var(--texfina-border-light);
     transition: background-color 0.2s ease;
+    align-items: center;
+    padding: 0;
 
     &:hover {
       background-color: var(--texfina-bg-secondary) !important;
@@ -1028,9 +1703,217 @@ html {
 
     .mat-mdc-cell {
       font-size: var(--texfina-font-size-sm);
-      padding: var(--texfina-spacing-lg);
+      padding: 8px 12px !important;
       color: var(--texfina-text-primary);
       vertical-align: middle;
+      height: auto !important;
+      border-bottom: none !important;
+      display: flex;
+      align-items: center;
+
+      // Alineación natural según el tipo de contenido
+      &:nth-child(1) {
+        // Código Fox
+        justify-content: flex-start;
+      }
+
+      &:nth-child(2) {
+        // Nombre
+        justify-content: flex-start;
+      }
+
+      &:nth-child(3) {
+        // Peso Unit
+        justify-content: center;
+      }
+
+      &:nth-child(4) {
+        // Unidad (badge)
+        justify-content: center;
+      }
+
+      &:nth-child(5) {
+        // Presentación
+        justify-content: flex-start;
+      }
+
+      &:nth-child(6) {
+        // Precio Unit
+        justify-content: flex-end;
+      }
+
+      &:nth-child(7) {
+        // Acciones
+        justify-content: center;
+      }
+    }
+
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 0.9fr 1.9fr 0.8fr 0.8fr 1.1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 1.8fr 0.7fr 0.7fr 1fr 0.9fr 0.9fr;
+      gap: 8px;
+
+      .mat-mdc-cell {
+        padding: 8px 8px !important;
+        font-size: 13px !important;
+      }
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 1.6fr 0.6fr 0.5fr 0.9fr 0.8fr 0.8fr;
+      gap: 6px;
+      min-height: 48px !important;
+
+      .mat-mdc-cell {
+        padding: 6px 6px !important;
+        font-size: 12px !important;
+
+        // Ajustar peso de fuente en móviles
+        &:nth-child(3),
+        &:nth-child(6) {
+          font-weight: 500;
+        }
+      }
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      // En móviles pequeños, usar una distribución más generosa
+      grid-template-columns: 0.8fr 2fr 0.7fr 0.6fr 1fr 0.8fr 0.8fr;
+      gap: 6px;
+      min-height: 50px !important;
+
+      .mat-mdc-cell {
+        padding: 6px 4px !important;
+        font-size: 12px !important;
+
+        // Mejorar alineación en móviles
+        &:nth-child(1), // Código
+        &:nth-child(3), // Peso  
+        &:nth-child(4), // Unidad
+        &:nth-child(6), // Precio
+        &:nth-child(7) {
+          // Acciones
+          justify-content: center !important;
+        }
+
+        &:nth-child(2), // Nombre
+        &:nth-child(5) {
+          // Presentación
+          justify-content: flex-start !important;
+        }
+      }
+    }
+
+    // Responsive design para pantallas muy pequeñas (320px)
+    @media (max-width: 360px) {
+      grid-template-columns: 0.5fr 1.3fr 0.4fr 0.4fr 0.6fr 0.5fr 0.5fr;
+      gap: 2px;
+      min-height: 42px !important;
+
+      .mat-mdc-cell {
+        padding: 2px 2px !important;
+        font-size: 10px !important;
+
+        // En pantallas extremadamente pequeñas, ocultar algunos elementos menos importantes
+        &:nth-child(3) {
+          // Peso Unit
+          .badge-texfina,
+          span {
+            display: none;
+          }
+
+          &::after {
+            content: "---";
+            font-size: 8px;
+            opacity: 0.5;
+          }
+        }
+      }
+    }
+  }
+
+  // Encabezados limpios sin iconos
+  .table-header-cell {
+    &.actions-header {
+      text-align: center;
+    }
+  }
+
+  // Celdas optimizadas
+  .table-cell {
+    &.actions-cell {
+      text-align: center;
+      padding: 4px 8px !important;
+    }
+  }
+
+  // Material cell específico
+  .material-cell {
+    .material-name {
+      font-size: 0.875rem;
+      line-height: 1.2;
+      margin-bottom: 2px;
+      font-weight: 500;
+    }
+
+    .material-class {
+      font-size: 0.75rem;
+      line-height: 1;
+      opacity: 0.7;
+    }
+  }
+
+  // Mejorar badges en la tabla
+  .badge-texfina {
+    &.badge-neutral {
+      background-color: var(--texfina-bg-secondary);
+      color: var(--texfina-text-secondary);
+      font-weight: 500;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--texfina-border-light);
+    }
+
+    &.badge-secondary {
+      background-color: var(--texfina-secondary) !important;
+      color: white !important;
+      font-weight: 600;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+  }
+
+  // Responsive para badges
+  @media (max-width: 768px) {
+    .badge-texfina {
+      &.badge-neutral,
+      &.badge-secondary {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .badge-texfina {
+      &.badge-neutral,
+      &.badge-secondary {
+        font-size: 0.65rem;
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
     }
   }
 }
@@ -1041,6 +1924,28 @@ html {
   gap: var(--texfina-spacing-sm);
   justify-content: center;
   align-items: center;
+
+  // Responsive design para móviles
+  @media (max-width: 768px) {
+    gap: 6px;
+  }
+
+  // Responsive design para pantallas muy pequeñas
+  @media (max-width: 480px) {
+    gap: 6px;
+
+    .btn-action {
+      width: 36px !important;
+      height: 36px !important;
+
+      .mat-icon,
+      mat-icon {
+        font-size: 18px !important;
+        width: 18px !important;
+        height: 18px !important;
+      }
+    }
+  }
 }
 
 .btn-action {
@@ -1142,6 +2047,34 @@ html {
   &:hover::before {
     left: 100%;
   }
+
+  // Responsive design para móviles
+  @media (max-width: 768px) {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+
+    .mat-icon,
+    mat-icon {
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+    }
+  }
+
+  // Responsive design para pantallas muy pequeñas
+  @media (max-width: 480px) {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+
+    .mat-icon,
+    mat-icon {
+      font-size: 16px !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
 }
 
 // Personalización de Material Design form fields
@@ -1150,16 +2083,19 @@ html {
 
   .mat-mdc-text-field-wrapper {
     border-radius: 8px !important;
-    background-color: white;
+    background-color: white !important;
     transition: all 0.2s ease;
+    box-shadow: none !important;
+    border-bottom: none !important;
 
     .mdc-notched-outline {
       .mdc-notched-outline__leading,
       .mdc-notched-outline__notch,
       .mdc-notched-outline__trailing {
         border-color: var(--texfina-border) !important;
-        border-width: 2px !important;
+        border-width: 1px !important;
         transition: all 0.2s ease;
+        background: transparent !important;
       }
     }
 
@@ -1168,7 +2104,7 @@ html {
         .mdc-notched-outline__leading,
         .mdc-notched-outline__notch,
         .mdc-notched-outline__trailing {
-          border-color: var(--texfina-secondary-light) !important;
+          border-color: var(--texfina-secondary) !important;
         }
       }
     }
@@ -1180,10 +2116,26 @@ html {
         .mdc-notched-outline__trailing {
           border-color: var(--texfina-secondary) !important;
           border-width: 2px !important;
-          box-shadow: 0 0 0 3px rgba(18, 30, 102, 0.1);
+          box-shadow: 0 0 0 2px rgba(18, 30, 102, 0.1) !important;
         }
       }
     }
+
+    // Eliminar líneas adicionales globalmente
+    &::before,
+    &::after {
+      display: none !important;
+      border: none !important;
+      border-bottom: none !important;
+      background: none !important;
+    }
+  }
+
+  // Eliminar underlines de Material Design
+  .mat-mdc-form-field-underline,
+  .mdc-line-ripple,
+  .mdc-text-field__ripple {
+    display: none !important;
   }
 
   .mat-mdc-floating-label {
@@ -1218,10 +2170,13 @@ html {
 
   // Estilos para input
   .mat-mdc-input-element {
-    color: var(--texfina-text-primary);
+    color: var(--texfina-text-primary) !important;
+    background: transparent !important;
+    box-shadow: none !important;
 
     &::placeholder {
-      color: var(--texfina-text-muted);
+      color: var(--texfina-text-muted) !important;
+      opacity: 0.7;
     }
   }
 }

@@ -29,180 +29,215 @@
     </div>
 
     <!-- Filtros de búsqueda -->
-    <div class="filters-card">
-      <div class="filters-title">
-        <mat-icon>filter_list</mat-icon>
-        Filtros de Búsqueda
+    <div class="filters-card" [class.expanded]="filtrosExpanded">
+      <div class="filters-header" (click)="toggleFiltros()">
+        <div class="filters-title">
+          <mat-icon>tune</mat-icon>
+          Filtros de Búsqueda
+          <mat-icon class="expand-icon" [class.rotated]="filtrosExpanded"
+            >expand_more</mat-icon
+          >
+        </div>
+        <span class="filter-subtitle" *ngIf="filtrosExpanded"
+          >Los resultados se actualizan automáticamente</span
+        >
       </div>
 
-      <form
-        [formGroup]="filtrosForm"
-        (ngSubmit)="buscar()"
-        class="filters-form"
-      >
-        <div class="filters-grid">
-          <div class="filter-group">
-            <mat-form-field appearance="outline">
-              <mat-label>Código</mat-label>
-              <input
-                matInput
-                formControlName="codigo"
-                placeholder="Buscar por código"
-              />
-              <mat-icon matPrefix>tag</mat-icon>
-            </mat-form-field>
-          </div>
+      <div class="filters-content" *ngIf="filtrosExpanded">
+        <form [formGroup]="filtrosForm" class="filters-form">
+          <div class="filters-grid">
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">tag</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="codigo"
+                  placeholder="Filtrar por código..."
+                  type="text"
+                />
+              </div>
+            </div>
 
-          <div class="filter-group">
-            <mat-form-field appearance="outline">
-              <mat-label>Descripción</mat-label>
-              <input
-                matInput
-                formControlName="descripcion"
-                placeholder="Buscar por descripción"
-              />
-              <mat-icon matPrefix>description</mat-icon>
-            </mat-form-field>
-          </div>
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">description</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="descripcion"
+                  placeholder="Filtrar por descripción..."
+                  type="text"
+                />
+              </div>
+            </div>
 
-          <div class="filter-group">
-            <mat-form-field appearance="outline">
-              <mat-label>Proveedor</mat-label>
-              <input
-                matInput
-                formControlName="proveedor"
-                placeholder="Buscar por proveedor"
-              />
-              <mat-icon matPrefix>business</mat-icon>
-            </mat-form-field>
-          </div>
-        </div>
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">business</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="proveedor"
+                  placeholder="Filtrar por proveedor..."
+                  type="text"
+                />
+              </div>
+            </div>
 
-        <div class="filters-actions">
-          <button class="btn-texfina btn-primary" type="submit">
-            <mat-icon>search</mat-icon>
-            Buscar
-          </button>
-          <button
-            class="btn-texfina btn-outline"
-            type="button"
-            (click)="limpiarFiltros()"
-          >
-            <mat-icon>clear</mat-icon>
-            Limpiar
-          </button>
-        </div>
-      </form>
+            <div class="filter-actions">
+              <button
+                class="btn-clear-filters"
+                type="button"
+                (click)="limpiarFiltros()"
+                matTooltip="Limpiar todos los filtros"
+              >
+                <mat-icon>clear_all</mat-icon>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Tabla de insumos -->
     <div class="table-card">
-      <div class="table-header">
-        <h3 class="table-title text-texfina text-primary">Lista de Insumos</h3>
-        <div class="table-actions">
-          <span class="text-texfina text-muted"
-            >{{ materiales.length }} registros</span
-          >
+      <div class="table-with-headers">
+        <!-- Encabezados de columnas -->
+        <div class="column-headers">
+          <div class="header-row">
+            <div class="header-col codigo-col" (click)="sortData('id_fox')">
+              <span>Código Fox</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col nombre-col" (click)="sortData('nombre')">
+              <span>Nombre</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div
+              class="header-col peso-col"
+              (click)="sortData('peso_unitario')"
+            >
+              <span>Peso Unit.</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col unidad-col" (click)="sortData('id_unidad')">
+              <span>Unidad</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div
+              class="header-col presentacion-col"
+              (click)="sortData('presentacion')"
+            >
+              <span>Presentación</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div
+              class="header-col precio-col"
+              (click)="sortData('precio_unitario')"
+            >
+              <span>Precio Unit.</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col acciones-col">
+              <span>Acciones</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="table-container">
-        <table mat-table [dataSource]="materiales" class="data-table">
-          <!-- Columna Código Fox -->
-          <ng-container matColumnDef="id_fox">
-            <th mat-header-cell *matHeaderCellDef>Código Fox</th>
-            <td mat-cell *matCellDef="let material">
-              <span class="badge-texfina badge-neutral">
-                {{ material.id_fox || "-" }}
-              </span>
-            </td>
-          </ng-container>
+        <div class="table-container">
+          <table mat-table [dataSource]="dataSource" matSort class="data-table">
+            <!-- Columna Código Fox -->
+            <ng-container matColumnDef="id_fox">
+              <td mat-cell *matCellDef="let material" class="table-cell">
+                <span class="badge-texfina badge-neutral">
+                  {{ material.id_fox || "-" }}
+                </span>
+              </td>
+            </ng-container>
 
-          <!-- Columna Nombre -->
-          <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef>Nombre</th>
-            <td mat-cell *matCellDef="let material">
-              <div class="material-cell">
-                <div class="material-name text-texfina text-primary">
-                  {{ material.nombre }}
+            <!-- Columna Nombre -->
+            <ng-container matColumnDef="nombre">
+              <td mat-cell *matCellDef="let material" class="table-cell">
+                <div class="material-cell">
+                  <div
+                    class="material-name text-texfina text-primary font-medium"
+                  >
+                    {{ material.nombre }}
+                  </div>
+                  <div class="material-class text-texfina text-muted">
+                    {{ material.id_clase || "Sin clase" }}
+                  </div>
                 </div>
-                <div class="material-class text-texfina text-muted">
-                  {{ material.id_clase || "Sin clase" }}
+              </td>
+            </ng-container>
+
+            <!-- Columna Peso Unitario -->
+            <ng-container matColumnDef="peso_unitario">
+              <td mat-cell *matCellDef="let material" class="table-cell">
+                <span class="text-texfina text-secondary">
+                  {{ material.peso_unitario || "-" }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Unidad -->
+            <ng-container matColumnDef="id_unidad">
+              <td mat-cell *matCellDef="let material" class="table-cell">
+                <span class="badge-texfina badge-secondary">
+                  {{ material.unidad?.nombre || material.id_unidad || "-" }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Presentación -->
+            <ng-container matColumnDef="presentacion">
+              <td mat-cell *matCellDef="let material" class="table-cell">
+                <span class="text-texfina text-secondary">
+                  {{ material.presentacion || "-" }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Precio Unitario -->
+            <ng-container matColumnDef="precio_unitario">
+              <td mat-cell *matCellDef="let material" class="table-cell">
+                <span class="text-texfina text-primary font-semibold">
+                  {{
+                    material.precio_unitario
+                      ? "S/ " + material.precio_unitario.toFixed(2)
+                      : "-"
+                  }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="acciones">
+              <td
+                mat-cell
+                *matCellDef="let material"
+                class="table-cell actions-cell"
+              >
+                <div class="action-buttons">
+                  <button
+                    class="btn-action btn-view"
+                    (click)="verDetalle(material)"
+                    matTooltip="Ver detalle"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button
+                    class="btn-action btn-edit"
+                    (click)="editarMaterial(material)"
+                    matTooltip="Editar"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
                 </div>
-              </div>
-            </td>
-          </ng-container>
+              </td>
+            </ng-container>
 
-          <!-- Columna Peso Unitario -->
-          <ng-container matColumnDef="peso_unitario">
-            <th mat-header-cell *matHeaderCellDef>Peso Unitario</th>
-            <td mat-cell *matCellDef="let material">
-              <span class="text-texfina text-secondary">
-                {{ material.peso_unitario || "-" }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Columna Unidad -->
-          <ng-container matColumnDef="id_unidad">
-            <th mat-header-cell *matHeaderCellDef>Unidad</th>
-            <td mat-cell *matCellDef="let material">
-              <span class="badge-texfina badge-secondary">
-                {{ material.id_unidad || "-" }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Columna Presentación -->
-          <ng-container matColumnDef="presentacion">
-            <th mat-header-cell *matHeaderCellDef>Presentación</th>
-            <td mat-cell *matCellDef="let material">
-              <span class="text-texfina text-secondary">
-                {{ material.presentacion || "-" }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Columna Precio Unitario -->
-          <ng-container matColumnDef="precio_unitario">
-            <th mat-header-cell *matHeaderCellDef>Precio Unitario</th>
-            <td mat-cell *matCellDef="let material">
-              <span class="text-texfina text-primary font-medium">
-                {{
-                  material.precio_unitario
-                    ? "S/ " + material.precio_unitario.toFixed(2)
-                    : "-"
-                }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Columna Acciones -->
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let material">
-              <div class="action-buttons">
-                <button
-                  class="btn-action btn-view"
-                  (click)="verDetalle(material)"
-                  matTooltip="Ver detalle"
-                >
-                  <mat-icon>visibility</mat-icon>
-                </button>
-                <button
-                  class="btn-action btn-edit"
-                  (click)="editarMaterial(material)"
-                  matTooltip="Editar"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
       </div>
 
       <!-- Paginación -->

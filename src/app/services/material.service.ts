@@ -397,7 +397,7 @@ export class MaterialService {
   }
 
   private getMaterialesMock(): Insumo[] {
-    return [
+    const materiales = [
       {
         id_insumo: 1,
         id_fox: 'QUIM001',
@@ -509,6 +509,12 @@ export class MaterialService {
         created_at: new Date('2024-01-10'),
       },
     ];
+
+    // Agregar las relaciones con unidades
+    return materiales.map((material) => ({
+      ...material,
+      unidad: this.unidadesMock.find((u) => u.id_unidad === material.id_unidad),
+    }));
   }
 
   // ===== LOTES =====
