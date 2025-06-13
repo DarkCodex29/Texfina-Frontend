@@ -1118,122 +1118,33 @@ html {
 
   .filters-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 16px;
     align-items: center;
 
-    // Para el nuevo diseño con botón de limpiar
-    &:has(.filter-actions) {
-      grid-template-columns: 1fr 1fr 1fr auto;
-      gap: 16px;
-      align-items: center;
+    // Grid mejorado - 3 columnas, botón en fila separada
+    grid-template-columns: 1fr 1fr 1fr;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 1fr 1fr;
     }
 
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
       gap: 16px;
-
-      &:has(.filter-actions) {
-        grid-template-columns: 1fr;
-      }
     }
   }
 
+  // Reglas específicas para cada pantalla
   .filter-actions {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end; // Alineado a la derecha
+    grid-column: 1 / -1; // Ocupa toda la fila
+    margin-top: 8px; // Pequeño espacio adicional
 
     @media (max-width: 768px) {
-      justify-content: stretch;
       margin-top: 16px;
-      align-items: center;
-    }
-  }
-
-  .filter-group {
-    position: relative;
-    width: 100%;
-
-    .simple-input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      background: white;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 0 16px;
-      transition: all 0.3s ease;
-      height: 56px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-      &:hover {
-        border-color: var(--texfina-secondary);
-        box-shadow: 0 4px 12px rgba(18, 30, 102, 0.15);
-        transform: translateY(-1px);
-      }
-
-      &:focus-within {
-        border-color: var(--texfina-secondary);
-        box-shadow: 0 0 0 4px rgba(18, 30, 102, 0.1),
-          0 4px 12px rgba(18, 30, 102, 0.15);
-        transform: translateY(-1px);
-      }
-
-      .input-icon {
-        color: var(--texfina-secondary);
-        margin-right: 12px;
-        font-size: 20px;
-        flex-shrink: 0;
-      }
-
-      .simple-input {
-        flex: 1;
-        border: none;
-        outline: none;
-        background: transparent;
-        font-size: 16px;
-        color: var(--texfina-text-primary);
-        padding: 0;
-        height: 100%;
-
-        &::placeholder {
-          color: var(--texfina-text-muted);
-          opacity: 0.7;
-        }
-
-        &:focus::placeholder {
-          opacity: 0.5;
-        }
-      }
-    }
-  }
-
-  .filters-actions {
-    display: flex;
-    gap: var(--texfina-spacing-md);
-    justify-content: flex-end;
-    margin-top: var(--texfina-spacing-xl);
-    padding-top: var(--texfina-spacing-lg);
-    border-top: 1px solid var(--texfina-border-light);
-
-    @media (max-width: 768px) {
       justify-content: stretch;
-      flex-direction: column;
-
-      .btn-texfina {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
-    @media (min-width: 769px) and (max-width: 1024px) {
-      flex-wrap: wrap;
-
-      .btn-texfina {
-        flex: 1;
-        min-width: 120px;
-      }
     }
   }
 }
@@ -1275,9 +1186,8 @@ html {
 
 // Botón de limpiar filtros
 .btn-clear-filters {
-  width: 56px !important;
-  height: 56px !important;
-  min-width: 56px !important;
+  min-width: 140px !important;
+  height: 48px !important;
   border-radius: 10px !important;
   border: 2px solid var(--texfina-primary) !important;
   background: linear-gradient(135deg, white, #fef7f7) !important;
@@ -1290,6 +1200,9 @@ html {
   box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
   position: relative;
   overflow: hidden;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 0 20px;
 
   &::before {
     content: "";
@@ -1308,15 +1221,15 @@ html {
   }
 
   &:hover {
-    border-color: var(--texfina-primary) !important;
     background: linear-gradient(
       135deg,
       var(--texfina-primary),
-      #a01e22
+      #c41e3a
     ) !important;
     color: white !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(189, 33, 38, 0.25);
+    border-color: var(--texfina-primary) !important;
+    box-shadow: 0 4px 12px rgba(189, 33, 38, 0.3);
+    transform: translateY(-2px);
 
     &::before {
       left: 100%;
@@ -1324,20 +1237,12 @@ html {
   }
 
   &:active {
-    transform: translateY(-1px) scale(1.04);
-  }
-
-  .mat-icon {
-    font-size: 24px !important;
-    width: 24px !important;
-    height: 24px !important;
-    z-index: 1;
-    position: relative;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(189, 33, 38, 0.2);
   }
 
   @media (max-width: 768px) {
     width: 100% !important;
-    height: 48px !important;
     min-width: auto !important;
   }
 }
@@ -2378,6 +2283,315 @@ button {
       font-size: 20px !important;
       width: 20px !important;
       height: 20px !important;
+    }
+  }
+}
+
+// ============================================================================
+// PROVEEDORES - GRID ESPECÍFICO
+// ============================================================================
+
+/* Grid específico para proveedores: empresa, ruc, contacto, direccion, acciones */
+app-proveedores {
+  // En móviles, ajustar ancho mínimo específico para proveedores
+  @media (max-width: 480px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 750px !important; // Ancho mínimo para proveedores (menos columnas)
+      }
+    }
+  }
+
+  @media (max-width: 320px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container,
+      .data-table,
+      .mat-mdc-table {
+        min-width: 750px !important;
+      }
+    }
+  }
+
+  .column-headers .header-row {
+    grid-template-columns: 2fr 1.2fr 1.5fr 2fr 1fr !important;
+    gap: 12px;
+
+    .header-col {
+      // Alineación específica para proveedores
+      &.empresa-col {
+        justify-content: flex-start;
+      }
+      &.ruc-col {
+        justify-content: center;
+      }
+      &.contacto-col {
+        justify-content: flex-start;
+      }
+      &.direccion-col {
+        justify-content: flex-start;
+      }
+      &.acciones-col {
+        justify-content: center;
+      }
+    }
+
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 1.8fr 1.1fr 1.4fr 1.8fr 1fr !important;
+      gap: 10px;
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 1.6fr 1fr 1.3fr 1.6fr 0.9fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 1.4fr 0.9fr 1.2fr 1.4fr 0.8fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      grid-template-columns: 1.5fr 1fr 1.3fr 1.5fr 0.8fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para pantallas muy pequeñas
+    @media (max-width: 360px) {
+      grid-template-columns: 1.2fr 0.8fr 1fr 1.2fr 0.7fr !important;
+      gap: 4px;
+    }
+  }
+
+  .data-table .mat-mdc-row {
+    grid-template-columns: 2fr 1.2fr 1.5fr 2fr 1fr !important;
+    gap: 12px;
+
+    .mat-mdc-cell {
+      // Alineación específica para proveedores
+      &:nth-child(1) {
+        // Empresa
+        justify-content: flex-start;
+      }
+
+      &:nth-child(2) {
+        // RUC (badge)
+        justify-content: center;
+      }
+
+      &:nth-child(3) {
+        // Contacto
+        justify-content: flex-start;
+      }
+
+      &:nth-child(4) {
+        // Dirección
+        justify-content: flex-start;
+      }
+
+      &:nth-child(5) {
+        // Acciones
+        justify-content: center;
+      }
+    }
+
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 1.8fr 1.1fr 1.4fr 1.8fr 1fr !important;
+      gap: 10px;
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 1.6fr 1fr 1.3fr 1.6fr 0.9fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 1.4fr 0.9fr 1.2fr 1.4fr 0.8fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      grid-template-columns: 1.5fr 1fr 1.3fr 1.5fr 0.8fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para pantallas muy pequeñas
+    @media (max-width: 360px) {
+      grid-template-columns: 1.2fr 0.8fr 1fr 1.2fr 0.7fr !important;
+      gap: 4px;
+    }
+  }
+}
+
+// ============================================================================
+// ELEMENTOS DE TABLA TEXFINA
+// ============================================================================
+
+// ============================================================================
+// ALMACENES - GRID ESPECÍFICO
+// ============================================================================
+
+/* Grid específico para almacenes: id_almacen, nombre, ubicacion, acciones */
+app-almacenes {
+  // En móviles, ajustar ancho mínimo específico para almacenes
+  @media (max-width: 480px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 700px !important; // Ancho mínimo para almacenes (4 columnas)
+      }
+    }
+  }
+
+  @media (max-width: 320px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container,
+      .data-table,
+      .mat-mdc-table {
+        min-width: 700px !important;
+      }
+    }
+  }
+
+  .column-headers .header-row {
+    grid-template-columns: 1fr 2.5fr 2fr 1fr !important;
+    gap: 12px;
+
+    .header-col {
+      // Alineación específica para almacenes
+      &.id-col {
+        justify-content: center;
+      }
+      &.nombre-col {
+        justify-content: flex-start;
+      }
+      &.ubicacion-col {
+        justify-content: flex-start;
+      }
+      &.acciones-col {
+        justify-content: center;
+      }
+    }
+  }
+
+  .data-table {
+    .table-cell {
+      // Grid y alineación para filas de datos
+      &:nth-child(1) {
+        justify-self: center;
+      } // ID - centrado
+      &:nth-child(2) {
+        justify-self: start;
+      } // Nombre - izquierda
+      &:nth-child(3) {
+        justify-self: start;
+      } // Ubicación - izquierda
+      &:nth-child(4) {
+        justify-self: center;
+      } // Acciones - centrado
+    }
+
+    .mat-mdc-row {
+      display: grid;
+      grid-template-columns: 1fr 2.5fr 2fr 1fr !important;
+      gap: 12px;
+      align-items: center;
+    }
+  }
+}
+
+.filter-group {
+  position: relative;
+  width: 100%;
+
+  .simple-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0 16px;
+    transition: all 0.3s ease;
+    height: 56px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      border-color: var(--texfina-secondary);
+      box-shadow: 0 4px 12px rgba(18, 30, 102, 0.15);
+      transform: translateY(-1px);
+    }
+
+    &:focus-within {
+      border-color: var(--texfina-secondary);
+      box-shadow: 0 0 0 4px rgba(18, 30, 102, 0.1),
+        0 4px 12px rgba(18, 30, 102, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .input-icon {
+      color: var(--texfina-secondary);
+      margin-right: 12px;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .simple-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 16px;
+      color: var(--texfina-text-primary);
+      padding: 0;
+      height: 100%;
+
+      &::placeholder {
+        color: var(--texfina-text-muted);
+        opacity: 0.7;
+      }
+
+      &:focus::placeholder {
+        opacity: 0.5;
+      }
+    }
+  }
+}
+
+.filters-actions {
+  display: flex;
+  gap: var(--texfina-spacing-md);
+  justify-content: flex-end;
+  margin-top: var(--texfina-spacing-xl);
+  padding-top: var(--texfina-spacing-lg);
+  border-top: 1px solid var(--texfina-border-light);
+
+  @media (max-width: 768px) {
+    justify-content: stretch;
+    flex-direction: column;
+
+    .btn-texfina {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    flex-wrap: wrap;
+
+    .btn-texfina {
+      flex: 1;
+      min-width: 120px;
     }
   }
 }

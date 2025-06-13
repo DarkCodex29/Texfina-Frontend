@@ -48,11 +48,11 @@
           <div class="filters-grid">
             <div class="filter-group">
               <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">tag</mat-icon>
+                <mat-icon class="input-icon">qr_code</mat-icon>
                 <input
                   class="simple-input"
-                  formControlName="codigo"
-                  placeholder="Filtrar por código..."
+                  formControlName="codigoFox"
+                  placeholder="Filtrar por código fox..."
                   type="text"
                 />
               </div>
@@ -60,11 +60,11 @@
 
             <div class="filter-group">
               <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">description</mat-icon>
+                <mat-icon class="input-icon">inventory_2</mat-icon>
                 <input
                   class="simple-input"
-                  formControlName="descripcion"
-                  placeholder="Filtrar por descripción..."
+                  formControlName="nombre"
+                  placeholder="Filtrar por nombre..."
                   type="text"
                 />
               </div>
@@ -72,12 +72,50 @@
 
             <div class="filter-group">
               <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">business</mat-icon>
+                <mat-icon class="input-icon">scale</mat-icon>
                 <input
                   class="simple-input"
-                  formControlName="proveedor"
-                  placeholder="Filtrar por proveedor..."
+                  formControlName="pesoUnitario"
+                  placeholder="Filtrar por peso..."
+                  type="number"
+                  step="0.01"
+                />
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">straighten</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="unidad"
+                  placeholder="Filtrar por unidad..."
                   type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">category</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="presentacion"
+                  placeholder="Filtrar por presentación..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">attach_money</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="precioUnitario"
+                  placeholder="Filtrar por precio..."
+                  type="number"
+                  step="0.01"
                 />
               </div>
             </div>
@@ -89,7 +127,7 @@
                 (click)="limpiarFiltros()"
                 matTooltip="Limpiar todos los filtros"
               >
-                <mat-icon>clear_all</mat-icon>
+                Limpiar todos
               </button>
             </div>
           </div>

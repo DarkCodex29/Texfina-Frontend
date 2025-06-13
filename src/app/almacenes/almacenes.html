@@ -1,163 +1,221 @@
-<div class="almacenes-container page-container">
-  <div class="page-header">
-    <h1 class="page-title">Gestión de almacenes</h1>
-    <div class="action-buttons">
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="abrirNuevoAlmacen()"
-        class="btn-agregar"
-      >
-        <mat-icon>add_circle_outline</mat-icon>
-        Agregar almacén
-      </button>
-    </div>
-  </div>
-
-  <!-- Filtros de búsqueda -->
-  <mat-card class="filtros-card">
-    <form [formGroup]="filtrosForm" (ngSubmit)="buscar()" class="filtros-form">
-      <div class="filtros-row">
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Nombre</mat-label>
-          <input
-            matInput
-            formControlName="nombre"
-            placeholder="Ingresa el nombre del almacén"
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Ubicación</mat-label>
-          <input
-            matInput
-            formControlName="ubicacion"
-            placeholder="Ingresa la ubicación"
-          />
-        </mat-form-field>
-
-        <div class="filtro-buttons">
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            class="btn-buscar"
-          >
-            <mat-icon>search</mat-icon>
-            Buscar
-          </button>
-          <button
-            mat-stroked-button
-            color="accent"
-            type="button"
-            (click)="limpiarFiltros()"
-            class="btn-limpiar"
-          >
-            <mat-icon>clear</mat-icon>
-            Limpiar
-          </button>
-        </div>
-      </div>
-    </form>
-  </mat-card>
-
-  <!-- Tabla de almacenes -->
+<div class="page-container">
   <div class="page-content">
-    <mat-card class="table-card">
-      <div class="table-container">
-        <table
-          mat-table
-          [dataSource]="almacenes"
-          class="almacenes-table"
-          matSort
-        >
-          <!-- Columna ID Almacén -->
-          <ng-container matColumnDef="id_almacen">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="th-id">
-              ID
-            </th>
-            <td mat-cell *matCellDef="let almacen" class="td-id">
-              {{ almacen.id_almacen || '-' }}
-            </td>
-          </ng-container>
+    <!-- Header de la página -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title text-texfina text-primary">
+          Gestión de Almacenes
+        </h1>
+        <p class="page-subtitle text-texfina text-muted">
+          Administra las ubicaciones y espacios de almacenamiento
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-texfina btn-primary" (click)="abrirNuevoAlmacen()">
+          <mat-icon>add_circle_outline</mat-icon>
+          Agregar Almacén
+        </button>
+      </div>
+    </div>
 
-          <!-- Columna Nombre -->
-          <ng-container matColumnDef="nombre">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header
-              class="th-nombre"
-            >
-              Nombre
-            </th>
-            <td mat-cell *matCellDef="let almacen" class="td-nombre">
-              {{ almacen.nombre }}
-            </td>
-          </ng-container>
-
-          <!-- Columna Ubicación -->
-          <ng-container matColumnDef="ubicacion">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header
-              class="th-ubicacion"
-            >
-              Ubicación
-            </th>
-            <td mat-cell *matCellDef="let almacen" class="td-ubicacion">
-              {{ almacen.ubicacion || '-' }}
-            </td>
-          </ng-container>
-
-          <!-- Columna Acciones -->
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef class="th-acciones">
-              Acciones
-            </th>
-            <td mat-cell *matCellDef="let almacen" class="td-acciones">
-              <div class="action-buttons">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="verDetalle(almacen)"
-                  matTooltip="Ver detalle"
-                  class="btn-detalle"
-                >
-                  <mat-icon>visibility</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="accent"
-                  (click)="editarAlmacen(almacen)"
-                  matTooltip="Editar"
-                  class="btn-editar"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
-
-        <!-- Mensaje cuando no hay datos -->
-        <div *ngIf="almacenes.length === 0" class="no-data">
-          <mat-icon>storage</mat-icon>
-          <p>No se encontraron almacenes</p>
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="abrirNuevoAlmacen()"
+    <!-- Filtros de búsqueda -->
+    <div class="filters-card" [class.expanded]="filtrosExpanded">
+      <div class="filters-header" (click)="toggleFiltros()">
+        <div class="filters-title">
+          <mat-icon>tune</mat-icon>
+          Filtros de Búsqueda
+          <mat-icon class="expand-icon" [class.rotated]="filtrosExpanded"
+            >expand_more</mat-icon
           >
-            <mat-icon>add</mat-icon>
-            Agregar primer almacén
+        </div>
+        <span class="filter-subtitle" *ngIf="filtrosExpanded"
+          >Los resultados se actualizan automáticamente</span
+        >
+      </div>
+
+      <div class="filters-content" *ngIf="filtrosExpanded">
+        <form [formGroup]="filtrosForm" class="filters-form">
+          <div class="filters-grid">
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">tag</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="idAlmacen"
+                  placeholder="Filtrar por ID..."
+                  type="number"
+                />
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">storage</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="nombre"
+                  placeholder="Filtrar por nombre..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">location_on</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="ubicacion"
+                  placeholder="Filtrar por ubicación..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-actions">
+              <button
+                class="btn-clear-filters"
+                type="button"
+                (click)="limpiarFiltros()"
+                matTooltip="Limpiar todos los filtros"
+              >
+                Limpiar todos
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tabla de almacenes -->
+    <div class="table-card">
+      <div class="table-with-headers">
+        <!-- Encabezados de columnas -->
+        <div class="column-headers">
+          <div class="header-row">
+            <div class="header-col id-col" (click)="sortData('id_almacen')">
+              <span>ID</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col nombre-col" (click)="sortData('nombre')">
+              <span>Nombre</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div
+              class="header-col ubicacion-col"
+              (click)="sortData('ubicacion')"
+            >
+              <span>Ubicación</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col acciones-col">
+              <span>Acciones</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table mat-table [dataSource]="dataSource" matSort class="data-table">
+            <!-- Columna ID -->
+            <ng-container matColumnDef="id_almacen">
+              <td mat-cell *matCellDef="let almacen" class="table-cell">
+                <span class="badge-texfina badge-neutral">
+                  {{ formatearCodigo(almacen.id_almacen) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Nombre -->
+            <ng-container matColumnDef="nombre">
+              <td mat-cell *matCellDef="let almacen" class="table-cell">
+                <div class="almacen-cell">
+                  <div
+                    class="almacen-name text-texfina text-primary font-medium"
+                  >
+                    {{ almacen.nombre || "-" }}
+                  </div>
+                  <div class="almacen-type text-texfina text-muted">
+                    Almacén de Materiales
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Ubicación -->
+            <ng-container matColumnDef="ubicacion">
+              <td mat-cell *matCellDef="let almacen" class="table-cell">
+                <div class="ubicacion-cell">
+                  <mat-icon class="location-icon">location_on</mat-icon>
+                  <span class="text-texfina text-secondary">
+                    {{ almacen.ubicacion || "-" }}
+                  </span>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="acciones">
+              <td
+                mat-cell
+                *matCellDef="let almacen"
+                class="table-cell actions-cell"
+              >
+                <div class="action-buttons">
+                  <button
+                    class="btn-action btn-view"
+                    (click)="verDetalle(almacen)"
+                    matTooltip="Ver detalle"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button
+                    class="btn-action btn-edit"
+                    (click)="editarAlmacen(almacen)"
+                    matTooltip="Editar"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+
+          <!-- Mensaje cuando no hay datos -->
+          <div *ngIf="dataSource.data.length === 0" class="no-data">
+            <mat-icon class="no-data-icon">storage</mat-icon>
+            <h3 class="no-data-title text-texfina text-primary">
+              No hay almacenes registrados
+            </h3>
+            <p class="no-data-subtitle text-texfina text-muted">
+              Comienza agregando tu primer almacén para gestionar el inventario
+            </p>
+            <button
+              class="btn-texfina btn-primary"
+              (click)="abrirNuevoAlmacen()"
+            >
+              <mat-icon>add</mat-icon>
+              Agregar Primer Almacén
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <div class="table-footer">
+        <div class="pagination-info">
+          <span class="text-texfina text-muted">Página 1 de 10</span>
+        </div>
+        <div class="pagination-controls">
+          <button class="pagination-button" disabled>
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button class="pagination-button">
+            <mat-icon>chevron_right</mat-icon>
           </button>
         </div>
       </div>
-    </mat-card>
+    </div>
   </div>
 </div>

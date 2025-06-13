@@ -82,9 +82,12 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     private fb: FormBuilder
   ) {
     this.filtrosForm = this.fb.group({
-      codigo: [''],
-      descripcion: [''],
-      proveedor: [''],
+      codigoFox: [''],
+      nombre: [''],
+      pesoUnitario: [''],
+      unidad: [''],
+      presentacion: [''],
+      precioUnitario: [''],
     });
   }
 
@@ -128,35 +131,60 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     const filtros = this.filtrosForm.value;
     let materialesFiltrados = [...this.materiales];
 
-    if (filtros.codigo && filtros.codigo.trim()) {
+    // Filtro por Código Fox
+    if (filtros.codigoFox && filtros.codigoFox.trim()) {
       materialesFiltrados = materialesFiltrados.filter((material) =>
-        material.id_fox?.toLowerCase().includes(filtros.codigo.toLowerCase())
+        material.id_fox?.toLowerCase().includes(filtros.codigoFox.toLowerCase())
       );
     }
 
-    if (filtros.descripcion && filtros.descripcion.trim()) {
+    // Filtro por Nombre
+    if (filtros.nombre && filtros.nombre.trim()) {
       materialesFiltrados = materialesFiltrados.filter((material) =>
-        material.nombre
-          ?.toLowerCase()
-          .includes(filtros.descripcion.toLowerCase())
+        material.nombre?.toLowerCase().includes(filtros.nombre.toLowerCase())
       );
     }
 
-    if (filtros.proveedor && filtros.proveedor.trim()) {
+    // Filtro por Peso Unitario
+    if (filtros.pesoUnitario && filtros.pesoUnitario.toString().trim()) {
+      const pesoFiltro = parseFloat(filtros.pesoUnitario);
+      if (!isNaN(pesoFiltro)) {
+        materialesFiltrados = materialesFiltrados.filter((material) => {
+          const peso = material.peso_unitario || 0;
+          return peso >= pesoFiltro - 0.01 && peso <= pesoFiltro + 0.01;
+        });
+      }
+    }
+
+    // Filtro por Unidad
+    if (filtros.unidad && filtros.unidad.trim()) {
       materialesFiltrados = materialesFiltrados.filter((material) => {
-        // Buscar en los proveedores asociados al insumo
-        if (material.proveedores && material.proveedores.length > 0) {
-          return material.proveedores.some((insumoProveedor) => {
-            const proveedor = this.proveedores.find(
-              (p) => p.id_proveedor === insumoProveedor.id_proveedor
-            );
-            return proveedor?.empresa
-              ?.toLowerCase()
-              .includes(filtros.proveedor.toLowerCase());
-          });
-        }
-        return false;
+        const unidadNombre =
+          material.unidad?.nombre || material.id_unidad?.toString() || '';
+        return unidadNombre
+          .toLowerCase()
+          .includes(filtros.unidad.toLowerCase());
       });
+    }
+
+    // Filtro por Presentación
+    if (filtros.presentacion && filtros.presentacion.trim()) {
+      materialesFiltrados = materialesFiltrados.filter((material) =>
+        material.presentacion
+          ?.toLowerCase()
+          .includes(filtros.presentacion.toLowerCase())
+      );
+    }
+
+    // Filtro por Precio Unitario
+    if (filtros.precioUnitario && filtros.precioUnitario.toString().trim()) {
+      const precioFiltro = parseFloat(filtros.precioUnitario);
+      if (!isNaN(precioFiltro)) {
+        materialesFiltrados = materialesFiltrados.filter((material) => {
+          const precio = material.precio_unitario || 0;
+          return precio >= precioFiltro - 0.01 && precio <= precioFiltro + 0.01;
+        });
+      }
     }
 
     this.dataSource.data = materialesFiltrados;

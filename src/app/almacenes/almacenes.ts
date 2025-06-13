@@ -1,4 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormsModule,
@@ -6,7 +12,7 @@ import {
   FormBuilder,
   FormGroup,
 } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -14,11 +20,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSortModule, MatSort } from '@angular/material/sort';
 
 import { MaterialService } from '../services/material.service';
 import { Almacen } from '../models/insumo.model';
 import { EditarAlmacenDialogComponent } from './editar-almacen-dialog/editar-almacen-dialog';
 import { DetalleAlmacenDialogComponent } from './detalle-almacen-dialog/detalle-almacen-dialog';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-almacenes',
@@ -35,13 +44,20 @@ import { DetalleAlmacenDialogComponent } from './detalle-almacen-dialog/detalle-
     MatIconModule,
     MatTooltipModule,
     MatDialogModule,
+    MatSortModule,
   ],
   templateUrl: './almacenes.html',
   styleUrls: ['./almacenes.scss'],
 })
-export class AlmacenesComponent implements OnInit {
+export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild(MatSort) sort!: MatSort;
+
   almacenes: Almacen[] = [];
+  dataSource = new MatTableDataSource<Almacen>([]);
   filtrosForm: FormGroup;
+  filtrosExpanded: boolean = true;
+  private destroy$ = new Subject<void>();
+
   displayedColumns: string[] = [
     'id_almacen',
     'nombre',
@@ -49,12 +65,17 @@ export class AlmacenesComponent implements OnInit {
     'acciones',
   ];
 
+  get almacenesFiltrados(): Almacen[] {
+    return this.dataSource.data;
+  }
+
   constructor(
     private materialService: MaterialService,
     private dialog: MatDialog,
     private fb: FormBuilder
   ) {
     this.filtrosForm = this.fb.group({
+      idAlmacen: [''],
       nombre: [''],
       ubicacion: [''],
     });
@@ -62,24 +83,90 @@ export class AlmacenesComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarAlmacenes();
+    this.configurarFiltrosEnTiempoReal();
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  configurarFiltrosEnTiempoReal(): void {
+    this.filtrosForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltros();
+      });
   }
 
   cargarAlmacenes(): void {
     this.materialService.getAlmacenes().subscribe((almacenes) => {
       this.almacenes = almacenes;
+      this.dataSource.data = [...almacenes];
     });
   }
 
-  buscar(): void {
+  aplicarFiltros(): void {
     const filtros = this.filtrosForm.value;
-    this.materialService.buscarAlmacenes(filtros).subscribe((almacenes) => {
-      this.almacenes = almacenes;
-    });
+    let almacenesFiltrados = [...this.almacenes];
+
+    // Filtro por ID Almacén
+    if (filtros.idAlmacen && filtros.idAlmacen.toString().trim()) {
+      const idFiltro = parseInt(filtros.idAlmacen);
+      if (!isNaN(idFiltro)) {
+        almacenesFiltrados = almacenesFiltrados.filter(
+          (almacen) => almacen.id_almacen === idFiltro
+        );
+      }
+    }
+
+    // Filtro por Nombre
+    if (filtros.nombre && filtros.nombre.trim()) {
+      almacenesFiltrados = almacenesFiltrados.filter((almacen) =>
+        almacen.nombre?.toLowerCase().includes(filtros.nombre.toLowerCase())
+      );
+    }
+
+    // Filtro por Ubicación
+    if (filtros.ubicacion && filtros.ubicacion.trim()) {
+      almacenesFiltrados = almacenesFiltrados.filter((almacen) =>
+        almacen.ubicacion
+          ?.toLowerCase()
+          .includes(filtros.ubicacion.toLowerCase())
+      );
+    }
+
+    this.dataSource.data = almacenesFiltrados;
   }
 
   limpiarFiltros(): void {
     this.filtrosForm.reset();
-    this.cargarAlmacenes();
+    this.dataSource.data = [...this.almacenes];
+  }
+
+  toggleFiltros(): void {
+    this.filtrosExpanded = !this.filtrosExpanded;
+  }
+
+  sortData(column: string): void {
+    if (this.sort) {
+      // Si ya está ordenado por esta columna, cambiar dirección
+      if (this.sort.active === column) {
+        this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        // Nueva columna, empezar con ascendente
+        this.sort.active = column;
+        this.sort.direction = 'asc';
+      }
+      this.sort.sortChange.emit({
+        active: this.sort.active,
+        direction: this.sort.direction,
+      });
+    }
   }
 
   formatearCodigo(id?: number): string {
