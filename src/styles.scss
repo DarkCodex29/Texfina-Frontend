@@ -3031,6 +3031,168 @@ app-clases {
   }
 }
 
+// ======================================================
+// CONFIGURACIÓN ESPECÍFICA PARA RECETAS
+// ======================================================
+.page-container:has(.receta-cell) {
+  // Ancho mínimo para 5 columnas: id + nombre + ingredientes + estado + acciones
+  @media (max-width: 768px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 700px !important; // Ancho mínimo para recetas (5 columnas)
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 700px !important; // Ancho mínimo para recetas (5 columnas)
+      }
+    }
+  }
+
+  @media (max-width: 320px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container,
+      .data-table,
+      .mat-mdc-table {
+        min-width: 700px !important;
+      }
+    }
+  }
+
+  .column-headers .header-row {
+    grid-template-columns: 1fr 2.5fr 1.5fr 1fr 1fr !important;
+    gap: 12px;
+
+    .header-col {
+      // Alineación específica para recetas - DEBE COINCIDIR CON CONTENIDO
+      &.id-col {
+        justify-content: center; // ID - centrado como badge
+        text-align: center;
+      }
+      &.nombre-col {
+        justify-content: flex-start; // Nombre - izquierda
+        text-align: left;
+      }
+      &.ingredientes-col {
+        justify-content: center; // Ingredientes - centrado
+        text-align: center;
+      }
+      &.estado-col {
+        justify-content: center; // Estado - centrado como badge
+        text-align: center;
+      }
+      &.acciones-col {
+        justify-content: center; // Acciones - centrado
+        text-align: center;
+      }
+    }
+
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 0.9fr 2.4fr 1.4fr 0.9fr 0.9fr !important;
+      gap: 10px;
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 2.3fr 1.3fr 0.8fr 0.8fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 2.2fr 1.2fr 0.7fr 0.7fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      grid-template-columns: 0.6fr 2.1fr 1.1fr 0.6fr 0.6fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para pantallas muy pequeñas
+    @media (max-width: 360px) {
+      grid-template-columns: 0.5fr 2fr 1fr 0.5fr 0.5fr !important;
+      gap: 4px;
+    }
+  }
+
+  .data-table .mat-mdc-row {
+    grid-template-columns: 1fr 2.5fr 1.5fr 1fr 1fr !important;
+    gap: 12px;
+
+    .mat-mdc-cell {
+      // Alineación específica para recetas - DEBE COINCIDIR CON HEADERS
+      &:nth-child(1) {
+        // ID (badge) - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(2) {
+        // Nombre - izquierda
+        justify-content: flex-start;
+        text-align: left;
+      }
+
+      &:nth-child(3) {
+        // Ingredientes - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(4) {
+        // Estado - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(5) {
+        // Acciones - centrado
+        justify-content: center;
+        text-align: center;
+      }
+    }
+
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 0.9fr 2.4fr 1.4fr 0.9fr 0.9fr !important;
+      gap: 10px;
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 2.3fr 1.3fr 0.8fr 0.8fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 2.2fr 1.2fr 0.7fr 0.7fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      grid-template-columns: 0.6fr 2.1fr 1.1fr 0.6fr 0.6fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para pantallas muy pequeñas
+    @media (max-width: 360px) {
+      grid-template-columns: 0.5fr 2fr 1fr 0.5fr 0.5fr !important;
+      gap: 4px;
+    }
+  }
+}
+
 .filter-group {
   position: relative;
   width: 100%;

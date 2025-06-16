@@ -196,10 +196,7 @@ export class ApiService {
   // PROVEEDORES
   // ============================================================================
 
-  getProveedores(
-    pagina = 1,
-    tamaño = 10
-  ): Observable<ApiResponse<any[]>> {
+  getProveedores(pagina = 1, tamaño = 10): Observable<ApiResponse<any[]>> {
     const params = new HttpParams()
       .set('pagina', pagina.toString())
       .set('tamaño', tamaño.toString());
@@ -237,10 +234,7 @@ export class ApiService {
   // LOTES
   // ============================================================================
 
-  getLotes(
-    pagina = 1,
-    tamaño = 10
-  ): Observable<ApiResponse<any[]>> {
+  getLotes(pagina = 1, tamaño = 10): Observable<ApiResponse<any[]>> {
     const params = new HttpParams()
       .set('pagina', pagina.toString())
       .set('tamaño', tamaño.toString());
@@ -290,10 +284,7 @@ export class ApiService {
   // STOCKS
   // ============================================================================
 
-  getStocks(
-    pagina = 1,
-    tamaño = 10
-  ): Observable<ApiResponse<any[]>> {
+  getStocks(pagina = 1, tamaño = 10): Observable<ApiResponse<any[]>> {
     const params = new HttpParams()
       .set('pagina', pagina.toString())
       .set('tamaño', tamaño.toString());
@@ -464,5 +455,56 @@ export class ApiService {
         headers: this.getHeaders(),
       }
     );
+  }
+
+  // ============================================================================
+  // RECETAS
+  // ============================================================================
+
+  getRecetas(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/recetas`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getReceta(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/recetas/${id}`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  crearReceta(receta: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/recetas`, receta, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  actualizarReceta(receta: any): Observable<any> {
+    return this.http.put(
+      `${this.baseUrl}/recetas/${receta.id_receta}`,
+      receta,
+      {
+        headers: this.getHeaders(),
+      }
+    );
+  }
+
+  eliminarReceta(id: number): Observable<boolean> {
+    return this.http.delete<boolean>(`${this.baseUrl}/recetas/${id}`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  buscarRecetas(filtros: any): Observable<ApiResponse<any[]>> {
+    let params = new HttpParams();
+
+    if (filtros.nombre) {
+      params = params.set('nombre', filtros.nombre);
+    }
+
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/recetas/buscar`, {
+      headers: this.getHeaders(),
+      params,
+    });
   }
 }

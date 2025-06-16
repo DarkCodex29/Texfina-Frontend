@@ -1,0 +1,46 @@
+// ============================================================================
+// RECETAS - ESTILOS ESPECÍFICOS (SIN LAYOUT)
+// ============================================================================
+
+/* Usar clases globales de Texfina - sin estilos locales que interfieran */
+
+/* Solo estilos muy específicos para la celda de receta */
+.receta-cell {
+  .receta-name {
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .receta-class {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+}
+
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--texfina-border-radius);
+  transition: all 0.2s ease;
+
+  &.btn-view {
+    background-color: var(--texfina-secondary-light);
+    color: var(--texfina-secondary);
+
+    &:hover {
+      background-color: var(--texfina-secondary);
+      color: white;
+    }
+  }
+
+  &.btn-edit {
+    background-color: var(--texfina-success-light);
+    color: var(--texfina-success);
+
+    &:hover {
+      background-color: var(--texfina-success);
+      color: white;
+    }
+  }
+}

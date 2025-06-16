@@ -1527,4 +1527,215 @@ export class MaterialService {
 
     return csvRows.join('\n');
   }
+
+  // ===== RECETAS =====
+  getRecetas(): Observable<Receta[]> {
+    if (this.useApi) {
+      return this.apiService.getRecetas().pipe(
+        map((response) => response.data || response),
+        catchError(() => of(this.getRecetasMock()))
+      );
+    }
+    return of(this.getRecetasMock());
+  }
+
+  private getRecetasMock(): Receta[] {
+    return [
+      {
+        id_receta: 1,
+        nombre: 'Tela Algodón Básica',
+        detalles: [
+          {
+            id: 1,
+            id_receta: 1,
+            id_insumo: 5, // Algodón Peinado 40/1
+            proporcion: 85.0,
+            orden: 1,
+            tipo_medida: 'PORCENTAJE',
+          },
+          {
+            id: 2,
+            id_receta: 1,
+            id_insumo: 1, // Ácido Acético
+            proporcion: 10.0,
+            orden: 2,
+            tipo_medida: 'PORCENTAJE',
+          },
+          {
+            id: 3,
+            id_receta: 1,
+            id_insumo: 9, // Sulfato de Sodio
+            proporcion: 5.0,
+            orden: 3,
+            tipo_medida: 'PORCENTAJE',
+          },
+        ],
+      },
+      {
+        id_receta: 2,
+        nombre: 'Tela Teñida Azul Marino',
+        detalles: [
+          {
+            id: 4,
+            id_receta: 2,
+            id_insumo: 5, // Algodón Peinado 40/1
+            proporcion: 70.0,
+            orden: 1,
+            tipo_medida: 'PORCENTAJE',
+          },
+          {
+            id: 5,
+            id_receta: 2,
+            id_insumo: 3, // Colorante Azul Marino
+            proporcion: 15.0,
+            orden: 2,
+            tipo_medida: 'PORCENTAJE',
+          },
+          {
+            id: 6,
+            id_receta: 2,
+            id_insumo: 2, // Peróxido de Hidrógeno
+            proporcion: 10.0,
+            orden: 3,
+            tipo_medida: 'PORCENTAJE',
+          },
+          {
+            id: 7,
+            id_receta: 2,
+            id_insumo: 9, // Sulfato de Sodio
+            proporcion: 5.0,
+            orden: 4,
+            tipo_medida: 'PORCENTAJE',
+          },
+        ],
+      },
+      {
+        id_receta: 3,
+        nombre: 'Tela con Adhesivo Termoplástico',
+        detalles: [
+          {
+            id: 8,
+            id_receta: 3,
+            id_insumo: 5, // Algodón Peinado 40/1
+            proporcion: 60.0,
+            orden: 1,
+            tipo_medida: 'PORCENTAJE',
+          },
+          {
+            id: 9,
+            id_receta: 3,
+            id_insumo: 6, // Adhesivo Termoplástico
+            proporcion: 25.0,
+            orden: 2,
+            tipo_medida: 'PORCENTAJE',
+          },
+          {
+            id: 10,
+            id_receta: 3,
+            id_insumo: 8, // Disolvente Universal
+            proporcion: 15.0,
+            orden: 3,
+            tipo_medida: 'PORCENTAJE',
+          },
+        ],
+      },
+      {
+        id_receta: 4,
+        nombre: 'Tela Roja Premium',
+        detalles: [
+          {
+            id: 11,
+            id_receta: 4,
+            id_insumo: 5, // Algodón Peinado 40/1
+            proporcion: 65.0,
+            orden: 1,
+            tipo_medida: 'PORCENTAJE',
+          },
+          {
+            id: 12,
+            id_receta: 4,
+            id_insumo: 4, // Colorante Rojo Carmín
+            proporcion: 20.0,
+            orden: 2,
+            tipo_medida: 'PORCENTAJE',
+          },
+          {
+            id: 13,
+            id_receta: 4,
+            id_insumo: 7, // Adhesivo PVA
+            proporcion: 10.0,
+            orden: 3,
+            tipo_medida: 'PORCENTAJE',
+          },
+          {
+            id: 14,
+            id_receta: 4,
+            id_insumo: 1, // Ácido Acético
+            proporcion: 5.0,
+            orden: 4,
+            tipo_medida: 'PORCENTAJE',
+          },
+        ],
+      },
+      {
+        id_receta: 5,
+        nombre: 'Receta Sin Ingredientes',
+        detalles: [],
+      },
+    ];
+  }
+
+  crearReceta(receta: Receta): Observable<Receta> {
+    if (this.useApi) {
+      return this.apiService.crearReceta(receta);
+    }
+
+    // Mock implementation
+    const nuevaReceta = {
+      ...receta,
+      id_receta:
+        Math.max(...this.getRecetasMock().map((r) => r.id_receta || 0)) + 1,
+    };
+
+    return of(nuevaReceta);
+  }
+
+  actualizarReceta(receta: Receta): Observable<Receta> {
+    if (this.useApi) {
+      return this.apiService.actualizarReceta(receta);
+    }
+    return of(receta);
+  }
+
+  eliminarReceta(id: number): Observable<boolean> {
+    if (this.useApi) {
+      return this.apiService.eliminarReceta(id);
+    }
+    return of(true);
+  }
+
+  buscarRecetas(filtros: { nombre?: string }): Observable<Receta[]> {
+    if (this.useApi) {
+      return this.apiService.buscarRecetas(filtros).pipe(
+        map((response) => response.data || response),
+        catchError(() => this.buscarRecetasMock(filtros))
+      );
+    }
+    return this.buscarRecetasMock(filtros);
+  }
+
+  private buscarRecetasMock(filtros: {
+    nombre?: string;
+  }): Observable<Receta[]> {
+    let recetasFiltradas = this.getRecetasMock();
+
+    if (filtros.nombre?.trim()) {
+      const nombreBusqueda = filtros.nombre.toLowerCase();
+      recetasFiltradas = recetasFiltradas.filter((receta) =>
+        receta.nombre?.toLowerCase().includes(nombreBusqueda)
+      );
+    }
+
+    return of(recetasFiltradas);
+  }
 }
