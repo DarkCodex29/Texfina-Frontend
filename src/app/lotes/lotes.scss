@@ -1,56 +1,318 @@
 // ============================================================================
-// LOTES - ESTILOS ESPECÍFICOS (SIN LAYOUT)
+// LOTES - ESTILOS ESPECÍFICOS DEL SISTEMA TEXFINA
 // ============================================================================
+// Los estilos base están en styles.scss - aquí solo lo específico de lotes
 
-// Solo estilos específicos de la tabla de lotes
-.lotes-table {
-  width: 100%;
-  background-color: white;
-
-  .mat-mdc-header-cell {
-    background-color: #fafafa;
-    color: #666;
-    font-weight: 600;
-    font-size: 0.875rem;
-    padding: 0.75rem;
-    border-bottom: 2px solid #e0e0e0;
+/* Estilos específicos para información de lotes */
+.lote-cell {
+  .insumo-name {
+    font-weight: 500;
+    line-height: 1.2;
   }
 
-  .mat-mdc-row {
-    height: 48px;
-    border-bottom: 1px solid #f0f0f0;
+  .lote-codigo {
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
 
-    &:hover {
-      background-color: #f8f9fa !important;
+  .lote-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .lote-alerts {
+      display: flex;
+      gap: 0.25rem;
+
+      .alert-icon {
+        font-size: 1rem;
+        width: 1rem;
+        height: 1rem;
+
+        &.vencido {
+          animation: pulse 2s infinite;
+        }
+      }
+    }
+  }
+
+  .stock-info {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-family: "Roboto Mono", monospace;
+
+    .stock-actual {
+      font-weight: 600;
     }
 
-    .mat-mdc-cell {
-      font-size: 0.875rem;
-      padding: 0.75rem;
-      color: #333;
+    .stock-separator {
+      color: var(--texfina-text-muted);
+      font-weight: 400;
+    }
 
-      .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: center;
+    .stock-inicial {
+      color: var(--texfina-text-muted);
+      font-weight: 400;
+    }
+  }
+
+  .fecha-info {
+    .fecha-value {
+      font-weight: 500;
+
+      &.fecha-vencida {
+        font-weight: 600;
       }
 
-      .btn-ver,
-      .btn-editar {
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
+      &.fecha-por-vencer {
+        font-weight: 600;
+      }
+    }
 
-        &.btn-ver {
-          background-color: #e0f2fe;
-          color: #0284c7;
-        }
+    .fecha-sin-vencimiento {
+      color: var(--texfina-text-muted);
+      font-style: italic;
+    }
+  }
+}
 
-        &.btn-editar {
-          background-color: #ecfdf5;
-          color: #059669;
+.lote-info {
+  .lote-codigo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+
+    .badge-texfina {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .lote-alerts {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+      flex-shrink: 0;
+
+      .alert-icon {
+        font-size: 1rem;
+        width: 1rem;
+        height: 1rem;
+        flex-shrink: 0;
+
+        &.vencido {
+          animation: pulse 2s infinite;
         }
       }
+    }
+  }
+}
+
+.stock-info {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: "Roboto Mono", monospace;
+
+  .stock-actual {
+    font-weight: 600;
+  }
+}
+
+.fecha-vencida {
+  font-weight: 600;
+}
+
+.fecha-por-vencer {
+  font-weight: 600;
+}
+
+/* Animación para elementos vencidos */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// ============================================================================
+// LEYENDA COMPACTA EN FOOTER - COMPONENTE OPTIMIZADO
+// ============================================================================
+
+.footer-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+
+  .legend-compact {
+    display: flex;
+    align-items: center;
+    gap: var(--texfina-spacing-md);
+
+    .legend-label {
+      font-size: var(--texfina-font-size-sm);
+      color: var(--texfina-text-secondary);
+      font-weight: 500;
+    }
+
+    .legend-indicators {
+      display: flex;
+      gap: var(--texfina-spacing-md);
+      flex-wrap: wrap;
+    }
+
+    .legend-mini-item {
+      display: flex;
+      align-items: center;
+      gap: var(--texfina-spacing-xs);
+      cursor: help;
+
+      .legend-mini-indicator {
+        width: 16px;
+        height: 8px;
+        border-radius: 2px;
+        border-left: 3px solid;
+
+        &.vencido {
+          background-color: rgba(255, 230, 230, 0.6);
+          border-left-color: #ff6b6b;
+        }
+
+        &.por-vencer {
+          background-color: rgba(255, 248, 220, 0.7);
+          border-left-color: #ffd93d;
+        }
+
+        &.agotado {
+          background-color: rgba(245, 245, 245, 0.8);
+          border-left-color: #999;
+        }
+
+        &.stock-bajo {
+          background-color: rgba(230, 245, 255, 0.7);
+          border-left-color: #74c0fc;
+        }
+      }
+
+      span {
+        font-size: var(--texfina-font-size-xs);
+        color: var(--texfina-text-secondary);
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+// Responsive para leyenda compacta
+@media (max-width: 1024px) {
+  .footer-legend {
+    .legend-compact {
+      flex-direction: column;
+      gap: var(--texfina-spacing-sm);
+      align-items: flex-start;
+
+      .legend-indicators {
+        gap: var(--texfina-spacing-sm);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-legend {
+    .legend-compact {
+      .legend-indicators {
+        flex-direction: column;
+        gap: var(--texfina-spacing-xs);
+      }
+
+      .legend-mini-item {
+        span {
+          font-size: 0.6rem;
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// SISTEMA DE SOMBREADO CON COLORES REFERENCIALES (PATRÓN PARA TODAS LAS TABLAS)
+// ============================================================================
+
+/* Estado CRÍTICO: Vencido - Rojo referencial (peligro) */
+.data-table .mat-mdc-row.row-vencido {
+  background-color: rgba(255, 230, 230, 0.6) !important; // Fondo rojo muy suave
+  border-left: 3px solid #ff6b6b !important; // Borde rojo suave
+
+  &:hover {
+    background-color: rgba(255, 230, 230, 0.8) !important;
+  }
+}
+
+/* Estado ADVERTENCIA: Por vencer - Amarillo referencial (precaución) */
+.data-table .mat-mdc-row.row-por-vencer {
+  background-color: rgba(
+    255,
+    248,
+    220,
+    0.7
+  ) !important; // Fondo amarillo muy suave
+  border-left: 3px solid #ffd93d !important; // Borde amarillo suave
+
+  &:hover {
+    background-color: rgba(255, 248, 220, 0.9) !important;
+  }
+}
+
+/* Estado AGOTADO: Sin stock - Gris referencial (inactivo) */
+.data-table .mat-mdc-row.row-agotado {
+  background-color: rgba(245, 245, 245, 0.8) !important; // Fondo gris muy suave
+  border-left: 3px solid #999 !important; // Borde gris neutral
+
+  &:hover {
+    background-color: rgba(240, 240, 240, 1) !important;
+  }
+}
+
+/* Estado STOCK BAJO: Poco inventario - Azul referencial (información) */
+.data-table .mat-mdc-row.row-stock-bajo {
+  background-color: rgba(230, 245, 255, 0.7) !important; // Fondo azul muy suave
+  border-left: 3px solid #74c0fc !important; // Borde azul suave
+
+  &:hover {
+    background-color: rgba(230, 245, 255, 0.9) !important;
+  }
+}
+
+/* Botones de acción específicos */
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--texfina-border-radius);
+  transition: all 0.2s ease;
+
+  &.btn-view {
+    background-color: var(--texfina-secondary-light);
+    color: var(--texfina-secondary);
+
+    &:hover {
+      background-color: var(--texfina-secondary);
+      color: white;
+    }
+  }
+
+  &.btn-edit {
+    background-color: var(--texfina-success-light);
+    color: var(--texfina-success);
+
+    &:hover {
+      background-color: var(--texfina-success);
+      color: white;
     }
   }
 }

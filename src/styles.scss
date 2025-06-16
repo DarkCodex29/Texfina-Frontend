@@ -1272,7 +1272,7 @@ html {
   }
 }
 
-// Encabezados de columna integrados
+// Encabezados de columna integrados (FALLBACK - solo para pantallas sin configuración específica)
 .column-headers {
   background: var(--texfina-bg-secondary);
   border-bottom: 2px solid var(--texfina-border);
@@ -1299,7 +1299,7 @@ html {
 
   .header-row {
     display: grid;
-    grid-template-columns: 1fr 2fr 0.8fr 0.8fr 1.2fr 1fr 1fr;
+    grid-template-columns: 1fr 2fr 0.8fr 0.8fr 1.2fr 1fr 1fr; // FALLBACK para pantallas sin configuración específica
     gap: 12px;
     padding: 0;
     align-items: center;
@@ -1579,7 +1579,7 @@ html {
   }
 }
 
-// Tabla de datos mejorada
+// Tabla de datos mejorada (FALLBACK - solo para pantallas sin configuración específica)
 .data-table {
   width: 100%;
   background: white;
@@ -1592,10 +1592,10 @@ html {
     display: none !important;
   }
 
-  // Filas de datos alineadas con grid
+  // Filas de datos alineadas con grid (FALLBACK)
   .mat-mdc-row {
     display: grid !important;
-    grid-template-columns: 1fr 2fr 0.8fr 0.8fr 1.2fr 1fr 1fr;
+    grid-template-columns: 1fr 2fr 0.8fr 0.8fr 1.2fr 1fr 1fr; // FALLBACK para pantallas sin configuración específica
     gap: 12px;
     min-height: 52px !important;
     border-bottom: 1px solid var(--texfina-border-light);
@@ -2289,6 +2289,181 @@ button {
 }
 
 // ============================================================================
+// INSUMOS/MATERIALES - GRID ESPECÍFICO
+// ============================================================================
+
+/* Grid específico para insumos: codigoFox, nombre, pesoUnitario, unidad, presentacion, precioUnitario, acciones */
+app-materiales {
+  // En móviles, ajustar ancho mínimo específico para materiales
+  @media (max-width: 480px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 900px !important; // Ancho mínimo para materiales (7 columnas)
+      }
+    }
+  }
+
+  @media (max-width: 320px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container,
+      .data-table,
+      .mat-mdc-table {
+        min-width: 900px !important;
+      }
+    }
+  }
+
+  .column-headers .header-row {
+    grid-template-columns: 1fr 2fr 0.8fr 0.8fr 1.2fr 1fr 1fr !important;
+    gap: 12px;
+
+    .header-col {
+      // Alineación específica para materiales - DEBE COINCIDIR CON CONTENIDO
+      &.codigo-col {
+        justify-content: center; // Centrado como los badges
+        text-align: center;
+      }
+      &.nombre-col {
+        justify-content: flex-start; // Izquierda
+        text-align: left;
+      }
+      &.peso-col {
+        justify-content: center; // Centrado
+        text-align: center;
+      }
+      &.unidad-col {
+        justify-content: center; // Centrado como badges
+        text-align: center;
+      }
+      &.presentacion-col {
+        justify-content: flex-start; // Izquierda
+        text-align: left;
+      }
+      &.precio-col {
+        justify-content: flex-end; // Derecha
+        text-align: right;
+      }
+      &.acciones-col {
+        justify-content: center; // Centrado
+        text-align: center;
+      }
+    }
+
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 0.9fr 1.9fr 0.8fr 0.8fr 1.1fr 1fr 1fr !important;
+      gap: 10px;
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 1.8fr 0.7fr 0.7fr 1fr 0.9fr 0.9fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 1.6fr 0.6fr 0.5fr 0.9fr 0.8fr 0.8fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      grid-template-columns: 0.8fr 2fr 0.7fr 0.6fr 1fr 0.8fr 0.8fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para pantallas muy pequeñas
+    @media (max-width: 360px) {
+      grid-template-columns: 0.5fr 1.3fr 0.4fr 0.4fr 0.6fr 0.5fr 0.5fr !important;
+      gap: 2px;
+    }
+  }
+
+  .data-table .mat-mdc-row {
+    grid-template-columns: 1fr 2fr 0.8fr 0.8fr 1.2fr 1fr 1fr !important;
+    gap: 12px;
+
+    .mat-mdc-cell {
+      // Alineación específica para materiales - DEBE COINCIDIR CON HEADERS
+      &:nth-child(1) {
+        // Código Fox - centrado para badges
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(2) {
+        // Nombre - izquierda
+        justify-content: flex-start;
+        text-align: left;
+      }
+
+      &:nth-child(3) {
+        // Peso Unit - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(4) {
+        // Unidad (badge) - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(5) {
+        // Presentación - izquierda
+        justify-content: flex-start;
+        text-align: left;
+      }
+
+      &:nth-child(6) {
+        // Precio Unit - derecha
+        justify-content: flex-end;
+        text-align: right;
+      }
+
+      &:nth-child(7) {
+        // Acciones - centrado
+        justify-content: center;
+        text-align: center;
+      }
+    }
+
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 0.9fr 1.9fr 0.8fr 0.8fr 1.1fr 1fr 1fr !important;
+      gap: 10px;
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 1.8fr 0.7fr 0.7fr 1fr 0.9fr 0.9fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 1.6fr 0.6fr 0.5fr 0.9fr 0.8fr 0.8fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      grid-template-columns: 0.8fr 2fr 0.7fr 0.6fr 1fr 0.8fr 0.8fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para pantallas muy pequeñas
+    @media (max-width: 360px) {
+      grid-template-columns: 0.5fr 1.3fr 0.4fr 0.4fr 0.6fr 0.5fr 0.5fr !important;
+      gap: 2px;
+    }
+  }
+}
+
+// ============================================================================
 // PROVEEDORES - GRID ESPECÍFICO
 // ============================================================================
 
@@ -2320,21 +2495,26 @@ app-proveedores {
     gap: 12px;
 
     .header-col {
-      // Alineación específica para proveedores
+      // Alineación específica para proveedores - DEBE COINCIDIR CON CONTENIDO
       &.empresa-col {
-        justify-content: flex-start;
+        justify-content: flex-start; // Izquierda
+        text-align: left;
       }
       &.ruc-col {
-        justify-content: center;
+        justify-content: center; // Centrado como badges
+        text-align: center;
       }
       &.contacto-col {
-        justify-content: flex-start;
+        justify-content: flex-start; // Izquierda
+        text-align: left;
       }
       &.direccion-col {
-        justify-content: flex-start;
+        justify-content: flex-start; // Izquierda
+        text-align: left;
       }
       &.acciones-col {
-        justify-content: center;
+        justify-content: center; // Centrado
+        text-align: center;
       }
     }
 
@@ -2374,30 +2554,35 @@ app-proveedores {
     gap: 12px;
 
     .mat-mdc-cell {
-      // Alineación específica para proveedores
+      // Alineación específica para proveedores - DEBE COINCIDIR CON HEADERS
       &:nth-child(1) {
-        // Empresa
+        // Empresa - izquierda
         justify-content: flex-start;
+        text-align: left;
       }
 
       &:nth-child(2) {
-        // RUC (badge)
+        // RUC (badge) - centrado
         justify-content: center;
+        text-align: center;
       }
 
       &:nth-child(3) {
-        // Contacto
+        // Contacto - izquierda
         justify-content: flex-start;
+        text-align: left;
       }
 
       &:nth-child(4) {
-        // Dirección
+        // Dirección - izquierda
         justify-content: flex-start;
+        text-align: left;
       }
 
       &:nth-child(5) {
-        // Acciones
+        // Acciones - centrado
         justify-content: center;
+        text-align: center;
       }
     }
 
@@ -2469,45 +2654,380 @@ app-almacenes {
     gap: 12px;
 
     .header-col {
-      // Alineación específica para almacenes
+      // Alineación específica para almacenes - DEBE COINCIDIR CON CONTENIDO
       &.id-col {
-        justify-content: center;
+        justify-content: center; // Centrado
+        text-align: center;
       }
       &.nombre-col {
-        justify-content: flex-start;
+        justify-content: flex-start; // Izquierda
+        text-align: left;
       }
       &.ubicacion-col {
-        justify-content: flex-start;
+        justify-content: flex-start; // Izquierda
+        text-align: left;
       }
       &.acciones-col {
-        justify-content: center;
+        justify-content: center; // Centrado
+        text-align: center;
       }
     }
   }
 
-  .data-table {
-    .table-cell {
-      // Grid y alineación para filas de datos
+  .data-table .mat-mdc-row {
+    display: grid;
+    grid-template-columns: 1fr 2.5fr 2fr 1fr !important;
+    gap: 12px;
+    align-items: center;
+
+    .mat-mdc-cell {
+      // Alineación específica para almacenes - DEBE COINCIDIR CON HEADERS
       &:nth-child(1) {
-        justify-self: center;
-      } // ID - centrado
+        // ID - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
       &:nth-child(2) {
-        justify-self: start;
-      } // Nombre - izquierda
+        // Nombre - izquierda
+        justify-content: flex-start;
+        text-align: left;
+      }
+
       &:nth-child(3) {
-        justify-self: start;
-      } // Ubicación - izquierda
+        // Ubicación - izquierda
+        justify-content: flex-start;
+        text-align: left;
+      }
+
       &:nth-child(4) {
-        justify-self: center;
-      } // Acciones - centrado
+        // Acciones - centrado
+        justify-content: center;
+        text-align: center;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// CLASES - GRID ESPECÍFICO
+// ============================================================================
+
+/* Grid específico para clases: codigo, familia, sub_familia, acciones */
+app-clases {
+  // En móviles, ajustar ancho mínimo específico para clases
+  @media (max-width: 480px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 650px !important; // Ancho mínimo para clases (4 columnas)
+      }
+    }
+  }
+
+  @media (max-width: 320px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container,
+      .data-table,
+      .mat-mdc-table {
+        min-width: 650px !important;
+      }
+    }
+  }
+
+  .column-headers .header-row {
+    grid-template-columns: 1fr 2fr 1.5fr 1fr !important;
+    gap: 12px;
+
+    .header-col {
+      // Alineación específica para clases - DEBE COINCIDIR CON CONTENIDO
+      &.codigo-col {
+        justify-content: center; // Centrado como badges
+        text-align: center;
+      }
+      &.familia-col {
+        justify-content: flex-start; // Izquierda
+        text-align: left;
+      }
+      &.subfamilia-col {
+        justify-content: flex-start; // Izquierda
+        text-align: left;
+      }
+      &.acciones-col {
+        justify-content: center; // Centrado
+        text-align: center;
+      }
     }
 
-    .mat-mdc-row {
-      display: grid;
-      grid-template-columns: 1fr 2.5fr 2fr 1fr !important;
-      gap: 12px;
-      align-items: center;
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 0.9fr 1.9fr 1.4fr 0.9fr !important;
+      gap: 10px;
     }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 1.8fr 1.3fr 0.8fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 1.7fr 1.2fr 0.7fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      grid-template-columns: 0.6fr 1.6fr 1.1fr 0.6fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para pantallas muy pequeñas
+    @media (max-width: 360px) {
+      grid-template-columns: 0.5fr 1.5fr 1fr 0.5fr !important;
+      gap: 4px;
+    }
+  }
+
+  .data-table .mat-mdc-row {
+    grid-template-columns: 1fr 2fr 1.5fr 1fr !important;
+    gap: 12px;
+
+    .mat-mdc-cell {
+      // Alineación específica para clases - DEBE COINCIDIR CON HEADERS
+      &:nth-child(1) {
+        // Código (badge) - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(2) {
+        // Familia - izquierda
+        justify-content: flex-start;
+        text-align: left;
+      }
+
+      &:nth-child(3) {
+        // Subfamilia - izquierda
+        justify-content: flex-start;
+        text-align: left;
+      }
+
+      &:nth-child(4) {
+        // Acciones - centrado
+        justify-content: center;
+        text-align: center;
+      }
+    }
+
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 0.9fr 1.9fr 1.4fr 0.9fr !important;
+      gap: 10px;
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 1.8fr 1.3fr 0.8fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 1.7fr 1.2fr 0.7fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      grid-template-columns: 0.6fr 1.6fr 1.1fr 0.6fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para pantallas muy pequeñas
+    @media (max-width: 360px) {
+      grid-template-columns: 0.5fr 1.5fr 1fr 0.5fr !important;
+      gap: 4px;
+    }
+  }
+}
+
+// ======================================================
+// CONFIGURACIÓN ESPECÍFICA PARA UNIDADES
+// ======================================================
+.page-container:has(.unidad-cell) {
+  // Ancho mínimo para 3 columnas: código + descripción + acciones
+  @media (max-width: 768px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 500px !important; // Ancho mínimo para unidades (3 columnas)
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 500px !important; // Ancho mínimo para unidades (3 columnas)
+      }
+    }
+  }
+
+  @media (max-width: 320px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container,
+      .data-table,
+      .mat-mdc-table {
+        min-width: 500px !important;
+      }
+    }
+  }
+
+  .column-headers .header-row {
+    grid-template-columns: 1fr 2.5fr 1fr !important;
+    gap: 12px;
+
+    .header-cell {
+      // Alineación específica para unidades - DEBE COINCIDIR CON CONTENIDO
+      &:nth-child(1) {
+        justify-content: center; // Código - centrado como badge
+        text-align: center;
+      }
+      &:nth-child(2) {
+        justify-content: flex-start; // Descripción - izquierda
+        text-align: left;
+      }
+      &:nth-child(3) {
+        justify-content: center; // Acciones - centrado
+        text-align: center;
+      }
+    }
+
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 0.9fr 2.4fr 0.9fr !important;
+      gap: 10px;
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 2.3fr 0.8fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 2.2fr 0.7fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      grid-template-columns: 0.6fr 2.1fr 0.6fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para pantallas muy pequeñas
+    @media (max-width: 360px) {
+      grid-template-columns: 0.5fr 2fr 0.5fr !important;
+      gap: 4px;
+    }
+  }
+
+  .data-table .mat-mdc-row {
+    grid-template-columns: 1fr 2.5fr 1fr !important;
+    gap: 12px;
+
+    .mat-mdc-cell {
+      // Alineación específica para unidades - DEBE COINCIDIR CON HEADERS
+      &:nth-child(1) {
+        // Código (badge) - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(2) {
+        // Descripción - izquierda
+        justify-content: flex-start;
+        text-align: left;
+      }
+
+      &:nth-child(3) {
+        // Acciones - centrado
+        justify-content: center;
+        text-align: center;
+      }
+    }
+
+    // Responsive design para tablets y laptops pequeñas
+    @media (max-width: 1200px) {
+      grid-template-columns: 0.9fr 2.4fr 0.9fr !important;
+      gap: 10px;
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 2.3fr 0.8fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles grandes
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 2.2fr 0.7fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para móviles pequeños
+    @media (max-width: 480px) {
+      grid-template-columns: 0.6fr 2.1fr 0.6fr !important;
+      gap: 6px;
+    }
+
+    // Responsive design para pantallas muy pequeñas
+    @media (max-width: 360px) {
+      grid-template-columns: 0.5fr 2fr 0.5fr !important;
+      gap: 4px;
+    }
+  }
+}
+
+// ======================================================
+// CONFIGURACIÓN ESPECÍFICA PARA LOTES
+// ======================================================
+.page-container:has(.badge-texfina.badge-primary) {
+  .column-headers .header-row {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 1.5fr 1.2fr 1.2fr 1fr 1fr; // 7 columnas: código(1.5) + insumo(2) + ubicación(1.5) + stock(1.2) + vencimiento(1.2) + estado(1) + acciones(1)
+  }
+
+  .data-table .mat-mdc-row {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 1.5fr 1.2fr 1.2fr 1fr 1fr; // Misma configuración que headers
+  }
+
+  // Columnas específicas para lotes
+  .codigo-col,
+  .insumo-col,
+  .ubicacion-col {
+    text-align: left;
+    justify-content: flex-start;
+  }
+
+  .stock-col,
+  .fecha-col,
+  .estado-col {
+    text-align: center;
+    justify-content: center;
+  }
+
+  .acciones-col {
+    text-align: center;
+    justify-content: center;
   }
 }
 

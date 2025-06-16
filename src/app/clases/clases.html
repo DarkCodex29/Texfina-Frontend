@@ -1,159 +1,263 @@
-<div class="clases-container page-container">
-  <div class="page-header">
-    <h1 class="page-title">Gestión de clases</h1>
-    <div class="action-buttons">
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="abrirNuevaClase()"
-        class="btn-agregar"
-      >
-        <mat-icon>add_circle_outline</mat-icon>
-        Agregar clase
-      </button>
-    </div>
-  </div>
-
-  <!-- Filtros de búsqueda -->
-  <mat-card class="filtros-card">
-    <form [formGroup]="filtrosForm" (ngSubmit)="buscar()" class="filtros-form">
-      <div class="filtros-row">
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Familia</mat-label>
-          <input
-            matInput
-            formControlName="familia"
-            placeholder="Ingresa la familia"
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Subfamilia</mat-label>
-          <input
-            matInput
-            formControlName="sub_familia"
-            placeholder="Ingresa la subfamilia"
-          />
-        </mat-form-field>
-
-        <div class="filtro-buttons">
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            class="btn-buscar"
-          >
-            <mat-icon>search</mat-icon>
-            Buscar
-          </button>
-          <button
-            mat-stroked-button
-            color="accent"
-            type="button"
-            (click)="limpiarFiltros()"
-            class="btn-limpiar"
-          >
-            <mat-icon>clear</mat-icon>
-            Limpiar
-          </button>
-        </div>
-      </div>
-    </form>
-  </mat-card>
-
-  <!-- Tabla de clases -->
+<div class="page-container">
   <div class="page-content">
-    <mat-card class="table-card">
-      <div class="table-container">
-        <table mat-table [dataSource]="clases" class="clases-table" matSort>
-          <!-- Columna Código -->
-          <ng-container matColumnDef="codigo">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header
-              class="th-codigo"
-            >
-              Código
-            </th>
-            <td mat-cell *matCellDef="let clase" class="td-codigo">
-              {{ clase.id_clase }}
-            </td>
-          </ng-container>
+    <!-- Header de la página -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title text-texfina text-primary">Gestión de Clases</h1>
+        <p class="page-subtitle text-texfina text-muted">
+          Administra las clasificaciones y categorías de materiales
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-texfina btn-primary" (click)="abrirNuevaClase()">
+          <mat-icon>add_circle_outline</mat-icon>
+          Agregar Clase
+        </button>
+      </div>
+    </div>
 
-          <!-- Columna Familia -->
-          <ng-container matColumnDef="familia">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header
-              class="th-familia"
-            >
-              Familia
-            </th>
-            <td mat-cell *matCellDef="let clase" class="td-familia">
-              {{ clase.familia }}
-            </td>
-          </ng-container>
+    <!-- Filtros de búsqueda -->
+    <div class="filters-card" [class.expanded]="filtrosExpanded">
+      <div class="filters-header" (click)="toggleFiltros()">
+        <div class="filters-title">
+          <mat-icon>tune</mat-icon>
+          Filtros de Búsqueda
+          <mat-icon class="expand-icon" [class.rotated]="filtrosExpanded"
+            >expand_more</mat-icon
+          >
+        </div>
+        <span class="filter-subtitle" *ngIf="filtrosExpanded"
+          >Los resultados se actualizan automáticamente</span
+        >
+      </div>
 
-          <!-- Columna Subfamilia -->
-          <ng-container matColumnDef="sub_familia">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header
-              class="th-subfamilia"
-            >
-              Subfamilia
-            </th>
-            <td mat-cell *matCellDef="let clase" class="td-subfamilia">
-              {{ clase.sub_familia }}
-            </td>
-          </ng-container>
-
-          <!-- Columna Acciones -->
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef class="th-acciones">
-              Acciones
-            </th>
-            <td mat-cell *matCellDef="let clase" class="td-acciones">
-              <div class="action-buttons">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="verDetalle(clase)"
-                  matTooltip="Ver detalle"
-                  class="btn-detalle"
-                >
-                  <mat-icon>visibility</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="accent"
-                  (click)="editarClase(clase)"
-                  matTooltip="Editar"
-                  class="btn-editar"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
+      <div class="filters-content" *ngIf="filtrosExpanded">
+        <form [formGroup]="filtrosForm" class="filters-form">
+          <div class="filters-grid">
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">tag</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="codigo"
+                  placeholder="Filtrar por código..."
+                  type="text"
+                />
               </div>
-            </td>
-          </ng-container>
+            </div>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">category</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="familia"
+                  placeholder="Filtrar por familia..."
+                  type="text"
+                />
+              </div>
+            </div>
 
-        <!-- Mensaje cuando no hay datos -->
-        <div *ngIf="clases.length === 0" class="no-data">
-          <mat-icon>category</mat-icon>
-          <p>No se encontraron clases</p>
-          <button mat-raised-button color="primary" (click)="abrirNuevaClase()">
-            <mat-icon>add</mat-icon>
-            Agregar primera clase
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">label</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="sub_familia"
+                  placeholder="Filtrar por subfamilia..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-actions">
+              <button
+                class="btn-clear-filters"
+                type="button"
+                (click)="limpiarFiltros()"
+                matTooltip="Limpiar todos los filtros"
+              >
+                Limpiar todos
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tabla de clases -->
+    <div class="table-card">
+      <div class="table-with-headers">
+        <!-- Encabezados de columnas -->
+        <div class="column-headers">
+          <div class="header-row">
+            <div class="header-col codigo-col" (click)="sortData('codigo')">
+              <span>Código</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col familia-col" (click)="sortData('familia')">
+              <span>Familia</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div
+              class="header-col subfamilia-col"
+              (click)="sortData('sub_familia')"
+            >
+              <span>Subfamilia</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col acciones-col">
+              <span>Acciones</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <!-- Estado de error -->
+          <div *ngIf="hasError" class="error-state">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <h3 class="error-title text-texfina text-primary">
+              Error al cargar datos
+            </h3>
+            <p class="error-subtitle text-texfina text-muted">
+              {{ errorMessage }}
+            </p>
+            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
+              <mat-icon>refresh</mat-icon>
+              Reintentar
+            </button>
+          </div>
+
+          <!-- Estado vacío (sin datos) -->
+          <div *ngIf="isEmpty" class="empty-state">
+            <mat-icon class="empty-icon">category</mat-icon>
+            <h3 class="empty-title text-texfina text-primary">
+              No hay clases registradas
+            </h3>
+            <p class="empty-subtitle text-texfina text-muted">
+              Comienza agregando tu primera clase para organizar los materiales
+            </p>
+            <button class="btn-texfina btn-primary" (click)="abrirNuevaClase()">
+              <mat-icon>add</mat-icon>
+              Agregar Primera Clase
+            </button>
+          </div>
+
+          <!-- Estado filtrado vacío -->
+          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
+            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
+            <h3 class="filtered-empty-title text-texfina text-primary">
+              Sin resultados
+            </h3>
+            <p class="filtered-empty-subtitle text-texfina text-muted">
+              No encontramos clases que coincidan con tus filtros
+            </p>
+            <button class="btn-texfina btn-outline" (click)="limpiarFiltros()">
+              <mat-icon>clear_all</mat-icon>
+              Limpiar filtros
+            </button>
+          </div>
+
+          <!-- Tabla siempre visible (con skeleton o datos) -->
+          <table mat-table [dataSource]="dataSource" matSort class="data-table">
+            <!-- Columna Código -->
+            <ng-container matColumnDef="codigo">
+              <td mat-cell *matCellDef="let clase" class="table-cell">
+                <span class="badge-texfina badge-neutral">
+                  {{ clase.id_clase || "-" }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Familia -->
+            <ng-container matColumnDef="familia">
+              <td mat-cell *matCellDef="let clase" class="table-cell">
+                <div class="clase-cell">
+                  <div class="clase-name text-texfina font-medium">
+                    {{ clase.familia || "-" }}
+                  </div>
+                  <div class="clase-type text-texfina text-muted">
+                    Clasificación Principal
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Subfamilia -->
+            <ng-container matColumnDef="sub_familia">
+              <td mat-cell *matCellDef="let clase" class="table-cell">
+                <span class="text-texfina text-secondary">
+                  {{ clase.sub_familia || "-" }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="acciones">
+              <td
+                mat-cell
+                *matCellDef="let clase"
+                class="table-cell actions-cell"
+              >
+                <div class="action-buttons">
+                  <button
+                    class="btn-action btn-view"
+                    (click)="verDetalle(clase)"
+                    matTooltip="Ver detalle"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button
+                    class="btn-action btn-edit"
+                    (click)="editarClase(clase)"
+                    matTooltip="Editar"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+
+          <!-- Skeleton superpuesto mientras carga -->
+          <div *ngIf="isLoading" class="skeleton-overlay">
+            <table class="skeleton-table">
+              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5]">
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                  <div class="skeleton-line skeleton-subtext"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-actions"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <div class="table-footer">
+        <div class="pagination-info">
+          <span class="text-texfina text-muted">Página 1 de 10</span>
+        </div>
+        <div class="pagination-controls">
+          <button class="pagination-button" disabled>
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button class="pagination-button">
+            <mat-icon>chevron_right</mat-icon>
           </button>
         </div>
       </div>
-    </mat-card>
+    </div>
   </div>
 </div>

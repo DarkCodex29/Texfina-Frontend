@@ -190,7 +190,7 @@
               <th mat-header-cell *matHeaderCellDef>Material</th>
               <td mat-cell *matCellDef="let stock">
                 <div class="material-cell">
-                  <div class="material-name text-texfina text-primary">
+                  <div class="material-name text-texfina">
                     {{ stock.nombre }}
                   </div>
                   <div class="material-unit text-texfina text-muted">
@@ -240,7 +240,7 @@
             <ng-container matColumnDef="valor">
               <th mat-header-cell *matHeaderCellDef>Valor Total</th>
               <td mat-cell *matCellDef="let stock">
-                <span class="text-texfina text-primary"
+                <span class="text-texfina"
                   >{{ formatearMoneda(stock.valor_total) }}</span
                 >
               </td>

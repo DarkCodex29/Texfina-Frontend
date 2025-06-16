@@ -21,13 +21,20 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { MaterialService } from '../services/material.service';
 import { Almacen } from '../models/insumo.model';
 import { EditarAlmacenDialogComponent } from './editar-almacen-dialog/editar-almacen-dialog';
 import { DetalleAlmacenDialogComponent } from './detalle-almacen-dialog/detalle-almacen-dialog';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  takeUntil,
+  delay,
+  finalize,
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-almacenes',
@@ -45,6 +52,7 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
     MatTooltipModule,
     MatDialogModule,
     MatSortModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './almacenes.html',
   styleUrls: ['./almacenes.scss'],
@@ -58,6 +66,11 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
   filtrosExpanded: boolean = true;
   private destroy$ = new Subject<void>();
 
+  // Estados de la aplicación
+  isLoading: boolean = false;
+  hasError: boolean = false;
+  errorMessage: string = '';
+
   displayedColumns: string[] = [
     'id_almacen',
     'nombre',
@@ -67,6 +80,20 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get almacenesFiltrados(): Almacen[] {
     return this.dataSource.data;
+  }
+
+  // Estados computados
+  get isEmpty(): boolean {
+    return !this.isLoading && !this.hasError && this.almacenes.length === 0;
+  }
+
+  get isFilteredEmpty(): boolean {
+    return (
+      !this.isLoading &&
+      !this.hasError &&
+      this.almacenes.length > 0 &&
+      this.dataSource.data.length === 0
+    );
   }
 
   constructor(
@@ -104,10 +131,38 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cargarAlmacenes(): void {
-    this.materialService.getAlmacenes().subscribe((almacenes) => {
-      this.almacenes = almacenes;
-      this.dataSource.data = [...almacenes];
-    });
+    this.isLoading = true;
+    this.hasError = false;
+    this.errorMessage = '';
+
+    this.materialService
+      .getAlmacenes()
+      .pipe(
+        delay(800), // Remover en producción - solo para demostrar skeleton
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe({
+        next: (almacenes) => {
+          this.almacenes = almacenes;
+          this.dataSource.data = [...almacenes];
+        },
+        error: (error) => {
+          console.error('Error al cargar almacenes:', error);
+          this.hasError = true;
+          this.errorMessage =
+            error?.message ||
+            'Error al cargar los datos de almacenes. Verifique su conexión e intente nuevamente.';
+          this.almacenes = [];
+          this.dataSource.data = [];
+        },
+      });
+  }
+
+  reintentarCarga(): void {
+    this.cargarAlmacenes();
   }
 
   aplicarFiltros(): void {

@@ -131,14 +131,65 @@
         </div>
 
         <div class="table-container">
+          <!-- Estado de error -->
+          <div *ngIf="hasError" class="error-state">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <h3 class="error-title text-texfina text-primary">
+              Error al cargar datos
+            </h3>
+            <p class="error-subtitle text-texfina text-muted">
+              {{ errorMessage }}
+            </p>
+            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
+              <mat-icon>refresh</mat-icon>
+              Reintentar
+            </button>
+          </div>
+
+          <!-- Estado vacío (sin datos) -->
+          <div *ngIf="isEmpty" class="empty-state">
+            <mat-icon class="empty-icon">business</mat-icon>
+            <h3 class="empty-title text-texfina text-primary">
+              No hay proveedores registrados
+            </h3>
+            <p class="empty-subtitle text-texfina text-muted">
+              Comienza agregando tu primer proveedor para gestionar el
+              directorio
+            </p>
+            <button
+              class="btn-texfina btn-primary"
+              (click)="abrirNuevoProveedor()"
+            >
+              <mat-icon>add</mat-icon>
+              Agregar Primer Proveedor
+            </button>
+          </div>
+
+          <!-- Estado filtrado vacío -->
+          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
+            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
+            <h3 class="filtered-empty-title text-texfina text-primary">
+              No se encontraron resultados
+            </h3>
+            <p class="filtered-empty-subtitle text-texfina text-muted">
+              Intenta ajustar los filtros o limpiar la búsqueda
+            </p>
+            <button
+              class="btn-texfina btn-secondary"
+              (click)="limpiarFiltros()"
+            >
+              <mat-icon>clear</mat-icon>
+              Limpiar Filtros
+            </button>
+          </div>
+
+          <!-- Tabla siempre visible (con skeleton o datos) -->
           <table mat-table [dataSource]="dataSource" matSort class="data-table">
             <!-- Columna Empresa -->
             <ng-container matColumnDef="empresa">
               <td mat-cell *matCellDef="let proveedor" class="table-cell">
                 <div class="proveedor-cell">
-                  <div
-                    class="proveedor-name text-texfina text-primary font-medium"
-                  >
+                  <div class="proveedor-name text-texfina font-medium">
                     {{ proveedor.empresa || "-" }}
                   </div>
                   <div class="proveedor-code text-texfina text-muted">
@@ -201,8 +252,33 @@
               </td>
             </ng-container>
 
+            <!-- Filas de datos reales -->
             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
+
+          <!-- Skeleton superpuesto mientras carga -->
+          <div *ngIf="isLoading" class="skeleton-overlay">
+            <table class="skeleton-table">
+              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5, 6]">
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                  <div class="skeleton-line skeleton-subtext"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-actions"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
 

@@ -21,12 +21,19 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  takeUntil,
+  finalize,
+  delay,
+} from 'rxjs';
 import { MaterialService } from '../services/material.service';
 import { Proveedor } from '../models/insumo.model';
 import { DetalleProveedorDialogComponent } from './detalle-proveedor-dialog/detalle-proveedor-dialog';
 import { EditarProveedorDialogComponent } from './editar-proveedor-dialog/editar-proveedor-dialog';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-proveedores',
@@ -44,6 +51,7 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
     MatCardModule,
     MatTooltipModule,
     MatSortModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './proveedores.html',
   styleUrls: ['./proveedores.scss'],
@@ -57,6 +65,11 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
   filtrosExpanded: boolean = true;
   private destroy$ = new Subject<void>();
 
+  // Estados de carga y error
+  isLoading: boolean = false;
+  hasError: boolean = false;
+  errorMessage: string = '';
+
   displayedColumns: string[] = [
     'empresa',
     'ruc',
@@ -67,6 +80,18 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get proveedoresFiltrados(): Proveedor[] {
     return this.dataSource.data;
+  }
+
+  get isEmpty(): boolean {
+    return !this.isLoading && this.proveedores.length === 0 && !this.hasError;
+  }
+
+  get isFilteredEmpty(): boolean {
+    return (
+      !this.isLoading &&
+      this.dataSource.data.length === 0 &&
+      this.proveedores.length > 0
+    );
   }
 
   constructor(
@@ -105,28 +130,66 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cargarProveedores(): void {
-    this.materialService.getProveedores().subscribe((proveedores) => {
-      this.proveedores = proveedores;
-      this.dataSource.data = [...proveedores];
-    });
+    this.isLoading = true;
+    this.hasError = false;
+    this.errorMessage = '';
+
+    console.log(
+      '🔄 Iniciando carga de proveedores - isLoading:',
+      this.isLoading
+    );
+
+    this.materialService
+      .getProveedores()
+      .pipe(
+        // Delay artificial para demostrar el skeleton (remover en producción)
+        delay(1500),
+        finalize(() => {
+          this.isLoading = false;
+          console.log('✅ Carga completada - isLoading:', this.isLoading);
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (proveedores) => {
+          console.log('🏢 Proveedores cargados:', proveedores.length);
+          this.proveedores = proveedores;
+          this.dataSource.data = [...proveedores];
+        },
+        error: (error) => {
+          console.error('❌ Error al cargar proveedores:', error);
+          this.hasError = true;
+          this.errorMessage =
+            'Error al cargar los proveedores. Por favor, intenta nuevamente.';
+          this.proveedores = [];
+          this.dataSource.data = [];
+        },
+      });
+  }
+
+  reintentarCarga(): void {
+    this.cargarProveedores();
   }
 
   aplicarFiltros(): void {
     const filtros = this.filtrosForm.value;
     let proveedoresFiltrados = [...this.proveedores];
 
+    // Filtro por Empresa
     if (filtros.empresa && filtros.empresa.trim()) {
       proveedoresFiltrados = proveedoresFiltrados.filter((proveedor) =>
         proveedor.empresa?.toLowerCase().includes(filtros.empresa.toLowerCase())
       );
     }
 
+    // Filtro por RUC
     if (filtros.ruc && filtros.ruc.trim()) {
       proveedoresFiltrados = proveedoresFiltrados.filter((proveedor) =>
         proveedor.ruc?.toLowerCase().includes(filtros.ruc.toLowerCase())
       );
     }
 
+    // Filtro por Contacto
     if (filtros.contacto && filtros.contacto.trim()) {
       proveedoresFiltrados = proveedoresFiltrados.filter((proveedor) =>
         proveedor.contacto
@@ -135,6 +198,7 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     }
 
+    // Filtro por Dirección
     if (filtros.direccion && filtros.direccion.trim()) {
       proveedoresFiltrados = proveedoresFiltrados.filter((proveedor) =>
         proveedor.direccion

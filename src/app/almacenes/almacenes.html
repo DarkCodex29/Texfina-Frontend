@@ -115,6 +115,76 @@
         </div>
 
         <div class="table-container">
+          <!-- Estado de error -->
+          <div *ngIf="hasError" class="error-state">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <h3 class="error-title text-texfina text-primary">
+              Error al cargar datos
+            </h3>
+            <p class="error-subtitle text-texfina text-muted">
+              {{ errorMessage }}
+            </p>
+            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
+              <mat-icon>refresh</mat-icon>
+              Reintentar
+            </button>
+          </div>
+
+          <!-- Estado vacío (sin datos) -->
+          <div *ngIf="isEmpty" class="empty-state">
+            <mat-icon class="empty-icon">storage</mat-icon>
+            <h3 class="empty-title text-texfina text-primary">
+              No hay almacenes registrados
+            </h3>
+            <p class="empty-subtitle text-texfina text-muted">
+              Comienza agregando tu primer almacén para gestionar el inventario
+            </p>
+            <button
+              class="btn-texfina btn-primary"
+              (click)="abrirNuevoAlmacen()"
+            >
+              <mat-icon>add</mat-icon>
+              Agregar Primer Almacén
+            </button>
+          </div>
+
+          <!-- Estado filtrado vacío -->
+          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
+            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
+            <h3 class="filtered-empty-title text-texfina text-primary">
+              Sin resultados
+            </h3>
+            <p class="filtered-empty-subtitle text-texfina text-muted">
+              No encontramos almacenes que coincidan con tus filtros
+            </p>
+            <button class="btn-texfina btn-outline" (click)="limpiarFiltros()">
+              <mat-icon>clear_all</mat-icon>
+              Limpiar filtros
+            </button>
+          </div>
+
+          <!-- Skeleton superpuesto mientras carga -->
+          <div *ngIf="isLoading" class="skeleton-overlay">
+            <table class="skeleton-table">
+              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5]">
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                  <div class="skeleton-line skeleton-subtext"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-actions"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Tabla siempre visible (con skeleton o datos) -->
           <table mat-table [dataSource]="dataSource" matSort class="data-table">
             <!-- Columna ID -->
             <ng-container matColumnDef="id_almacen">
@@ -129,9 +199,7 @@
             <ng-container matColumnDef="nombre">
               <td mat-cell *matCellDef="let almacen" class="table-cell">
                 <div class="almacen-cell">
-                  <div
-                    class="almacen-name text-texfina text-primary font-medium"
-                  >
+                  <div class="almacen-name text-texfina font-medium">
                     {{ almacen.nombre || "-" }}
                   </div>
                   <div class="almacen-type text-texfina text-muted">
@@ -181,24 +249,6 @@
 
             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
-
-          <!-- Mensaje cuando no hay datos -->
-          <div *ngIf="dataSource.data.length === 0" class="no-data">
-            <mat-icon class="no-data-icon">storage</mat-icon>
-            <h3 class="no-data-title text-texfina text-primary">
-              No hay almacenes registrados
-            </h3>
-            <p class="no-data-subtitle text-texfina text-muted">
-              Comienza agregando tu primer almacén para gestionar el inventario
-            </p>
-            <button
-              class="btn-texfina btn-primary"
-              (click)="abrirNuevoAlmacen()"
-            >
-              <mat-icon>add</mat-icon>
-              Agregar Primer Almacén
-            </button>
-          </div>
         </div>
       </div>
 
