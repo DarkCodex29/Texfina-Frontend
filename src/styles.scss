@@ -3912,45 +3912,62 @@ app-consumos {
 
 // Configuración para stock - 8 columnas: codigo + material + almacen + clase + stock + estado + valor + acciones
 app-stock {
-  .data-table .mat-mdc-row {
-    display: grid !important;
-    grid-template-columns: 50px 150px 140px 100px 120px 60px 110px 80px; // codigo + material + almacen + clase + stock + estado + valor + acciones
-    gap: 6px;
-    min-height: 64px !important;
-    align-items: center;
-    width: 100%;
-  }
-
+  // Headers personalizados con divs
   .column-headers .header-row {
     display: grid !important;
-    grid-template-columns: 50px 150px 140px 100px 120px 60px 110px 80px; // codigo + material + almacen + clase + stock + estado + valor + acciones
-    gap: 6px;
-    align-items: center;
-    width: 100%;
+    grid-template-columns: 0.8fr 1.8fr 1.2fr 0.9fr 1.3fr 0.7fr 1.1fr 0.8fr !important;
+    gap: 8px !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  // Filas de la tabla Angular Material
+  .data-table .mat-mdc-row {
+    display: grid !important;
+    grid-template-columns: 0.8fr 1.8fr 1.2fr 0.9fr 1.3fr 0.7fr 1.1fr 0.8fr !important;
+    gap: 8px !important;
+    min-height: 64px !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  // Skeleton table que se superpone
+  .skeleton-table .skeleton-row {
+    display: grid !important;
+    grid-template-columns: 0.8fr 1.8fr 1.2fr 0.9fr 1.3fr 0.7fr 1.1fr 0.8fr !important;
+    gap: 8px !important;
+    min-height: 64px !important;
+    align-items: center !important;
+    width: 100% !important;
   }
 
   .table-container {
-    min-width: 810px;
-    overflow-x: auto;
     width: 100%;
+    overflow-x: auto;
+  }
+
+  // Forzar que la tabla use el ancho completo
+  .data-table {
+    width: 100% !important;
   }
 
   // Responsive para tablets
   @media (max-width: 1024px) {
     .data-table .mat-mdc-row,
-    .column-headers .header-row {
-      grid-template-columns: 0.6fr 1.7fr 1.3fr 0.9fr 1.2fr 0.7fr 1.1fr 0.8fr;
-      min-width: 750px;
+    .column-headers .header-row,
+    .skeleton-table .skeleton-row {
+      grid-template-columns: 0.7fr 1.6fr 1.1fr 0.8fr 1.2fr 0.6fr 1fr 0.7fr !important;
+      gap: 6px !important;
     }
   }
 
   // Responsive para móvil
   @media (max-width: 768px) {
     .data-table .mat-mdc-row,
-    .column-headers .header-row {
-      grid-template-columns: 0.5fr 1.6fr 1.2fr 0.8fr 1.1fr 0.6fr 1fr 0.7fr;
-      min-width: 650px;
-      gap: 6px;
+    .column-headers .header-row,
+    .skeleton-table .skeleton-row {
+      grid-template-columns: 0.6fr 1.4fr 1fr 0.7fr 1.1fr 0.5fr 0.9fr 0.6fr !important;
+      gap: 4px !important;
     }
   }
 
