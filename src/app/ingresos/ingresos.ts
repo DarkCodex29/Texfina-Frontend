@@ -1,4 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormsModule,
@@ -6,17 +12,19 @@ import {
   FormBuilder,
   FormGroup,
 } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSortModule } from '@angular/material/sort';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 import { MaterialService } from '../services/material.service';
 import { Ingreso, Insumo, Unidad, Lote } from '../models/insumo.model';
@@ -29,32 +37,53 @@ import { Ingreso, Insumo, Unidad, Lote } from '../models/insumo.model';
     FormsModule,
     ReactiveFormsModule,
     MatTableModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
     MatButtonModule,
     MatIconModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatDialogModule,
+    MatPaginatorModule,
+    MatCardModule,
     MatTooltipModule,
     MatChipsModule,
     MatSortModule,
-    MatDialogModule,
   ],
   templateUrl: './ingresos.html',
   styleUrls: ['./ingresos.scss'],
 })
-export class IngresosComponent implements OnInit {
+export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
+  // ============================================================================
+  // PROPIEDADES DE DATOS
+  // ============================================================================
   ingresos: Ingreso[] = [];
+  ingresosFiltrados: Ingreso[] = [];
   insumos: Insumo[] = [];
   unidades: Unidad[] = [];
   lotes: Lote[] = [];
-  filtrosForm: FormGroup;
+  dataSource = new MatTableDataSource<Ingreso>([]);
 
+  // ============================================================================
+  // PROPIEDADES DE ESTADO
+  // ============================================================================
+  isLoading = false;
+  hasError = false;
+  errorMessage = '';
+  filtrosExpanded = false;
+
+  // ============================================================================
+  // PROPIEDADES DE FILTROS
+  // ============================================================================
+  filtrosForm: FormGroup;
+  private destroy$ = new Subject<void>();
+
+  // ============================================================================
+  // CONFIGURACIÓN DE TABLA
+  // ============================================================================
   displayedColumns: string[] = [
     'fecha',
     'insumo',
     'cantidad',
-    'presentacion',
     'lote',
     'precio_total',
     'numero_remision',
@@ -76,59 +105,177 @@ export class IngresosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.inicializarFiltros();
     this.cargarDatos();
   }
 
+  ngAfterViewInit(): void {
+    // Configuración adicional después de la vista
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // ============================================================================
+  // MÉTODOS DE INICIALIZACIÓN
+  // ============================================================================
+  inicializarFiltros(): void {
+    // Configurar filtros en tiempo real con debounce
+    this.filtrosForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltros();
+      });
+  }
+
   cargarDatos(): void {
+    this.isLoading = true;
+    this.hasError = false;
+
     // Cargar ingresos e insumos en paralelo
-    this.materialService.getIngresos().subscribe((ingresos) => {
-      this.ingresos = ingresos;
+    this.materialService.getIngresos().subscribe({
+      next: (ingresos) => {
+        this.ingresos = ingresos;
+        this.aplicarFiltros();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.hasError = true;
+        this.errorMessage = 'Error al cargar los ingresos';
+        this.isLoading = false;
+        console.error('Error al cargar ingresos:', error);
+      },
     });
 
-    this.materialService.getMateriales().subscribe((insumos: any) => {
-      this.insumos = insumos;
+    this.materialService.getMateriales().subscribe({
+      next: (insumos: any) => {
+        this.insumos = insumos;
+      },
+      error: (error) => console.error('Error al cargar insumos:', error),
     });
 
-    this.materialService.getUnidades().subscribe((unidades) => {
-      this.unidades = unidades;
+    this.materialService.getUnidades().subscribe({
+      next: (unidades) => {
+        this.unidades = unidades;
+      },
+      error: (error) => console.error('Error al cargar unidades:', error),
     });
 
-    this.materialService.getLotes().subscribe((lotes) => {
-      this.lotes = lotes;
+    this.materialService.getLotes().subscribe({
+      next: (lotes) => {
+        this.lotes = lotes;
+      },
+      error: (error) => console.error('Error al cargar lotes:', error),
     });
   }
 
-  buscar(): void {
+  // ============================================================================
+  // MÉTODOS DE FILTROS
+  // ============================================================================
+  toggleFiltros(): void {
+    this.filtrosExpanded = !this.filtrosExpanded;
+  }
+
+  aplicarFiltros(): void {
     const filtros = this.filtrosForm.value;
-    this.materialService.buscarIngresos(filtros).subscribe((ingresos) => {
-      this.ingresos = ingresos;
-    });
+    let ingresosFiltrados = [...this.ingresos];
+
+    // Filtro por Insumo
+    if (filtros.insumo && filtros.insumo.trim()) {
+      ingresosFiltrados = ingresosFiltrados.filter((ingreso) => {
+        const insumoNombre = this.getInsumoNombre(ingreso.id_insumo);
+        return insumoNombre
+          .toLowerCase()
+          .includes(filtros.insumo.toLowerCase());
+      });
+    }
+
+    // Filtro por Número de Remisión
+    if (filtros.numero_remision && filtros.numero_remision.trim()) {
+      ingresosFiltrados = ingresosFiltrados.filter((ingreso) =>
+        ingreso.numero_remision
+          ?.toLowerCase()
+          .includes(filtros.numero_remision.toLowerCase())
+      );
+    }
+
+    // Filtro por Orden de Compra
+    if (filtros.orden_compra && filtros.orden_compra.trim()) {
+      ingresosFiltrados = ingresosFiltrados.filter((ingreso) =>
+        ingreso.orden_compra
+          ?.toLowerCase()
+          .includes(filtros.orden_compra.toLowerCase())
+      );
+    }
+
+    // Filtro por Estado
+    if (filtros.estado && filtros.estado.trim()) {
+      ingresosFiltrados = ingresosFiltrados.filter((ingreso) =>
+        this.getEstadoIngreso(ingreso)
+          .toLowerCase()
+          .includes(filtros.estado.toLowerCase())
+      );
+    }
+
+    this.ingresosFiltrados = ingresosFiltrados;
+    this.dataSource.data = this.ingresosFiltrados;
   }
 
   limpiarFiltros(): void {
     this.filtrosForm.reset();
-    this.cargarDatos();
+    this.aplicarFiltros();
   }
 
-  abrirNuevoIngreso(): void {
-    // TODO: Implementar modal de nuevo ingreso
-    console.log('Abrir modal de nuevo ingreso');
+  // ============================================================================
+  // MÉTODOS DE TABLA
+  // ============================================================================
+  sortData(column: string): void {
+    console.log('Ordenar por:', column);
+    // TODO: Implementar ordenamiento
+  }
+
+  // ============================================================================
+  // MÉTODOS DE ACCIONES
+  // ============================================================================
+  abrirRegistroIngreso(): void {
+    console.log('Abrir registro de ingreso');
+    // TODO: Implementar modal de registro
+  }
+
+  abrirIngresoMasivo(): void {
+    console.log('Abrir ingreso masivo');
+    // TODO: Implementar modal de ingreso masivo
   }
 
   verDetalle(ingreso: Ingreso): void {
-    // TODO: Implementar modal de detalle
     console.log('Ver detalle de ingreso:', ingreso);
+    // TODO: Implementar modal de detalle
   }
 
   editarIngreso(ingreso: Ingreso): void {
-    // TODO: Implementar modal de edición
     console.log('Editar ingreso:', ingreso);
+    // TODO: Implementar modal de edición
   }
 
+  reintentarCarga(): void {
+    this.cargarDatos();
+  }
+
+  // ============================================================================
+  // MÉTODOS UTILITARIOS
+  // ============================================================================
   getInsumoNombre(id_insumo?: number): string {
     if (!id_insumo) return '-';
     const insumo = this.insumos.find((i) => i.id_insumo === id_insumo);
     return insumo ? insumo.nombre : `Insumo #${id_insumo}`;
+  }
+
+  getInsumoCodigoFox(id_insumo?: number): string {
+    if (!id_insumo) return '';
+    const insumo = this.insumos.find((i) => i.id_insumo === id_insumo);
+    return insumo?.id_fox || '';
   }
 
   getUnidadNombre(id_unidad?: string): string {
@@ -140,20 +287,58 @@ export class IngresosComponent implements OnInit {
   getLoteNombre(id_lote?: number): string {
     if (!id_lote) return '-';
     const lote = this.lotes.find((l) => l.id_lote === id_lote);
-    return lote ? lote.lote || `Lote #${id_lote}` : `Lote #${id_lote}`;
+    return lote ? lote.lote || `L-${id_lote}` : `L-${id_lote}`;
   }
 
-  getColorEstado(estado?: string): string {
-    switch (estado?.toUpperCase()) {
-      case 'PROCESADO':
-        return 'success';
-      case 'PENDIENTE':
-        return 'warn';
-      case 'ANULADO':
-        return 'default';
-      default:
-        return 'primary';
+  getEstadoIngreso(ingreso: Ingreso): string {
+    return ingreso.estado || 'PENDIENTE';
+  }
+
+  formatearFecha(fecha?: string): string {
+    if (!fecha) return '-';
+    try {
+      return new Date(fecha).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+    } catch {
+      return '-';
     }
+  }
+
+  formatearCantidad(cantidad?: number): string {
+    return (
+      cantidad?.toLocaleString('es-ES', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }) || '0'
+    );
+  }
+
+  formatearPrecio(precio?: number): string {
+    if (!precio) return 'S/ 0.00';
+    return precio.toLocaleString('es-ES', {
+      style: 'currency',
+      currency: 'PEN',
+      currencyDisplay: 'symbol',
+    });
+  }
+
+  // ============================================================================
+  // PROPIEDADES COMPUTADAS PARA ESTADOS
+  // ============================================================================
+  get isEmpty(): boolean {
+    return !this.isLoading && !this.hasError && this.ingresos.length === 0;
+  }
+
+  get isFilteredEmpty(): boolean {
+    return (
+      !this.isLoading &&
+      !this.hasError &&
+      this.ingresos.length > 0 &&
+      this.ingresosFiltrados.length === 0
+    );
   }
 }
 

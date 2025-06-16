@@ -1,14 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { Subject, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatTableModule } from '@angular/material/table';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
@@ -48,35 +51,47 @@ export interface Clase {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatCardModule,
+    MatTableModule,
+    MatSortModule,
     MatIconModule,
     MatButtonModule,
+    MatTooltipModule,
+    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatTableModule,
-    MatTooltipModule,
     MatChipsModule,
     MatSnackBarModule,
   ],
   templateUrl: './stock.html',
   styleUrls: ['./stock.scss'],
 })
-export class StockComponent implements OnInit {
-  filtrosForm: FormGroup;
+export class StockComponent implements OnInit, AfterViewInit, OnDestroy {
+  // Gestión de estado
+  isLoading = false;
+  hasError = false;
+  errorMessage = '';
+  filtrosExpanded = false;
+
+  // Datos
   stocks: Stock[] = [];
-  stocksFiltrados: Stock[] = [];
   almacenes: Almacen[] = [];
   clases: Clase[] = [];
-
+  dataSource = new MatTableDataSource<Stock>([]);
   displayedColumns: string[] = [
     'codigo',
     'material',
     'almacen',
-    'stock_actual',
+    'clase',
+    'stock',
     'estado',
     'valor',
+    'acciones',
   ];
+
+  // Filtros
+  filtrosForm: FormGroup;
+  private destroy$ = new Subject<void>();
 
   // Estadísticas
   totalItems = 0;
@@ -87,22 +102,73 @@ export class StockComponent implements OnInit {
   constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
     this.filtrosForm = this.fb.group({
       codigo: [''],
-      nombre: [''],
+      material: [''],
       almacen: [''],
       clase: [''],
-      estado_stock: [''],
-      stock_minimo: [''],
-      stock_maximo: [''],
+      estado: [''],
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
+    this.configurarFiltros();
     this.cargarDatos();
-    this.calcularEstadisticas();
   }
 
-  cargarDatos(): void {
-    // Simular datos de almacenes
+  ngAfterViewInit() {
+    // Configuración adicional después de la vista
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // Computed properties
+  get isEmpty(): boolean {
+    return !this.isLoading && !this.hasError && this.stocks.length === 0;
+  }
+
+  get isFilteredEmpty(): boolean {
+    return (
+      !this.isLoading &&
+      !this.hasError &&
+      this.stocks.length > 0 &&
+      this.dataSource.filteredData.length === 0
+    );
+  }
+
+  // Configuración de filtros
+  private configurarFiltros() {
+    this.filtrosForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltros();
+      });
+  }
+
+  // Cargar datos
+  private async cargarDatos() {
+    this.isLoading = true;
+    this.hasError = false;
+
+    try {
+      // Simular carga de datos
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Cargar datos mock
+      this.cargarDatosMock();
+      this.calcularEstadisticas();
+    } catch (error) {
+      this.hasError = true;
+      this.errorMessage = 'Error al cargar los datos de stock';
+      console.error('Error cargando stock:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private cargarDatosMock() {
+    // Datos de almacenes
     this.almacenes = [
       {
         id_almacen: 1,
@@ -121,7 +187,7 @@ export class StockComponent implements OnInit {
       },
     ];
 
-    // Simular datos de clases
+    // Datos de clases
     this.clases = [
       { id_clase: 1, nombre: 'Fibras Naturales' },
       { id_clase: 2, nombre: 'Fibras Sintéticas' },
@@ -130,7 +196,7 @@ export class StockComponent implements OnInit {
       { id_clase: 5, nombre: 'Accesorios' },
     ];
 
-    // Simular datos de stock
+    // Datos de stock
     this.stocks = [
       {
         id_insumo: 1,
@@ -202,14 +268,14 @@ export class StockComponent implements OnInit {
         costo_unitario: 15.8,
         valor_total: 39500.0,
         fecha_ultimo_movimiento: '2024-01-15',
-        estado_stock: 'ALTO',
+        estado_stock: 'NORMAL',
       },
       {
         id_insumo: 5,
         codigo_fox: 'ACC005',
-        nombre: 'Botones Plásticos 4 orif.',
-        id_almacen: 1,
-        almacen: 'Almacén Principal',
+        nombre: 'Botones Plásticos 15mm',
+        id_almacen: 3,
+        almacen: 'Almacén de Tránsito',
         id_clase: 5,
         clase: 'Accesorios',
         id_unidad: 3,
@@ -219,109 +285,54 @@ export class StockComponent implements OnInit {
         stock_maximo: 50000,
         costo_unitario: 0.05,
         valor_total: 750.0,
-        fecha_ultimo_movimiento: '2024-01-11',
-        estado_stock: 'NORMAL',
-      },
-      {
-        id_insumo: 6,
-        codigo_fox: 'LYC006',
-        nombre: 'Lycra Elastane 40D',
-        id_almacen: 3,
-        almacen: 'Almacén de Tránsito',
-        id_clase: 2,
-        clase: 'Fibras Sintéticas',
-        id_unidad: 1,
-        unidad: 'kg',
-        stock_actual: 180,
-        stock_minimo: 200,
-        stock_maximo: 1000,
-        costo_unitario: 45.6,
-        valor_total: 8208.0,
-        fecha_ultimo_movimiento: '2024-01-09',
-        estado_stock: 'BAJO',
+        fecha_ultimo_movimiento: '2024-01-14',
+        estado_stock: 'ALTO',
       },
     ];
 
-    this.stocksFiltrados = [...this.stocks];
+    this.dataSource.data = this.stocks;
   }
 
-  buscar(): void {
+  // Filtros
+  toggleFiltros() {
+    this.filtrosExpanded = !this.filtrosExpanded;
+  }
+
+  aplicarFiltros() {
     const filtros = this.filtrosForm.value;
 
-    this.stocksFiltrados = this.stocks.filter((stock) => {
+    this.dataSource.filterPredicate = (stock: Stock) => {
+      const codigo = (stock.codigo_fox || '').toLowerCase();
+      const material = (stock.nombre || '').toLowerCase();
+      const almacen = (stock.almacen || '').toLowerCase();
+      const clase = (stock.clase || '').toLowerCase();
+      const estado = (stock.estado_stock || '').toLowerCase();
+
       return (
-        (!filtros.codigo ||
-          stock.codigo_fox
-            .toLowerCase()
-            .includes(filtros.codigo.toLowerCase())) &&
-        (!filtros.nombre ||
-          stock.nombre.toLowerCase().includes(filtros.nombre.toLowerCase())) &&
-        (!filtros.almacen || stock.id_almacen.toString() === filtros.almacen) &&
-        (!filtros.clase || stock.id_clase.toString() === filtros.clase) &&
-        (!filtros.estado_stock ||
-          stock.estado_stock === filtros.estado_stock) &&
-        (!filtros.stock_minimo || stock.stock_actual >= filtros.stock_minimo) &&
-        (!filtros.stock_maximo || stock.stock_actual <= filtros.stock_maximo)
+        (!filtros.codigo || codigo.includes(filtros.codigo.toLowerCase())) &&
+        (!filtros.material ||
+          material.includes(filtros.material.toLowerCase())) &&
+        (!filtros.almacen || almacen.includes(filtros.almacen.toLowerCase())) &&
+        (!filtros.clase || clase.includes(filtros.clase.toLowerCase())) &&
+        (!filtros.estado || estado.includes(filtros.estado.toLowerCase()))
       );
-    });
+    };
 
-    this.calcularEstadisticas();
+    this.dataSource.filter = Date.now().toString(); // Trigger filter
   }
 
-  limpiarFiltros(): void {
+  limpiarFiltros() {
     this.filtrosForm.reset();
-    this.stocksFiltrados = [...this.stocks];
-    this.calcularEstadisticas();
+    this.dataSource.filter = '';
   }
 
-  calcularEstadisticas(): void {
-    this.totalItems = this.stocksFiltrados.length;
-    this.valorTotalInventario = this.stocksFiltrados.reduce(
-      (sum, stock) => sum + stock.valor_total,
-      0
-    );
-    this.itemsCriticos = this.stocksFiltrados.filter(
-      (s) => s.estado_stock === 'CRITICO'
-    ).length;
-    this.itemsBajos = this.stocksFiltrados.filter(
-      (s) => s.estado_stock === 'BAJO'
-    ).length;
-  }
-
-  exportarExcel(): void {
-    this.snackBar.open('Exportando a Excel...', 'Cerrar', {
-      duration: 2000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-    });
-
-    setTimeout(() => {
-      this.snackBar.open('Reporte exportado exitosamente', 'Cerrar', {
-        duration: 3000,
-        horizontalPosition: 'end',
-        verticalPosition: 'top',
-        panelClass: ['snackbar-success'],
-      });
-    }, 2000);
-  }
-
-  verMovimientos(stock: Stock): void {
-    this.snackBar.open(
-      `Abriendo historial de movimientos para ${stock.nombre}`,
-      'Cerrar',
-      {
-        duration: 3000,
-        horizontalPosition: 'end',
-        verticalPosition: 'top',
-      }
-    );
-  }
-
+  // Formateo de datos
   formatearCodigo(codigo: string): string {
-    return codigo || 'N/A';
+    return codigo?.toUpperCase() || 'N/A';
   }
 
   formatearMoneda(valor: number): string {
+    if (valor === null || valor === undefined) return 'S/ 0.00';
     return new Intl.NumberFormat('es-PE', {
       style: 'currency',
       currency: 'PEN',
@@ -329,66 +340,66 @@ export class StockComponent implements OnInit {
   }
 
   formatearNumero(valor: number): string {
-    return new Intl.NumberFormat('es-PE').format(valor);
+    if (valor === null || valor === undefined) return '0';
+    return valor.toLocaleString('es-ES', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
   }
 
-  formatearFecha(fecha: string): string {
-    if (!fecha) return 'N/A';
-    return new Date(fecha).toLocaleDateString('es-PE');
+  getEstadoTexto(estado: string): string {
+    const estados: { [key: string]: string } = {
+      CRITICO: 'Crítico',
+      BAJO: 'Bajo',
+      NORMAL: 'Normal',
+      ALTO: 'Alto',
+    };
+    return estados[estado] || estado;
   }
 
-  getColorEstado(estado: string): string {
-    switch (estado) {
-      case 'CRITICO':
-        return 'critico';
-      case 'BAJO':
-        return 'bajo';
-      case 'NORMAL':
-        return 'normal';
-      case 'ALTO':
-        return 'alto';
-      default:
-        return 'normal';
-    }
+  // Estadísticas
+  calcularEstadisticas() {
+    this.totalItems = this.stocks.length;
+    this.valorTotalInventario = this.stocks.reduce(
+      (total, stock) => total + stock.valor_total,
+      0
+    );
+    this.itemsCriticos = this.stocks.filter(
+      (stock) => stock.estado_stock === 'CRITICO'
+    ).length;
+    this.itemsBajos = this.stocks.filter(
+      (stock) => stock.estado_stock === 'BAJO'
+    ).length;
   }
 
-  getNombreAlmacen(id: number): string {
-    const almacen = this.almacenes.find((a) => a.id_almacen === id);
-    return almacen ? almacen.nombre : 'N/A';
+  // Acciones de la tabla
+  sortData(column: string) {
+    // Implementar ordenamiento
+    console.log('Ordenar por:', column);
   }
 
-  getNombreClase(id: number): string {
-    const clase = this.clases.find((c) => c.id_clase === id);
-    return clase ? clase.nombre : 'N/A';
+  verMovimientos(stock: Stock) {
+    console.log('Ver movimientos de stock:', stock);
+    // Implementar navegación o modal de movimientos
   }
 
-  getEstadoStockClass(estado: string): string {
-    switch (estado) {
-      case 'CRITICO':
-        return 'stock-critico';
-      case 'BAJO':
-        return 'stock-bajo';
-      case 'NORMAL':
-        return 'stock-normal';
-      case 'ALTO':
-        return 'stock-alto';
-      default:
-        return 'stock-normal';
-    }
+  ajustarStockItem(stock: Stock) {
+    console.log('Ajustar stock individual:', stock);
+    // Implementar navegación o modal de ajuste
   }
 
-  getEstadoBadgeClass(estado: string): string {
-    switch (estado) {
-      case 'CRITICO':
-        return 'badge-primary';
-      case 'BAJO':
-        return 'badge-warning';
-      case 'NORMAL':
-        return 'badge-success';
-      case 'ALTO':
-        return 'badge-secondary';
-      default:
-        return 'badge-neutral';
-    }
+  // Acciones principales
+  ajustarStock() {
+    console.log('Abrir ajuste de stock general');
+    // Implementar navegación o modal de ajuste general
+  }
+
+  exportarReporte() {
+    console.log('Exportar reporte de stock');
+    // Implementar exportación de reportes
+  }
+
+  reintentarCarga() {
+    this.cargarDatos();
   }
 }

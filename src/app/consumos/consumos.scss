@@ -1,0 +1,29 @@
+// Estilos específicos para la pantalla de consumos
+// Clases específicas únicamente, el layout usa CSS global
+
+.consumo-cell {
+  .insumo-name {
+    margin-bottom: 2px;
+  }
+
+  .insumo-codigo {
+    font-size: 12px;
+  }
+}
+
+.cantidad-cell {
+  .cantidad-valor {
+    margin-bottom: 2px;
+  }
+
+  .cantidad-unidad {
+    font-size: 12px;
+  }
+}
+
+.btn-action {
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

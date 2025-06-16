@@ -3193,6 +3193,165 @@ app-clases {
   }
 }
 
+// ======================================================
+// CONFIGURACIÓN ESPECÍFICA PARA INGRESOS
+// ======================================================
+.page-container:has(.ingreso-cell) {
+  // Ancho mínimo para 8 columnas: fecha + insumo + cantidad + lote + precio + remision + estado + acciones
+  @media (max-width: 768px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 1000px !important; // Ancho mínimo para ingresos (8 columnas)
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 1000px !important; // Ancho mínimo para ingresos (8 columnas)
+      }
+    }
+  }
+
+  @media (max-width: 320px) {
+    .table-with-headers {
+      .column-headers,
+      .table-container {
+        min-width: 1000px !important; // Mantener scroll horizontal en pantallas muy pequeñas
+      }
+    }
+  }
+
+  // Grid específico para ingresos: 8 columnas
+  .column-headers .header-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1.5fr 1fr 1.5fr 1.5fr 1fr 1fr; // fecha + insumo + cantidad + lote + precio + remision + estado + acciones
+    grid-gap: 12px;
+    align-items: center;
+
+    .header-col {
+      // Alineación específica para headers de ingresos
+      &.fecha-col {
+        justify-content: center;
+        text-align: center;
+      }
+      &.insumo-col {
+        justify-content: flex-start;
+        text-align: left;
+      }
+      &.cantidad-col {
+        justify-content: center;
+        text-align: center;
+      }
+      &.lote-col {
+        justify-content: center;
+        text-align: center;
+      }
+      &.precio-col {
+        justify-content: flex-end;
+        text-align: right;
+      }
+      &.remision-col {
+        justify-content: center;
+        text-align: center;
+      }
+      &.estado-col {
+        justify-content: center;
+        text-align: center;
+      }
+      &.acciones-col {
+        justify-content: center;
+        text-align: center;
+      }
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 1.8fr 1.3fr 0.8fr 1.3fr 1.3fr 0.8fr 0.8fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 1.7fr 1.2fr 0.7fr 1.2fr 1.2fr 0.7fr 0.7fr !important;
+      gap: 6px;
+    }
+  }
+
+  .data-table .mat-mdc-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1.5fr 1fr 1.5fr 1.5fr 1fr 1fr; // fecha + insumo + cantidad + lote + precio + remision + estado + acciones
+    grid-gap: 12px;
+    align-items: center;
+
+    .mat-mdc-cell {
+      // Alineación específica para ingresos - DEBE COINCIDIR CON HEADERS
+      &:nth-child(1) {
+        // Fecha - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(2) {
+        // Insumo - izquierda
+        justify-content: flex-start;
+        text-align: left;
+      }
+
+      &:nth-child(3) {
+        // Cantidad - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(4) {
+        // Lote - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(5) {
+        // Precio - derecha
+        justify-content: flex-end;
+        text-align: right;
+      }
+
+      &:nth-child(6) {
+        // Remisión - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(7) {
+        // Estado - centrado
+        justify-content: center;
+        text-align: center;
+      }
+
+      &:nth-child(8) {
+        // Acciones - centrado
+        justify-content: center;
+        text-align: center;
+      }
+    }
+
+    // Responsive design para tablets
+    @media (max-width: 1024px) {
+      grid-template-columns: 0.8fr 1.8fr 1.3fr 0.8fr 1.3fr 1.3fr 0.8fr 0.8fr !important;
+      gap: 8px;
+    }
+
+    // Responsive design para móviles
+    @media (max-width: 768px) {
+      grid-template-columns: 0.7fr 1.7fr 1.2fr 0.7fr 1.2fr 1.2fr 0.7fr 0.7fr !important;
+      gap: 6px;
+    }
+  }
+}
+
 .filter-group {
   position: relative;
   width: 100%;
@@ -3611,6 +3770,277 @@ app-clases {
       width: 80px; // Ancho fijo para botones
       background: linear-gradient(90deg, #fff3e0 25%, #ffcc02 50%, #fff3e0 75%);
       background-size: 200% 100%;
+    }
+  }
+}
+
+// ============================================================================
+// CONFIGURACIÓN ESPECÍFICA PARA CONSUMOS
+// ============================================================================
+
+// Configuración para consumos - 7 columnas: fecha + insumo + area + cantidad + lote + estado + acciones
+app-consumos {
+  .data-table .mat-mdc-row {
+    display: grid !important;
+    grid-template-columns: 1fr 2fr 1fr 1.5fr 1fr 1fr 1fr; // fecha + insumo + area + cantidad + lote + estado + acciones
+    gap: 12px;
+    min-height: 64px !important;
+    align-items: center;
+  }
+
+  .column-headers .header-row {
+    display: grid !important;
+    grid-template-columns: 1fr 2fr 1fr 1.5fr 1fr 1fr 1fr; // fecha + insumo + area + cantidad + lote + estado + acciones
+    gap: 12px;
+    align-items: center;
+    min-height: 48px;
+  }
+
+  // Configuración de alineación para cada columna específica de consumos
+  .header-col,
+  .table-cell {
+    &.fecha-col,
+    &:nth-child(1) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.insumo-col,
+    &:nth-child(2) {
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    &.area-col,
+    &:nth-child(3) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.cantidad-col,
+    &:nth-child(4) {
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    &.lote-col,
+    &:nth-child(5) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.estado-col,
+    &:nth-child(6) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.acciones-col,
+    &:nth-child(7) {
+      justify-content: center;
+      text-align: center;
+    }
+  }
+
+  // Hacer que la tabla tenga scroll horizontal cuando sea necesario
+  .table-container {
+    min-width: 900px; // Ancho mínimo para 7 columnas
+    overflow-x: auto;
+  }
+
+  // Responsive design para tablets
+  @media (max-width: 1024px) {
+    .data-table .mat-mdc-row {
+      grid-template-columns: 0.8fr 1.8fr 0.8fr 1.2fr 0.8fr 0.8fr 0.8fr;
+      gap: 8px;
+      min-height: 60px !important;
+    }
+
+    .column-headers .header-row {
+      grid-template-columns: 0.8fr 1.8fr 0.8fr 1.2fr 0.8fr 0.8fr 0.8fr;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .table-container {
+      min-width: 800px;
+    }
+  }
+
+  // Responsive design para móviles grandes
+  @media (max-width: 768px) {
+    .data-table .mat-mdc-row {
+      grid-template-columns: 0.7fr 1.6fr 0.7fr 1fr 0.7fr 0.7fr 0.7fr;
+      gap: 6px;
+      min-height: 56px !important;
+    }
+
+    .column-headers .header-row {
+      grid-template-columns: 0.7fr 1.6fr 0.7fr 1fr 0.7fr 0.7fr 0.7fr;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .table-container {
+      min-width: 700px;
+    }
+  }
+
+  // Responsive design para móviles pequeños
+  @media (max-width: 480px) {
+    .data-table .mat-mdc-row {
+      grid-template-columns: 0.6fr 1.4fr 0.6fr 0.8fr 0.6fr 0.6fr 0.6fr;
+      gap: 4px;
+      min-height: 52px !important;
+    }
+
+    .column-headers .header-row {
+      grid-template-columns: 0.6fr 1.4fr 0.6fr 0.8fr 0.6fr 0.6fr 0.6fr;
+      gap: 4px;
+      font-size: 11px;
+    }
+
+    .table-container {
+      min-width: 600px;
+    }
+  }
+}
+
+// ============================================================================
+// CONFIGURACIÓN ESPECÍFICA PARA STOCK
+// ============================================================================
+
+// Configuración para stock - 8 columnas: codigo + material + almacen + clase + stock + estado + valor + acciones
+app-stock {
+  .data-table .mat-mdc-row {
+    display: grid !important;
+    grid-template-columns: 50px 150px 140px 100px 120px 60px 110px 80px; // codigo + material + almacen + clase + stock + estado + valor + acciones
+    gap: 6px;
+    min-height: 64px !important;
+    align-items: center;
+    width: 100%;
+  }
+
+  .column-headers .header-row {
+    display: grid !important;
+    grid-template-columns: 50px 150px 140px 100px 120px 60px 110px 80px; // codigo + material + almacen + clase + stock + estado + valor + acciones
+    gap: 6px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .table-container {
+    min-width: 810px;
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  // Responsive para tablets
+  @media (max-width: 1024px) {
+    .data-table .mat-mdc-row,
+    .column-headers .header-row {
+      grid-template-columns: 0.6fr 1.7fr 1.3fr 0.9fr 1.2fr 0.7fr 1.1fr 0.8fr;
+      min-width: 750px;
+    }
+  }
+
+  // Responsive para móvil
+  @media (max-width: 768px) {
+    .data-table .mat-mdc-row,
+    .column-headers .header-row {
+      grid-template-columns: 0.5fr 1.6fr 1.2fr 0.8fr 1.1fr 0.6fr 1fr 0.7fr;
+      min-width: 650px;
+      gap: 6px;
+    }
+  }
+
+  // Alineación específica para cada columna
+  .header-col,
+  .table-cell {
+    display: flex;
+    align-items: center;
+    padding: 12px 8px;
+
+    &.codigo-col,
+    &:nth-child(1) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.material-col,
+    &:nth-child(2) {
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    &.almacen-col,
+    &:nth-child(3) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.clase-col,
+    &:nth-child(4) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.stock-col,
+    &:nth-child(5) {
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    &.estado-col,
+    &:nth-child(6) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.valor-col,
+    &:nth-child(7) {
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    &.acciones-col,
+    &:nth-child(8) {
+      justify-content: center;
+      text-align: center;
+    }
+  }
+
+  // Headers específicos
+  .header-col {
+    font-weight: 600;
+    color: #374151;
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+    height: 48px;
+
+    .sort-icon {
+      margin-left: 4px;
+      font-size: 16px;
+      opacity: 0.6;
+    }
+
+    &:hover {
+      background: #f3f4f6;
+      cursor: pointer;
+
+      .sort-icon {
+        opacity: 1;
+      }
+    }
+  }
+
+  // Celdas de datos
+  .table-cell {
+    min-height: 64px;
+    border-bottom: 1px solid #f3f4f6;
+
+    &:hover {
+      background: #f9fafb;
     }
   }
 }
