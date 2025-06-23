@@ -1,408 +1,535 @@
 <div class="reportes-container page-container">
-  <!-- Header de la página -->
-  <div class="page-header">
-    <h1 class="page-title">Reportes y Analytics</h1>
-    <div class="action-buttons">
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="exportarExcel()"
-        [disabled]="cargandoReporte"
-        class="btn-exportar"
-      >
-        Exportar Excel
-      </button>
-
-      <button
-        mat-raised-button
-        color="accent"
-        (click)="exportarPDF()"
-        [disabled]="cargandoReporte"
-        class="btn-exportar"
-      >
-        Exportar PDF
-      </button>
-
-      <button
-        mat-stroked-button
-        color="primary"
-        (click)="programarReporte()"
-        class="btn-programar"
-      >
-        Programar Reporte
-      </button>
+  <div class="page-content">
+    <!-- Header de la página -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title text-texfina text-primary">
+          Reportes y Analytics
+        </h1>
+        <p class="page-subtitle text-texfina text-muted">
+          Genera reportes detallados y analiza métricas clave del inventario
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          class="btn-texfina btn-success"
+          (click)="exportarExcel()"
+          [disabled]="cargandoReporte"
+        >
+          <mat-icon>file_download</mat-icon>
+          Exportar Excel
+        </button>
+        <button
+          class="btn-texfina btn-secondary"
+          (click)="exportarPDF()"
+          [disabled]="cargandoReporte"
+        >
+          <mat-icon>picture_as_pdf</mat-icon>
+          Exportar PDF
+        </button>
+        <button class="btn-texfina btn-primary" (click)="programarReporte()">
+          <mat-icon>schedule</mat-icon>
+          Programar Reporte
+        </button>
+      </div>
     </div>
-  </div>
 
-  <!-- KPIs Dashboard -->
-  <div class="kpis-section">
-    <h2 class="section-title">Indicadores Clave</h2>
-    <div class="kpis-grid">
-      <mat-card
+    <!-- KPIs Dashboard -->
+    <div class="summary-cards">
+      <div
+        class="card-texfina"
         *ngFor="let kpi of kpis"
-        class="kpi-card"
-        [class]="getColorTendencia(kpi.tendencia)"
+        [ngClass]="getCardClass(kpi.tendencia)"
       >
-        <mat-card-content>
-          <div class="kpi-content">
-            <div class="kpi-header">
-              <div class="kpi-value">{{ kpi.valor }}</div>
-              <div class="kpi-tendencia">
-                <mat-icon>{{ getIconoTendencia(kpi.tendencia) }}</mat-icon>
-                <span *ngIf="kpi.porcentaje">{{ kpi.porcentaje }}%</span>
+        <div class="card-content">
+          <div class="summary-header">
+            <div class="summary-value text-texfina text-primary">
+              {{ kpi.valor }}
+            </div>
+            <div class="summary-trend" [ngClass]="getTrendClass(kpi.tendencia)">
+              <mat-icon>{{ getIconoTendencia(kpi.tendencia) }}</mat-icon>
+              <span *ngIf="kpi.porcentaje">{{ kpi.porcentaje }}%</span>
+            </div>
+          </div>
+          <div class="summary-label text-texfina text-muted">
+            {{ kpi.nombre }}
+          </div>
+          <div class="summary-description text-texfina text-muted">
+            {{ kpi.descripcion }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-card" [class.expanded]="filtrosExpanded">
+      <div class="filters-header" (click)="toggleFiltros()">
+        <div class="filters-title">
+          <mat-icon>tune</mat-icon>
+          Filtros de Búsqueda
+          <mat-icon class="expand-icon" [class.rotated]="filtrosExpanded"
+            >expand_more</mat-icon
+          >
+        </div>
+        <span class="filter-subtitle" *ngIf="filtrosExpanded">
+          Los resultados se actualizan automáticamente
+        </span>
+      </div>
+
+      <div class="filters-content" *ngIf="filtrosExpanded">
+        <form [formGroup]="filtrosForm" class="filters-form">
+          <div class="filters-grid">
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">assessment</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="tipo_reporte_text"
+                  placeholder="Filtrar por tipo reporte..."
+                  type="text"
+                />
               </div>
             </div>
-            <div class="kpi-label">{{ kpi.nombre }}</div>
-            <div class="kpi-descripcion">{{ kpi.descripcion }}</div>
+
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">calendar_today</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="fecha_desde_text"
+                  placeholder="Filtrar por fecha desde..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">event</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="fecha_hasta_text"
+                  placeholder="Filtrar por fecha hasta..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">warehouse</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="almacen"
+                  placeholder="Filtrar por almacén..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <mat-icon class="input-icon">category</mat-icon>
+                <input
+                  class="simple-input"
+                  formControlName="clase"
+                  placeholder="Filtrar por clase..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-actions">
+              <button
+                class="btn-clear-filters"
+                type="button"
+                (click)="limpiarFiltros()"
+                matTooltip="Limpiar todos los filtros"
+              >
+                Limpiar todos
+              </button>
+            </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <!-- Filtros -->
-  <mat-card class="filters-card">
-    <mat-card-header>
-      <mat-card-title>Configuración del Reporte</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="filtrosForm" class="filters-form">
-        <div class="filters-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Tipo de Reporte</mat-label>
-            <mat-select
-              formControlName="tipo_reporte"
-              (selectionChange)="generarReporte()"
-            >
-              <mat-option value="inventario">Reporte de Inventario</mat-option>
-              <mat-option value="movimientos">Movimientos de Stock</mat-option>
-              <mat-option value="rotacion">Análisis de Rotación</mat-option>
-              <mat-option value="valorizado">Inventario Valorizado</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Fecha Desde</mat-label>
-            <input
-              matInput
-              [matDatepicker]="pickerDesde"
-              formControlName="fecha_desde"
-            />
-            <mat-datepicker-toggle
-              matSuffix
-              [for]="pickerDesde"
-            ></mat-datepicker-toggle>
-            <mat-datepicker #pickerDesde></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Fecha Hasta</mat-label>
-            <input
-              matInput
-              [matDatepicker]="pickerHasta"
-              formControlName="fecha_hasta"
-            />
-            <mat-datepicker-toggle
-              matSuffix
-              [for]="pickerHasta"
-            ></mat-datepicker-toggle>
-            <mat-datepicker #pickerHasta></mat-datepicker>
-          </mat-form-field>
+    <!-- Tabla de reportes -->
+    <div class="table-card">
+      <div class="table-with-headers">
+        <!-- Encabezados según tipo de reporte -->
+        <div class="column-headers" *ngIf="currentReportType === 'inventario'">
+          <div class="header-row">
+            <div class="header-col codigo-col" (click)="sortData('codigo')">
+              <span>Código</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col material-col" (click)="sortData('material')">
+              <span>Material</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col almacen-col" (click)="sortData('almacen')">
+              <span>Almacén</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col clase-col" (click)="sortData('clase')">
+              <span>Clase</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col stock-col" (click)="sortData('stock')">
+              <span>Stock Actual</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col valor-col" (click)="sortData('valor')">
+              <span>Valor Total</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col rotacion-col" (click)="sortData('rotacion')">
+              <span>Rotación</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col dias-col" (click)="sortData('dias')">
+              <span>Días Inventario</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+          </div>
         </div>
 
-        <div class="filters-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Almacén</mat-label>
-            <mat-select formControlName="almacen">
-              <mat-option value="">Todos los almacenes</mat-option>
-              <mat-option
-                *ngFor="let almacen of almacenes"
-                [value]="almacen.id.toString()"
-              >
-                {{ almacen.nombre }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+        <div class="column-headers" *ngIf="currentReportType === 'movimientos'">
+          <div class="header-row">
+            <div class="header-col fecha-col" (click)="sortData('fecha')">
+              <span>Fecha</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col tipo-col" (click)="sortData('tipo')">
+              <span>Tipo</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col codigo-col" (click)="sortData('codigo')">
+              <span>Código</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col material-col" (click)="sortData('material')">
+              <span>Material</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col cantidad-col" (click)="sortData('cantidad')">
+              <span>Cantidad</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col almacen-col" (click)="sortData('almacen')">
+              <span>Almacén</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col usuario-col" (click)="sortData('usuario')">
+              <span>Usuario</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+          </div>
+        </div>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Clase</mat-label>
-            <mat-select formControlName="clase">
-              <mat-option value="">Todas las clases</mat-option>
-              <mat-option
-                *ngFor="let clase of clases"
-                [value]="clase.id.toString()"
-              >
-                {{ clase.nombre }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <div class="filter-actions">
-            <button
-              mat-raised-button
-              color="primary"
-              (click)="generarReporte()"
-              [disabled]="cargandoReporte"
-              class="btn-generar"
-            >
-              {{ cargandoReporte ? 'Generando...' : 'Generar Reporte' }}
+        <div class="table-container">
+          <!-- Estado de error -->
+          <div *ngIf="hasError" class="error-state">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <h3 class="error-title text-texfina text-primary">
+              Error al generar reporte
+            </h3>
+            <p class="error-subtitle text-texfina text-muted">
+              {{ errorMessage }}
+            </p>
+            <button class="btn-texfina btn-primary" (click)="aplicarFiltros()">
+              <mat-icon>refresh</mat-icon>
+              Reintentar
             </button>
           </div>
+
+          <!-- Estado vacío -->
+          <div *ngIf="isEmpty" class="empty-state">
+            <mat-icon class="empty-icon">assessment</mat-icon>
+            <h3 class="empty-title text-texfina text-primary">
+              No hay datos para mostrar
+            </h3>
+            <p class="empty-subtitle text-texfina text-muted">
+              No se encontraron datos para los filtros seleccionados
+            </p>
+            <button class="btn-texfina btn-primary" (click)="limpiarFiltros()">
+              <mat-icon>clear</mat-icon>
+              Limpiar Filtros
+            </button>
+          </div>
+
+          <!-- Reporte de Inventario -->
+          <table
+            mat-table
+            [dataSource]="reporteInventarioFiltrado"
+            matSort
+            class="data-table"
+            *ngIf="currentReportType === 'inventario' && !isEmpty && !hasError"
+          >
+            <!-- Columna Código -->
+            <ng-container matColumnDef="codigo">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span class="badge-texfina badge-primary"
+                  >{{ item.codigo_fox }}</span
+                >
+              </td>
+            </ng-container>
+
+            <!-- Columna Material -->
+            <ng-container matColumnDef="material">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <div class="material-info">
+                  <div class="material-name text-texfina font-medium">
+                    {{ item.nombre }}
+                  </div>
+                  <div class="material-detail text-texfina text-muted">
+                    ID: {{ item.id_insumo }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Almacén -->
+            <ng-container matColumnDef="almacen">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span class="badge-texfina badge-secondary"
+                  >{{ item.almacen }}</span
+                >
+              </td>
+            </ng-container>
+
+            <!-- Columna Clase -->
+            <ng-container matColumnDef="clase">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span class="badge-texfina badge-neutral"
+                  >{{ item.clase }}</span
+                >
+              </td>
+            </ng-container>
+
+            <!-- Columna Stock -->
+            <ng-container matColumnDef="stock">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <div class="stock-info">
+                  <div class="stock-value text-texfina font-semibold">
+                    {{ formatearNumero(item.stock_actual) }}
+                  </div>
+                  <div class="stock-unit text-texfina text-muted">unidades</div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Valor -->
+            <ng-container matColumnDef="valor">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <div class="valor-info">
+                  <div class="valor-total text-texfina font-semibold">
+                    {{ formatearMoneda(item.valor_total) }}
+                  </div>
+                  <div class="valor-unit text-texfina text-muted">
+                    Unit: {{ formatearMoneda(item.costo_unitario) }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Rotación -->
+            <ng-container matColumnDef="rotacion">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span
+                  class="badge-texfina"
+                  [ngClass]="getRotacionClass(item.rotacion)"
+                >
+                  {{ item.rotacion }}x
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Días -->
+            <ng-container matColumnDef="dias">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span class="text-texfina font-medium"
+                  >{{ item.dias_inventario }} días</span
+                >
+              </td>
+            </ng-container>
+
+            <!-- Filas de datos -->
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumnsInventario"
+            ></tr>
+          </table>
+
+          <!-- Reporte de Movimientos -->
+          <table
+            mat-table
+            [dataSource]="reporteMovimientosFiltrado"
+            matSort
+            class="data-table"
+            *ngIf="currentReportType === 'movimientos' && !isEmpty && !hasError"
+          >
+            <!-- Columna Fecha -->
+            <ng-container matColumnDef="fecha">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span class="text-texfina font-medium"
+                  >{{ formatearFecha(item.fecha) }}</span
+                >
+              </td>
+            </ng-container>
+
+            <!-- Columna Tipo -->
+            <ng-container matColumnDef="tipo">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span
+                  class="badge-texfina"
+                  [ngClass]="getTipoMovimientoClass(item.tipo_movimiento)"
+                >
+                  {{ item.tipo_movimiento }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Código -->
+            <ng-container matColumnDef="codigo">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span class="badge-texfina badge-primary"
+                  >{{ item.codigo_fox }}</span
+                >
+              </td>
+            </ng-container>
+
+            <!-- Columna Material -->
+            <ng-container matColumnDef="material">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span class="text-texfina font-medium"
+                  >{{ item.material }}</span
+                >
+              </td>
+            </ng-container>
+
+            <!-- Columna Cantidad -->
+            <ng-container matColumnDef="cantidad">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span
+                  class="text-texfina font-semibold"
+                  [ngClass]="getCantidadClass(item.tipo_movimiento)"
+                >
+                  {{ formatearCantidad(item.cantidad) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Almacén -->
+            <ng-container matColumnDef="almacen">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span class="badge-texfina badge-secondary"
+                  >{{ item.almacen }}</span
+                >
+              </td>
+            </ng-container>
+
+            <!-- Columna Usuario -->
+            <ng-container matColumnDef="usuario">
+              <td mat-cell *matCellDef="let item" class="table-cell">
+                <span class="text-texfina">{{ item.usuario }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Filas de datos -->
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumnsMovimientos"
+            ></tr>
+          </table>
+
+          <!-- Skeleton superpuesto mientras carga -->
+          <div *ngIf="cargandoReporte" class="skeleton-overlay">
+            <table
+              class="skeleton-table"
+              *ngIf="filtrosForm.value.tipo_reporte === 'inventario'"
+            >
+              <tr class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6]">
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                  <div class="skeleton-line skeleton-subtext"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                  <div class="skeleton-line skeleton-subtext"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-price"></div>
+                  <div class="skeleton-line skeleton-subtext"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+              </tr>
+            </table>
+
+            <table
+              class="skeleton-table"
+              *ngIf="filtrosForm.value.tipo_reporte === 'movimientos'"
+            >
+              <tr class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6]">
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      </div>
 
-  <!-- Barra de progreso -->
-  <mat-progress-bar
-    *ngIf="cargandoReporte"
-    mode="indeterminate"
-    class="progress-bar"
-  ></mat-progress-bar>
-
-  <!-- Contenido de reportes por tabs -->
-  <div class="page-content">
-    <mat-tab-group class="reportes-tabs" *ngIf="!cargandoReporte">
-      <!-- Tab Reporte de Inventario -->
-      <mat-tab
-        label="Inventario Valorizado"
-        *ngIf="filtrosForm.value.tipo_reporte === 'inventario'"
-      >
-        <mat-card class="table-card">
-          <mat-card-header>
-            <mat-card-title>Reporte de Inventario Valorizado</mat-card-title>
-            <mat-card-subtitle>
-              Mostrando {{ reporteInventario.length }} items
-            </mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="table-container">
-              <table
-                mat-table
-                [dataSource]="reporteInventario"
-                class="reportes-table"
-              >
-                <!-- Columna Código -->
-                <ng-container matColumnDef="codigo">
-                  <th mat-header-cell *matHeaderCellDef>Código Fox</th>
-                  <td mat-cell *matCellDef="let item">
-                    <span class="codigo-cell">{{ item.codigo_fox }}</span>
-                  </td>
-                </ng-container>
-
-                <!-- Columna Material -->
-                <ng-container matColumnDef="material">
-                  <th mat-header-cell *matHeaderCellDef>Material</th>
-                  <td mat-cell *matCellDef="let item">
-                    <div class="material-cell">
-                      <div class="material-name">{{ item.nombre }}</div>
-                    </div>
-                  </td>
-                </ng-container>
-
-                <!-- Columna Almacén -->
-                <ng-container matColumnDef="almacen">
-                  <th mat-header-cell *matHeaderCellDef>Almacén</th>
-                  <td mat-cell *matCellDef="let item">
-                    <span class="almacen-cell">{{ item.almacen }}</span>
-                  </td>
-                </ng-container>
-
-                <!-- Columna Clase -->
-                <ng-container matColumnDef="clase">
-                  <th mat-header-cell *matHeaderCellDef>Clase</th>
-                  <td mat-cell *matCellDef="let item">
-                    <span class="clase-cell">{{ item.clase }}</span>
-                  </td>
-                </ng-container>
-
-                <!-- Columna Stock -->
-                <ng-container matColumnDef="stock_actual">
-                  <th mat-header-cell *matHeaderCellDef>Stock Actual</th>
-                  <td mat-cell *matCellDef="let item">
-                    <span class="stock-cell"
-                      >{{ formatearNumero(item.stock_actual) }}</span
-                    >
-                  </td>
-                </ng-container>
-
-                <!-- Columna Valor Total -->
-                <ng-container matColumnDef="valor_total">
-                  <th mat-header-cell *matHeaderCellDef>Valor Total</th>
-                  <td mat-cell *matCellDef="let item">
-                    <span class="valor-cell"
-                      >{{ formatearMoneda(item.valor_total) }}</span
-                    >
-                  </td>
-                </ng-container>
-
-                <!-- Columna Rotación -->
-                <ng-container matColumnDef="rotacion">
-                  <th mat-header-cell *matHeaderCellDef>Rotación</th>
-                  <td mat-cell *matCellDef="let item">
-                    <span
-                      class="rotacion-cell"
-                      [class]="getColorRotacion(item.rotacion)"
-                    >
-                      {{ item.rotacion }}x
-                    </span>
-                  </td>
-                </ng-container>
-
-                <!-- Columna Días Inventario -->
-                <ng-container matColumnDef="dias_inventario">
-                  <th mat-header-cell *matHeaderCellDef>Días Inventario</th>
-                  <td mat-cell *matCellDef="let item">
-                    <span class="dias-cell"
-                      >{{ item.dias_inventario }} días</span
-                    >
-                  </td>
-                </ng-container>
-
-                <tr
-                  mat-header-row
-                  *matHeaderRowDef="displayedColumnsInventario"
-                ></tr>
-                <tr
-                  mat-row
-                  *matRowDef="let row; columns: displayedColumnsInventario;"
-                ></tr>
-              </table>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </mat-tab>
-
-      <!-- Tab Movimientos -->
-      <mat-tab
-        label="Movimientos de Stock"
-        *ngIf="filtrosForm.value.tipo_reporte === 'movimientos'"
-      >
-        <mat-card class="table-card">
-          <mat-card-header>
-            <mat-card-title>Movimientos de Stock</mat-card-title>
-            <mat-card-subtitle>
-              Mostrando {{ reporteMovimientos.length }} movimientos
-            </mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="table-container">
-              <table
-                mat-table
-                [dataSource]="reporteMovimientos"
-                class="reportes-table"
-              >
-                <!-- Columna Fecha -->
-                <ng-container matColumnDef="fecha">
-                  <th mat-header-cell *matHeaderCellDef>Fecha</th>
-                  <td mat-cell *matCellDef="let mov">
-                    <span class="fecha-cell"
-                      >{{ formatearFecha(mov.fecha) }}</span
-                    >
-                  </td>
-                </ng-container>
-
-                <!-- Columna Tipo -->
-                <ng-container matColumnDef="tipo">
-                  <th mat-header-cell *matHeaderCellDef>Tipo</th>
-                  <td mat-cell *matCellDef="let mov">
-                    <span
-                      class="tipo-cell"
-                      [class]="getColorMovimiento(mov.tipo_movimiento)"
-                    >
-                      {{ mov.tipo_movimiento }}
-                    </span>
-                  </td>
-                </ng-container>
-
-                <!-- Columna Código -->
-                <ng-container matColumnDef="codigo">
-                  <th mat-header-cell *matHeaderCellDef>Código</th>
-                  <td mat-cell *matCellDef="let mov">
-                    <span class="codigo-cell">{{ mov.codigo_fox }}</span>
-                  </td>
-                </ng-container>
-
-                <!-- Columna Material -->
-                <ng-container matColumnDef="material">
-                  <th mat-header-cell *matHeaderCellDef>Material</th>
-                  <td mat-cell *matCellDef="let mov">
-                    <span class="material-cell">{{ mov.material }}</span>
-                  </td>
-                </ng-container>
-
-                <!-- Columna Cantidad -->
-                <ng-container matColumnDef="cantidad">
-                  <th mat-header-cell *matHeaderCellDef>Cantidad</th>
-                  <td mat-cell *matCellDef="let mov">
-                    <span
-                      class="cantidad-cell"
-                      [class]="mov.cantidad >= 0 ? 'positiva' : 'negativa'"
-                    >
-                      {{ formatearCantidad(mov.cantidad) }}
-                    </span>
-                  </td>
-                </ng-container>
-
-                <!-- Columna Almacén -->
-                <ng-container matColumnDef="almacen">
-                  <th mat-header-cell *matHeaderCellDef>Almacén</th>
-                  <td mat-cell *matCellDef="let mov">
-                    <span class="almacen-cell">{{ mov.almacen }}</span>
-                  </td>
-                </ng-container>
-
-                <!-- Columna Usuario -->
-                <ng-container matColumnDef="usuario">
-                  <th mat-header-cell *matHeaderCellDef>Usuario</th>
-                  <td mat-cell *matCellDef="let mov">
-                    <span class="usuario-cell">{{ mov.usuario }}</span>
-                  </td>
-                </ng-container>
-
-                <tr
-                  mat-header-row
-                  *matHeaderRowDef="displayedColumnsMovimientos"
-                ></tr>
-                <tr
-                  mat-row
-                  *matRowDef="let row; columns: displayedColumnsMovimientos;"
-                ></tr>
-              </table>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </mat-tab>
-
-      <!-- Tabs adicionales para otros tipos de reportes -->
-      <mat-tab
-        label="En Desarrollo"
-        *ngIf="filtrosForm.value.tipo_reporte === 'rotacion'"
-      >
-        <div class="coming-soon">
-          <h3>Análisis de Rotación</h3>
-          <p>Este reporte estará disponible próximamente</p>
+      <!-- Paginación -->
+      <div class="table-footer">
+        <div class="pagination-info">
+          <span class="text-texfina text-muted">
+            Mostrando {{ getCurrentPageItems() }} de {{ getTotalItems() }}
+            registros
+          </span>
         </div>
-      </mat-tab>
-
-      <mat-tab
-        label="En Desarrollo"
-        *ngIf="filtrosForm.value.tipo_reporte === 'valorizado'"
-      >
-        <div class="coming-soon">
-          <h3>Inventario Valorizado Avanzado</h3>
-          <p>Este reporte estará disponible próximamente</p>
+        <div class="pagination-controls">
+          <button class="pagination-button" [disabled]="isFirstPage()">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button class="pagination-button" [disabled]="isLastPage()">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
         </div>
-      </mat-tab>
-    </mat-tab-group>
-  </div>
-
-  <!-- Mensaje cuando no hay datos -->
-  <div
-    *ngIf="!cargandoReporte && reporteInventario.length === 0 && reporteMovimientos.length === 0"
-    class="no-data"
-  >
-    <h3>No se encontraron datos para el reporte</h3>
-    <p>Ajuste los filtros y genere un nuevo reporte</p>
+      </div>
+    </div>
   </div>
 </div>

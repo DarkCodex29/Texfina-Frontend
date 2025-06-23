@@ -4061,3 +4061,300 @@ app-stock {
     }
   }
 }
+
+// ============================================================================
+// CONFIGURACIÓN ESPECÍFICA PARA REPORTES
+// ============================================================================
+
+// Configuración para reportes de inventario - 8 columnas: codigo + material + almacen + clase + stock + valor + rotacion + dias
+app-reportes {
+  // REPORTE DE INVENTARIO
+  .table-with-headers .column-headers .header-row:has(.codigo-col) {
+    grid-template-columns: 90px 280px 160px 140px 150px 160px 110px 140px;
+  }
+
+  .table-container .data-table:has(.material-info) {
+    grid-template-columns: 90px 280px 160px 140px 150px 160px 110px 140px;
+  }
+
+  .skeleton-table:has(.material-info) .skeleton-row {
+    grid-template-columns: 90px 280px 160px 140px 150px 160px 110px 140px;
+  }
+
+  // REPORTE DE MOVIMIENTOS - 7 columnas: fecha + tipo + codigo + material + cantidad + almacen + usuario
+  .table-with-headers .column-headers .header-row:has(.fecha-col) {
+    grid-template-columns: 110px 100px 90px 240px 120px 160px 140px;
+  }
+
+  .table-container .data-table:has(.text-texfina.font-medium) {
+    grid-template-columns: 110px 100px 90px 240px 120px 160px 140px;
+  }
+
+  .skeleton-table:has(.text-texfina) .skeleton-row {
+    grid-template-columns: 110px 100px 90px 240px 120px 160px 140px;
+  }
+
+  // Responsive para tablets
+  @media (max-width: 1199px) and (min-width: 1000px) {
+    .table-with-headers .column-headers .header-row:has(.codigo-col),
+    .table-container .data-table:has(.material-info),
+    .skeleton-table:has(.material-info) .skeleton-row {
+      grid-template-columns: 80px 240px 140px 120px 130px 140px 100px 120px;
+    }
+
+    .table-with-headers .column-headers .header-row:has(.fecha-col),
+    .table-container .data-table:has(.text-texfina.font-medium),
+    .skeleton-table:has(.text-texfina) .skeleton-row {
+      grid-template-columns: 100px 90px 80px 200px 100px 140px 120px;
+    }
+  }
+
+  // Responsive para móvil
+  @media (max-width: 999px) {
+    .table-with-headers .column-headers .header-row:has(.codigo-col),
+    .table-container .data-table:has(.material-info),
+    .skeleton-table:has(.material-info) .skeleton-row {
+      grid-template-columns: 70px 200px 120px 100px 110px 120px 90px 100px;
+    }
+
+    .table-with-headers .column-headers .header-row:has(.fecha-col),
+    .table-container .data-table:has(.text-texfina.font-medium),
+    .skeleton-table:has(.text-texfina) .skeleton-row {
+      grid-template-columns: 90px 80px 70px 180px 90px 120px 100px;
+    }
+  }
+
+  // Alineación específica para reportes
+  .header-col,
+  .table-cell {
+    display: flex;
+    align-items: center;
+    padding: 12px 8px;
+
+    // Para reportes de inventario
+    &.codigo-col,
+    &:nth-child(1) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.material-col,
+    &:nth-child(2) {
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    &.almacen-col,
+    &:nth-child(3) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.clase-col,
+    &:nth-child(4) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.stock-col,
+    &:nth-child(5) {
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    &.valor-col,
+    &:nth-child(6) {
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    &.rotacion-col,
+    &:nth-child(7) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.dias-col,
+    &:nth-child(8) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    // Para reportes de movimientos
+    &.fecha-col {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.tipo-col {
+      justify-content: center;
+      text-align: center;
+    }
+
+    &.cantidad-col {
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    &.usuario-col {
+      justify-content: center;
+      text-align: center;
+    }
+  }
+
+  // Headers con hover effects
+  .header-col {
+    font-weight: 600;
+    color: #374151;
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+    height: 48px;
+
+    .sort-icon {
+      margin-left: 4px;
+      font-size: 16px;
+      opacity: 0.6;
+    }
+
+    &:hover {
+      background: #f3f4f6;
+      cursor: pointer;
+
+      .sort-icon {
+        opacity: 1;
+      }
+    }
+  }
+
+  // Celdas con hover
+  .table-cell {
+    min-height: 64px;
+    border-bottom: 1px solid #f3f4f6;
+
+    &:hover {
+      background: #f9fafb;
+    }
+  }
+}
+
+// ============================================================================
+// SNACKBARS PERSONALIZADOS DEL SISTEMA TEXFINA
+// ============================================================================
+
+// Snackbars con colores empresariales de Texfina
+.texfina-snack-success {
+  background: var(--texfina-success) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-radius: var(--texfina-radius-md) !important;
+  box-shadow: var(--texfina-shadow-lg) !important;
+
+  .mat-mdc-snack-bar-action {
+    color: white !important;
+    font-weight: 700 !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+}
+
+.texfina-snack-error {
+  background: var(--texfina-primary) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-radius: var(--texfina-radius-md) !important;
+  box-shadow: var(--texfina-shadow-lg) !important;
+
+  .mat-mdc-snack-bar-action {
+    color: white !important;
+    font-weight: 700 !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+}
+
+.texfina-snack-warning {
+  background: var(--texfina-warning) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-radius: var(--texfina-radius-md) !important;
+  box-shadow: var(--texfina-shadow-lg) !important;
+
+  .mat-mdc-snack-bar-action {
+    color: white !important;
+    font-weight: 700 !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+}
+
+.texfina-snack-info {
+  background: var(--texfina-secondary) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-radius: var(--texfina-radius-md) !important;
+  box-shadow: var(--texfina-shadow-lg) !important;
+
+  .mat-mdc-snack-bar-action {
+    color: white !important;
+    font-weight: 700 !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+}
+
+.texfina-snack-loading {
+  background: var(--texfina-neutral) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-radius: var(--texfina-radius-md) !important;
+  box-shadow: var(--texfina-shadow-lg) !important;
+
+  .mat-mdc-snack-bar-action {
+    color: white !important;
+    font-weight: 700 !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+}
+
+// ============================================================================
+// ESTADOS DE FORMULARIO DE LOGIN
+// ============================================================================
+
+.texfina-form-error {
+  .texfina-access-card {
+    border: 2px solid var(--texfina-primary) !important;
+    box-shadow: 0 0 20px rgba(189, 33, 38, 0.2) !important;
+
+    .texfina-card-header {
+      background: linear-gradient(
+        135deg,
+        var(--texfina-primary) 0%,
+        var(--texfina-primary-dark) 100%
+      ) !important;
+    }
+  }
+}
+
+.texfina-form-loading {
+  .texfina-access-card {
+    opacity: 0.9;
+    filter: brightness(0.95);
+  }
+}
+
+.texfina-form-normal {
+  .texfina-access-card {
+    transition: all 0.3s ease;
+  }
+}

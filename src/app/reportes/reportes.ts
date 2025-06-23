@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -14,6 +14,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSortModule } from '@angular/material/sort';
+import { Subject, takeUntil, debounceTime } from 'rxjs';
 
 export interface ReporteInventario {
   id_insumo: number;
@@ -67,16 +69,29 @@ export interface KPI {
     MatTooltipModule,
     MatProgressBarModule,
     MatSnackBarModule,
+    MatSortModule,
   ],
   templateUrl: './reportes.html',
   styleUrls: ['./reportes.scss'],
 })
-export class ReportesComponent implements OnInit {
+export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  // Estado del componente
   filtrosForm: FormGroup;
+  filtrosExpanded = true;
+  cargandoReporte = false;
+  hasError = false;
+  errorMessage = '';
+
+  // Datos
   reporteInventario: ReporteInventario[] = [];
   reporteMovimientos: ReporteMovimiento[] = [];
+  reporteInventarioFiltrado: ReporteInventario[] = [];
+  reporteMovimientosFiltrado: ReporteMovimiento[] = [];
   kpis: KPI[] = [];
 
+  // Catálogos
   almacenes = [
     { id: 1, nombre: 'Almacén Principal' },
     { id: 2, nombre: 'Almacén Secundario' },
@@ -91,15 +106,16 @@ export class ReportesComponent implements OnInit {
     { id: 5, nombre: 'Accesorios' },
   ];
 
+  // Configuración de tablas
   displayedColumnsInventario: string[] = [
     'codigo',
     'material',
     'almacen',
     'clase',
-    'stock_actual',
-    'valor_total',
+    'stock',
+    'valor',
     'rotacion',
-    'dias_inventario',
+    'dias',
   ];
 
   displayedColumnsMovimientos: string[] = [
@@ -112,23 +128,109 @@ export class ReportesComponent implements OnInit {
     'usuario',
   ];
 
-  // Control de carga
-  cargandoReporte = false;
-
   constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
     this.filtrosForm = this.fb.group({
-      tipo_reporte: ['inventario'],
-      fecha_desde: [''],
-      fecha_hasta: [''],
+      tipo_reporte_text: [''],
+      fecha_desde_text: [''],
+      fecha_hasta_text: [''],
       almacen: [''],
       clase: [''],
-      incluir_stock_cero: [false],
     });
   }
 
   ngOnInit(): void {
     this.cargarKPIs();
-    this.generarReporte();
+    this.cargarReporteInventario();
+    this.cargarReporteMovimientos();
+
+    // Escuchar cambios en filtros con debounce
+    this.filtrosForm.valueChanges
+      .pipe(takeUntil(this.destroy$), debounceTime(300))
+      .subscribe(() => {
+        this.aplicarFiltros();
+      });
+  }
+
+  ngAfterViewInit(): void {
+    // Inicialización después de la vista
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // ===== GESTIÓN DE FILTROS =====
+  toggleFiltros(): void {
+    this.filtrosExpanded = !this.filtrosExpanded;
+  }
+
+  limpiarFiltros(): void {
+    this.filtrosForm.patchValue({
+      tipo_reporte_text: '',
+      fecha_desde_text: '',
+      fecha_hasta_text: '',
+      almacen: '',
+      clase: '',
+    });
+    this.aplicarFiltros();
+  }
+
+  // ===== GESTIÓN DE DATOS =====
+  aplicarFiltros(): void {
+    const filtros = this.filtrosForm.value;
+
+    // Filtrar reporte de inventario
+    this.reporteInventarioFiltrado = this.reporteInventario.filter((item) => {
+      const matchTipo =
+        !filtros.tipo_reporte_text ||
+        'inventario'
+          .toLowerCase()
+          .includes(filtros.tipo_reporte_text.toLowerCase());
+      const matchFechaDesde = !filtros.fecha_desde_text || true; // Por simplicidad
+      const matchFechaHasta = !filtros.fecha_hasta_text || true; // Por simplicidad
+      const matchAlmacen =
+        !filtros.almacen ||
+        item.almacen.toLowerCase().includes(filtros.almacen.toLowerCase());
+      const matchClase =
+        !filtros.clase ||
+        item.clase.toLowerCase().includes(filtros.clase.toLowerCase());
+
+      return (
+        matchTipo &&
+        matchFechaDesde &&
+        matchFechaHasta &&
+        matchAlmacen &&
+        matchClase
+      );
+    });
+
+    // Filtrar reporte de movimientos
+    this.reporteMovimientosFiltrado = this.reporteMovimientos.filter((item) => {
+      const matchTipo =
+        !filtros.tipo_reporte_text ||
+        'movimientos'
+          .toLowerCase()
+          .includes(filtros.tipo_reporte_text.toLowerCase());
+      const matchFechaDesde =
+        !filtros.fecha_desde_text ||
+        item.fecha.includes(filtros.fecha_desde_text);
+      const matchFechaHasta =
+        !filtros.fecha_hasta_text ||
+        item.fecha.includes(filtros.fecha_hasta_text);
+      const matchAlmacen =
+        !filtros.almacen ||
+        item.almacen.toLowerCase().includes(filtros.almacen.toLowerCase());
+      const matchClase = !filtros.clase || true; // Los movimientos no tienen clase directa
+
+      return (
+        matchTipo &&
+        matchFechaDesde &&
+        matchFechaHasta &&
+        matchAlmacen &&
+        matchClase
+      );
+    });
   }
 
   cargarKPIs(): void {
@@ -164,20 +266,6 @@ export class ReportesComponent implements OnInit {
     ];
   }
 
-  generarReporte(): void {
-    this.cargandoReporte = true;
-    const filtros = this.filtrosForm.value;
-
-    setTimeout(() => {
-      if (filtros.tipo_reporte === 'inventario') {
-        this.cargarReporteInventario();
-      } else {
-        this.cargarReporteMovimientos();
-      }
-      this.cargandoReporte = false;
-    }, 1500);
-  }
-
   cargarReporteInventario(): void {
     this.reporteInventario = [
       {
@@ -186,61 +274,62 @@ export class ReportesComponent implements OnInit {
         nombre: 'Algodón Pima Blanco',
         almacen: 'Almacén Principal',
         clase: 'Fibras Naturales',
-        stock_actual: 450,
+        stock_actual: 450.75,
         costo_unitario: 8.5,
-        valor_total: 3825.0,
+        valor_total: 3831.38,
         rotacion: 6.2,
         dias_inventario: 59,
       },
       {
         id_insumo: 2,
         codigo_fox: 'POL002',
-        nombre: 'Poliéster 150D',
-        almacen: 'Almacén Principal',
+        nombre: 'Poliéster 150D Negro',
+        almacen: 'Almacén Secundario',
         clase: 'Fibras Sintéticas',
-        stock_actual: 1250,
-        costo_unitario: 6.75,
-        valor_total: 8437.5,
+        stock_actual: 325.2,
+        costo_unitario: 12.75,
+        valor_total: 4146.3,
         rotacion: 4.8,
         dias_inventario: 76,
       },
       {
         id_insumo: 3,
         codigo_fox: 'HIL003',
-        nombre: 'Hilo de Algodón 20/1',
-        almacen: 'Almacén Secundario',
+        nombre: 'Hilo de Algodón 30/1',
+        almacen: 'Almacén Principal',
         clase: 'Hilos',
-        stock_actual: 85,
-        costo_unitario: 12.3,
-        valor_total: 1045.5,
-        rotacion: 12.1,
-        dias_inventario: 30,
+        stock_actual: 850.0,
+        costo_unitario: 15.25,
+        valor_total: 12962.5,
+        rotacion: 8.1,
+        dias_inventario: 45,
       },
       {
         id_insumo: 4,
         codigo_fox: 'TEL004',
-        nombre: 'Tela Jersey Modal',
-        almacen: 'Almacén Secundario',
+        nombre: 'Tela Jersey Algodón',
+        almacen: 'Almacén Principal',
         clase: 'Telas',
-        stock_actual: 2500,
-        costo_unitario: 15.8,
-        valor_total: 39500.0,
-        rotacion: 2.3,
-        dias_inventario: 159,
+        stock_actual: 125.5,
+        costo_unitario: 28.9,
+        valor_total: 3626.95,
+        rotacion: 3.2,
+        dias_inventario: 114,
       },
       {
         id_insumo: 5,
         codigo_fox: 'ACC005',
-        nombre: 'Botones Plásticos 4 orif.',
-        almacen: 'Almacén Principal',
+        nombre: 'Botones Metálicos',
+        almacen: 'Almacén de Tránsito',
         clase: 'Accesorios',
-        stock_actual: 15000,
-        costo_unitario: 0.05,
-        valor_total: 750.0,
-        rotacion: 8.7,
-        dias_inventario: 42,
+        stock_actual: 2500.0,
+        costo_unitario: 0.85,
+        valor_total: 2125.0,
+        rotacion: 12.5,
+        dias_inventario: 29,
       },
     ];
+    this.reporteInventarioFiltrado = [...this.reporteInventario];
   }
 
   cargarReporteMovimientos(): void {
@@ -251,93 +340,142 @@ export class ReportesComponent implements OnInit {
         tipo_movimiento: 'INGRESO',
         codigo_fox: 'ALG001',
         material: 'Algodón Pima Blanco',
-        cantidad: 500,
+        cantidad: 250.0,
         almacen: 'Almacén Principal',
         usuario: 'Juan Pérez',
-        observaciones: 'Compra directa a proveedor',
+        observaciones: 'Compra directa',
       },
       {
         id_movimiento: 2,
         fecha: '2024-01-14',
         tipo_movimiento: 'EGRESO',
         codigo_fox: 'POL002',
-        material: 'Poliéster 150D',
-        cantidad: -200,
-        almacen: 'Almacén Principal',
+        material: 'Poliéster 150D Negro',
+        cantidad: -125.5,
+        almacen: 'Almacén Secundario',
         usuario: 'María García',
-        observaciones: 'Producción orden #1024',
+        observaciones: 'Producción lote #1024',
       },
       {
         id_movimiento: 3,
         fecha: '2024-01-13',
         tipo_movimiento: 'AJUSTE',
         codigo_fox: 'HIL003',
-        material: 'Hilo de Algodón 20/1',
-        cantidad: -15,
-        almacen: 'Almacén Secundario',
+        material: 'Hilo de Algodón 30/1',
+        cantidad: 15.25,
+        almacen: 'Almacén Principal',
         usuario: 'Carlos López',
-        observaciones: 'Ajuste por inventario físico',
+        observaciones: 'Corrección inventario',
       },
       {
         id_movimiento: 4,
         fecha: '2024-01-12',
         tipo_movimiento: 'INGRESO',
         codigo_fox: 'TEL004',
-        material: 'Tela Jersey Modal',
-        cantidad: 1000,
-        almacen: 'Almacén Secundario',
+        material: 'Tela Jersey Algodón',
+        cantidad: 85.0,
+        almacen: 'Almacén Principal',
         usuario: 'Ana Rodríguez',
-        observaciones: 'Transferencia desde planta',
+        observaciones: 'Transferencia interna',
       },
     ];
+    this.reporteMovimientosFiltrado = [...this.reporteMovimientos];
   }
 
-  exportarExcel(): void {
-    this.snackBar.open('Generando reporte Excel...', 'Cerrar', {
-      duration: 2000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-    });
+  // ===== COMPUTED PROPERTIES =====
+  get isEmpty(): boolean {
+    const tipoFiltro =
+      this.filtrosForm.value.tipo_reporte_text?.toLowerCase() || '';
 
-    setTimeout(() => {
-      this.snackBar.open('Reporte exportado exitosamente', 'Cerrar', {
-        duration: 3000,
-        horizontalPosition: 'end',
-        verticalPosition: 'top',
-        panelClass: ['snackbar-success'],
-      });
-    }, 2000);
+    if (tipoFiltro.includes('movimiento')) {
+      return this.reporteMovimientosFiltrado.length === 0;
+    } else {
+      // Por defecto muestra inventario
+      return this.reporteInventarioFiltrado.length === 0;
+    }
+  }
+
+  get currentReportType(): 'inventario' | 'movimientos' {
+    const tipoFiltro =
+      this.filtrosForm.value.tipo_reporte_text?.toLowerCase() || '';
+    return tipoFiltro.includes('movimiento') ? 'movimientos' : 'inventario';
+  }
+
+  // ===== ORDENAMIENTO =====
+  sortData(column: string): void {
+    console.log('Ordenando por:', column);
+    // Implementar lógica de ordenamiento
+  }
+
+  // ===== FUNCIONES DE EXPORTACIÓN =====
+  exportarExcel(): void {
+    this.snackBar.open('Exportando a Excel...', 'Cerrar', { duration: 3000 });
   }
 
   exportarPDF(): void {
-    this.snackBar.open('Generando reporte PDF...', 'Cerrar', {
-      duration: 2000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-    });
-
-    setTimeout(() => {
-      this.snackBar.open('Reporte PDF generado exitosamente', 'Cerrar', {
-        duration: 3000,
-        horizontalPosition: 'end',
-        verticalPosition: 'top',
-        panelClass: ['snackbar-success'],
-      });
-    }, 2000);
+    this.snackBar.open('Exportando a PDF...', 'Cerrar', { duration: 3000 });
   }
 
   programarReporte(): void {
-    this.snackBar.open(
-      'Funcionalidad de programación disponible próximamente',
-      'Cerrar',
-      {
-        duration: 3000,
-        horizontalPosition: 'end',
-        verticalPosition: 'top',
-      }
-    );
+    this.snackBar.open('Función de programación en desarrollo...', 'Cerrar', {
+      duration: 3000,
+    });
   }
 
+  // ===== HELPERS DE CLASES CSS =====
+  getCardClass(tendencia: string): string {
+    switch (tendencia) {
+      case 'up':
+        return 'card-success';
+      case 'down':
+        return 'card-warning';
+      default:
+        return 'card-info';
+    }
+  }
+
+  getTrendClass(tendencia: string): string {
+    switch (tendencia) {
+      case 'up':
+        return 'trend-up';
+      case 'down':
+        return 'trend-down';
+      default:
+        return 'trend-stable';
+    }
+  }
+
+  getRotacionClass(rotacion: number): string {
+    if (rotacion >= 8) return 'badge-success';
+    if (rotacion >= 4) return 'badge-warning';
+    return 'badge-danger';
+  }
+
+  getTipoMovimientoClass(tipo: string): string {
+    switch (tipo) {
+      case 'INGRESO':
+        return 'badge-success';
+      case 'EGRESO':
+        return 'badge-danger';
+      case 'AJUSTE':
+        return 'badge-warning';
+      default:
+        return 'badge-neutral';
+    }
+  }
+
+  getCantidadClass(tipo: string): string {
+    switch (tipo) {
+      case 'INGRESO':
+        return 'text-success';
+      case 'EGRESO':
+        return 'text-danger';
+      default:
+        return 'text-neutral';
+    }
+  }
+
+  // ===== FORMATEO =====
   formatearMoneda(valor: number): string {
     return new Intl.NumberFormat('es-PE', {
       style: 'currency',
@@ -346,61 +484,53 @@ export class ReportesComponent implements OnInit {
   }
 
   formatearNumero(valor: number): string {
-    return new Intl.NumberFormat('es-PE').format(valor);
+    return new Intl.NumberFormat('es-PE', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(valor);
   }
 
   formatearFecha(fecha: string): string {
-    if (!fecha) return 'N/A';
     return new Date(fecha).toLocaleDateString('es-PE');
   }
 
   formatearCantidad(cantidad: number): string {
     const signo = cantidad >= 0 ? '+' : '';
-    return `${signo}${this.formatearNumero(cantidad)}`;
+    return `${signo}${this.formatearNumero(Math.abs(cantidad))}`;
   }
 
-  getColorMovimiento(tipo: string): string {
-    switch (tipo) {
-      case 'INGRESO':
-        return 'ingreso';
-      case 'EGRESO':
-        return 'egreso';
-      case 'AJUSTE':
-        return 'ajuste';
-      default:
-        return 'neutral';
-    }
-  }
-
+  // ===== ICONOS =====
   getIconoTendencia(tendencia: string): string {
     switch (tendencia) {
       case 'up':
         return 'trending_up';
       case 'down':
         return 'trending_down';
-      case 'stable':
-        return 'trending_flat';
       default:
         return 'trending_flat';
     }
   }
 
-  getColorTendencia(tendencia: string): string {
-    switch (tendencia) {
-      case 'up':
-        return 'success';
-      case 'down':
-        return 'warning';
-      case 'stable':
-        return 'neutral';
-      default:
-        return 'neutral';
-    }
+  // ===== PAGINACIÓN =====
+  getCurrentPageItems(): string {
+    const total =
+      this.currentReportType === 'inventario'
+        ? this.reporteInventarioFiltrado.length
+        : this.reporteMovimientosFiltrado.length;
+    return `1-${total}`;
   }
 
-  getColorRotacion(rotacion: number): string {
-    if (rotacion >= 8) return 'alta';
-    if (rotacion >= 4) return 'media';
-    return 'baja';
+  getTotalItems(): number {
+    return this.currentReportType === 'inventario'
+      ? this.reporteInventarioFiltrado.length
+      : this.reporteMovimientosFiltrado.length;
+  }
+
+  isFirstPage(): boolean {
+    return true; // Por ahora no hay paginación real
+  }
+
+  isLastPage(): boolean {
+    return true; // Por ahora no hay paginación real
   }
 }

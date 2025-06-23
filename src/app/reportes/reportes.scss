@@ -555,3 +555,238 @@
   overflow: auto;
   min-height: 0; // Importante para que flex funcione correctamente
 }
+
+// ===== ESTILOS ESPECÍFICOS DE REPORTES =====
+
+.reportes-container {
+  // Utiliza las clases globales del patrón Texfina
+}
+
+// ===== SUMMARY CARDS PARA REPORTES =====
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+
+  .card-texfina {
+    // Estilos adicionales específicos para cards de reportes
+
+    .summary-trend {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      &.trend-up {
+        color: #10b981;
+
+        mat-icon {
+          color: #10b981;
+        }
+      }
+
+      &.trend-down {
+        color: #f59e0b;
+
+        mat-icon {
+          color: #f59e0b;
+        }
+      }
+
+      &.trend-stable {
+        color: #6b7280;
+
+        mat-icon {
+          color: #6b7280;
+        }
+      }
+    }
+  }
+
+  &.card-success {
+    border-left: 4px solid #10b981;
+  }
+
+  &.card-warning {
+    border-left: 4px solid #f59e0b;
+  }
+
+  &.card-info {
+    border-left: 4px solid #3b82f6;
+  }
+}
+
+// ===== COLUMNAS ESPECÍFICAS PARA REPORTES =====
+
+// Para reporte de inventario
+.reportes-container .table-with-headers .column-headers .header-row {
+  &:has(.codigo-col) {
+    grid-template-columns: 80px 240px 140px 120px 130px 140px 100px 120px;
+  }
+}
+
+.reportes-container .table-container .data-table {
+  &:has(td .badge-texfina) {
+    grid-template-columns: 80px 240px 140px 120px 130px 140px 100px 120px;
+  }
+}
+
+// Para reporte de movimientos
+.reportes-container .table-with-headers .column-headers .header-row {
+  &:has(.fecha-col) {
+    grid-template-columns: 100px 90px 80px 200px 100px 140px 120px;
+  }
+}
+
+// ===== ALINEACIONES ESPECÍFICAS =====
+.reportes-container .table-container .data-table {
+  .table-cell {
+    // Código
+    &:nth-child(1) {
+      text-align: center;
+    }
+
+    // Material
+    &:nth-child(2) {
+      text-align: left;
+    }
+
+    // Almacén/Tipo
+    &:nth-child(3) {
+      text-align: center;
+    }
+
+    // Clase/Código (movimientos)
+    &:nth-child(4) {
+      text-align: center;
+    }
+
+    // Stock/Cantidad
+    &:nth-child(5) {
+      text-align: right;
+    }
+
+    // Valor/Almacén (movimientos)
+    &:nth-child(6) {
+      text-align: right;
+    }
+
+    // Rotación/Usuario
+    &:nth-child(7) {
+      text-align: center;
+    }
+
+    // Días
+    &:nth-child(8) {
+      text-align: center;
+    }
+  }
+}
+
+// ===== INFORMACIÓN DETALLADA EN CELDAS =====
+.material-info {
+  .material-name {
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 2px;
+  }
+
+  .material-detail {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+}
+
+.stock-info,
+.valor-info {
+  text-align: right;
+
+  .stock-value,
+  .valor-total {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 2px;
+  }
+
+  .stock-unit,
+  .valor-unit {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+}
+
+// ===== BADGES ESPECÍFICOS PARA REPORTES =====
+.badge-texfina {
+  &.badge-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-color: #10b981;
+  }
+
+  &.badge-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-color: #ef4444;
+  }
+
+  &.badge-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-color: #f59e0b;
+  }
+
+  &.badge-neutral {
+    background-color: #f3f4f6;
+    color: #374151;
+    border-color: #d1d5db;
+  }
+}
+
+// ===== CLASES DE TEXTO =====
+.text-success {
+  color: #10b981 !important;
+  font-weight: 600;
+}
+
+.text-danger {
+  color: #ef4444 !important;
+  font-weight: 600;
+}
+
+.text-neutral {
+  color: #6b7280 !important;
+}
+
+// ===== RESPONSIVE PARA REPORTES =====
+@media (max-width: 1200px) {
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .reportes-container .table-with-headers .column-headers .header-row {
+    &:has(.codigo-col) {
+      grid-template-columns: 70px 200px 120px 100px 110px 120px 90px 100px;
+    }
+
+    &:has(.fecha-col) {
+      grid-template-columns: 90px 80px 70px 180px 90px 120px 100px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .reportes-container .table-with-headers .column-headers .header-row {
+    &:has(.codigo-col) {
+      grid-template-columns: 60px 160px 100px 80px 90px 100px 70px 80px;
+    }
+
+    &:has(.fecha-col) {
+      grid-template-columns: 80px 70px 60px 140px 80px 100px 80px;
+    }
+  }
+}
