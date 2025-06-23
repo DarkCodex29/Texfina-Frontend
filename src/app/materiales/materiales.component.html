@@ -28,94 +28,22 @@
       </div>
     </div>
 
-    <!-- Filtros de búsqueda -->
-    <div class="filters-card" [class.expanded]="filtrosExpanded">
-      <div class="filters-header" (click)="toggleFiltros()">
-        <div class="filters-title">
-          <mat-icon>tune</mat-icon>
-          Filtros de Búsqueda
-          <mat-icon class="expand-icon" [class.rotated]="filtrosExpanded"
-            >expand_more</mat-icon
-          >
-        </div>
-        <span class="filter-subtitle" *ngIf="filtrosExpanded"
-          >Los resultados se actualizan automáticamente</span
-        >
+    <!-- Filtro General -->
+    <div class="filters-card">
+      <div class="filters-header">
+        <div class="filters-title">Búsqueda General</div>
       </div>
 
-      <div class="filters-content" *ngIf="filtrosExpanded">
-        <form [formGroup]="filtrosForm" class="filters-form">
+      <div class="filters-content">
+        <form [formGroup]="filtroGeneralForm" class="filters-form">
           <div class="filters-grid">
             <div class="filter-group">
               <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">qr_code</mat-icon>
                 <input
                   class="simple-input"
-                  formControlName="codigoFox"
-                  placeholder="Filtrar por código fox..."
+                  formControlName="busquedaGeneral"
+                  placeholder="Buscar en código, nombre, unidad, presentación, precio, peso..."
                   type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">inventory_2</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="nombre"
-                  placeholder="Filtrar por nombre..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">scale</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="pesoUnitario"
-                  placeholder="Filtrar por peso..."
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">straighten</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="unidad"
-                  placeholder="Filtrar por unidad..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">category</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="presentacion"
-                  placeholder="Filtrar por presentación..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">attach_money</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="precioUnitario"
-                  placeholder="Filtrar por precio..."
-                  type="number"
-                  step="0.01"
                 />
               </div>
             </div>
@@ -124,10 +52,10 @@
               <button
                 class="btn-clear-filters"
                 type="button"
-                (click)="limpiarFiltros()"
-                matTooltip="Limpiar todos los filtros"
+                (click)="limpiarFiltroGeneral()"
+                matTooltip="Limpiar búsqueda"
               >
-                Limpiar todos
+                Limpiar
               </button>
             </div>
           </div>
@@ -138,9 +66,10 @@
     <!-- Tabla de insumos -->
     <div class="table-card">
       <div class="table-with-headers">
-        <!-- Encabezados de columnas -->
+        <!-- Encabezados de columnas con filtros integrados -->
         <div class="column-headers">
-          <div class="header-row">
+          <!-- Fila de títulos -->
+          <div class="header-row header-titles">
             <div class="header-col codigo-col" (click)="sortData('id_fox')">
               <span>Código Fox</span>
               <mat-icon class="sort-icon">unfold_more</mat-icon>
@@ -175,7 +104,75 @@
               <mat-icon class="sort-icon">unfold_more</mat-icon>
             </div>
             <div class="header-col acciones-col">
-              <span>Acciones</span>
+              <span>ACCIONES</span>
+            </div>
+          </div>
+
+          <!-- Fila de filtros por columna -->
+          <div
+            class="header-row header-filters"
+            *ngIf="filtrosColumnaHabilitados"
+            [formGroup]="filtrosColumnaForm"
+          >
+            <div class="header-col codigo-col">
+              <input
+                class="column-filter-input"
+                formControlName="codigoFox"
+                placeholder="Código..."
+                type="text"
+              />
+            </div>
+            <div class="header-col nombre-col">
+              <input
+                class="column-filter-input"
+                formControlName="nombre"
+                placeholder="Nombre..."
+                type="text"
+              />
+            </div>
+            <div class="header-col peso-col">
+              <input
+                class="column-filter-input"
+                formControlName="pesoUnitario"
+                placeholder="Peso..."
+                type="number"
+                step="0.01"
+              />
+            </div>
+            <div class="header-col unidad-col">
+              <input
+                class="column-filter-input"
+                formControlName="unidad"
+                placeholder="Unidad..."
+                type="text"
+              />
+            </div>
+            <div class="header-col presentacion-col">
+              <input
+                class="column-filter-input"
+                formControlName="presentacion"
+                placeholder="Presentación..."
+                type="text"
+              />
+            </div>
+            <div class="header-col precio-col">
+              <input
+                class="column-filter-input"
+                formControlName="precioUnitario"
+                placeholder="Precio..."
+                type="number"
+                step="0.01"
+              />
+            </div>
+            <div class="header-col acciones-col">
+              <button
+                class="btn-clear-column-filters"
+                type="button"
+                (click)="limpiarFiltrosColumna()"
+                matTooltip="Limpiar filtros de columna"
+              >
+                Limpiar filtros
+              </button>
             </div>
           </div>
         </div>
@@ -225,7 +222,7 @@
             </p>
             <button
               class="btn-texfina btn-secondary"
-              (click)="limpiarFiltros()"
+              (click)="limpiarFiltroGeneral()"
             >
               <mat-icon>clear</mat-icon>
               Limpiar Filtros

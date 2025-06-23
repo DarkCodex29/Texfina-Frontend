@@ -4,6 +4,7 @@ import {
   OnDestroy,
   AfterViewInit,
   ViewChild,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -67,8 +68,11 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
   materiales: Insumo[] = [];
   dataSource = new MatTableDataSource<Insumo>([]);
   proveedores: Proveedor[] = [];
-  filtrosForm: FormGroup;
-  filtrosExpanded: boolean = true;
+  filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosExpanded = true;
+  filtrosColumnaHabilitados = false;
+  filtrosColumnaActivos = false;
   private destroy$ = new Subject<void>();
 
   // Estados de carga y error
@@ -108,7 +112,11 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     private dialog: MatDialog,
     private fb: FormBuilder
   ) {
-    this.filtrosForm = this.fb.group({
+    this.filtroGeneralForm = this.fb.group({
+      busquedaGeneral: [''],
+    });
+
+    this.filtrosColumnaForm = this.fb.group({
       codigoFox: [''],
       nombre: [''],
       pesoUnitario: [''],
@@ -121,7 +129,8 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.cargarMateriales();
     this.cargarProveedores();
-    this.configurarFiltrosEnTiempoReal();
+    this.configurarFiltroGeneralEnTiempoReal();
+    this.configurarFiltrosColumnaEnTiempoReal();
   }
 
   ngAfterViewInit(): void {
@@ -133,11 +142,19 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltrosEnTiempoReal(): void {
-    this.filtrosForm.valueChanges
+  configurarFiltroGeneralEnTiempoReal(): void {
+    this.filtroGeneralForm.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.aplicarFiltros();
+        this.aplicarFiltroGeneral();
+      });
+  }
+
+  configurarFiltrosColumnaEnTiempoReal(): void {
+    this.filtrosColumnaForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltrosColumna();
       });
   }
 
@@ -208,8 +225,43 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargarProveedores();
   }
 
-  aplicarFiltros(): void {
-    const filtros = this.filtrosForm.value;
+  aplicarFiltroGeneral(): void {
+    const busqueda = this.filtroGeneralForm
+      .get('busquedaGeneral')
+      ?.value?.trim()
+      .toLowerCase();
+
+    if (!busqueda) {
+      this.dataSource.data = [...this.materiales];
+      return;
+    }
+
+    const materialesFiltrados = this.materiales.filter((material) => {
+      const codigo = material.id_fox?.toLowerCase() || '';
+      const nombre = material.nombre?.toLowerCase() || '';
+      const unidad =
+        material.unidad?.nombre?.toLowerCase() ||
+        material.id_unidad?.toString().toLowerCase() ||
+        '';
+      const presentacion = material.presentacion?.toLowerCase() || '';
+      const precio = material.precio_unitario?.toString() || '';
+      const peso = material.peso_unitario?.toString() || '';
+
+      return (
+        codigo.includes(busqueda) ||
+        nombre.includes(busqueda) ||
+        unidad.includes(busqueda) ||
+        presentacion.includes(busqueda) ||
+        precio.includes(busqueda) ||
+        peso.includes(busqueda)
+      );
+    });
+
+    this.dataSource.data = materialesFiltrados;
+  }
+
+  aplicarFiltrosColumna(): void {
+    const filtros = this.filtrosColumnaForm.value;
     let materialesFiltrados = [...this.materiales];
 
     // Filtro por Código Fox
@@ -271,12 +323,38 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.data = materialesFiltrados;
   }
 
-  limpiarFiltros(): void {
-    this.filtrosForm.reset();
+  limpiarFiltroGeneral(): void {
+    this.filtroGeneralForm.reset();
     this.dataSource.data = [...this.materiales];
   }
 
-  toggleFiltros(): void {
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset();
+    this.dataSource.data = [...this.materiales];
+  }
+
+  toggleFiltrosColumna() {
+    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
+    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
+
+    if (this.filtrosColumnaHabilitados) {
+      if (this.filtrosColumnaActivos) {
+        this.limpiarFiltroGeneral();
+      } else {
+        this.limpiarFiltrosColumna();
+      }
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (event.key === 'F3') {
+      event.preventDefault();
+      this.toggleFiltrosColumna();
+    }
+  }
+
+  toggleFiltros() {
     this.filtrosExpanded = !this.filtrosExpanded;
   }
 

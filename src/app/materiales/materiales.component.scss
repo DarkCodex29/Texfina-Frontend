@@ -22,7 +22,6 @@
   width: 32px;
   height: 32px;
   border-radius: var(--texfina-border-radius);
-  transition: all 0.2s ease;
 
   &.btn-view {
     background-color: var(--texfina-secondary-light);
@@ -41,6 +40,352 @@
     &:hover {
       background-color: var(--texfina-success);
       color: white;
+    }
+  }
+}
+
+// ============================================================================
+// FILTROS SIMPLIFICADOS
+// ============================================================================
+
+.single-filter-container {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.filter-group-single {
+  flex: 1;
+}
+
+.filter-actions-single {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-toggle-column-filters {
+  background: white;
+  border: 2px solid var(--texfina-secondary);
+  color: var(--texfina-secondary);
+  padding: 10px 16px;
+  border-radius: var(--texfina-border-radius);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--texfina-secondary-light);
+  }
+
+  &.active {
+    background: var(--texfina-secondary);
+    border-color: var(--texfina-secondary);
+    color: white;
+
+    &:hover {
+      background: var(--texfina-secondary-dark);
+      border-color: var(--texfina-secondary-dark);
+    }
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ============================================================================
+// FILTROS POR COLUMNA
+// ============================================================================
+
+.header-filters {
+  background: var(--texfina-bg-muted);
+  border-top: 1px solid var(--texfina-border);
+  padding: 8px 0;
+}
+
+.column-filter-input {
+  width: 100%;
+  border: 1px solid var(--texfina-border);
+  border-radius: 6px;
+  background: white;
+  padding: 8px 12px;
+  margin: 0 4px;
+  font-size: 0.8rem;
+  color: var(--texfina-text-primary);
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-secondary);
+    box-shadow: 0 0 0 2px var(--texfina-secondary-light);
+  }
+
+  &::placeholder {
+    color: var(--texfina-text-muted);
+    font-size: 0.75rem;
+  }
+
+  &:hover {
+    border-color: var(--texfina-secondary-light);
+  }
+}
+
+.btn-clear-column-filters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background: var(--surface-color);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 500;
+
+  &:hover {
+    background: var(--background-muted);
+    color: var(--text-primary);
+    border-color: var(--primary-color);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color-alpha);
+  }
+}
+
+// Filtros de búsqueda
+.filters-card {
+  background: var(--surface-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-color);
+  transition: none !important;
+
+  &:hover {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .filters-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    user-select: none;
+    border-bottom: 1px solid var(--border-color);
+    cursor: default;
+    transition: none !important;
+
+    &:hover {
+      transition: none !important;
+      transform: none !important;
+      background: var(--surface-color) !important;
+    }
+
+    @media (max-width: 768px) {
+      padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .filters-title {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: var(--font-size-lg);
+      cursor: default;
+      transition: none !important;
+
+      &:hover {
+        transition: none !important;
+        transform: none !important;
+      }
+    }
+  }
+
+  .filters-content {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--background-subtle);
+    transition: none !important;
+
+    @media (max-width: 768px) {
+      padding: var(--spacing-md) var(--spacing-lg);
+    }
+  }
+
+  .filters-form {
+    transition: none !important;
+
+    .filters-grid {
+      display: flex;
+      gap: 3rem;
+      align-items: stretch;
+      transition: none !important;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: var(--spacing-lg);
+      }
+    }
+
+    .filter-group {
+      flex: 1;
+      transition: none !important;
+
+      .simple-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        transition: none !important;
+
+        .simple-input {
+          width: 100%;
+          padding: var(--spacing-lg) var(--spacing-xl);
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius-md);
+          background: var(--surface-color);
+          font-size: var(--font-size-base);
+          color: var(--text-primary);
+          height: 48px;
+          line-height: 1.4;
+          transition: none !important;
+
+          &::placeholder {
+            color: var(--text-muted);
+          }
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-color-alpha);
+            transition: none !important;
+          }
+
+          &:hover {
+            transition: none !important;
+          }
+        }
+      }
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 2rem;
+      align-items: stretch;
+      flex-shrink: 0;
+      transition: none !important;
+    }
+
+    .btn-clear-filters {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border: 2px solid var(--border-color);
+      border-radius: var(--border-radius-md);
+      background: var(--surface-color);
+      color: var(--text-muted);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      height: 48px;
+      min-width: 100px;
+      transition: none !important;
+
+      &:hover {
+        background: var(--background-muted);
+        color: var(--text-primary);
+        border-color: var(--primary-color);
+        transition: none !important;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-color-alpha);
+        transition: none !important;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// ANULAR TODAS LAS ANIMACIONES Y TRANSICIONES GLOBALES
+// ============================================================================
+
+:host {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .mat-mdc-card,
+  .mat-card,
+  .mat-mdc-form-field,
+  .mat-form-field,
+  .mat-mdc-button,
+  .mat-button,
+  .filters-card,
+  .page-content,
+  .page-container,
+  .btn-texfina,
+  button,
+  input,
+  div,
+  span,
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    transition: none !important;
+    transform: none !important;
+    animation: none !important;
+
+    &:hover {
+      transition: none !important;
+      transform: none !important;
+      animation: none !important;
+      box-shadow: inherit !important;
+    }
+
+    &:focus {
+      transition: none !important;
+      transform: none !important;
+      animation: none !important;
+    }
+
+    &:active {
+      transition: none !important;
+      transform: none !important;
+      animation: none !important;
+    }
+  }
+
+  .filters-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+
+    &:hover {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+
+  .btn-clear-filters {
+    &:hover {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
     }
   }
 }
