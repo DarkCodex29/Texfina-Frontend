@@ -4,6 +4,7 @@ import {
   AfterViewInit,
   OnDestroy,
   ViewChild,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -23,8 +24,15 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatSortModule } from '@angular/material/sort';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { MatSortModule, MatSort } from '@angular/material/sort';
+import {
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  takeUntil,
+  finalize,
+  delay,
+} from 'rxjs';
 
 import { MaterialService } from '../services/material.service';
 import { Ingreso, Insumo, Unidad, Lote } from '../models/insumo.model';
@@ -53,15 +61,23 @@ import { Ingreso, Insumo, Unidad, Lote } from '../models/insumo.model';
   styleUrls: ['./ingresos.scss'],
 })
 export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild(MatSort) sort!: MatSort;
+
   // ============================================================================
   // PROPIEDADES DE DATOS
   // ============================================================================
   ingresos: Ingreso[] = [];
-  ingresosFiltrados: Ingreso[] = [];
   insumos: Insumo[] = [];
   unidades: Unidad[] = [];
   lotes: Lote[] = [];
   dataSource = new MatTableDataSource<Ingreso>([]);
+
+  filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosExpanded = true;
+  filtrosColumnaHabilitados = false;
+  filtrosColumnaActivos = false;
+  private destroy$ = new Subject<void>();
 
   // ============================================================================
   // PROPIEDADES DE ESTADO
@@ -69,13 +85,6 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = false;
   hasError = false;
   errorMessage = '';
-  filtrosExpanded = false;
-
-  // ============================================================================
-  // PROPIEDADES DE FILTROS
-  // ============================================================================
-  filtrosForm: FormGroup;
-  private destroy$ = new Subject<void>();
 
   // ============================================================================
   // CONFIGURACIÓN DE TABLA
@@ -91,26 +100,50 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
     'acciones',
   ];
 
+  get ingresosFiltrados(): Ingreso[] {
+    return this.dataSource.data;
+  }
+
+  get isEmpty(): boolean {
+    return !this.isLoading && this.ingresos.length === 0 && !this.hasError;
+  }
+
+  get isFilteredEmpty(): boolean {
+    return (
+      !this.isLoading &&
+      this.dataSource.data.length === 0 &&
+      this.ingresos.length > 0
+    );
+  }
+
   constructor(
     private materialService: MaterialService,
     private dialog: MatDialog,
     private fb: FormBuilder
   ) {
-    this.filtrosForm = this.fb.group({
+    this.filtroGeneralForm = this.fb.group({
+      busquedaGeneral: [''],
+    });
+
+    this.filtrosColumnaForm = this.fb.group({
+      fecha: [''],
       insumo: [''],
+      cantidad: [''],
+      lote: [''],
+      precio_total: [''],
       numero_remision: [''],
-      orden_compra: [''],
       estado: [''],
     });
   }
 
   ngOnInit(): void {
-    this.inicializarFiltros();
     this.cargarDatos();
+    this.configurarFiltroGeneralEnTiempoReal();
+    this.configurarFiltrosColumnaEnTiempoReal();
   }
 
   ngAfterViewInit(): void {
-    // Configuración adicional después de la vista
+    this.dataSource.sort = this.sort;
   }
 
   ngOnDestroy(): void {
@@ -118,36 +151,58 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ============================================================================
-  // MÉTODOS DE INICIALIZACIÓN
-  // ============================================================================
-  inicializarFiltros(): void {
-    // Configurar filtros en tiempo real con debounce
-    this.filtrosForm.valueChanges
+  configurarFiltroGeneralEnTiempoReal(): void {
+    this.filtroGeneralForm.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.aplicarFiltros();
+        this.aplicarFiltroGeneral();
       });
   }
 
+  configurarFiltrosColumnaEnTiempoReal(): void {
+    this.filtrosColumnaForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltrosColumna();
+      });
+  }
+
+  // ============================================================================
+  // MÉTODOS DE INICIALIZACIÓN
+  // ============================================================================
   cargarDatos(): void {
     this.isLoading = true;
     this.hasError = false;
+    this.errorMessage = '';
+
+    console.log('🔄 Iniciando carga de ingresos - isLoading:', this.isLoading);
 
     // Cargar ingresos e insumos en paralelo
-    this.materialService.getIngresos().subscribe({
-      next: (ingresos) => {
-        this.ingresos = ingresos;
-        this.aplicarFiltros();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.hasError = true;
-        this.errorMessage = 'Error al cargar los ingresos';
-        this.isLoading = false;
-        console.error('Error al cargar ingresos:', error);
-      },
-    });
+    this.materialService
+      .getIngresos()
+      .pipe(
+        delay(1500),
+        finalize(() => {
+          this.isLoading = false;
+          console.log('✅ Carga completada - isLoading:', this.isLoading);
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (ingresos) => {
+          console.log('📦 Ingresos cargados:', ingresos.length);
+          this.ingresos = ingresos;
+          this.dataSource.data = [...ingresos];
+        },
+        error: (error) => {
+          console.error('❌ Error al cargar ingresos:', error);
+          this.hasError = true;
+          this.errorMessage =
+            'Error al cargar los ingresos. Por favor, intenta nuevamente.';
+          this.ingresos = [];
+          this.dataSource.data = [];
+        },
+      });
 
     this.materialService.getMateriales().subscribe({
       next: (insumos: any) => {
@@ -171,16 +226,62 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  reintentarCarga(): void {
+    this.cargarDatos();
+  }
+
   // ============================================================================
   // MÉTODOS DE FILTROS
   // ============================================================================
-  toggleFiltros(): void {
-    this.filtrosExpanded = !this.filtrosExpanded;
+  aplicarFiltroGeneral(): void {
+    const busqueda = this.filtroGeneralForm
+      .get('busquedaGeneral')
+      ?.value?.trim()
+      .toLowerCase();
+
+    if (!busqueda) {
+      this.dataSource.data = [...this.ingresos];
+      return;
+    }
+
+    const ingresosFiltrados = this.ingresos.filter((ingreso) => {
+      const insumoNombre = this.getInsumoNombre(
+        ingreso.id_insumo
+      ).toLowerCase();
+      const insumoCodigoFox = this.getInsumoCodigoFox(
+        ingreso.id_insumo
+      ).toLowerCase();
+      const numeroRemision = ingreso.numero_remision?.toLowerCase() || '';
+      const ordenCompra = ingreso.orden_compra?.toLowerCase() || '';
+      const loteNombre = this.getLoteNombre(ingreso.id_lote).toLowerCase();
+      const estado = this.getEstadoIngreso(ingreso).toLowerCase();
+      const fecha = this.formatearFecha(ingreso.fecha).toLowerCase();
+
+      return (
+        insumoNombre.includes(busqueda) ||
+        insumoCodigoFox.includes(busqueda) ||
+        numeroRemision.includes(busqueda) ||
+        ordenCompra.includes(busqueda) ||
+        loteNombre.includes(busqueda) ||
+        estado.includes(busqueda) ||
+        fecha.includes(busqueda)
+      );
+    });
+
+    this.dataSource.data = ingresosFiltrados;
   }
 
-  aplicarFiltros(): void {
-    const filtros = this.filtrosForm.value;
+  aplicarFiltrosColumna(): void {
+    const filtros = this.filtrosColumnaForm.value;
     let ingresosFiltrados = [...this.ingresos];
+
+    // Filtro por Fecha
+    if (filtros.fecha && filtros.fecha.trim()) {
+      ingresosFiltrados = ingresosFiltrados.filter((ingreso) => {
+        const fecha = this.formatearFecha(ingreso.fecha);
+        return fecha.includes(filtros.fecha);
+      });
+    }
 
     // Filtro por Insumo
     if (filtros.insumo && filtros.insumo.trim()) {
@@ -192,21 +293,45 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
 
+    // Filtro por Cantidad
+    if (filtros.cantidad && filtros.cantidad.toString().trim()) {
+      const cantidadFiltro = parseFloat(filtros.cantidad);
+      if (!isNaN(cantidadFiltro)) {
+        ingresosFiltrados = ingresosFiltrados.filter((ingreso) => {
+          const cantidad = ingreso.cantidad || 0;
+          return (
+            cantidad >= cantidadFiltro - 0.01 &&
+            cantidad <= cantidadFiltro + 0.01
+          );
+        });
+      }
+    }
+
+    // Filtro por Lote
+    if (filtros.lote && filtros.lote.trim()) {
+      ingresosFiltrados = ingresosFiltrados.filter((ingreso) => {
+        const loteNombre = this.getLoteNombre(ingreso.id_lote);
+        return loteNombre.toLowerCase().includes(filtros.lote.toLowerCase());
+      });
+    }
+
+    // Filtro por Precio Total
+    if (filtros.precio_total && filtros.precio_total.toString().trim()) {
+      const precioFiltro = parseFloat(filtros.precio_total);
+      if (!isNaN(precioFiltro)) {
+        ingresosFiltrados = ingresosFiltrados.filter((ingreso) => {
+          const precio = ingreso.precio_total_formula || 0;
+          return precio >= precioFiltro - 0.01 && precio <= precioFiltro + 0.01;
+        });
+      }
+    }
+
     // Filtro por Número de Remisión
     if (filtros.numero_remision && filtros.numero_remision.trim()) {
       ingresosFiltrados = ingresosFiltrados.filter((ingreso) =>
         ingreso.numero_remision
           ?.toLowerCase()
           .includes(filtros.numero_remision.toLowerCase())
-      );
-    }
-
-    // Filtro por Orden de Compra
-    if (filtros.orden_compra && filtros.orden_compra.trim()) {
-      ingresosFiltrados = ingresosFiltrados.filter((ingreso) =>
-        ingreso.orden_compra
-          ?.toLowerCase()
-          .includes(filtros.orden_compra.toLowerCase())
       );
     }
 
@@ -219,21 +344,62 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     }
 
-    this.ingresosFiltrados = ingresosFiltrados;
-    this.dataSource.data = this.ingresosFiltrados;
+    this.dataSource.data = ingresosFiltrados;
   }
 
-  limpiarFiltros(): void {
-    this.filtrosForm.reset();
-    this.aplicarFiltros();
+  limpiarFiltroGeneral(): void {
+    this.filtroGeneralForm.reset();
+    this.dataSource.data = [...this.ingresos];
+  }
+
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset();
+    this.dataSource.data = [...this.ingresos];
+  }
+
+  toggleFiltrosColumna() {
+    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
+    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
+
+    if (this.filtrosColumnaHabilitados) {
+      if (this.filtrosColumnaActivos) {
+        this.limpiarFiltroGeneral();
+      } else {
+        this.limpiarFiltrosColumna();
+      }
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (event.key === 'F3') {
+      event.preventDefault();
+      this.toggleFiltrosColumna();
+    }
+  }
+
+  toggleFiltros(): void {
+    this.filtrosExpanded = !this.filtrosExpanded;
   }
 
   // ============================================================================
   // MÉTODOS DE TABLA
   // ============================================================================
   sortData(column: string): void {
-    console.log('Ordenar por:', column);
-    // TODO: Implementar ordenamiento
+    if (this.sort) {
+      // Si ya está ordenado por esta columna, cambiar dirección
+      if (this.sort.active === column) {
+        this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        // Nueva columna, empezar con ascendente
+        this.sort.active = column;
+        this.sort.direction = 'asc';
+      }
+      this.sort.sortChange.emit({
+        active: this.sort.active,
+        direction: this.sort.direction,
+      });
+    }
   }
 
   // ============================================================================
@@ -257,10 +423,6 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
   editarIngreso(ingreso: Ingreso): void {
     console.log('Editar ingreso:', ingreso);
     // TODO: Implementar modal de edición
-  }
-
-  reintentarCarga(): void {
-    this.cargarDatos();
   }
 
   // ============================================================================
@@ -294,10 +456,11 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
     return ingreso.estado || 'PENDIENTE';
   }
 
-  formatearFecha(fecha?: string): string {
+  formatearFecha(fecha?: Date | string): string {
     if (!fecha) return '-';
     try {
-      return new Date(fecha).toLocaleDateString('es-ES', {
+      const fechaObj = fecha instanceof Date ? fecha : new Date(fecha);
+      return fechaObj.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -323,22 +486,6 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
       currency: 'PEN',
       currencyDisplay: 'symbol',
     });
-  }
-
-  // ============================================================================
-  // PROPIEDADES COMPUTADAS PARA ESTADOS
-  // ============================================================================
-  get isEmpty(): boolean {
-    return !this.isLoading && !this.hasError && this.ingresos.length === 0;
-  }
-
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      !this.hasError &&
-      this.ingresos.length > 0 &&
-      this.ingresosFiltrados.length === 0
-    );
   }
 }
 

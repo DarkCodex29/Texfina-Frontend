@@ -25,67 +25,21 @@
       </div>
     </div>
 
-    <!-- Filtros de búsqueda -->
-    <div class="filters-card" [class.expanded]="filtrosExpanded">
-      <div class="filters-header" (click)="toggleFiltros()">
-        <div class="filters-title">
-          <mat-icon>tune</mat-icon>
-          Filtros de Búsqueda
-          <mat-icon class="expand-icon" [class.rotated]="filtrosExpanded"
-            >expand_more</mat-icon
-          >
-        </div>
-        <span class="filter-subtitle" *ngIf="filtrosExpanded"
-          >Los resultados se actualizan automáticamente</span
-        >
+    <!-- Filtro General -->
+    <div class="filters-card">
+      <div class="filters-header">
+        <div class="filters-title">Búsqueda General</div>
       </div>
 
-      <div class="filters-content" *ngIf="filtrosExpanded">
-        <form [formGroup]="filtrosForm" class="filters-form">
+      <div class="filters-content">
+        <form [formGroup]="filtroGeneralForm" class="filters-form">
           <div class="filters-grid">
             <div class="filter-group">
               <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">inventory</mat-icon>
                 <input
                   class="simple-input"
-                  formControlName="insumo"
-                  placeholder="Filtrar por insumo..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">receipt_long</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="numero_remision"
-                  placeholder="Filtrar por número de remisión..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">assignment</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="orden_compra"
-                  placeholder="Filtrar por orden de compra..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">toggle_on</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="estado"
-                  placeholder="Filtrar por estado..."
+                  formControlName="busquedaGeneral"
+                  placeholder="Buscar en insumo, remisión, orden de compra, lote, estado..."
                   type="text"
                 />
               </div>
@@ -95,10 +49,10 @@
               <button
                 class="btn-clear-filters"
                 type="button"
-                (click)="limpiarFiltros()"
-                matTooltip="Limpiar todos los filtros"
+                (click)="limpiarFiltroGeneral()"
+                matTooltip="Limpiar búsqueda"
               >
-                Limpiar todos
+                Limpiar
               </button>
             </div>
           </div>
@@ -109,9 +63,10 @@
     <!-- Tabla de ingresos -->
     <div class="table-card">
       <div class="table-with-headers">
-        <!-- Encabezados de columnas -->
+        <!-- Encabezados de columnas con filtros integrados -->
         <div class="column-headers">
-          <div class="header-row">
+          <!-- Fila de títulos -->
+          <div class="header-row header-titles">
             <div class="header-col fecha-col" (click)="sortData('fecha')">
               <span>Fecha</span>
               <mat-icon class="sort-icon">unfold_more</mat-icon>
@@ -147,7 +102,83 @@
               <mat-icon class="sort-icon">unfold_more</mat-icon>
             </div>
             <div class="header-col acciones-col">
-              <span>Acciones</span>
+              <span>ACCIONES</span>
+            </div>
+          </div>
+
+          <!-- Fila de filtros por columna -->
+          <div
+            class="header-row header-filters"
+            *ngIf="filtrosColumnaHabilitados"
+            [formGroup]="filtrosColumnaForm"
+          >
+            <div class="header-col fecha-col">
+              <input
+                class="column-filter-input"
+                formControlName="fecha"
+                placeholder="Fecha..."
+                type="date"
+              />
+            </div>
+            <div class="header-col insumo-col">
+              <input
+                class="column-filter-input"
+                formControlName="insumo"
+                placeholder="Insumo..."
+                type="text"
+              />
+            </div>
+            <div class="header-col cantidad-col">
+              <input
+                class="column-filter-input"
+                formControlName="cantidad"
+                placeholder="Cantidad..."
+                type="number"
+                step="0.01"
+              />
+            </div>
+            <div class="header-col lote-col">
+              <input
+                class="column-filter-input"
+                formControlName="lote"
+                placeholder="Lote..."
+                type="text"
+              />
+            </div>
+            <div class="header-col precio-col">
+              <input
+                class="column-filter-input"
+                formControlName="precio_total"
+                placeholder="Precio..."
+                type="number"
+                step="0.01"
+              />
+            </div>
+            <div class="header-col remision-col">
+              <input
+                class="column-filter-input"
+                formControlName="numero_remision"
+                placeholder="Remisión..."
+                type="text"
+              />
+            </div>
+            <div class="header-col estado-col">
+              <input
+                class="column-filter-input"
+                formControlName="estado"
+                placeholder="Estado..."
+                type="text"
+              />
+            </div>
+            <div class="header-col acciones-col">
+              <button
+                class="btn-clear-column-filters"
+                type="button"
+                (click)="limpiarFiltrosColumna()"
+                matTooltip="Limpiar filtros de columna"
+              >
+                Limpiar filtros
+              </button>
             </div>
           </div>
         </div>
@@ -195,13 +226,6 @@
             <p class="filtered-empty-subtitle text-texfina text-muted">
               Intenta ajustar los filtros o limpiar la búsqueda
             </p>
-            <button
-              class="btn-texfina btn-secondary"
-              (click)="limpiarFiltros()"
-            >
-              <mat-icon>clear</mat-icon>
-              Limpiar Filtros
-            </button>
           </div>
 
           <!-- Tabla siempre visible (con skeleton o datos) -->
