@@ -4,6 +4,7 @@ import {
   OnDestroy,
   AfterViewInit,
   ViewChild,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -65,8 +66,11 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   unidades: Unidad[] = [];
   dataSource = new MatTableDataSource<Unidad>([]);
-  filtrosForm: FormGroup;
-  filtrosExpanded: boolean = true;
+  filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosExpanded = true;
+  filtrosColumnaHabilitados = false;
+  filtrosColumnaActivos = false;
   private destroy$ = new Subject<void>();
 
   // Estados de carga y error
@@ -97,7 +101,11 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     private dialog: MatDialog,
     private fb: FormBuilder
   ) {
-    this.filtrosForm = this.fb.group({
+    this.filtroGeneralForm = this.fb.group({
+      busquedaGeneral: [''],
+    });
+
+    this.filtrosColumnaForm = this.fb.group({
       id_unidad: [''],
       nombre: [''],
     });
@@ -105,7 +113,8 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarUnidades();
-    this.configurarFiltrosEnTiempoReal();
+    this.configurarFiltroGeneralEnTiempoReal();
+    this.configurarFiltrosColumnaEnTiempoReal();
   }
 
   ngAfterViewInit(): void {
@@ -117,11 +126,19 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltrosEnTiempoReal(): void {
-    this.filtrosForm.valueChanges
+  configurarFiltroGeneralEnTiempoReal(): void {
+    this.filtroGeneralForm.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.aplicarFiltros();
+        this.aplicarFiltroGeneral();
+      });
+  }
+
+  configurarFiltrosColumnaEnTiempoReal(): void {
+    this.filtrosColumnaForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltrosColumna();
       });
   }
 
@@ -164,8 +181,29 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargarUnidades();
   }
 
-  aplicarFiltros(): void {
-    const filtros = this.filtrosForm.value;
+  aplicarFiltroGeneral(): void {
+    const busqueda = this.filtroGeneralForm
+      .get('busquedaGeneral')
+      ?.value?.trim()
+      .toLowerCase();
+
+    if (!busqueda) {
+      this.dataSource.data = [...this.unidades];
+      return;
+    }
+
+    const unidadesFiltradas = this.unidades.filter((unidad) => {
+      const codigo = unidad.id_unidad?.toLowerCase() || '';
+      const nombre = unidad.nombre?.toLowerCase() || '';
+
+      return codigo.includes(busqueda) || nombre.includes(busqueda);
+    });
+
+    this.dataSource.data = unidadesFiltradas;
+  }
+
+  aplicarFiltrosColumna(): void {
+    const filtros = this.filtrosColumnaForm.value;
     let unidadesFiltradas = [...this.unidades];
 
     // Filtro por Código
@@ -187,9 +225,35 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.data = unidadesFiltradas;
   }
 
-  limpiarFiltros(): void {
-    this.filtrosForm.reset();
+  limpiarFiltroGeneral(): void {
+    this.filtroGeneralForm.reset();
     this.dataSource.data = [...this.unidades];
+  }
+
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset();
+    this.dataSource.data = [...this.unidades];
+  }
+
+  toggleFiltrosColumna() {
+    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
+    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
+
+    if (this.filtrosColumnaHabilitados) {
+      if (this.filtrosColumnaActivos) {
+        this.limpiarFiltroGeneral();
+      } else {
+        this.limpiarFiltrosColumna();
+      }
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (event.key === 'F3') {
+      event.preventDefault();
+      this.toggleFiltrosColumna();
+    }
   }
 
   toggleFiltros(): void {

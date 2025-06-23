@@ -129,36 +129,51 @@
     color: var(--texfina-text-muted);
     font-size: 0.75rem;
   }
-
-  &:hover {
-    border-color: var(--texfina-secondary-light);
-  }
 }
 
 .btn-clear-column-filters {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-  background: var(--surface-color);
-  color: var(--text-muted);
-  font-size: var(--font-size-xs);
+  min-width: 140px !important;
+  height: 48px !important;
+  border-radius: 10px !important;
+  border: 2px solid var(--texfina-primary) !important;
+  background: linear-gradient(135deg, white, #fef7f7) !important;
+  color: var(--texfina-primary) !important;
   cursor: pointer;
-  white-space: nowrap;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
+  position: relative;
+  overflow: hidden;
   font-weight: 500;
+  font-size: 14px;
+  padding: 0 20px;
+  white-space: nowrap;
 
-  &:hover {
-    background: var(--background-muted);
-    color: var(--text-primary);
-    border-color: var(--primary-color);
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
   }
 
   &:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px var(--primary-color-alpha);
+    border-color: var(--texfina-primary);
+    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    width: 100% !important;
+    min-width: auto !important;
   }
 }
 
@@ -169,25 +184,11 @@
   box-shadow: var(--shadow-sm);
   margin-bottom: 2rem;
   border: 1px solid var(--border-color);
-  transition: none !important;
-
-  &:hover {
-    transition: none !important;
-    transform: none !important;
-  }
 
   .filters-header {
     padding: var(--spacing-lg) var(--spacing-xl);
     user-select: none;
     border-bottom: 1px solid var(--border-color);
-    cursor: default;
-    transition: none !important;
-
-    &:hover {
-      transition: none !important;
-      transform: none !important;
-      background: var(--surface-color) !important;
-    }
 
     @media (max-width: 768px) {
       padding: var(--spacing-md) var(--spacing-lg);
@@ -200,20 +201,12 @@
       font-weight: 600;
       color: var(--text-primary);
       font-size: var(--font-size-lg);
-      cursor: default;
-      transition: none !important;
-
-      &:hover {
-        transition: none !important;
-        transform: none !important;
-      }
     }
   }
 
   .filters-content {
     padding: var(--spacing-lg) var(--spacing-xl);
     background: var(--background-subtle);
-    transition: none !important;
 
     @media (max-width: 768px) {
       padding: var(--spacing-md) var(--spacing-lg);
@@ -221,13 +214,10 @@
   }
 
   .filters-form {
-    transition: none !important;
-
     .filters-grid {
       display: flex;
       gap: 3rem;
       align-items: stretch;
-      transition: none !important;
 
       @media (max-width: 768px) {
         flex-direction: column;
@@ -237,13 +227,11 @@
 
     .filter-group {
       flex: 1;
-      transition: none !important;
 
       .simple-input-wrapper {
         position: relative;
         display: flex;
         align-items: center;
-        transition: none !important;
 
         .simple-input {
           width: 100%;
@@ -255,7 +243,6 @@
           color: var(--text-primary);
           height: 48px;
           line-height: 1.4;
-          transition: none !important;
 
           &::placeholder {
             color: var(--text-muted);
@@ -265,11 +252,6 @@
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px var(--primary-color-alpha);
-            transition: none !important;
-          }
-
-          &:hover {
-            transition: none !important;
           }
         }
       }
@@ -280,7 +262,6 @@
       gap: 2rem;
       align-items: stretch;
       flex-shrink: 0;
-      transition: none !important;
     }
 
     .btn-clear-filters {
@@ -298,94 +279,12 @@
       white-space: nowrap;
       height: 48px;
       min-width: 100px;
-      transition: none !important;
-
-      &:hover {
-        background: var(--background-muted);
-        color: var(--text-primary);
-        border-color: var(--primary-color);
-        transition: none !important;
-      }
 
       &:focus {
         outline: none;
         border-color: var(--primary-color);
         box-shadow: 0 0 0 3px var(--primary-color-alpha);
-        transition: none !important;
       }
-    }
-  }
-}
-
-// ============================================================================
-// ANULAR TODAS LAS ANIMACIONES Y TRANSICIONES GLOBALES
-// ============================================================================
-
-:host {
-  *,
-  *::before,
-  *::after {
-    transition: none !important;
-    transform: none !important;
-    animation: none !important;
-  }
-
-  .mat-mdc-card,
-  .mat-card,
-  .mat-mdc-form-field,
-  .mat-form-field,
-  .mat-mdc-button,
-  .mat-button,
-  .filters-card,
-  .page-content,
-  .page-container,
-  .btn-texfina,
-  button,
-  input,
-  div,
-  span,
-  p,
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    transition: none !important;
-    transform: none !important;
-    animation: none !important;
-
-    &:hover {
-      transition: none !important;
-      transform: none !important;
-      animation: none !important;
-      box-shadow: inherit !important;
-    }
-
-    &:focus {
-      transition: none !important;
-      transform: none !important;
-      animation: none !important;
-    }
-
-    &:active {
-      transition: none !important;
-      transform: none !important;
-      animation: none !important;
-    }
-  }
-
-  .filters-card {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-
-    &:hover {
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-    }
-  }
-
-  .btn-clear-filters {
-    &:hover {
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
     }
   }
 }

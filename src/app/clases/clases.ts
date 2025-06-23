@@ -4,6 +4,7 @@ import {
   AfterViewInit,
   OnDestroy,
   ViewChild,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -27,14 +28,14 @@ import { MaterialService } from '../services/material.service';
 import { Clase } from '../models/insumo.model';
 import { EditarClaseDialogComponent } from './editar-clase-dialog/editar-clase-dialog';
 import { DetalleClaseDialogComponent } from './detalle-clase-dialog/detalle-clase-dialog';
-import { Subject } from 'rxjs';
 import {
+  Subject,
   debounceTime,
   distinctUntilChanged,
   takeUntil,
   delay,
   finalize,
-} from 'rxjs/operators';
+} from 'rxjs';
 
 @Component({
   selector: 'app-clases',
@@ -62,32 +63,38 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clases: Clase[] = [];
   dataSource = new MatTableDataSource<Clase>([]);
-  filtrosForm: FormGroup;
-  filtrosExpanded: boolean = true;
+  filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosExpanded = true;
+  filtrosColumnaHabilitados = false;
+  filtrosColumnaActivos = false;
   private destroy$ = new Subject<void>();
 
-  // Estados de la aplicación
+  // Estados de carga y error
   isLoading: boolean = false;
   hasError: boolean = false;
   errorMessage: string = '';
 
-  displayedColumns: string[] = ['codigo', 'familia', 'sub_familia', 'acciones'];
+  displayedColumns: string[] = [
+    'id_clase',
+    'familia',
+    'sub_familia',
+    'acciones',
+  ];
 
   get clasesFiltradas(): Clase[] {
     return this.dataSource.data;
   }
 
-  // Estados computados
   get isEmpty(): boolean {
-    return !this.isLoading && !this.hasError && this.clases.length === 0;
+    return !this.isLoading && this.clases.length === 0 && !this.hasError;
   }
 
   get isFilteredEmpty(): boolean {
     return (
       !this.isLoading &&
-      !this.hasError &&
-      this.clases.length > 0 &&
-      this.dataSource.data.length === 0
+      this.dataSource.data.length === 0 &&
+      this.clases.length > 0
     );
   }
 
@@ -96,7 +103,11 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
     private dialog: MatDialog,
     private fb: FormBuilder
   ) {
-    this.filtrosForm = this.fb.group({
+    this.filtroGeneralForm = this.fb.group({
+      busquedaGeneral: [''],
+    });
+
+    this.filtrosColumnaForm = this.fb.group({
       codigo: [''],
       familia: [''],
       sub_familia: [''],
@@ -105,7 +116,8 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarClases();
-    this.configurarFiltrosEnTiempoReal();
+    this.configurarFiltroGeneralEnTiempoReal();
+    this.configurarFiltrosColumnaEnTiempoReal();
   }
 
   ngAfterViewInit(): void {
@@ -117,11 +129,19 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltrosEnTiempoReal(): void {
-    this.filtrosForm.valueChanges
+  configurarFiltroGeneralEnTiempoReal(): void {
+    this.filtroGeneralForm.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.aplicarFiltros();
+        this.aplicarFiltroGeneral();
+      });
+  }
+
+  configurarFiltrosColumnaEnTiempoReal(): void {
+    this.filtrosColumnaForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltrosColumna();
       });
   }
 
@@ -130,26 +150,30 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.hasError = false;
     this.errorMessage = '';
 
+    console.log('🔄 Iniciando carga de clases - isLoading:', this.isLoading);
+
     this.materialService
       .getClases()
       .pipe(
-        delay(800), // Remover en producción - solo para demostrar skeleton
-        takeUntil(this.destroy$),
+        // Delay artificial para demostrar el skeleton (remover en producción)
+        delay(1500),
         finalize(() => {
           this.isLoading = false;
-        })
+          console.log('✅ Carga completada - isLoading:', this.isLoading);
+        }),
+        takeUntil(this.destroy$)
       )
       .subscribe({
         next: (clases) => {
+          console.log('📦 Clases cargadas:', clases.length);
           this.clases = clases;
           this.dataSource.data = [...clases];
         },
         error: (error) => {
-          console.error('Error al cargar clases:', error);
+          console.error('❌ Error al cargar clases:', error);
           this.hasError = true;
           this.errorMessage =
-            error?.message ||
-            'Error al cargar los datos de clases. Verifique su conexión e intente nuevamente.';
+            'Error al cargar las clases. Por favor, intenta nuevamente.';
           this.clases = [];
           this.dataSource.data = [];
         },
@@ -160,8 +184,34 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargarClases();
   }
 
-  aplicarFiltros(): void {
-    const filtros = this.filtrosForm.value;
+  aplicarFiltroGeneral(): void {
+    const busqueda = this.filtroGeneralForm
+      .get('busquedaGeneral')
+      ?.value?.trim()
+      .toLowerCase();
+
+    if (!busqueda) {
+      this.dataSource.data = [...this.clases];
+      return;
+    }
+
+    const clasesFiltradas = this.clases.filter((clase) => {
+      const codigo = clase.id_clase?.toLowerCase() || '';
+      const familia = clase.familia?.toLowerCase() || '';
+      const subfamilia = clase.sub_familia?.toLowerCase() || '';
+
+      return (
+        codigo.includes(busqueda) ||
+        familia.includes(busqueda) ||
+        subfamilia.includes(busqueda)
+      );
+    });
+
+    this.dataSource.data = clasesFiltradas;
+  }
+
+  aplicarFiltrosColumna(): void {
+    const filtros = this.filtrosColumnaForm.value;
     let clasesFiltradas = [...this.clases];
 
     // Filtro por Código
@@ -190,12 +240,38 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.data = clasesFiltradas;
   }
 
-  limpiarFiltros(): void {
-    this.filtrosForm.reset();
+  limpiarFiltroGeneral(): void {
+    this.filtroGeneralForm.reset();
     this.dataSource.data = [...this.clases];
   }
 
-  toggleFiltros(): void {
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset();
+    this.dataSource.data = [...this.clases];
+  }
+
+  toggleFiltrosColumna() {
+    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
+    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
+
+    if (this.filtrosColumnaHabilitados) {
+      if (this.filtrosColumnaActivos) {
+        this.limpiarFiltroGeneral();
+      } else {
+        this.limpiarFiltrosColumna();
+      }
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (event.key === 'F3') {
+      event.preventDefault();
+      this.toggleFiltrosColumna();
+    }
+  }
+
+  toggleFiltros() {
     this.filtrosExpanded = !this.filtrosExpanded;
   }
 

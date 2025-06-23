@@ -6,7 +6,7 @@
 
 /* Solo estilos muy específicos para la celda de clase */
 .clase-cell {
-  .clase-name {
+  .clase-familia {
     font-weight: 600;
     line-height: 1.2;
   }
@@ -22,15 +22,269 @@
   width: 32px;
   height: 32px;
   border-radius: var(--texfina-border-radius);
-  transition: all 0.2s ease;
 
   &.btn-view {
     background-color: var(--texfina-secondary-light);
     color: var(--texfina-secondary);
+
+    &:hover {
+      background-color: var(--texfina-secondary);
+      color: white;
+    }
   }
 
   &.btn-edit {
-    background-color: var(--texfina-accent-light);
-    color: var(--texfina-accent);
+    background-color: var(--texfina-success-light);
+    color: var(--texfina-success);
+
+    &:hover {
+      background-color: var(--texfina-success);
+      color: white;
+    }
+  }
+}
+
+// ============================================================================
+// FILTROS SIMPLIFICADOS
+// ============================================================================
+
+.single-filter-container {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.filter-group-single {
+  flex: 1;
+}
+
+.filter-actions-single {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-toggle-column-filters {
+  background: white;
+  border: 2px solid var(--texfina-secondary);
+  color: var(--texfina-secondary);
+  padding: 10px 16px;
+  border-radius: var(--texfina-border-radius);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--texfina-secondary-light);
+  }
+
+  &.active {
+    background: var(--texfina-secondary);
+    border-color: var(--texfina-secondary);
+    color: white;
+
+    &:hover {
+      background: var(--texfina-secondary-dark);
+      border-color: var(--texfina-secondary-dark);
+    }
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ============================================================================
+// FILTROS POR COLUMNA
+// ============================================================================
+
+.header-filters {
+  background: var(--texfina-bg-muted);
+  border-top: 1px solid var(--texfina-border);
+  padding: 8px 0;
+}
+
+.column-filter-input {
+  width: 100%;
+  border: 1px solid var(--texfina-border);
+  border-radius: 6px;
+  background: white;
+  padding: 8px 12px;
+  margin: 0 4px;
+  font-size: 0.8rem;
+  color: var(--texfina-text-primary);
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-secondary);
+    box-shadow: 0 0 0 2px var(--texfina-secondary-light);
+  }
+
+  &::placeholder {
+    color: var(--texfina-text-muted);
+    font-size: 0.75rem;
+  }
+}
+
+.btn-clear-column-filters {
+  min-width: 140px !important;
+  height: 48px !important;
+  border-radius: 10px !important;
+  border: 2px solid var(--texfina-primary) !important;
+  background: linear-gradient(135deg, white, #fef7f7) !important;
+  color: var(--texfina-primary) !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 0 20px;
+  white-space: nowrap;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-primary);
+    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    width: 100% !important;
+    min-width: auto !important;
+  }
+}
+
+// Filtros de búsqueda
+.filters-card {
+  background: var(--surface-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-color);
+
+  .filters-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    user-select: none;
+    border-bottom: 1px solid var(--border-color);
+
+    @media (max-width: 768px) {
+      padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .filters-title {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: var(--font-size-lg);
+    }
+  }
+
+  .filters-content {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--background-subtle);
+
+    @media (max-width: 768px) {
+      padding: var(--spacing-md) var(--spacing-lg);
+    }
+  }
+
+  .filters-form {
+    .filters-grid {
+      display: flex;
+      gap: 3rem;
+      align-items: stretch;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: var(--spacing-lg);
+      }
+    }
+
+    .filter-group {
+      flex: 1;
+
+      .simple-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        .simple-input {
+          width: 100%;
+          padding: var(--spacing-lg) var(--spacing-xl);
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius-md);
+          background: var(--surface-color);
+          font-size: var(--font-size-base);
+          color: var(--text-primary);
+          height: 48px;
+          line-height: 1.4;
+
+          &::placeholder {
+            color: var(--text-muted);
+          }
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-color-alpha);
+          }
+        }
+      }
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 2rem;
+      align-items: stretch;
+      flex-shrink: 0;
+    }
+
+    .btn-clear-filters {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border: 2px solid var(--border-color);
+      border-radius: var(--border-radius-md);
+      background: var(--surface-color);
+      color: var(--text-muted);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      height: 48px;
+      min-width: 100px;
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-color-alpha);
+      }
+    }
   }
 }

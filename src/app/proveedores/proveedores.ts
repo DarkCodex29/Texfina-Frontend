@@ -4,6 +4,7 @@ import {
   AfterViewInit,
   OnDestroy,
   ViewChild,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -61,8 +62,11 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
 
   proveedores: Proveedor[] = [];
   dataSource = new MatTableDataSource<Proveedor>([]);
-  filtrosForm: FormGroup;
-  filtrosExpanded: boolean = true;
+  filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosExpanded = true;
+  filtrosColumnaHabilitados = false;
+  filtrosColumnaActivos = false;
   private destroy$ = new Subject<void>();
 
   // Estados de carga y error
@@ -99,7 +103,11 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
     private dialog: MatDialog,
     private fb: FormBuilder
   ) {
-    this.filtrosForm = this.fb.group({
+    this.filtroGeneralForm = this.fb.group({
+      busquedaGeneral: [''],
+    });
+
+    this.filtrosColumnaForm = this.fb.group({
       empresa: [''],
       ruc: [''],
       contacto: [''],
@@ -109,7 +117,8 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarProveedores();
-    this.configurarFiltrosEnTiempoReal();
+    this.configurarFiltroGeneralEnTiempoReal();
+    this.configurarFiltrosColumnaEnTiempoReal();
   }
 
   ngAfterViewInit(): void {
@@ -121,11 +130,19 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltrosEnTiempoReal(): void {
-    this.filtrosForm.valueChanges
+  configurarFiltroGeneralEnTiempoReal(): void {
+    this.filtroGeneralForm.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.aplicarFiltros();
+        this.aplicarFiltroGeneral();
+      });
+  }
+
+  configurarFiltrosColumnaEnTiempoReal(): void {
+    this.filtrosColumnaForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltrosColumna();
       });
   }
 
@@ -171,8 +188,36 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargarProveedores();
   }
 
-  aplicarFiltros(): void {
-    const filtros = this.filtrosForm.value;
+  aplicarFiltroGeneral(): void {
+    const busqueda = this.filtroGeneralForm
+      .get('busquedaGeneral')
+      ?.value?.trim()
+      .toLowerCase();
+
+    if (!busqueda) {
+      this.dataSource.data = [...this.proveedores];
+      return;
+    }
+
+    const proveedoresFiltrados = this.proveedores.filter((proveedor) => {
+      const empresa = proveedor.empresa?.toLowerCase() || '';
+      const ruc = proveedor.ruc?.toLowerCase() || '';
+      const contacto = proveedor.contacto?.toLowerCase() || '';
+      const direccion = proveedor.direccion?.toLowerCase() || '';
+
+      return (
+        empresa.includes(busqueda) ||
+        ruc.includes(busqueda) ||
+        contacto.includes(busqueda) ||
+        direccion.includes(busqueda)
+      );
+    });
+
+    this.dataSource.data = proveedoresFiltrados;
+  }
+
+  aplicarFiltrosColumna(): void {
+    const filtros = this.filtrosColumnaForm.value;
     let proveedoresFiltrados = [...this.proveedores];
 
     // Filtro por Empresa
@@ -210,9 +255,35 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.data = proveedoresFiltrados;
   }
 
-  limpiarFiltros(): void {
-    this.filtrosForm.reset();
+  limpiarFiltroGeneral(): void {
+    this.filtroGeneralForm.reset();
     this.dataSource.data = [...this.proveedores];
+  }
+
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset();
+    this.dataSource.data = [...this.proveedores];
+  }
+
+  toggleFiltrosColumna() {
+    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
+    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
+
+    if (this.filtrosColumnaHabilitados) {
+      if (this.filtrosColumnaActivos) {
+        this.limpiarFiltroGeneral();
+      } else {
+        this.limpiarFiltrosColumna();
+      }
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (event.key === 'F3') {
+      event.preventDefault();
+      this.toggleFiltrosColumna();
+    }
   }
 
   toggleFiltros(): void {

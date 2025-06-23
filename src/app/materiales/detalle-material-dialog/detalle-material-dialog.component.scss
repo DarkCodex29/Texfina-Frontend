@@ -1,136 +1,160 @@
 .dialog-container {
-  padding: 0;
-  margin: 0;
-  background-color: white;
-  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  width: 100%;
+  max-width: 800px;
+  background: var(--texfina-bg-primary);
+  border-radius: var(--texfina-radius-lg);
   overflow: hidden;
 }
 
 .dialog-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e0e0e0;
-  background-color: #fafafa;
+  align-items: flex-start;
+  padding: var(--texfina-spacing-xl);
+  background: linear-gradient(
+    135deg,
+    var(--texfina-secondary),
+    var(--texfina-secondary-dark)
+  );
+  color: white;
+  border-bottom: 1px solid var(--texfina-border-light);
+
+  .header-content {
+    flex: 1;
+  }
 
   .dialog-title {
+    margin: 0 0 8px 0;
+    font-size: var(--texfina-font-size-xl);
+    font-weight: 600;
+    color: white;
+  }
+
+  .dialog-subtitle {
     margin: 0;
-    font-size: 1.25rem;
-    font-weight: 500;
-    color: #333;
+    font-size: var(--texfina-font-size-sm);
+    opacity: 0.9;
+    color: white;
   }
 
   .close-button {
-    color: #666;
-
-    &:hover {
-      background-color: #f0f0f0;
-    }
+    color: white;
+    width: 40px;
+    height: 40px;
+    margin-left: var(--texfina-spacing-md);
   }
 }
 
-.detalle-content {
-  padding: 2rem;
+.dialog-content {
+  flex: 1;
+  padding: var(--texfina-spacing-xl);
+  overflow-y: auto;
+}
 
-  .form-row {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--texfina-spacing-lg);
+}
 
-    .form-field {
-      flex: 1;
-    }
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--texfina-spacing-lg);
+  align-items: start;
 
-    &.form-row-two {
-      .form-field {
-        flex: 1;
-      }
-    }
-
-    &.form-row-three {
-      .form-field {
-        flex: 1;
-      }
-    }
-  }
-
-  // Estilos específicos para los campos de formulario de solo lectura
-  .mat-mdc-form-field {
-    width: 100%;
-
-    .mat-mdc-form-field-label {
-      color: #555;
-    }
-
-    .mat-mdc-input-element {
-      color: #333;
-      background-color: #f8f9fa;
-
-      &[readonly] {
-        cursor: default;
-      }
-    }
-
-    .mat-mdc-select-disabled {
-      color: #6c757d;
-    }
-
-    // Estilo para campos deshabilitados
-    &.mat-form-field-disabled {
-      .mat-mdc-form-field-label {
-        color: #6c757d;
-      }
-    }
-  }
-
-  // Estilo especial para los select deshabilitados
-  .mat-mdc-select[disabled] {
-    color: #6c757d;
+  &.form-row-three {
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
 
-// Media queries para responsividad
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--texfina-spacing-xs);
+
+  &.form-group-full {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-label {
+  font-size: var(--texfina-font-size-sm);
+  font-weight: 500;
+  color: var(--texfina-text-primary);
+  margin-bottom: 0;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--texfina-border-light);
+  border-radius: var(--texfina-radius-md);
+  font-size: var(--texfina-font-size-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--texfina-bg-primary);
+  color: var(--texfina-text-primary);
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-secondary);
+    box-shadow: 0 0 0 3px rgba(18, 30, 102, 0.1);
+  }
+
+  &:disabled,
+  &[readonly] {
+    background: var(--texfina-bg-tertiary);
+    color: var(--texfina-text-secondary);
+    cursor: not-allowed;
+    border-color: var(--texfina-border-medium);
+  }
+}
+
+.form-select {
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  option {
+    padding: 8px;
+  }
+}
+
 @media (max-width: 768px) {
   .dialog-container {
-    margin: 0.5rem;
-    max-height: 90vh;
-    overflow-y: auto;
+    margin: 8px;
+    max-height: calc(100vh - 16px);
+    max-width: calc(100vw - 16px);
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: var(--texfina-spacing-md);
+
+    &.form-row-three {
+      grid-template-columns: 1fr;
+    }
   }
 
   .dialog-header {
-    padding: 1rem 1.5rem;
+    padding: var(--texfina-spacing-lg);
 
     .dialog-title {
-      font-size: 1.1rem;
+      font-size: var(--texfina-font-size-lg);
+    }
+
+    .dialog-subtitle {
+      font-size: 13px;
     }
   }
 
-  .detalle-content {
-    padding: 1.5rem;
-
-    .form-row {
-      flex-direction: column;
-      margin-bottom: 1rem;
-
-      &.form-row-two,
-      &.form-row-three {
-        flex-direction: column;
-      }
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .dialog-container {
-    margin: 0.25rem;
-  }
-
-  .dialog-header {
-    padding: 0.75rem 1rem;
-  }
-
-  .detalle-content {
-    padding: 1rem;
+  .dialog-content {
+    padding: var(--texfina-spacing-lg);
   }
 }

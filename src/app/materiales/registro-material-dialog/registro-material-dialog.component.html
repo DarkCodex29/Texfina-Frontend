@@ -1,109 +1,132 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2 class="dialog-title">
-      {{ esEdicion ? "Editar" : "Registrar" }} Material
-    </h2>
-    <p class="dialog-subtitle">
-      Complete los campos para {{ esEdicion ? "actualizar" : "registrar" }} un
-      material
-    </p>
+    <div class="header-content">
+      <h2 class="dialog-title">
+        {{ esEdicion ? "Editar" : "Registrar" }} Insumo
+      </h2>
+      <p class="dialog-subtitle">
+        Complete los campos para {{ esEdicion ? "actualizar" : "registrar" }} un
+        insumo en el sistema
+      </p>
+    </div>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
 
   <div class="dialog-content">
-    <form [formGroup]="materialForm">
-      <!-- Primera fila: Información básica -->
+    <form [formGroup]="materialForm" class="form-container">
+      <!-- Primera fila: Código Fox y Nombre -->
       <div class="form-row">
-        <mat-form-field appearance="outline">
-          <mat-label>Código Fox</mat-label>
-          <input matInput formControlName="id_fox" placeholder="Ej: ALG001" />
-          <mat-error *ngIf="materialForm.get('id_fox')?.hasError('required')">
-            El código es requerido
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Nombre del Material</mat-label>
+        <div class="form-group">
+          <label class="form-label">Código Fox</label>
           <input
-            matInput
+            class="form-input"
+            formControlName="id_fox"
+            placeholder="Ej: ALG001"
+            maxlength="50"
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              materialForm.get('id_fox')?.hasError('required') &&
+              materialForm.get('id_fox')?.touched
+            "
+          >
+            El código Fox es requerido
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nombre del Insumo</label>
+          <input
+            class="form-input"
             formControlName="nombre"
             placeholder="Ej: Algodón Peinado"
+            maxlength="200"
           />
-          <mat-error *ngIf="materialForm.get('nombre')?.hasError('required')">
-            El nombre es requerido
-          </mat-error>
-        </mat-form-field>
+          <div
+            class="error-message"
+            *ngIf="
+              materialForm.get('nombre')?.hasError('required') &&
+              materialForm.get('nombre')?.touched
+            "
+          >
+            El nombre del insumo es requerido
+          </div>
+        </div>
       </div>
 
-      <!-- Segunda fila: Clase y unidad -->
+      <!-- Segunda fila: Clase y Unidad -->
       <div class="form-row">
-        <mat-form-field appearance="outline">
-          <mat-label>Clase</mat-label>
-          <mat-select formControlName="id_clase">
-            <mat-option *ngFor="let clase of clases" [value]="clase.id_clase">
+        <div class="form-group">
+          <label class="form-label">Clase</label>
+          <select class="form-select" formControlName="id_clase">
+            <option value="">Seleccionar clase</option>
+            <option *ngFor="let clase of clases" [value]="clase.id_clase">
               {{ clase.familia }} - {{ clase.sub_familia }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+            </option>
+          </select>
+        </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Unidad</mat-label>
-          <mat-select formControlName="id_unidad">
-            <mat-option
-              *ngFor="let unidad of unidades"
-              [value]="unidad.id_unidad"
-            >
-              {{ unidad.nombre }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+        <div class="form-group">
+          <label class="form-label">Unidad de Medida</label>
+          <select class="form-select" formControlName="id_unidad">
+            <option value="">Seleccionar unidad</option>
+            <option *ngFor="let unidad of unidades" [value]="unidad.id_unidad">
+              {{ unidad.nombre }} ({{ unidad.id_unidad }})
+            </option>
+          </select>
+        </div>
       </div>
 
-      <!-- Tercera fila: Peso unitario y presentación -->
+      <!-- Tercera fila: Peso, Presentación y Precio -->
       <div class="form-row">
-        <mat-form-field appearance="outline">
-          <mat-label>Peso Unitario</mat-label>
+        <div class="form-group">
+          <label class="form-label">Peso Unitario</label>
           <input
-            matInput
+            class="form-input"
             type="number"
             formControlName="peso_unitario"
             placeholder="Ej: 1.5"
+            step="0.01"
+            min="0"
           />
-        </mat-form-field>
+        </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Presentación</mat-label>
+        <div class="form-group">
+          <label class="form-label">Presentación</label>
           <input
-            matInput
+            class="form-input"
             formControlName="presentacion"
             placeholder="Ej: Rollo 50kg"
+            maxlength="100"
           />
-        </mat-form-field>
+        </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Precio Unitario</mat-label>
+        <div class="form-group">
+          <label class="form-label">Precio Unitario (S/)</label>
           <input
-            matInput
+            class="form-input"
             type="number"
             formControlName="precio_unitario"
-            placeholder="Ej: 15.50"
+            placeholder="15.50"
+            step="0.01"
+            min="0"
           />
-          <span matPrefix>S/ &nbsp;</span>
-        </mat-form-field>
+        </div>
       </div>
     </form>
   </div>
 
   <div class="dialog-actions">
-    <button mat-button class="btn-cancelar" (click)="onCancel()">
-      Cancelar
-    </button>
+    <button class="btn-cancel" (click)="onCancel()">Cancelar</button>
     <button
-      mat-raised-button
-      class="btn-guardar"
+      class="btn-save"
       [disabled]="materialForm.invalid"
       (click)="onSubmit()"
     >
-      {{ esEdicion ? "Actualizar" : "Registrar" }}
+      {{ esEdicion ? "Actualizar" : "Registrar" }} Insumo
     </button>
   </div>
 </div>

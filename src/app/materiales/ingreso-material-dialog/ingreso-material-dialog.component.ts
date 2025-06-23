@@ -14,7 +14,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MaterialService } from '../../services/material.service';
-import { Insumo, Proveedor } from '../../models/insumo.model';
+import {
+  Insumo,
+  Proveedor,
+  Unidad,
+  Lote,
+  Ingreso,
+} from '../../models/insumo.model';
 
 @Component({
   selector: 'app-ingreso-material-dialog',
@@ -37,6 +43,8 @@ export class IngresoMaterialDialogComponent implements OnInit {
   ingresoForm: FormGroup;
   materiales: Insumo[] = [];
   proveedores: Proveedor[] = [];
+  unidades: Unidad[] = [];
+  lotes: Lote[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -44,17 +52,24 @@ export class IngresoMaterialDialogComponent implements OnInit {
     private dialogRef: MatDialogRef<IngresoMaterialDialogComponent>
   ) {
     this.ingresoForm = this.fb.group({
-      stock_actual: ['5 kg'],
-      nueva_cantidad: ['', [Validators.required, Validators.min(0)]],
-      codigo: ['103832'],
-      material: ['Tinte1'],
-      proveedor: ['Texfina'],
-      lote: ['KN542'],
+      id_insumo: ['', [Validators.required]],
+      fecha: [new Date().toISOString().split('T')[0], [Validators.required]],
+      cantidad: ['', [Validators.required, Validators.min(0.01)]],
+      id_unidad: [''],
+      presentacion: [''],
+      id_lote: [''],
+      precio_unitario_historico: [0, [Validators.min(0)]],
+      precio_total_formula: [0],
+      numero_remision: [''],
+      orden_compra: [''],
+      id_proveedor: [''],
+      estado: ['PENDIENTE'],
     });
   }
 
   ngOnInit(): void {
     this.cargarDatos();
+    this.configurarCalculos();
   }
 
   cargarDatos(): void {
@@ -65,27 +80,65 @@ export class IngresoMaterialDialogComponent implements OnInit {
     this.materialService.getProveedores().subscribe((proveedores) => {
       this.proveedores = proveedores;
     });
+
+    this.materialService.getUnidades().subscribe((unidades) => {
+      this.unidades = unidades;
+    });
+
+    this.materialService.getLotes().subscribe((lotes) => {
+      this.lotes = lotes;
+    });
+  }
+
+  configurarCalculos(): void {
+    // Calcular precio total automáticamente
+    this.ingresoForm.get('cantidad')?.valueChanges.subscribe(() => {
+      this.calcularPrecioTotal();
+    });
+
+    this.ingresoForm
+      .get('precio_unitario_historico')
+      ?.valueChanges.subscribe(() => {
+        this.calcularPrecioTotal();
+      });
+  }
+
+  calcularPrecioTotal(): void {
+    const cantidad = this.ingresoForm.get('cantidad')?.value || 0;
+    const precioUnitario =
+      this.ingresoForm.get('precio_unitario_historico')?.value || 0;
+    const precioTotal = cantidad * precioUnitario;
+
+    this.ingresoForm
+      .get('precio_total_formula')
+      ?.setValue(precioTotal, { emitEvent: false });
   }
 
   onSubmit(): void {
     if (this.ingresoForm.valid) {
       const formValue = this.ingresoForm.value;
 
-      const ingreso = {
-        fecha: new Date(),
-        cantidad: parseFloat(formValue.nueva_cantidad),
-        codigo: formValue.codigo,
-        material: formValue.material,
-        proveedor: formValue.proveedor,
-        lote: formValue.lote,
-        stock_actual: formValue.stock_actual,
+      const ingreso: Ingreso = {
+        id_insumo: parseInt(formValue.id_insumo),
+        fecha: new Date(formValue.fecha),
+        cantidad: parseFloat(formValue.cantidad),
+        id_unidad: formValue.id_unidad,
+        presentacion: formValue.presentacion,
+        id_lote: formValue.id_lote ? parseInt(formValue.id_lote) : undefined,
+        precio_unitario_historico: parseFloat(
+          formValue.precio_unitario_historico
+        ),
+        precio_total_formula: parseFloat(formValue.precio_total_formula),
+        numero_remision: formValue.numero_remision,
+        orden_compra: formValue.orden_compra,
+        estado: formValue.estado,
       };
 
-      this.materialService.crearIngreso(ingreso as any).subscribe({
-        next: (resultado: any) => {
+      this.materialService.crearIngreso(ingreso).subscribe({
+        next: (resultado) => {
           this.dialogRef.close(resultado);
         },
-        error: (error: any) => {
+        error: (error) => {
           console.error('Error al registrar ingreso:', error);
         },
       });

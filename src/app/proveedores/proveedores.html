@@ -18,67 +18,21 @@
       </div>
     </div>
 
-    <!-- Filtros de búsqueda -->
-    <div class="filters-card" [class.expanded]="filtrosExpanded">
-      <div class="filters-header" (click)="toggleFiltros()">
-        <div class="filters-title">
-          <mat-icon>tune</mat-icon>
-          Filtros de Búsqueda
-          <mat-icon class="expand-icon" [class.rotated]="filtrosExpanded"
-            >expand_more</mat-icon
-          >
-        </div>
-        <span class="filter-subtitle" *ngIf="filtrosExpanded"
-          >Los resultados se actualizan automáticamente</span
-        >
+    <!-- Filtro General -->
+    <div class="filters-card">
+      <div class="filters-header">
+        <div class="filters-title">Búsqueda General</div>
       </div>
 
-      <div class="filters-content" *ngIf="filtrosExpanded">
-        <form [formGroup]="filtrosForm" class="filters-form">
+      <div class="filters-content">
+        <form [formGroup]="filtroGeneralForm" class="filters-form">
           <div class="filters-grid">
             <div class="filter-group">
               <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">business</mat-icon>
                 <input
                   class="simple-input"
-                  formControlName="empresa"
-                  placeholder="Filtrar por empresa..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">receipt_long</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="ruc"
-                  placeholder="Filtrar por RUC..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">person</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="contacto"
-                  placeholder="Filtrar por contacto..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">location_on</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="direccion"
-                  placeholder="Filtrar por dirección..."
+                  formControlName="busquedaGeneral"
+                  placeholder="Buscar en empresa, RUC, contacto, dirección..."
                   type="text"
                 />
               </div>
@@ -88,10 +42,10 @@
               <button
                 class="btn-clear-filters"
                 type="button"
-                (click)="limpiarFiltros()"
-                matTooltip="Limpiar todos los filtros"
+                (click)="limpiarFiltroGeneral()"
+                matTooltip="Limpiar búsqueda"
               >
-                Limpiar todos
+                Limpiar
               </button>
             </div>
           </div>
@@ -102,9 +56,10 @@
     <!-- Tabla de proveedores -->
     <div class="table-card">
       <div class="table-with-headers">
-        <!-- Encabezados de columnas -->
+        <!-- Encabezados de columnas con filtros integrados -->
         <div class="column-headers">
-          <div class="header-row">
+          <!-- Fila de títulos -->
+          <div class="header-row header-titles">
             <div class="header-col empresa-col" (click)="sortData('empresa')">
               <span>Empresa</span>
               <mat-icon class="sort-icon">unfold_more</mat-icon>
@@ -125,7 +80,57 @@
               <mat-icon class="sort-icon">unfold_more</mat-icon>
             </div>
             <div class="header-col acciones-col">
-              <span>Acciones</span>
+              <span>ACCIONES</span>
+            </div>
+          </div>
+
+          <!-- Fila de filtros por columna -->
+          <div
+            class="header-row header-filters"
+            *ngIf="filtrosColumnaHabilitados"
+            [formGroup]="filtrosColumnaForm"
+          >
+            <div class="header-col empresa-col">
+              <input
+                class="column-filter-input"
+                formControlName="empresa"
+                placeholder="Empresa..."
+                type="text"
+              />
+            </div>
+            <div class="header-col ruc-col">
+              <input
+                class="column-filter-input"
+                formControlName="ruc"
+                placeholder="RUC..."
+                type="text"
+              />
+            </div>
+            <div class="header-col contacto-col">
+              <input
+                class="column-filter-input"
+                formControlName="contacto"
+                placeholder="Contacto..."
+                type="text"
+              />
+            </div>
+            <div class="header-col direccion-col">
+              <input
+                class="column-filter-input"
+                formControlName="direccion"
+                placeholder="Dirección..."
+                type="text"
+              />
+            </div>
+            <div class="header-col acciones-col">
+              <button
+                class="btn-clear-column-filters"
+                type="button"
+                (click)="limpiarFiltrosColumna()"
+                matTooltip="Limpiar filtros de columna"
+              >
+                Limpiar filtros
+              </button>
             </div>
           </div>
         </div>
@@ -174,13 +179,6 @@
             <p class="filtered-empty-subtitle text-texfina text-muted">
               Intenta ajustar los filtros o limpiar la búsqueda
             </p>
-            <button
-              class="btn-texfina btn-secondary"
-              (click)="limpiarFiltros()"
-            >
-              <mat-icon>clear</mat-icon>
-              Limpiar Filtros
-            </button>
           </div>
 
           <!-- Tabla siempre visible (con skeleton o datos) -->
