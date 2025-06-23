@@ -4,6 +4,7 @@ import {
   OnDestroy,
   AfterViewInit,
   ViewChild,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -61,19 +62,31 @@ import { Receta, Insumo } from '../models/insumo.model';
 export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatSort) sort!: MatSort;
 
+  // ============================================================================
+  // PROPIEDADES DE DATOS
+  // ============================================================================
   recetas: Receta[] = [];
   dataSource = new MatTableDataSource<Receta>([]);
   insumos: Insumo[] = [];
-  filtrosForm: FormGroup;
-  filtrosExpanded: boolean = true;
+
+  filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosExpanded = true;
+  filtrosColumnaHabilitados = false;
+  filtrosColumnaActivos = false;
   private destroy$ = new Subject<void>();
 
-  // Estados de carga y error
-  isLoading: boolean = false;
-  isLoadingInsumos: boolean = false;
-  hasError: boolean = false;
-  errorMessage: string = '';
+  // ============================================================================
+  // PROPIEDADES DE ESTADO
+  // ============================================================================
+  isLoading = false;
+  isLoadingInsumos = false;
+  hasError = false;
+  errorMessage = '';
 
+  // ============================================================================
+  // CONFIGURACIÓN DE TABLA
+  // ============================================================================
   displayedColumns: string[] = [
     'id_receta',
     'nombre',
@@ -103,7 +116,11 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
     private dialog: MatDialog,
     private fb: FormBuilder
   ) {
-    this.filtrosForm = this.fb.group({
+    this.filtroGeneralForm = this.fb.group({
+      busquedaGeneral: [''],
+    });
+
+    this.filtrosColumnaForm = this.fb.group({
       codigoReceta: [''],
       nombre: [''],
       ingredientes: [''],
@@ -114,7 +131,8 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.cargarRecetas();
     this.cargarInsumos();
-    this.configurarFiltrosEnTiempoReal();
+    this.configurarFiltroGeneralEnTiempoReal();
+    this.configurarFiltrosColumnaEnTiempoReal();
   }
 
   ngAfterViewInit(): void {
@@ -126,14 +144,25 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltrosEnTiempoReal(): void {
-    this.filtrosForm.valueChanges
+  configurarFiltroGeneralEnTiempoReal(): void {
+    this.filtroGeneralForm.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.aplicarFiltros();
+        this.aplicarFiltroGeneral();
       });
   }
 
+  configurarFiltrosColumnaEnTiempoReal(): void {
+    this.filtrosColumnaForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltrosColumna();
+      });
+  }
+
+  // ============================================================================
+  // MÉTODOS DE INICIALIZACIÓN
+  // ============================================================================
   cargarRecetas(): void {
     this.isLoading = true;
     this.hasError = false;
@@ -144,7 +173,6 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.materialService
       .getRecetas()
       .pipe(
-        // Delay artificial para demostrar el skeleton (remover en producción)
         delay(1500),
         finalize(() => {
           this.isLoading = false;
@@ -175,7 +203,6 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.materialService
       .getMateriales()
       .pipe(
-        // Delay artificial para demostrar el skeleton (remover en producción)
         delay(1000),
         finalize(() => {
           this.isLoadingInsumos = false;
@@ -198,15 +225,45 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargarInsumos();
   }
 
-  aplicarFiltros(): void {
-    const filtros = this.filtrosForm.value;
+  // ============================================================================
+  // MÉTODOS DE FILTROS
+  // ============================================================================
+  aplicarFiltroGeneral(): void {
+    const busqueda = this.filtroGeneralForm
+      .get('busquedaGeneral')
+      ?.value?.trim()
+      .toLowerCase();
+
+    if (!busqueda) {
+      this.dataSource.data = [...this.recetas];
+      return;
+    }
+
+    const recetasFiltradas = this.recetas.filter((receta) => {
+      const codigo = this.formatearCodigo(receta.id_receta).toLowerCase();
+      const nombre = receta.nombre?.toLowerCase() || '';
+      const ingredientesCount = this.getIngredientesCount(receta).toString();
+      const estado = this.getEstadoReceta(receta).toLowerCase();
+
+      return (
+        codigo.includes(busqueda) ||
+        nombre.includes(busqueda) ||
+        ingredientesCount.includes(busqueda) ||
+        estado.includes(busqueda)
+      );
+    });
+
+    this.dataSource.data = recetasFiltradas;
+  }
+
+  aplicarFiltrosColumna(): void {
+    const filtros = this.filtrosColumnaForm.value;
     let recetasFiltradas = [...this.recetas];
 
     // Filtro por Código Receta
     if (filtros.codigoReceta && filtros.codigoReceta.trim()) {
       recetasFiltradas = recetasFiltradas.filter((receta) =>
-        receta.id_receta
-          ?.toString()
+        this.formatearCodigo(receta.id_receta)
           .toLowerCase()
           .includes(filtros.codigoReceta.toLowerCase())
       );
@@ -224,7 +281,7 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
       const ingredientesFiltro = parseFloat(filtros.ingredientes);
       if (!isNaN(ingredientesFiltro)) {
         recetasFiltradas = recetasFiltradas.filter((receta) => {
-          const count = receta.detalles?.length || 0;
+          const count = this.getIngredientesCount(receta);
           return (
             count >= ingredientesFiltro - 0.01 &&
             count <= ingredientesFiltro + 0.01
@@ -244,15 +301,44 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.data = recetasFiltradas;
   }
 
-  limpiarFiltros(): void {
-    this.filtrosForm.reset();
+  limpiarFiltroGeneral(): void {
+    this.filtroGeneralForm.reset();
     this.dataSource.data = [...this.recetas];
+  }
+
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset();
+    this.dataSource.data = [...this.recetas];
+  }
+
+  toggleFiltrosColumna() {
+    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
+    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
+
+    if (this.filtrosColumnaHabilitados) {
+      if (this.filtrosColumnaActivos) {
+        this.limpiarFiltroGeneral();
+      } else {
+        this.limpiarFiltrosColumna();
+      }
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (event.key === 'F3') {
+      event.preventDefault();
+      this.toggleFiltrosColumna();
+    }
   }
 
   toggleFiltros(): void {
     this.filtrosExpanded = !this.filtrosExpanded;
   }
 
+  // ============================================================================
+  // MÉTODOS DE TABLA
+  // ============================================================================
   sortData(column: string): void {
     if (this.sort) {
       // Si ya está ordenado por esta columna, cambiar dirección
@@ -270,62 +356,32 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // ============================================================================
+  // MÉTODOS DE ACCIONES
+  // ============================================================================
   abrirRegistroReceta(): void {
     console.log('➕ Abriendo formulario para nueva receta');
     // TODO: Implementar dialog para crear nueva receta
-    // const dialogRef = this.dialog.open(RegistroRecetaDialogComponent, {
-    //   width: '800px',
-    //   disableClose: true,
-    // });
-
-    // dialogRef.afterClosed().subscribe((result) => {
-    //   if (result) {
-    //     this.cargarRecetas();
-    //   }
-    // });
   }
 
   abrirIngresoReceta(): void {
     console.log('📥 Abriendo formulario para ingreso de receta');
     // TODO: Implementar dialog para ingreso de receta
-    // const dialogRef = this.dialog.open(IngresoRecetaDialogComponent, {
-    //   width: '700px',
-    //   disableClose: true,
-    // });
-
-    // dialogRef.afterClosed().subscribe((result) => {
-    //   if (result) {
-    //     // Actualizar stock o datos necesarios
-    //     console.log('Ingreso registrado:', result);
-    //   }
-    // });
   }
 
   verDetalle(receta: Receta): void {
     console.log('👁️ Ver detalle de receta:', receta.nombre);
     // TODO: Implementar dialog de detalle de receta
-    // this.dialog.open(DetalleRecetaDialogComponent, {
-    //   width: '800px',
-    //   data: receta,
-    // });
   }
 
   editarReceta(receta: Receta): void {
     console.log('✏️ Editando receta:', receta.nombre);
     // TODO: Implementar dialog de edición de receta
-    // const dialogRef = this.dialog.open(RegistroRecetaDialogComponent, {
-    //   width: '800px',
-    //   data: { receta, esEdicion: true },
-    //   disableClose: true,
-    // });
-
-    // dialogRef.afterClosed().subscribe((result) => {
-    //   if (result) {
-    //     this.cargarRecetas();
-    //   }
-    // });
   }
 
+  // ============================================================================
+  // MÉTODOS UTILITARIOS
+  // ============================================================================
   formatearCodigo(id?: number): string {
     if (!id) return 'REC-0000';
     return `REC-${id.toString().padStart(4, '0')}`;

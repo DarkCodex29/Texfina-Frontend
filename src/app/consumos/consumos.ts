@@ -1,4 +1,10 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  HostListener,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
@@ -6,8 +12,15 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Subject, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import {
+  Subject,
+  of,
+  debounceTime,
+  distinctUntilChanged,
+  takeUntil,
+  finalize,
+  delay,
+} from 'rxjs';
 
 import { Consumo, Insumo, Lote } from '../models/insumo.model';
 import { MaterialService } from '../services/material.service';
@@ -28,17 +41,31 @@ import { MaterialService } from '../services/material.service';
   styleUrls: ['./consumos.scss'],
 })
 export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
-  // Gestión de estado
-  isLoading = false;
-  hasError = false;
-  errorMessage = '';
-  filtrosExpanded = false;
-
-  // Datos
+  // ============================================================================
+  // PROPIEDADES DE DATOS
+  // ============================================================================
   consumos: Consumo[] = [];
   insumos: Insumo[] = [];
   lotes: Lote[] = [];
   dataSource = new MatTableDataSource<Consumo>([]);
+
+  filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosExpanded = true;
+  filtrosColumnaHabilitados = false;
+  filtrosColumnaActivos = false;
+  private destroy$ = new Subject<void>();
+
+  // ============================================================================
+  // PROPIEDADES DE ESTADO
+  // ============================================================================
+  isLoading = false;
+  hasError = false;
+  errorMessage = '';
+
+  // ============================================================================
+  // CONFIGURACIÓN DE TABLA
+  // ============================================================================
   displayedColumns: string[] = [
     'fecha',
     'insumo',
@@ -49,25 +76,40 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
     'acciones',
   ];
 
-  // Filtros
-  filtrosForm: FormGroup;
-  private destroy$ = new Subject<void>();
+  get isEmpty(): boolean {
+    return !this.isLoading && !this.hasError && this.consumos.length === 0;
+  }
+
+  get isFilteredEmpty(): boolean {
+    return (
+      !this.isLoading &&
+      this.dataSource.data.length === 0 &&
+      this.consumos.length > 0
+    );
+  }
 
   constructor(
     private fb: FormBuilder,
     private materialService: MaterialService
   ) {
-    this.filtrosForm = this.fb.group({
+    this.filtroGeneralForm = this.fb.group({
+      busquedaGeneral: [''],
+    });
+
+    this.filtrosColumnaForm = this.fb.group({
+      fecha: [''],
       insumo: [''],
       area: [''],
+      cantidad: [''],
       lote: [''],
       estado: [''],
     });
   }
 
   ngOnInit() {
-    this.configurarFiltros();
     this.cargarDatos();
+    this.configurarFiltroGeneralEnTiempoReal();
+    this.configurarFiltrosColumnaEnTiempoReal();
   }
 
   ngAfterViewInit() {
@@ -79,94 +121,240 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // Computed properties
-  get isEmpty(): boolean {
-    return !this.isLoading && !this.hasError && this.consumos.length === 0;
-  }
-
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      !this.hasError &&
-      this.consumos.length > 0 &&
-      this.dataSource.filteredData.length === 0
-    );
-  }
-
-  // Configuración de filtros
-  private configurarFiltros() {
-    this.filtrosForm.valueChanges
+  configurarFiltroGeneralEnTiempoReal(): void {
+    this.filtroGeneralForm.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.aplicarFiltros();
+        this.aplicarFiltroGeneral();
       });
   }
 
-  // Cargar datos
-  private async cargarDatos() {
+  configurarFiltrosColumnaEnTiempoReal(): void {
+    this.filtrosColumnaForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltrosColumna();
+      });
+  }
+
+  // ============================================================================
+  // MÉTODOS DE INICIALIZACIÓN
+  // ============================================================================
+  private cargarDatos() {
     this.isLoading = true;
     this.hasError = false;
+    this.errorMessage = '';
 
-    try {
-      // Cargar datos en paralelo
-      const [consumosData, insumosData, lotesData] = await Promise.all([
-        // TODO: Implementar getConsumos() en MaterialService
-        of([]).toPromise(), // Placeholder para consumos
-        this.materialService.getMateriales().toPromise(),
-        this.materialService.getLotes().toPromise(),
-      ]);
+    console.log('🔄 Iniciando carga de consumos - isLoading:', this.isLoading);
 
-      this.consumos = consumosData || [];
-      this.insumos = insumosData || [];
-      this.lotes = lotesData || [];
+    Promise.all([
+      of([]).toPromise(), // TODO: Implementar getConsumos() en MaterialService
+      this.materialService.getMateriales().toPromise(),
+      this.materialService.getLotes().toPromise(),
+    ])
+      .then(([consumosData, insumosData, lotesData]) => {
+        // Delay artificial para demostrar el skeleton
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve([consumosData, insumosData, lotesData]);
+          }, 1500);
+        });
+      })
+      .then(([consumosData, insumosData, lotesData]: any) => {
+        console.log('📋 Consumos cargados:', (consumosData || []).length);
+        this.consumos = consumosData || [];
+        this.insumos = insumosData || [];
+        this.lotes = lotesData || [];
+        this.dataSource.data = [...this.consumos];
+      })
+      .catch((error) => {
+        console.error('❌ Error al cargar consumos:', error);
+        this.hasError = true;
+        this.errorMessage = 'Error al cargar los datos de consumos';
+        this.consumos = [];
+        this.insumos = [];
+        this.lotes = [];
+        this.dataSource.data = [];
+      })
+      .finally(() => {
+        this.isLoading = false;
+        console.log('✅ Carga completada - isLoading:', this.isLoading);
+      });
+  }
 
-      this.dataSource.data = this.consumos;
-    } catch (error) {
-      this.hasError = true;
-      this.errorMessage = 'Error al cargar los datos de consumos';
-      console.error('Error cargando consumos:', error);
-    } finally {
-      this.isLoading = false;
+  reintentarCarga(): void {
+    this.cargarDatos();
+  }
+
+  // ============================================================================
+  // MÉTODOS DE FILTROS
+  // ============================================================================
+  aplicarFiltroGeneral(): void {
+    const busqueda = this.filtroGeneralForm
+      .get('busquedaGeneral')
+      ?.value?.trim()
+      .toLowerCase();
+
+    if (!busqueda) {
+      this.dataSource.data = [...this.consumos];
+      return;
+    }
+
+    const consumosFiltrados = this.consumos.filter((consumo) => {
+      const fecha = this.formatearFecha(consumo.fecha).toLowerCase();
+      const insumoNombre = this.getInsumoNombre(consumo.id_insumo).toLowerCase();
+      const insumoCodigoFox = this.getInsumoCodigoFox(consumo.id_insumo).toLowerCase();
+      const area = (consumo.area || '').toLowerCase();
+      const cantidad = this.formatearCantidad(consumo.cantidad);
+      const loteNombre = this.getLoteNombre(consumo.id_lote).toLowerCase();
+      const estado = this.getEstadoConsumo(consumo).toLowerCase();
+
+      return (
+        fecha.includes(busqueda) ||
+        insumoNombre.includes(busqueda) ||
+        insumoCodigoFox.includes(busqueda) ||
+        area.includes(busqueda) ||
+        cantidad.includes(busqueda) ||
+        loteNombre.includes(busqueda) ||
+        estado.includes(busqueda)
+      );
+    });
+
+    this.dataSource.data = consumosFiltrados;
+  }
+
+  aplicarFiltrosColumna(): void {
+    const filtros = this.filtrosColumnaForm.value;
+    let consumosFiltrados = [...this.consumos];
+
+    // Filtro por Fecha
+    if (filtros.fecha && filtros.fecha.toString().trim()) {
+      const fechaFiltro = filtros.fecha.toString();
+      consumosFiltrados = consumosFiltrados.filter((consumo) => {
+        const fechaConsumo = this.formatearFecha(consumo.fecha);
+        return fechaConsumo.includes(fechaFiltro);
+      });
+    }
+
+    // Filtro por Insumo
+    if (filtros.insumo && filtros.insumo.trim()) {
+      consumosFiltrados = consumosFiltrados.filter((consumo) => {
+        const insumoNombre = this.getInsumoNombre(consumo.id_insumo).toLowerCase();
+        const insumoCodigoFox = this.getInsumoCodigoFox(consumo.id_insumo).toLowerCase();
+        return (
+          insumoNombre.includes(filtros.insumo.toLowerCase()) ||
+          insumoCodigoFox.includes(filtros.insumo.toLowerCase())
+        );
+      });
+    }
+
+    // Filtro por Área
+    if (filtros.area && filtros.area.trim()) {
+      consumosFiltrados = consumosFiltrados.filter((consumo) =>
+        (consumo.area || '').toLowerCase().includes(filtros.area.toLowerCase())
+      );
+    }
+
+    // Filtro por Cantidad
+    if (filtros.cantidad && filtros.cantidad.toString().trim()) {
+      const cantidadFiltro = parseFloat(filtros.cantidad);
+      if (!isNaN(cantidadFiltro)) {
+        consumosFiltrados = consumosFiltrados.filter((consumo) => {
+          const cantidad = consumo.cantidad || 0;
+          return (
+            cantidad >= cantidadFiltro - 0.01 &&
+            cantidad <= cantidadFiltro + 0.01
+          );
+        });
+      }
+    }
+
+    // Filtro por Lote
+    if (filtros.lote && filtros.lote.trim()) {
+      consumosFiltrados = consumosFiltrados.filter((consumo) =>
+        this.getLoteNombre(consumo.id_lote)
+          .toLowerCase()
+          .includes(filtros.lote.toLowerCase())
+      );
+    }
+
+    // Filtro por Estado
+    if (filtros.estado && filtros.estado.trim()) {
+      consumosFiltrados = consumosFiltrados.filter((consumo) =>
+        this.getEstadoConsumo(consumo)
+          .toLowerCase()
+          .includes(filtros.estado.toLowerCase())
+      );
+    }
+
+    this.dataSource.data = consumosFiltrados;
+  }
+
+  limpiarFiltroGeneral(): void {
+    this.filtroGeneralForm.reset();
+    this.dataSource.data = [...this.consumos];
+  }
+
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset();
+    this.dataSource.data = [...this.consumos];
+  }
+
+  toggleFiltrosColumna() {
+    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
+    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
+
+    if (this.filtrosColumnaHabilitados) {
+      if (this.filtrosColumnaActivos) {
+        this.limpiarFiltroGeneral();
+      } else {
+        this.limpiarFiltrosColumna();
+      }
     }
   }
 
-  // Filtros
-  toggleFiltros() {
-    this.filtrosExpanded = !this.filtrosExpanded;
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (event.key === 'F3') {
+      event.preventDefault();
+      this.toggleFiltrosColumna();
+    }
   }
 
-  aplicarFiltros() {
-    const filtros = this.filtrosForm.value;
-
-    this.dataSource.filterPredicate = (consumo: Consumo) => {
-      const insumoNombre =
-        this.getInsumoNombre(consumo.id_insumo)?.toLowerCase() || '';
-      const insumoCodigoFox =
-        this.getInsumoCodigoFox(consumo.id_insumo)?.toLowerCase() || '';
-      const area = (consumo.area || '').toLowerCase();
-      const loteNombre =
-        this.getLoteNombre(consumo.id_lote)?.toLowerCase() || '';
-      const estado = (consumo.estado || '').toLowerCase();
-
-      return (
-        (!filtros.insumo ||
-          insumoNombre.includes(filtros.insumo.toLowerCase()) ||
-          insumoCodigoFox.includes(filtros.insumo.toLowerCase())) &&
-        (!filtros.area || area.includes(filtros.area.toLowerCase())) &&
-        (!filtros.lote || loteNombre.includes(filtros.lote.toLowerCase())) &&
-        (!filtros.estado || estado.includes(filtros.estado.toLowerCase()))
-      );
-    };
-
-    this.dataSource.filter = Date.now().toString(); // Trigger filter
+  // ============================================================================
+  // MÉTODOS DE TABLA
+  // ============================================================================
+  sortData(column: string) {
+    console.log('Ordenar por:', column);
+    // TODO: Implementar ordenamiento
   }
 
-  limpiarFiltros() {
-    this.filtrosForm.reset();
-    this.dataSource.filter = '';
+  // ============================================================================
+  // MÉTODOS DE ACCIONES
+  // ============================================================================
+  verDetalle(consumo: Consumo) {
+    console.log('👁️ Ver detalle de consumo:', consumo);
+    // TODO: Implementar modal de detalle
   }
 
-  // Utilidades para obtener datos relacionados
+  editarConsumo(consumo: Consumo) {
+    console.log('✏️ Editar consumo:', consumo);
+    // TODO: Implementar modal de edición
+  }
+
+  abrirRegistroConsumo() {
+    console.log('➕ Abrir registro de consumo');
+    // TODO: Implementar modal de registro
+  }
+
+  abrirConsumoMasivo() {
+    console.log('📤 Abrir consumo masivo');
+    // TODO: Implementar modal de carga masiva
+  }
+
+  // ============================================================================
+  // MÉTODOS UTILITARIOS
+  // ============================================================================
   getInsumoNombre(idInsumo?: number): string {
     if (!idInsumo) return 'Sin insumo';
     const insumo = this.insumos.find((i) => i.id_insumo === idInsumo);
@@ -195,7 +383,6 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
     return consumo.estado || 'PENDIENTE';
   }
 
-  // Formateo de datos
   formatearFecha(fecha?: Date): string {
     if (!fecha) return '';
     const fechaObj = new Date(fecha);
@@ -212,36 +399,5 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-  }
-
-  // Acciones de la tabla
-  sortData(column: string) {
-    // Implementar ordenamiento
-    console.log('Ordenar por:', column);
-  }
-
-  verDetalle(consumo: Consumo) {
-    console.log('Ver detalle de consumo:', consumo);
-    // Implementar navegación o modal de detalle
-  }
-
-  editarConsumo(consumo: Consumo) {
-    console.log('Editar consumo:', consumo);
-    // Implementar navegación o modal de edición
-  }
-
-  // Acciones principales
-  abrirRegistroConsumo() {
-    console.log('Abrir registro de consumo');
-    // Implementar navegación o modal de registro
-  }
-
-  abrirConsumoMasivo() {
-    console.log('Abrir consumo masivo');
-    // Implementar navegación o modal de carga masiva
-  }
-
-  reintentarCarga() {
-    this.cargarDatos();
   }
 }

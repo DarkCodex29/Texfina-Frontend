@@ -1,83 +1,102 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2 class="dialog-title">{{ esNuevo ? 'Nueva clase' : 'Editar clase' }}</h2>
-    <button mat-icon-button (click)="onCancel()" class="close-button">
+    <div class="header-content">
+      <h2 class="dialog-title">{{ esNuevo ? "Registrar" : "Editar" }} Clase</h2>
+      <p class="dialog-subtitle">
+        Complete los campos para {{ esNuevo ? "registrar" : "actualizar" }} una
+        clase en el sistema
+      </p>
+    </div>
+    <button mat-icon-button mat-dialog-close class="close-button">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <form [formGroup]="claseForm" (ngSubmit)="onSubmit()" class="dialog-form">
-    <div class="form-content">
-      <!-- Primera fila - Código -->
+  <div class="dialog-content">
+    <form [formGroup]="claseForm" class="form-container">
+      <!-- Primera fila: Código y Familia -->
       <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Código *</mat-label>
+        <div class="form-group">
+          <label class="form-label">Código Clase</label>
           <input
-            matInput
+            class="form-input"
             formControlName="id_clase"
             placeholder="Ej: QUIM, MAT_PRIMA"
+            maxlength="50"
             style="text-transform: uppercase"
           />
-          <mat-hint>Solo letras mayúsculas y guiones bajos</mat-hint>
-          <mat-error *ngIf="claseForm.get('id_clase')?.hasError('required')">
-            El código es requerido
-          </mat-error>
-          <mat-error *ngIf="claseForm.get('id_clase')?.hasError('pattern')">
+          <div
+            class="error-message"
+            *ngIf="
+              claseForm.get('id_clase')?.hasError('required') &&
+              claseForm.get('id_clase')?.touched
+            "
+          >
+            El código de clase es requerido
+          </div>
+          <div
+            class="error-message"
+            *ngIf="
+              claseForm.get('id_clase')?.hasError('pattern') &&
+              claseForm.get('id_clase')?.touched
+            "
+          >
             Solo se permiten letras mayúsculas y guiones bajos
-          </mat-error>
-        </mat-form-field>
-      </div>
+          </div>
+        </div>
 
-      <!-- Segunda fila - Familia -->
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Familia *</mat-label>
+        <div class="form-group">
+          <label class="form-label">Familia</label>
           <input
-            matInput
+            class="form-input"
             formControlName="familia"
             placeholder="Ej: Químicos, Materia Prima"
+            maxlength="100"
           />
-          <mat-error *ngIf="claseForm.get('familia')?.hasError('required')">
+          <div
+            class="error-message"
+            *ngIf="
+              claseForm.get('familia')?.hasError('required') &&
+              claseForm.get('familia')?.touched
+            "
+          >
             La familia es requerida
-          </mat-error>
-        </mat-form-field>
+          </div>
+        </div>
       </div>
 
-      <!-- Tercera fila - Subfamilia -->
+      <!-- Segunda fila: Subfamilia -->
       <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Subfamilia *</mat-label>
+        <div class="form-group">
+          <label class="form-label">Subfamilia</label>
           <input
-            matInput
+            class="form-input"
             formControlName="sub_familia"
             placeholder="Ej: Químicos Básicos, Fibras"
+            maxlength="100"
           />
-          <mat-error *ngIf="claseForm.get('sub_familia')?.hasError('required')">
+          <div
+            class="error-message"
+            *ngIf="
+              claseForm.get('sub_familia')?.hasError('required') &&
+              claseForm.get('sub_familia')?.touched
+            "
+          >
             La subfamilia es requerida
-          </mat-error>
-        </mat-form-field>
+          </div>
+        </div>
       </div>
-    </div>
+    </form>
+  </div>
 
-    <div class="dialog-actions">
-      <button
-        mat-button
-        type="button"
-        (click)="onCancel()"
-        class="btn-cancelar"
-      >
-        Cancelar
-      </button>
-      <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        [disabled]="!claseForm.valid"
-        class="btn-guardar"
-      >
-        <mat-icon>save</mat-icon>
-        {{ esNuevo ? 'Crear' : 'Actualizar' }}
-      </button>
-    </div>
-  </form>
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="onCancel()">Cancelar</button>
+    <button
+      class="btn-save"
+      [disabled]="claseForm.invalid"
+      (click)="onSubmit()"
+    >
+      {{ esNuevo ? "Registrar" : "Actualizar" }} Clase
+    </button>
+  </div>
 </div>

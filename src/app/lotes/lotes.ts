@@ -4,6 +4,7 @@ import {
   OnDestroy,
   AfterViewInit,
   ViewChild,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -67,19 +68,31 @@ import { DetalleLoteDialogComponent } from './detalle-lote-dialog/detalle-lote-d
 export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatSort) sort!: MatSort;
 
+  // ============================================================================
+  // PROPIEDADES DE DATOS
+  // ============================================================================
   lotes: Lote[] = [];
   dataSource = new MatTableDataSource<Lote>([]);
   insumos: Insumo[] = [];
-  filtrosForm: FormGroup;
-  filtrosExpanded: boolean = true;
+
+  filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosExpanded = true;
+  filtrosColumnaHabilitados = false;
+  filtrosColumnaActivos = false;
   private destroy$ = new Subject<void>();
 
-  // Estados de carga y error
-  isLoading: boolean = false;
-  isLoadingInsumos: boolean = false;
-  hasError: boolean = false;
-  errorMessage: string = '';
+  // ============================================================================
+  // PROPIEDADES DE ESTADO
+  // ============================================================================
+  isLoading = false;
+  isLoadingInsumos = false;
+  hasError = false;
+  errorMessage = '';
 
+  // ============================================================================
+  // CONFIGURACIÓN DE TABLA
+  // ============================================================================
   displayedColumns: string[] = [
     'lote',
     'id_insumo',
@@ -111,7 +124,11 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
     private dialog: MatDialog,
     private fb: FormBuilder
   ) {
-    this.filtrosForm = this.fb.group({
+    this.filtroGeneralForm = this.fb.group({
+      busquedaGeneral: [''],
+    });
+
+    this.filtrosColumnaForm = this.fb.group({
       lote: [''],
       insumo: [''],
       ubicacion: [''],
@@ -124,7 +141,8 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.cargarLotes();
     this.cargarInsumos();
-    this.configurarFiltrosEnTiempoReal();
+    this.configurarFiltroGeneralEnTiempoReal();
+    this.configurarFiltrosColumnaEnTiempoReal();
   }
 
   ngAfterViewInit(): void {
@@ -136,14 +154,25 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltrosEnTiempoReal(): void {
-    this.filtrosForm.valueChanges
+  configurarFiltroGeneralEnTiempoReal(): void {
+    this.filtroGeneralForm.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.aplicarFiltros();
+        this.aplicarFiltroGeneral();
       });
   }
 
+  configurarFiltrosColumnaEnTiempoReal(): void {
+    this.filtrosColumnaForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltrosColumna();
+      });
+  }
+
+  // ============================================================================
+  // MÉTODOS DE INICIALIZACIÓN
+  // ============================================================================
   cargarLotes(): void {
     this.isLoading = true;
     this.hasError = false;
@@ -154,7 +183,6 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.materialService
       .getLotes()
       .pipe(
-        // Delay artificial para demostrar el skeleton (remover en producción)
         delay(1500),
         finalize(() => {
           this.isLoading = false;
@@ -185,7 +213,6 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.materialService
       .getMateriales()
       .pipe(
-        // Delay artificial para demostrar el skeleton (remover en producción)
         delay(1000),
         finalize(() => {
           this.isLoadingInsumos = false;
@@ -208,8 +235,39 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargarInsumos();
   }
 
-  aplicarFiltros(): void {
-    const filtros = this.filtrosForm.value;
+  // ============================================================================
+  // MÉTODOS DE FILTROS
+  // ============================================================================
+  aplicarFiltroGeneral(): void {
+    const busqueda = this.filtroGeneralForm
+      .get('busquedaGeneral')
+      ?.value?.trim()
+      .toLowerCase();
+
+    if (!busqueda) {
+      this.dataSource.data = [...this.lotes];
+      return;
+    }
+
+    const lotesFiltrados = this.lotes.filter((lote) => {
+      const codigo = lote.lote?.toLowerCase() || '';
+      const insumoNombre = this.getInsumoNombre(lote.id_insumo).toLowerCase();
+      const ubicacion = lote.ubicacion?.toLowerCase() || '';
+      const estado = lote.estado_lote?.toLowerCase() || '';
+
+      return (
+        codigo.includes(busqueda) ||
+        insumoNombre.includes(busqueda) ||
+        ubicacion.includes(busqueda) ||
+        estado.includes(busqueda)
+      );
+    });
+
+    this.dataSource.data = lotesFiltrados;
+  }
+
+  aplicarFiltrosColumna(): void {
+    const filtros = this.filtrosColumnaForm.value;
     let lotesFiltrados = [...this.lotes];
 
     // Filtro por Código de Lote
@@ -271,15 +329,44 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.data = lotesFiltrados;
   }
 
-  limpiarFiltros(): void {
-    this.filtrosForm.reset();
+  limpiarFiltroGeneral(): void {
+    this.filtroGeneralForm.reset();
     this.dataSource.data = [...this.lotes];
+  }
+
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset();
+    this.dataSource.data = [...this.lotes];
+  }
+
+  toggleFiltrosColumna() {
+    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
+    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
+
+    if (this.filtrosColumnaHabilitados) {
+      if (this.filtrosColumnaActivos) {
+        this.limpiarFiltroGeneral();
+      } else {
+        this.limpiarFiltrosColumna();
+      }
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (event.key === 'F3') {
+      event.preventDefault();
+      this.toggleFiltrosColumna();
+    }
   }
 
   toggleFiltros(): void {
     this.filtrosExpanded = !this.filtrosExpanded;
   }
 
+  // ============================================================================
+  // MÉTODOS DE TABLA
+  // ============================================================================
   sortData(column: string): void {
     if (this.sort) {
       // Si ya está ordenado por esta columna, cambiar dirección
@@ -297,6 +384,9 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // ============================================================================
+  // MÉTODOS DE ACCIONES
+  // ============================================================================
   abrirNuevoLote(): void {
     const dialogRef = this.dialog.open(EditarLoteDialogComponent, {
       width: '700px',
@@ -333,6 +423,9 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  // ============================================================================
+  // MÉTODOS UTILITARIOS
+  // ============================================================================
   getInsumoNombre(id_insumo?: number): string {
     const insumo = this.insumos.find((i) => i.id_insumo === id_insumo);
     return insumo ? insumo.nombre : 'Sin asignar';
@@ -394,7 +487,7 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
     const stockInicial = lote.stock_inicial || 0;
     const porcentaje =
       stockInicial > 0 ? (stockActual / stockInicial) * 100 : 0;
-    return porcentaje > 0 && porcentaje <= 20; // Menos del 20% del stock inicial
+    return porcentaje > 0 && porcentaje <= 20;
   }
 }
 

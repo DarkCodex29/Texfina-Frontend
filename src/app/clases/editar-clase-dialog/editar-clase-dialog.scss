@@ -5,137 +5,175 @@
 .dialog-container {
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
   width: 100%;
-  max-width: 600px;
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
+}
 
-  // ===== HEADER =====
-  .dialog-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-    color: white;
+.dialog-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  max-height: calc(90vh - 160px);
+}
 
-    .dialog-title {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px;
+  background: linear-gradient(
+    135deg,
+    var(--texfina-secondary),
+    var(--texfina-secondary-dark)
+  );
+  color: white;
+  border-bottom: 1px solid var(--texfina-border-light);
 
-    .close-button {
-      color: white;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.2);
-      }
-
-      mat-icon {
-        font-size: 1.25rem;
-      }
-    }
+  .header-content {
+    flex: 1;
   }
 
-  // ===== FORM =====
-  .dialog-form {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  .dialog-title {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+  }
 
-    .form-content {
-      padding: 2rem;
-      flex: 1;
+  .dialog-subtitle {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+    color: white;
+  }
 
-      .form-row {
-        margin-bottom: 1.5rem;
+  .close-button {
+    color: white;
+    width: 40px;
+    height: 40px;
+    margin-left: 16px;
+  }
+}
 
-        &:last-child {
-          margin-bottom: 0;
-        }
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-        .form-field {
-          width: 100%;
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
 
-          mat-label {
-            color: #374151;
-            font-weight: 500;
-          }
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-          .mat-mdc-text-field-wrapper {
-            border-radius: 8px;
-          }
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #424242;
+  margin-bottom: 0;
+}
 
-          input {
-            font-size: 0.875rem;
-            padding: 0.75rem;
-          }
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--texfina-border-light);
+  border-radius: var(--texfina-radius-md);
+  font-size: var(--texfina-font-size-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--texfina-bg-primary);
+  color: var(--texfina-text-primary);
 
-          mat-hint {
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-top: 0.25rem;
-          }
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-secondary);
+    box-shadow: 0 0 0 3px rgba(18, 30, 102, 0.1);
+  }
 
-          mat-error {
-            font-size: 0.75rem;
-            color: #dc2626;
-            margin-top: 0.25rem;
-          }
-        }
-      }
-    }
+  &::placeholder {
+    color: var(--texfina-text-muted);
+  }
 
-    // ===== ACTIONS =====
-    .dialog-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      padding: 1.5rem 2rem;
-      background-color: #f8fafc;
-      border-top: 1px solid #e2e8f0;
+  &:disabled {
+    background: var(--texfina-bg-tertiary);
+    color: var(--texfina-text-secondary);
+    cursor: not-allowed;
+  }
+}
 
-      .btn-cancelar {
-        color: #6b7280;
-        background-color: transparent;
-        border: 1px solid #d1d5db;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 500;
+.form-select {
+  cursor: pointer;
 
-        &:hover {
-          background-color: #f9fafb;
-          border-color: #9ca3af;
-        }
-      }
+  option {
+    padding: 8px;
+  }
+}
 
-      .btn-guardar {
-        background-color: #7c3aed;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 500;
-        min-width: 120px;
+.error-message {
+  font-size: 12px;
+  color: var(--texfina-error);
+  margin-top: 4px;
+  min-height: 16px;
+}
 
-        mat-icon {
-          margin-right: 0.5rem;
-          font-size: 1.125rem;
-        }
+.dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid var(--texfina-border-light);
+  background: var(--texfina-bg-secondary);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
 
-        &:hover:not(:disabled) {
-          background-color: #6d28d9;
-        }
+.btn-cancel {
+  padding: 10px 20px;
+  border: 2px solid var(--texfina-neutral);
+  background: var(--texfina-bg-primary);
+  color: var(--texfina-neutral);
+  border-radius: var(--texfina-radius-md);
+  font-size: var(--texfina-font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-        &:disabled {
-          background-color: #9ca3af;
-          color: #6b7280;
-        }
-      }
-    }
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(152, 149, 148, 0.1);
+  }
+}
+
+.btn-save {
+  padding: 10px 20px;
+  border: 2px solid var(--texfina-secondary);
+  background: var(--texfina-secondary);
+  color: white;
+  border-radius: var(--texfina-radius-md);
+  font-size: var(--texfina-font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(18, 30, 102, 0.1);
+  }
+
+  &:disabled {
+    background: var(--texfina-bg-tertiary);
+    border-color: var(--texfina-border-medium);
+    color: var(--texfina-text-muted);
+    cursor: not-allowed;
   }
 }
 
@@ -146,37 +184,39 @@
 // ===== TABLET Y MÓVIL =====
 @media (max-width: 768px) {
   .dialog-container {
-    width: 100%;
-    max-width: 95vw;
-    margin: 0.5rem;
+    margin: 8px;
+    max-height: calc(100vh - 16px);
+  }
 
-    .dialog-header {
-      padding: 1rem 1.5rem;
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 
-      .dialog-title {
-        font-size: 1.125rem;
-      }
+  .dialog-header {
+    padding: 16px;
+
+    .dialog-title {
+      font-size: 18px;
     }
 
-    .dialog-form {
-      .form-content {
-        padding: 1.5rem;
+    .dialog-subtitle {
+      font-size: 13px;
+    }
+  }
 
-        .form-row {
-          margin-bottom: 1.25rem;
-        }
-      }
+  .dialog-content {
+    padding: 16px;
+  }
 
-      .dialog-actions {
-        padding: 1rem 1.5rem;
-        flex-direction: column-reverse;
+  .dialog-actions {
+    padding: 12px 16px;
+    flex-direction: column-reverse;
 
-        .btn-cancelar,
-        .btn-guardar {
-          width: 100%;
-          justify-content: center;
-        }
-      }
+    .btn-cancel,
+    .btn-save {
+      width: 100%;
+      justify-content: center;
     }
   }
 }

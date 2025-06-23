@@ -18,55 +18,21 @@
       </div>
     </div>
 
-    <!-- Filtros de búsqueda -->
-    <div class="filters-card" [class.expanded]="filtrosExpanded">
-      <div class="filters-header" (click)="toggleFiltros()">
-        <div class="filters-title">
-          <mat-icon>tune</mat-icon>
-          Filtros de Búsqueda
-          <mat-icon class="expand-icon" [class.rotated]="filtrosExpanded"
-            >expand_more</mat-icon
-          >
-        </div>
-        <span class="filter-subtitle" *ngIf="filtrosExpanded"
-          >Los resultados se actualizan automáticamente</span
-        >
+    <!-- Filtro General -->
+    <div class="filters-card">
+      <div class="filters-header">
+        <div class="filters-title">Búsqueda General</div>
       </div>
 
-      <div class="filters-content" *ngIf="filtrosExpanded">
-        <form [formGroup]="filtrosForm" class="filters-form">
+      <div class="filters-content">
+        <form [formGroup]="filtroGeneralForm" class="filters-form">
           <div class="filters-grid">
             <div class="filter-group">
               <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">tag</mat-icon>
                 <input
                   class="simple-input"
-                  formControlName="idAlmacen"
-                  placeholder="Filtrar por ID..."
-                  type="number"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">storage</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="nombre"
-                  placeholder="Filtrar por nombre..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">location_on</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="ubicacion"
-                  placeholder="Filtrar por ubicación..."
+                  formControlName="busquedaGeneral"
+                  placeholder="Buscar en ID, nombre, ubicación..."
                   type="text"
                 />
               </div>
@@ -76,10 +42,10 @@
               <button
                 class="btn-clear-filters"
                 type="button"
-                (click)="limpiarFiltros()"
-                matTooltip="Limpiar todos los filtros"
+                (click)="limpiarFiltroGeneral()"
+                matTooltip="Limpiar búsqueda"
               >
-                Limpiar todos
+                Limpiar
               </button>
             </div>
           </div>
@@ -90,9 +56,10 @@
     <!-- Tabla de almacenes -->
     <div class="table-card">
       <div class="table-with-headers">
-        <!-- Encabezados de columnas -->
+        <!-- Encabezados de columnas con filtros integrados -->
         <div class="column-headers">
-          <div class="header-row">
+          <!-- Fila de títulos -->
+          <div class="header-row header-titles">
             <div class="header-col id-col" (click)="sortData('id_almacen')">
               <span>ID</span>
               <mat-icon class="sort-icon">unfold_more</mat-icon>
@@ -109,7 +76,49 @@
               <mat-icon class="sort-icon">unfold_more</mat-icon>
             </div>
             <div class="header-col acciones-col">
-              <span>Acciones</span>
+              <span>ACCIONES</span>
+            </div>
+          </div>
+
+          <!-- Fila de filtros por columna -->
+          <div
+            class="header-row header-filters"
+            *ngIf="filtrosColumnaHabilitados"
+            [formGroup]="filtrosColumnaForm"
+          >
+            <div class="header-col id-col">
+              <input
+                class="column-filter-input"
+                formControlName="idAlmacen"
+                placeholder="ID..."
+                type="number"
+              />
+            </div>
+            <div class="header-col nombre-col">
+              <input
+                class="column-filter-input"
+                formControlName="nombre"
+                placeholder="Nombre..."
+                type="text"
+              />
+            </div>
+            <div class="header-col ubicacion-col">
+              <input
+                class="column-filter-input"
+                formControlName="ubicacion"
+                placeholder="Ubicación..."
+                type="text"
+              />
+            </div>
+            <div class="header-col acciones-col">
+              <button
+                class="btn-clear-column-filters"
+                type="button"
+                (click)="limpiarFiltrosColumna()"
+                matTooltip="Limpiar filtros de columna"
+              >
+                Limpiar filtros
+              </button>
             </div>
           </div>
         </div>
@@ -152,36 +161,11 @@
           <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
             <mat-icon class="filtered-empty-icon">search_off</mat-icon>
             <h3 class="filtered-empty-title text-texfina text-primary">
-              Sin resultados
+              No se encontraron resultados
             </h3>
             <p class="filtered-empty-subtitle text-texfina text-muted">
-              No encontramos almacenes que coincidan con tus filtros
+              Intenta ajustar los filtros o limpiar la búsqueda
             </p>
-            <button class="btn-texfina btn-outline" (click)="limpiarFiltros()">
-              <mat-icon>clear_all</mat-icon>
-              Limpiar filtros
-            </button>
-          </div>
-
-          <!-- Skeleton superpuesto mientras carga -->
-          <div *ngIf="isLoading" class="skeleton-overlay">
-            <table class="skeleton-table">
-              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5]">
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                  <div class="skeleton-line skeleton-subtext"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-actions"></div>
-                </td>
-              </tr>
-            </table>
           </div>
 
           <!-- Tabla siempre visible (con skeleton o datos) -->
@@ -212,12 +196,9 @@
             <!-- Columna Ubicación -->
             <ng-container matColumnDef="ubicacion">
               <td mat-cell *matCellDef="let almacen" class="table-cell">
-                <div class="ubicacion-cell">
-                  <mat-icon class="location-icon">location_on</mat-icon>
-                  <span class="text-texfina text-secondary">
-                    {{ almacen.ubicacion || "-" }}
-                  </span>
-                </div>
+                <span class="text-texfina text-secondary">
+                  {{ almacen.ubicacion || "-" }}
+                </span>
               </td>
             </ng-container>
 
@@ -247,8 +228,30 @@
               </td>
             </ng-container>
 
+            <!-- Filas de datos reales -->
             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
+
+          <!-- Skeleton superpuesto mientras carga -->
+          <div *ngIf="isLoading" class="skeleton-overlay">
+            <table class="skeleton-table">
+              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5]">
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                  <div class="skeleton-line skeleton-subtext"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-actions"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
 

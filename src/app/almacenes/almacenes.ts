@@ -4,6 +4,7 @@ import {
   AfterViewInit,
   OnDestroy,
   ViewChild,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -27,14 +28,14 @@ import { MaterialService } from '../services/material.service';
 import { Almacen } from '../models/insumo.model';
 import { EditarAlmacenDialogComponent } from './editar-almacen-dialog/editar-almacen-dialog';
 import { DetalleAlmacenDialogComponent } from './detalle-almacen-dialog/detalle-almacen-dialog';
-import { Subject } from 'rxjs';
 import {
+  Subject,
   debounceTime,
   distinctUntilChanged,
   takeUntil,
   delay,
   finalize,
-} from 'rxjs/operators';
+} from 'rxjs';
 
 @Component({
   selector: 'app-almacenes',
@@ -60,17 +61,29 @@ import {
 export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatSort) sort!: MatSort;
 
+  // ============================================================================
+  // PROPIEDADES DE DATOS
+  // ============================================================================
   almacenes: Almacen[] = [];
   dataSource = new MatTableDataSource<Almacen>([]);
-  filtrosForm: FormGroup;
-  filtrosExpanded: boolean = true;
+
+  filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosExpanded = true;
+  filtrosColumnaHabilitados = false;
+  filtrosColumnaActivos = false;
   private destroy$ = new Subject<void>();
 
-  // Estados de la aplicación
-  isLoading: boolean = false;
-  hasError: boolean = false;
-  errorMessage: string = '';
+  // ============================================================================
+  // PROPIEDADES DE ESTADO
+  // ============================================================================
+  isLoading = false;
+  hasError = false;
+  errorMessage = '';
 
+  // ============================================================================
+  // CONFIGURACIÓN DE TABLA
+  // ============================================================================
   displayedColumns: string[] = [
     'id_almacen',
     'nombre',
@@ -82,17 +95,15 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.dataSource.data;
   }
 
-  // Estados computados
   get isEmpty(): boolean {
-    return !this.isLoading && !this.hasError && this.almacenes.length === 0;
+    return !this.isLoading && this.almacenes.length === 0 && !this.hasError;
   }
 
   get isFilteredEmpty(): boolean {
     return (
       !this.isLoading &&
-      !this.hasError &&
-      this.almacenes.length > 0 &&
-      this.dataSource.data.length === 0
+      this.dataSource.data.length === 0 &&
+      this.almacenes.length > 0
     );
   }
 
@@ -101,7 +112,11 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
     private dialog: MatDialog,
     private fb: FormBuilder
   ) {
-    this.filtrosForm = this.fb.group({
+    this.filtroGeneralForm = this.fb.group({
+      busquedaGeneral: [''],
+    });
+
+    this.filtrosColumnaForm = this.fb.group({
       idAlmacen: [''],
       nombre: [''],
       ubicacion: [''],
@@ -110,7 +125,8 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarAlmacenes();
-    this.configurarFiltrosEnTiempoReal();
+    this.configurarFiltroGeneralEnTiempoReal();
+    this.configurarFiltrosColumnaEnTiempoReal();
   }
 
   ngAfterViewInit(): void {
@@ -122,39 +138,53 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltrosEnTiempoReal(): void {
-    this.filtrosForm.valueChanges
+  configurarFiltroGeneralEnTiempoReal(): void {
+    this.filtroGeneralForm.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.aplicarFiltros();
+        this.aplicarFiltroGeneral();
       });
   }
 
+  configurarFiltrosColumnaEnTiempoReal(): void {
+    this.filtrosColumnaForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltrosColumna();
+      });
+  }
+
+  // ============================================================================
+  // MÉTODOS DE INICIALIZACIÓN
+  // ============================================================================
   cargarAlmacenes(): void {
     this.isLoading = true;
     this.hasError = false;
     this.errorMessage = '';
 
+    console.log('🔄 Iniciando carga de almacenes - isLoading:', this.isLoading);
+
     this.materialService
       .getAlmacenes()
       .pipe(
-        delay(800), // Remover en producción - solo para demostrar skeleton
-        takeUntil(this.destroy$),
+        delay(1500),
         finalize(() => {
           this.isLoading = false;
-        })
+          console.log('✅ Carga completada - isLoading:', this.isLoading);
+        }),
+        takeUntil(this.destroy$)
       )
       .subscribe({
         next: (almacenes) => {
+          console.log('📦 Almacenes cargados:', almacenes.length);
           this.almacenes = almacenes;
           this.dataSource.data = [...almacenes];
         },
         error: (error) => {
-          console.error('Error al cargar almacenes:', error);
+          console.error('❌ Error al cargar almacenes:', error);
           this.hasError = true;
           this.errorMessage =
-            error?.message ||
-            'Error al cargar los datos de almacenes. Verifique su conexión e intente nuevamente.';
+            'Error al cargar los almacenes. Por favor, intenta nuevamente.';
           this.almacenes = [];
           this.dataSource.data = [];
         },
@@ -165,8 +195,37 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargarAlmacenes();
   }
 
-  aplicarFiltros(): void {
-    const filtros = this.filtrosForm.value;
+  // ============================================================================
+  // MÉTODOS DE FILTROS
+  // ============================================================================
+  aplicarFiltroGeneral(): void {
+    const busqueda = this.filtroGeneralForm
+      .get('busquedaGeneral')
+      ?.value?.trim()
+      .toLowerCase();
+
+    if (!busqueda) {
+      this.dataSource.data = [...this.almacenes];
+      return;
+    }
+
+    const almacenesFiltrados = this.almacenes.filter((almacen) => {
+      const id = almacen.id_almacen?.toString() || '';
+      const nombre = almacen.nombre?.toLowerCase() || '';
+      const ubicacion = almacen.ubicacion?.toLowerCase() || '';
+
+      return (
+        id.includes(busqueda) ||
+        nombre.includes(busqueda) ||
+        ubicacion.includes(busqueda)
+      );
+    });
+
+    this.dataSource.data = almacenesFiltrados;
+  }
+
+  aplicarFiltrosColumna(): void {
+    const filtros = this.filtrosColumnaForm.value;
     let almacenesFiltrados = [...this.almacenes];
 
     // Filtro por ID Almacén
@@ -198,15 +257,44 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.data = almacenesFiltrados;
   }
 
-  limpiarFiltros(): void {
-    this.filtrosForm.reset();
+  limpiarFiltroGeneral(): void {
+    this.filtroGeneralForm.reset();
     this.dataSource.data = [...this.almacenes];
+  }
+
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset();
+    this.dataSource.data = [...this.almacenes];
+  }
+
+  toggleFiltrosColumna() {
+    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
+    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
+
+    if (this.filtrosColumnaHabilitados) {
+      if (this.filtrosColumnaActivos) {
+        this.limpiarFiltroGeneral();
+      } else {
+        this.limpiarFiltrosColumna();
+      }
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (event.key === 'F3') {
+      event.preventDefault();
+      this.toggleFiltrosColumna();
+    }
   }
 
   toggleFiltros(): void {
     this.filtrosExpanded = !this.filtrosExpanded;
   }
 
+  // ============================================================================
+  // MÉTODOS DE TABLA
+  // ============================================================================
   sortData(column: string): void {
     if (this.sort) {
       // Si ya está ordenado por esta columna, cambiar dirección
@@ -224,11 +312,9 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  formatearCodigo(id?: number): string {
-    if (!id) return '00000';
-    return id.toString().padStart(5, '0');
-  }
-
+  // ============================================================================
+  // MÉTODOS DE ACCIONES
+  // ============================================================================
   abrirNuevoAlmacen(): void {
     const dialogRef = this.dialog.open(EditarAlmacenDialogComponent, {
       width: '600px',
@@ -262,6 +348,14 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cargarAlmacenes();
       }
     });
+  }
+
+  // ============================================================================
+  // MÉTODOS UTILITARIOS
+  // ============================================================================
+  formatearCodigo(id?: number): string {
+    if (!id) return '00000';
+    return id.toString().padStart(5, '0');
   }
 }
 
