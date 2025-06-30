@@ -12,13 +12,27 @@
         </p>
       </div>
       <div class="header-actions">
-        <button class="btn-texfina btn-primary" (click)="abrirRegistroReceta()">
-          <mat-icon>add_circle_outline</mat-icon>
-          Agregar Receta
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
+          Carga Masiva
         </button>
-        <button class="btn-texfina btn-success" (click)="abrirIngresoReceta()">
-          <mat-icon>add_box</mat-icon>
-          Registrar Ingreso
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
+          >
+            Exportar
+          </button>
+          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+            <button class="dropdown-item" (click)="exportarExcel()">
+              Exportar a Excel
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              Exportar a PDF
+            </button>
+          </div>
+        </div>
+        <button class="btn-texfina btn-primary" (click)="agregar()">
+          Agregar Receta
         </button>
       </div>
     </div>
@@ -37,7 +51,7 @@
                 <input
                   class="simple-input"
                   formControlName="busquedaGeneral"
-                  placeholder="Buscar en código, nombre, ingredientes, estado..."
+                  placeholder="Buscar en código, nombre..."
                   type="text"
                 />
               </div>
@@ -166,10 +180,7 @@
             <p class="empty-subtitle text-texfina text-muted">
               Comienza agregando tu primera receta para gestionar formulaciones
             </p>
-            <button
-              class="btn-texfina btn-primary"
-              (click)="abrirRegistroReceta()"
-            >
+            <button class="btn-texfina btn-primary" (click)="agregar()">
               <mat-icon>add</mat-icon>
               Agregar Primera Receta
             </button>
@@ -252,7 +263,7 @@
                   </button>
                   <button
                     class="btn-action btn-edit"
-                    (click)="editarReceta(receta)"
+                    (click)="editar(receta)"
                     matTooltip="Editar"
                   >
                     <mat-icon>edit</mat-icon>

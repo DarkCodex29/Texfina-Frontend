@@ -1,165 +1,211 @@
 // ============================================================================
-// RECETAS - ESTILOS ESPECÍFICOS (SIN LAYOUT)
+// RECETAS - SISTEMA DE COLORES TEXFINA OBLIGATORIO
 // ============================================================================
 
-/* Usar clases globales de Texfina - sin estilos locales que interfieran */
-
-/* Solo estilos muy específicos para la celda de receta */
-.receta-cell {
-  .receta-name {
-    font-weight: 600;
-    line-height: 1.2;
-  }
-
-  .receta-class {
-    font-size: 0.75rem;
-    line-height: 1.2;
-    margin-top: 2px;
-  }
-}
-
-.btn-action {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--texfina-border-radius);
-
-  &.btn-view {
-    background-color: var(--texfina-secondary-light);
-    color: var(--texfina-secondary);
-  }
-
-  &.btn-edit {
-    background-color: var(--texfina-success-light);
-    color: var(--texfina-success);
-  }
+:root {
+  --texfina-primary: #bd2126;
+  --texfina-secondary: #121e66;
+  --texfina-neutral: #989594;
+  --texfina-success: #16a34a;
+  --texfina-border-light: #e5e7eb;
+  --texfina-text-primary: #111827;
+  --texfina-text-muted: #6b7280;
+  --texfina-primary-bg: #fef2f2;
+  --texfina-secondary-bg: #f1f5f9;
+  --texfina-neutral-bg: #f8fafc;
+  --texfina-spacing-xs: 4px;
+  --texfina-spacing-sm: 8px;
+  --texfina-spacing-md: 16px;
+  --texfina-spacing-lg: 24px;
+  --texfina-spacing-xl: 32px;
+  --texfina-radius-sm: 4px;
+  --texfina-radius-md: 8px;
+  --texfina-radius-lg: 12px;
+  --texfina-font-size-xs: 12px;
+  --texfina-font-size-sm: 14px;
+  --texfina-font-size-base: 16px;
+  --texfina-font-size-lg: 18px;
+  --texfina-font-size-xl: 20px;
+  --texfina-bg-primary: #ffffff;
+  --texfina-bg-secondary: #f9fafb;
+  --texfina-bg-tertiary: #f3f4f6;
+  --texfina-border-medium: #d1d5db;
 }
 
 // ============================================================================
-// FILTROS POR COLUMNA
+// DROPDOWN EXPORTAR OBLIGATORIO CON RESPONSIVE
 // ============================================================================
 
-.header-filters {
-  background: var(--texfina-bg-muted);
-  border-top: 1px solid var(--texfina-border);
-  padding: 8px 0;
-}
-
-.column-filter-input {
-  width: 100%;
-  border: 1px solid var(--texfina-border);
-  border-radius: 6px;
-  background: white;
-  padding: 8px 12px;
-  margin: 0 4px;
-  font-size: 0.8rem;
-  color: var(--texfina-text-primary);
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-secondary);
-    box-shadow: 0 0 0 2px var(--texfina-secondary-light);
-  }
-
-  &::placeholder {
-    color: var(--texfina-text-muted);
-    font-size: 0.75rem;
-  }
-}
-
-.btn-clear-column-filters {
-  min-width: 140px !important;
-  height: 48px !important;
-  border-radius: 10px !important;
-  border: 2px solid var(--texfina-primary) !important;
-  background: linear-gradient(135deg, white, #fef7f7) !important;
-  color: var(--texfina-primary) !important;
-  cursor: pointer;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
+.dropdown-export {
   position: relative;
-  overflow: hidden;
-  font-weight: 500;
-  font-size: 14px;
-  padding: 0 20px;
-  white-space: nowrap;
+  display: inline-block;
 
-  &::before {
-    content: "";
+  .dropdown-trigger {
+    cursor: pointer;
+  }
+
+  .dropdown-menu {
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.4),
-      transparent
-    );
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid var(--texfina-border-light);
+    border-radius: var(--texfina-radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    min-width: 160px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+
+    &.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--texfina-text-primary);
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: var(--texfina-secondary-bg);
+        color: var(--texfina-secondary);
+      }
+
+      &:first-child {
+        border-radius: var(--texfina-radius-md) var(--texfina-radius-md) 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 0 var(--texfina-radius-md) var(--texfina-radius-md);
+      }
+    }
   }
 
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-primary);
-    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
-  }
-
+  // MÓVIL: Dropdown de ancho completo
   @media (max-width: 768px) {
-    width: 100% !important;
-    min-width: auto !important;
+    .dropdown-menu {
+      left: 0;
+      right: 0;
+      min-width: 100%;
+      width: 100%;
+    }
   }
 }
 
 // ============================================================================
-// FILTROS DE BÚSQUEDA
+// HEADER ACTIONS RESPONSIVE OBLIGATORIO
+// ============================================================================
+
+.header-actions {
+  display: flex;
+  gap: var(--texfina-spacing-md);
+  align-items: center;
+  flex-wrap: nowrap;
+
+  // MÓVIL: Reorganizar botones
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-sm);
+    width: 100%;
+
+    .btn-texfina {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .dropdown-export {
+      width: 100%;
+
+      .dropdown-trigger {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  // MÓVIL PEQUEÑO: Stack vertical
+  @media (max-width: 480px) {
+    gap: var(--texfina-spacing-xs);
+
+    .btn-texfina {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+}
+
+.page-header {
+  // MÓVIL: Header en columna
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-lg);
+    align-items: stretch;
+
+    .header-content {
+      text-align: center;
+    }
+  }
+}
+
+// ============================================================================
+// FILTROS CARD OBLIGATORIO
 // ============================================================================
 
 .filters-card {
-  background: var(--surface-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 2rem;
-  border: 1px solid var(--border-color);
+  background: var(--texfina-bg-primary);
+  border-radius: var(--texfina-radius-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--texfina-spacing-xl);
+  border: 1px solid var(--texfina-border-light);
 
   .filters-header {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    user-select: none;
-    border-bottom: 1px solid var(--border-color);
+    padding: var(--texfina-spacing-lg) var(--texfina-spacing-xl);
+    border-bottom: 1px solid var(--texfina-border-light);
+    background: var(--texfina-bg-secondary);
 
     @media (max-width: 768px) {
-      padding: var(--spacing-md) var(--spacing-lg);
+      padding: var(--texfina-spacing-md) var(--texfina-spacing-lg);
     }
 
     .filters-title {
       display: flex;
       align-items: center;
-      gap: var(--spacing-sm);
+      gap: var(--texfina-spacing-sm);
       font-weight: 600;
-      color: var(--text-primary);
-      font-size: var(--font-size-lg);
+      color: var(--texfina-text-primary);
+      font-size: var(--texfina-font-size-lg);
+      margin: 0;
     }
   }
 
   .filters-content {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: var(--background-subtle);
+    padding: var(--texfina-spacing-lg) var(--texfina-spacing-xl);
 
     @media (max-width: 768px) {
-      padding: var(--spacing-md) var(--spacing-lg);
+      padding: var(--texfina-spacing-md) var(--texfina-spacing-lg);
     }
   }
 
   .filters-form {
     .filters-grid {
       display: flex;
-      gap: 3rem;
+      gap: var(--texfina-spacing-xl);
       align-items: stretch;
 
       @media (max-width: 768px) {
         flex-direction: column;
-        gap: var(--spacing-lg);
+        gap: var(--texfina-spacing-lg);
       }
     }
 
@@ -173,23 +219,23 @@
 
         .simple-input {
           width: 100%;
-          padding: var(--spacing-lg) var(--spacing-xl);
-          border: 1px solid var(--border-color);
-          border-radius: var(--border-radius-md);
-          background: var(--surface-color);
-          font-size: var(--font-size-base);
-          color: var(--text-primary);
+          padding: 12px 16px;
+          border: 2px solid var(--texfina-border-light);
+          border-radius: var(--texfina-radius-md);
+          background: var(--texfina-bg-primary);
+          font-size: var(--texfina-font-size-sm);
+          color: var(--texfina-text-primary);
           height: 48px;
-          line-height: 1.4;
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
           &::placeholder {
-            color: var(--text-muted);
+            color: var(--texfina-text-muted);
           }
 
           &:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--primary-color-alpha);
+            border-color: var(--texfina-secondary);
+            box-shadow: 0 0 0 3px rgba(18, 30, 102, 0.1);
           }
         }
       }
@@ -197,32 +243,161 @@
 
     .filter-actions {
       display: flex;
-      gap: 2rem;
+      gap: var(--texfina-spacing-md);
       align-items: stretch;
       flex-shrink: 0;
+
+      @media (max-width: 768px) {
+        justify-content: center;
+      }
     }
 
     .btn-clear-filters {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: var(--spacing-md) var(--spacing-lg);
-      border: 2px solid var(--border-color);
-      border-radius: var(--border-radius-md);
-      background: var(--surface-color);
-      color: var(--text-muted);
-      font-size: var(--font-size-sm);
+      padding: 12px 20px;
+      border: 2px solid var(--texfina-border-light);
+      border-radius: var(--texfina-radius-md);
+      background: var(--texfina-bg-primary);
+      color: var(--texfina-text-muted);
+      font-size: var(--texfina-font-size-sm);
       font-weight: 500;
       cursor: pointer;
       white-space: nowrap;
       height: 48px;
       min-width: 100px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: var(--texfina-neutral);
+        color: var(--texfina-neutral);
+      }
 
       &:focus {
         outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px var(--primary-color-alpha);
+        border-color: var(--texfina-secondary);
+        box-shadow: 0 0 0 3px rgba(18, 30, 102, 0.1);
       }
     }
+  }
+}
+
+// ============================================================================
+// ESTILOS ESPECÍFICOS DE RECETAS
+// ============================================================================
+
+.receta-cell {
+  .receta-name {
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--texfina-text-primary);
+  }
+
+  .receta-class {
+    font-size: var(--texfina-font-size-xs);
+    line-height: 1.2;
+    margin-top: 2px;
+    color: var(--texfina-text-muted);
+  }
+}
+
+.btn-action {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--texfina-radius-md);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &.btn-view {
+    background-color: var(--texfina-secondary-bg);
+    color: var(--texfina-secondary);
+
+    &:hover {
+      background-color: var(--texfina-secondary);
+      color: white;
+    }
+  }
+
+  &.btn-edit {
+    background-color: #dcfce7;
+    color: var(--texfina-success);
+
+    &:hover {
+      background-color: var(--texfina-success);
+      color: white;
+    }
+  }
+}
+
+// ============================================================================
+// FILTROS POR COLUMNA
+// ============================================================================
+
+.header-filters {
+  background: var(--texfina-bg-tertiary);
+  border-top: 1px solid var(--texfina-border-light);
+  padding: var(--texfina-spacing-sm) 0;
+}
+
+.column-filter-input {
+  width: 100%;
+  border: 1px solid var(--texfina-border-light);
+  border-radius: var(--texfina-radius-sm);
+  background: var(--texfina-bg-primary);
+  padding: var(--texfina-spacing-sm) 12px;
+  margin: 0 4px;
+  font-size: var(--texfina-font-size-xs);
+  color: var(--texfina-text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-secondary);
+    box-shadow: 0 0 0 2px rgba(18, 30, 102, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--texfina-text-muted);
+    font-size: var(--texfina-font-size-xs);
+  }
+}
+
+.btn-clear-column-filters {
+  min-width: 140px !important;
+  height: 40px !important;
+  border-radius: var(--texfina-radius-md) !important;
+  border: 2px solid var(--texfina-primary) !important;
+  background: var(--texfina-bg-primary) !important;
+  color: var(--texfina-primary) !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
+  font-weight: 500;
+  font-size: var(--texfina-font-size-xs);
+  padding: 0 16px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--texfina-primary) !important;
+    color: white !important;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-primary);
+    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    width: 100% !important;
+    min-width: auto !important;
   }
 }

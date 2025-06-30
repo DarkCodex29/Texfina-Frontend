@@ -1,9 +1,12 @@
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+} from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
 
 import { Lote, Insumo } from '../../models/insumo.model';
 
@@ -15,7 +18,7 @@ interface DialogData {
 @Component({
   selector: 'app-detalle-lote-dialog',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatChipsModule],
+  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
   templateUrl: './detalle-lote-dialog.html',
   styleUrls: ['./detalle-lote-dialog.scss'],
 })
@@ -152,5 +155,43 @@ export class DetalleLoteDialogComponent {
 
   getDiasAbsolutos(): number {
     return Math.abs(this.getDiasParaVencimiento());
+  }
+
+  formatearCodigo(id?: number): string {
+    if (!id) return '00001';
+    return id.toString().padStart(5, '0');
+  }
+
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
+  }
+
+  formatearFecha(fecha?: string | Date): string {
+    if (!fecha) return '-';
+    const fechaObj = typeof fecha === 'string' ? new Date(fecha) : fecha;
+    return fechaObj.toLocaleDateString('es-ES');
+  }
+
+  formatearNumero(numero?: number): string {
+    if (numero === null || numero === undefined) return '0';
+    return numero.toString();
+  }
+
+  formatearPrecio(precio?: number): string {
+    if (!precio) return '$0.00';
+    return `$${precio.toFixed(2)}`;
+  }
+
+  getEstadoVencimiento(): string {
+    if (!this.lote.fecha_expiracion) return '-';
+
+    const hoy = new Date();
+    const fechaVencimiento = new Date(this.lote.fecha_expiracion);
+    const diffTime = fechaVencimiento.getTime() - hoy.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return 'Vencido';
+    if (diffDays <= 7) return 'Por vencer';
+    return 'Vigente';
   }
 }

@@ -144,6 +144,43 @@
   }
 }
 
+// DATEPICKER CON ÍCONO DENTRO DEL INPUT
+.date-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .form-input {
+    padding-right: 48px; // Espacio para el ícono
+  }
+
+  .date-picker-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: var(--texfina-text-muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--texfina-secondary-bg);
+      color: var(--texfina-secondary);
+    }
+
+    ::ng-deep {
+      .mat-datepicker-toggle-default-icon {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
 // INDICADOR DE STOCK ESPECÍFICO
 .stock-indicator {
   margin: 16px 0;

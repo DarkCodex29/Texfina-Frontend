@@ -35,6 +35,17 @@ import {
 } from 'rxjs';
 import { MaterialService } from '../services/material.service';
 import { Receta, Insumo } from '../models/insumo.model';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+  ColumnaExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+  MapeoColumna,
+} from '../services/carga-masiva.service';
+import { DetalleRecetaDialogComponent } from './detalle-receta-dialog/detalle-receta-dialog';
 
 @Component({
   selector: 'app-recetas',
@@ -74,6 +85,7 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
   filtrosExpanded = true;
   filtrosColumnaHabilitados = false;
   filtrosColumnaActivos = false;
+  dropdownExportAbierto = false;
   private destroy$ = new Subject<void>();
 
   // ============================================================================
@@ -114,7 +126,9 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
   ) {
     this.filtroGeneralForm = this.fb.group({
       busquedaGeneral: [''],
@@ -357,26 +371,118 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ============================================================================
-  // MÉTODOS DE ACCIONES
+  // MÉTODOS DE EXPORTACIÓN
   // ============================================================================
-  abrirRegistroReceta(): void {
+  private configurarExportacion(): ConfiguracionExportacion<Receta> {
+    return {
+      entidades: this.dataSource.data,
+      nombreArchivo: 'recetas',
+      nombreEntidad: 'Recetas',
+      columnas: [
+        { campo: 'id_receta', titulo: 'ID Receta', formato: 'numero' },
+        { campo: 'nombre', titulo: 'Nombre', formato: 'texto' },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.recetas.length,
+        cantidadFiltrada: this.dataSource.data.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Receta> {
+    return {
+      tipoEntidad: 'recetas',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Nombre',
+          campoEntidad: 'nombre',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'nombre',
+          validador: (valor) => valor && valor.length <= 200,
+          mensajeError: 'El nombre debe tener máximo 200 caracteres',
+        },
+      ],
+    };
+  }
+
+  private obtenerFiltrosActivos(): any {
+    const filtros: any = {};
+    const busquedaGeneral =
+      this.filtroGeneralForm.get('busquedaGeneral')?.value;
+    if (busquedaGeneral) {
+      filtros.busquedaGeneral = busquedaGeneral;
+    }
+    return filtros;
+  }
+
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
+    }
+  }
+
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
+
+  cargaMasiva(): void {
+    console.log('📥 Iniciando carga masiva de recetas');
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService.generarPlantilla(config);
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  // ============================================================================
+  // MÉTODOS DE ACCIONES CRUD
+  // ============================================================================
+  agregar(): void {
     console.log('➕ Abriendo formulario para nueva receta');
     // TODO: Implementar dialog para crear nueva receta
   }
 
-  abrirIngresoReceta(): void {
-    console.log('📥 Abriendo formulario para ingreso de receta');
-    // TODO: Implementar dialog para ingreso de receta
+  editar(receta: Receta): void {
+    console.log('✏️ Editando receta:', receta.nombre);
+    // TODO: Implementar dialog de edición de receta
   }
 
   verDetalle(receta: Receta): void {
-    console.log('👁️ Ver detalle de receta:', receta.nombre);
-    // TODO: Implementar dialog de detalle de receta
+    this.dialog.open(DetalleRecetaDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: { receta: receta },
+    });
   }
 
-  editarReceta(receta: Receta): void {
-    console.log('✏️ Editando receta:', receta.nombre);
-    // TODO: Implementar dialog de edición de receta
+  eliminar(receta: Receta): void {
+    const confirmacion = confirm(
+      `¿Está seguro que desea eliminar la receta ${receta.nombre}?`
+    );
+    if (confirmacion && receta.id_receta) {
+      this.materialService.eliminarReceta(receta.id_receta).subscribe(() => {
+        this.cargarRecetas();
+      });
+    }
   }
 
   // ============================================================================
