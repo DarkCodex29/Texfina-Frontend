@@ -11,8 +11,6 @@ import {
   MAT_DIALOG_DATA,
   MatDialogModule,
 } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -31,8 +29,6 @@ interface DialogData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatButtonModule,
     MatIconModule,
   ],
@@ -66,7 +62,6 @@ export class EditarUnidadDialogComponent implements OnInit {
   ngOnInit(): void {
     if (!this.esNuevo && this.data.unidad) {
       this.unidadForm.patchValue(this.data.unidad);
-      // Deshabilitar el campo ID al editar
       this.unidadForm.get('id_unidad')?.disable();
     }
   }
@@ -86,11 +81,9 @@ export class EditarUnidadDialogComponent implements OnInit {
             },
             error: (error) => {
               console.error('Error al crear unidad:', error);
-              // Aquí podrías mostrar un mensaje de error
             },
           });
         } else {
-          // Combinar datos para actualizar con ID original preservado
           const unidadActualizada = {
             ...unidadData,
             id_unidad: this.data.unidad!.id_unidad,
@@ -101,13 +94,11 @@ export class EditarUnidadDialogComponent implements OnInit {
             },
             error: (error) => {
               console.error('Error al actualizar unidad:', error);
-              // Aquí podrías mostrar un mensaje de error
             },
           });
         }
       } catch (error) {
         console.error('Error:', error);
-        // Aquí podrías mostrar un mensaje de error
       }
     }
   }
@@ -116,7 +107,6 @@ export class EditarUnidadDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  // Validadores personalizados
   get idUnidadErrors() {
     const control = this.unidadForm.get('id_unidad');
     if (control?.hasError('required')) return 'El código es requerido';

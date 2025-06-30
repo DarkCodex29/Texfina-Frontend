@@ -1,63 +1,72 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2 class="dialog-title">
-      {{ esNuevo ? 'Nueva unidad' : 'Editar unidad' }}
-    </h2>
-    <button mat-icon-button (click)="onCancel()" class="close-button">
+    <div class="header-content">
+      <h2 class="dialog-title">
+        {{ esNuevo ? 'Agregar Unidad' : 'Editar Unidad' }}
+      </h2>
+      <p class="dialog-subtitle">
+        {{ esNuevo ? 'Crea una nueva unidad de medida' : 'Modifica la
+        información de la unidad' }}
+      </p>
+    </div>
+    <button mat-icon-button mat-dialog-close class="close-button">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <form [formGroup]="unidadForm" (ngSubmit)="onSubmit()" class="dialog-form">
-    <div class="form-content">
-      <!-- Código -->
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Código *</mat-label>
-          <input
-            matInput
-            formControlName="id_unidad"
-            placeholder="Ej: KG, LT, UN"
-            style="text-transform: uppercase"
-          />
-          <mat-hint>Solo letras mayúsculas, números y guiones bajos</mat-hint>
-          <mat-error *ngIf="idUnidadErrors">{{ idUnidadErrors }}</mat-error>
-        </mat-form-field>
-      </div>
+  <form [formGroup]="unidadForm" (ngSubmit)="onSubmit()">
+    <div class="dialog-content">
+      <div class="form-container">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Código *</label>
+            <input
+              class="form-input"
+              formControlName="id_unidad"
+              placeholder="Ej: KG, LT, UN"
+              [style.text-transform]="'uppercase'"
+              maxlength="50"
+            />
+            <div class="form-hint">
+              Solo letras mayúsculas, números y guiones bajos
+            </div>
+            <div class="form-error" *ngIf="idUnidadErrors">
+              {{ idUnidadErrors }}
+            </div>
+          </div>
 
-      <!-- Nombre -->
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Nombre *</mat-label>
-          <input
-            matInput
-            formControlName="nombre"
-            placeholder="Ej: Kilogramo, Litro, Unidad"
-          />
-          <mat-hint>Nombre descriptivo de la unidad</mat-hint>
-          <mat-error *ngIf="nombreErrors">{{ nombreErrors }}</mat-error>
-        </mat-form-field>
+          <div class="form-group">
+            <label class="form-label">Descripción *</label>
+            <input
+              class="form-input"
+              formControlName="nombre"
+              placeholder="Ej: Kilogramo, Litro, Unidad"
+              maxlength="100"
+            />
+            <div class="form-hint">Nombre descriptivo de la unidad</div>
+            <div class="form-error" *ngIf="nombreErrors">
+              {{ nombreErrors }}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="dialog-actions">
       <button
-        mat-button
         type="button"
+        class="btn-texfina btn-neutral"
         (click)="onCancel()"
-        class="btn-cancelar"
       >
         Cancelar
       </button>
       <button
-        mat-raised-button
-        color="primary"
         type="submit"
+        class="btn-texfina btn-primary"
         [disabled]="!unidadForm.valid"
-        class="btn-guardar"
       >
         <mat-icon>save</mat-icon>
-        {{ esNuevo ? 'Crear' : 'Actualizar' }}
+        {{ esNuevo ? 'Crear Unidad' : 'Actualizar Unidad' }}
       </button>
     </div>
   </form>

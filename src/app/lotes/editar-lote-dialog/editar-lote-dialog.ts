@@ -6,14 +6,14 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+} from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { MaterialService } from '../../services/material.service';
@@ -31,13 +31,10 @@ interface DialogData {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    MatDialogModule,
     MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
     MatDatepickerModule,
     MatIconModule,
-    MatTooltipModule,
   ],
   templateUrl: './editar-lote-dialog.html',
   styleUrls: ['./editar-lote-dialog.scss'],

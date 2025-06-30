@@ -9,12 +9,26 @@
         </p>
       </div>
       <div class="header-actions">
-        <button
-          class="btn-texfina btn-primary"
-          (click)="abrirNuevoLote()"
-          [disabled]="isLoading"
-        >
-          <mat-icon>add_circle_outline</mat-icon>
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
+          Carga Masiva
+        </button>
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
+          >
+            Exportar
+          </button>
+          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+            <button class="dropdown-item" (click)="exportarExcel()">
+              Exportar a Excel
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              Exportar a PDF
+            </button>
+          </div>
+        </div>
+        <button class="btn-texfina btn-primary" (click)="agregar()">
           Agregar Lote
         </button>
       </div>
@@ -196,7 +210,7 @@
             <p class="empty-subtitle text-texfina text-muted">
               Comienza agregando tu primer lote para gestionar el inventario
             </p>
-            <button class="btn-texfina btn-primary" (click)="abrirNuevoLote()">
+            <button class="btn-texfina btn-primary" (click)="agregar()">
               <mat-icon>add</mat-icon>
               Agregar Primer Lote
             </button>
@@ -304,10 +318,17 @@
                   </button>
                   <button
                     class="btn-action btn-edit"
-                    (click)="editarLote(lote)"
+                    (click)="editar(lote)"
                     matTooltip="Editar"
                   >
                     <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    class="btn-action btn-delete"
+                    (click)="eliminar(lote)"
+                    matTooltip="Eliminar"
+                  >
+                    <mat-icon>delete</mat-icon>
                   </button>
                 </div>
               </td>

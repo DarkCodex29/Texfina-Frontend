@@ -36,9 +36,22 @@ import {
   delay,
 } from 'rxjs';
 import { MaterialService } from '../services/material.service';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+  ColumnaExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+  MapeoColumna,
+  ResultadoCargaMasiva,
+} from '../services/carga-masiva.service';
+import { LotesService } from '../services/lotes.service';
 import { Lote, Insumo } from '../models/insumo.model';
 import { EditarLoteDialogComponent } from './editar-lote-dialog/editar-lote-dialog';
 import { DetalleLoteDialogComponent } from './detalle-lote-dialog/detalle-lote-dialog';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 
 @Component({
   selector: 'app-lotes',
@@ -80,6 +93,7 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
   filtrosExpanded = true;
   filtrosColumnaHabilitados = false;
   filtrosColumnaActivos = false;
+  dropdownExportAbierto = false;
   private destroy$ = new Subject<void>();
 
   // ============================================================================
@@ -121,8 +135,11 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private materialService: MaterialService,
+    private lotesService: LotesService,
     private dialog: MatDialog,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
   ) {
     this.filtroGeneralForm = this.fb.group({
       busquedaGeneral: [''],
@@ -488,6 +505,220 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
     const porcentaje =
       stockInicial > 0 ? (stockActual / stockInicial) * 100 : 0;
     return porcentaje > 0 && porcentaje <= 20;
+  }
+
+  // ============================================================================
+  // MÉTODOS OBLIGATORIOS REGLA DE ORO
+  // ============================================================================
+
+  agregar(): void {
+    const dialogRef = this.dialog.open(EditarLoteDialogComponent, {
+      width: '700px',
+      disableClose: true,
+      data: { esNuevo: true, insumos: this.insumos, titulo: 'Agregar Lote' },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.cargarLotes();
+      }
+    });
+  }
+
+  editar(lote: Lote): void {
+    const dialogRef = this.dialog.open(EditarLoteDialogComponent, {
+      width: '700px',
+      disableClose: true,
+      data: {
+        lote,
+        esNuevo: false,
+        insumos: this.insumos,
+        titulo: 'Editar Lote',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.cargarLotes();
+      }
+    });
+  }
+
+  eliminar(lote: Lote): void {
+    const confirmacion = confirm(
+      `¿Está seguro que desea eliminar el lote ${lote.lote}?`
+    );
+    if (confirmacion && lote.id_lote) {
+      this.lotesService.eliminarLote(lote.id_lote).subscribe(() => {
+        this.cargarLotes();
+      });
+    }
+  }
+
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
+    }
+  }
+
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
+
+  cargaMasiva(): void {
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
+    });
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  private configurarExportacion(): ConfiguracionExportacion<Lote> {
+    return {
+      entidades: this.dataSource.data,
+      nombreArchivo: 'lotes',
+      nombreEntidad: 'Lotes',
+      columnas: [
+        { campo: 'id_lote', titulo: 'ID', formato: 'numero' },
+        { campo: 'lote', titulo: 'Código Lote', formato: 'texto' },
+        { campo: 'id_insumo', titulo: 'ID Insumo', formato: 'numero' },
+        { campo: 'ubicacion', titulo: 'Ubicación', formato: 'texto' },
+        { campo: 'stock_inicial', titulo: 'Stock Inicial', formato: 'numero' },
+        { campo: 'stock_actual', titulo: 'Stock Actual', formato: 'numero' },
+        {
+          campo: 'fecha_expiracion',
+          titulo: 'Fecha Expiración',
+          formato: 'fecha',
+        },
+        { campo: 'precio_total', titulo: 'Precio Total', formato: 'numero' },
+        { campo: 'estado_lote', titulo: 'Estado', formato: 'texto' },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.lotes.length,
+        cantidadFiltrada: this.dataSource.data.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Lote> {
+    return {
+      tipoEntidad: 'lotes',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Código Lote',
+          campoEntidad: 'lote',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'ID Insumo',
+          campoEntidad: 'id_insumo',
+          obligatorio: true,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Ubicación',
+          campoEntidad: 'ubicacion',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Stock Inicial',
+          campoEntidad: 'stock_inicial',
+          obligatorio: true,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Stock Actual',
+          campoEntidad: 'stock_actual',
+          obligatorio: true,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Fecha Expiración',
+          campoEntidad: 'fecha_expiracion',
+          obligatorio: false,
+          tipoEsperado: 'fecha',
+        },
+        {
+          columnaArchivo: 'Precio Total',
+          campoEntidad: 'precio_total',
+          obligatorio: false,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Estado',
+          campoEntidad: 'estado_lote',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'lote',
+          validador: (valor) => valor && valor.length <= 100,
+          mensajeError: 'El código del lote debe tener máximo 100 caracteres',
+        },
+        {
+          campo: 'ubicacion',
+          validador: (valor) => !valor || valor.length <= 200,
+          mensajeError: 'La ubicación debe tener máximo 200 caracteres',
+        },
+        {
+          campo: 'estado_lote',
+          validador: (valor) => !valor || valor.length <= 50,
+          mensajeError: 'El estado debe tener máximo 50 caracteres',
+        },
+      ],
+    };
+  }
+
+  private obtenerFiltrosActivos(): any {
+    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
+    const filtrosColumna = this.filtrosColumnaForm.value;
+
+    return {
+      busquedaGeneral: filtroGeneral || '',
+      ...filtrosColumna,
+    };
+  }
+
+  private descargarPlantillaCargaMasiva(): void {
+    this.cargaMasivaService.generarPlantilla(this.configurarCargaMasiva());
+  }
+
+  private procesarArchivoCargaMasiva(archivo: File): void {
+    this.cargaMasivaService
+      .procesarArchivo(archivo, this.configurarCargaMasiva())
+      .then((resultado: ResultadoCargaMasiva<Lote>) => {
+        console.log('Carga masiva completada:', resultado);
+        this.cargarLotes();
+      })
+      .catch((error: any) => {
+        console.error('Error en carga masiva:', error);
+      });
   }
 }
 

@@ -1,287 +1,367 @@
+// SISTEMA DE COLORES TEXFINA OBLIGATORIO
+:root {
+  --texfina-primary: #bd2126;
+  --texfina-secondary: #121e66;
+  --texfina-secondary-dark: #0f1a5a;
+  --texfina-neutral: #989594;
+  --texfina-success: #16a34a;
+  --texfina-border-light: #e5e7eb;
+  --texfina-border-medium: #d1d5db;
+  --texfina-text-primary: #111827;
+  --texfina-text-muted: #6b7280;
+  --texfina-primary-bg: #fef2f2;
+  --texfina-secondary-bg: #f1f5f9;
+  --texfina-neutral-bg: #f8fafc;
+  --texfina-bg-primary: #ffffff;
+  --texfina-bg-tertiary: #f3f4f6;
+  --texfina-spacing-xs: 4px;
+  --texfina-spacing-sm: 8px;
+  --texfina-spacing-md: 12px;
+  --texfina-spacing-lg: 16px;
+  --texfina-spacing-xl: 24px;
+  --texfina-radius-md: 6px;
+  --texfina-font-size-sm: 14px;
+}
+
 .dialog-container {
   display: flex;
   flex-direction: column;
-  min-height: 500px;
   max-height: 90vh;
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
 
-  .dialog-header {
-    padding: 20px 24px 0;
-    border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 20px;
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px;
+  background: linear-gradient(
+    135deg,
+    var(--texfina-secondary),
+    var(--texfina-secondary-dark)
+  );
+  color: white;
+  border-bottom: 1px solid var(--texfina-border-light);
 
-    .dialog-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 0 0 16px;
-      font-size: 24px;
-      font-weight: 500;
-      color: #1976d2;
-
-      mat-icon {
-        font-size: 28px;
-        width: 28px;
-        height: 28px;
-      }
-    }
-  }
-
-  .dialog-content {
+  .header-content {
     flex: 1;
-    padding: 0 24px;
-    overflow-y: auto;
+  }
 
-    .lote-form {
-      .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        margin-bottom: 16px;
+  .dialog-title {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: white !important;
+  }
 
-        &:last-child {
-          margin-bottom: 0;
-        }
+  .dialog-subtitle {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+    color: white !important;
+  }
 
-        .form-field {
-          width: 100%;
+  .close-button {
+    color: white;
+    width: 40px;
+    height: 40px;
+    margin-left: 16px;
 
-          &.full-width {
-            grid-column: 1 / -1;
-          }
-        }
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+.dialog-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  max-height: calc(90vh - 160px);
+  background: var(--texfina-bg-primary);
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--texfina-spacing-lg);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--texfina-spacing-lg);
+  align-items: start;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--texfina-spacing-xs);
+
+  &.form-group-full {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-label {
+  font-size: var(--texfina-font-size-sm);
+  font-weight: 500;
+  color: var(--texfina-text-primary);
+  margin-bottom: 0;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--texfina-border-light);
+  border-radius: var(--texfina-radius-md);
+  font-size: var(--texfina-font-size-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--texfina-bg-primary);
+  color: var(--texfina-text-primary);
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-secondary);
+    box-shadow: 0 0 0 3px rgba(18, 30, 102, 0.1);
+  }
+
+  &:disabled,
+  &[readonly] {
+    background: var(--texfina-bg-tertiary) !important;
+    color: #1f2937 !important;
+    cursor: not-allowed;
+    border-color: var(--texfina-border-medium);
+  }
+
+  &::placeholder {
+    color: var(--texfina-text-muted);
+  }
+}
+
+// INDICADOR DE STOCK ESPECÍFICO
+.stock-indicator {
+  margin: 16px 0;
+  padding: 16px;
+  background-color: var(--texfina-neutral-bg);
+  border-radius: 8px;
+  border: 1px solid var(--texfina-border-light);
+
+  .stock-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--texfina-border-light);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+
+    .stock-fill {
+      height: 100%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+      border-radius: 4px;
+
+      &.stock-critical {
+        background-color: var(--texfina-primary);
       }
 
-      // Indicador visual de stock
-      .stock-indicator {
-        margin: 16px 0;
-        padding: 16px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-
-        .stock-bar {
-          width: 100%;
-          height: 8px;
-          background-color: #e0e0e0;
-          border-radius: 4px;
-          overflow: hidden;
-          margin-bottom: 8px;
-
-          .stock-fill {
-            height: 100%;
-            transition: width 0.3s ease, background-color 0.3s ease;
-            border-radius: 4px;
-
-            &.stock-critical {
-              background-color: #f44336;
-            }
-
-            &.stock-low {
-              background-color: #ff9800;
-            }
-
-            &.stock-medium {
-              background-color: #2196f3;
-            }
-
-            &.stock-good {
-              background-color: #4caf50;
-            }
-          }
-        }
-
-        .stock-percentage {
-          font-weight: 600;
-          font-size: 14px;
-          color: #424242;
-        }
+      &.stock-low {
+        background-color: #ff9800;
       }
 
-      // Sección de información
-      .info-section {
-        margin-top: 24px;
-        padding: 16px;
-        background-color: #f5f5f5;
-        border-radius: 8px;
+      &.stock-medium {
+        background-color: var(--texfina-secondary);
+      }
 
-        h4 {
-          margin: 0 0 12px;
-          font-size: 16px;
-          font-weight: 500;
-          color: #424242;
-        }
-
-        .info-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-
-          .info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-
-            label {
-              font-size: 12px;
-              font-weight: 500;
-              color: #757575;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-            }
-
-            span {
-              font-size: 14px;
-              color: #424242;
-              font-weight: 500;
-            }
-          }
-        }
+      &.stock-good {
+        background-color: var(--texfina-success);
       }
     }
   }
 
-  .dialog-actions {
-    display: flex;
-    justify-content: flex-end;
+  .stock-percentage {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--texfina-text-primary);
+  }
+}
+
+// INFORMACIÓN ADICIONAL
+.info-section {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: var(--texfina-neutral-bg);
+  border-radius: 8px;
+
+  h4 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--texfina-text-primary);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
-    padding: 20px 24px;
-    border-top: 1px solid #e0e0e0;
-    background-color: #fafafa;
 
-    .btn-cancelar {
-      min-width: 100px;
-      height: 40px;
-    }
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
 
-    .btn-guardar {
-      min-width: 140px;
-      height: 40px;
-      font-weight: 500;
-
-      mat-icon {
-        margin-right: 8px;
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
+      label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--texfina-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
-      &:disabled {
-        background-color: #e0e0e0;
-        color: #9e9e9e;
+      span {
+        font-size: 14px;
+        color: var(--texfina-text-primary);
+        font-weight: 500;
       }
     }
   }
 }
 
-// Responsive Design
+// BOTONES TEXFINA OBLIGATORIO
+.btn-texfina {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--texfina-radius-md);
+  font-size: var(--texfina-font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  min-height: 44px;
+  min-width: 100px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.btn-primary {
+    background: var(--texfina-primary);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #a01e23;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(189, 33, 38, 0.3);
+    }
+  }
+
+  &.btn-secondary {
+    background: var(--texfina-secondary);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #0f1a5a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(18, 30, 102, 0.3);
+    }
+  }
+
+  &.btn-success {
+    background: var(--texfina-success);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #15803d;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+  }
+
+  &.btn-neutral {
+    background: var(--texfina-neutral);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #7c7b7a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(152, 149, 148, 0.3);
+    }
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--texfina-spacing-md);
+  padding: var(--texfina-spacing-xl);
+  border-top: 1px solid var(--texfina-border-light);
+  background: var(--texfina-neutral-bg);
+}
+
+// RESPONSIVE OBLIGATORIO
 @media (max-width: 768px) {
-  .dialog-container {
-    .dialog-header {
-      padding: 16px 20px 0;
+  .dialog-header {
+    padding: 20px;
 
-      .dialog-title {
-        font-size: 20px;
-
-        mat-icon {
-          font-size: 24px;
-          width: 24px;
-          height: 24px;
-        }
-      }
+    .dialog-title {
+      font-size: 18px;
     }
 
-    .dialog-content {
-      padding: 0 20px;
-
-      .lote-form {
-        .form-row {
-          grid-template-columns: 1fr;
-          gap: 12px;
-
-          .form-field {
-            &.full-width {
-              grid-column: 1;
-            }
-          }
-        }
-
-        .info-section {
-          .info-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-      }
+    .dialog-subtitle {
+      font-size: 13px;
     }
+  }
 
-    .dialog-actions {
-      padding: 16px 20px;
-      flex-direction: column-reverse;
+  .dialog-content {
+    padding: 20px;
+  }
 
-      .btn-cancelar,
-      .btn-guardar {
-        width: 100%;
-        margin: 0;
-      }
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: var(--texfina-spacing-md);
+  }
+
+  .dialog-actions {
+    padding: 16px 20px;
+    flex-direction: column;
+
+    .btn-texfina {
+      width: 100%;
+      justify-content: center;
     }
   }
 }
 
 @media (max-width: 480px) {
-  .dialog-container {
-    .dialog-header {
-      padding: 12px 16px 0;
+  .dialog-header {
+    padding: 16px;
 
-      .dialog-title {
-        font-size: 18px;
-        gap: 8px;
-
-        mat-icon {
-          font-size: 20px;
-          width: 20px;
-          height: 20px;
-        }
-      }
+    .dialog-title {
+      font-size: 16px;
     }
+  }
 
-    .dialog-content {
-      padding: 0 16px;
+  .dialog-content {
+    padding: 16px;
+  }
 
-      .lote-form {
-        .stock-indicator {
-          padding: 12px;
-          margin: 12px 0;
+  .form-input,
+  .form-select {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
 
-          .stock-percentage {
-            font-size: 12px;
-          }
-        }
-
-        .info-section {
-          padding: 12px;
-          margin-top: 16px;
-
-          h4 {
-            font-size: 14px;
-          }
-
-          .info-grid {
-            .info-item {
-              label {
-                font-size: 10px;
-              }
-
-              span {
-                font-size: 12px;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    .dialog-actions {
-      padding: 12px 16px;
-    }
+  .btn-texfina {
+    padding: 10px 16px;
+    font-size: 13px;
   }
 }
 
