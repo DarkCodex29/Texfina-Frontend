@@ -12,45 +12,59 @@
   </div>
 
   <div class="dialog-content">
-    <!-- Primera fila - Código y RUC -->
-    <div class="form-row form-row-two">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Código</mat-label>
-        <input
-          matInput
-          [value]="formatearCodigo(proveedor.id_proveedor)"
-          readonly
-        />
-      </mat-form-field>
+    <div class="form-container">
+      <!-- Primera fila: Código y RUC -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Código</label>
+          <input
+            class="form-input"
+            [value]="formatearCodigo(proveedor.id_proveedor)"
+            readonly
+          />
+        </div>
 
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>RUC</mat-label>
-        <input matInput [value]="proveedor.ruc || '-'" readonly />
-      </mat-form-field>
-    </div>
+        <div class="form-group">
+          <label class="form-label">RUC</label>
+          <input class="form-input" [value]="proveedor.ruc || '-'" readonly />
+        </div>
+      </div>
 
-    <!-- Segunda fila - Empresa -->
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Empresa</mat-label>
-        <input matInput [value]="proveedor.empresa || '-'" readonly />
-      </mat-form-field>
-    </div>
+      <!-- Segunda fila: Empresa -->
+      <div class="form-row">
+        <div class="form-group form-group-full">
+          <label class="form-label">Empresa</label>
+          <input
+            class="form-input"
+            [value]="proveedor.empresa || '-'"
+            readonly
+          />
+        </div>
+      </div>
 
-    <!-- Tercera fila - Dirección -->
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Dirección</mat-label>
-        <input matInput [value]="proveedor.direccion || '-'" readonly />
-      </mat-form-field>
-    </div>
+      <!-- Tercera fila: Dirección -->
+      <div class="form-row">
+        <div class="form-group form-group-full">
+          <label class="form-label">Dirección</label>
+          <input
+            class="form-input"
+            [value]="proveedor.direccion || '-'"
+            readonly
+          />
+        </div>
+      </div>
 
-    <!-- Cuarta fila - Contacto -->
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Contacto</mat-label>
-        <input matInput [value]="proveedor.contacto || '-'" readonly />
-      </mat-form-field>
+      <!-- Cuarta fila: Contacto -->
+      <div class="form-row">
+        <div class="form-group form-group-full">
+          <label class="form-label">Contacto</label>
+          <input
+            class="form-input"
+            [value]="proveedor.contacto || '-'"
+            readonly
+          />
+        </div>
+      </div>
     </div>
   </div>
 </div>
