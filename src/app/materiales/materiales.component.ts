@@ -34,9 +34,8 @@ import {
   delay,
 } from 'rxjs';
 import { MaterialService } from '../services/material.service';
-import { Insumo, Proveedor } from '../models/insumo.model';
+import { Insumo } from '../models/insumo.model';
 import { RegistroMaterialDialogComponent } from './registro-material-dialog/registro-material-dialog.component';
-import { IngresoMaterialDialogComponent } from './ingreso-material-dialog/ingreso-material-dialog.component';
 import { DetalleMaterialDialogComponent } from './detalle-material-dialog/detalle-material-dialog.component';
 
 @Component({
@@ -67,17 +66,16 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   materiales: Insumo[] = [];
   dataSource = new MatTableDataSource<Insumo>([]);
-  proveedores: Proveedor[] = [];
   filtroGeneralForm: FormGroup;
   filtrosColumnaForm: FormGroup;
   filtrosExpanded = true;
   filtrosColumnaHabilitados = false;
   filtrosColumnaActivos = false;
+  dropdownExportAbierto = false;
   private destroy$ = new Subject<void>();
 
   // Estados de carga y error
   isLoading: boolean = false;
-  isLoadingProveedores: boolean = false;
   hasError: boolean = false;
   errorMessage: string = '';
 
@@ -128,7 +126,6 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarMateriales();
-    this.cargarProveedores();
     this.configurarFiltroGeneralEnTiempoReal();
     this.configurarFiltrosColumnaEnTiempoReal();
   }
@@ -196,33 +193,8 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  cargarProveedores(): void {
-    this.isLoadingProveedores = true;
-
-    this.materialService
-      .getProveedores()
-      .pipe(
-        // Delay artificial para demostrar el skeleton (remover en producción)
-        delay(1000),
-        finalize(() => {
-          this.isLoadingProveedores = false;
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (proveedores) => {
-          this.proveedores = proveedores;
-        },
-        error: (error) => {
-          console.error('Error al cargar proveedores:', error);
-          this.proveedores = [];
-        },
-      });
-  }
-
   reintentarCarga(): void {
     this.cargarMateriales();
-    this.cargarProveedores();
   }
 
   aplicarFiltroGeneral(): void {
@@ -388,20 +360,6 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  abrirIngresoMaterial(): void {
-    const dialogRef = this.dialog.open(IngresoMaterialDialogComponent, {
-      width: '700px',
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        // Actualizar stock o datos necesarios
-        console.log('Ingreso registrado:', result);
-      }
-    });
-  }
-
   abrirAgregarLote(): void {
     // Implementar modal para agregar lote
     console.log('Abrir modal de agregar lote');
@@ -428,21 +386,79 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  getProveedoresNombres(material: Insumo): string {
-    if (!material.proveedores || material.proveedores.length === 0) return '-';
-
-    const nombres = material.proveedores.map((insumoProveedor) => {
-      const proveedor = this.proveedores.find(
-        (p) => p.id_proveedor === insumoProveedor.id_proveedor
-      );
-      return proveedor?.empresa || 'Proveedor desconocido';
-    });
-
-    return nombres.join(', ');
-  }
-
   formatearFecha(fecha?: Date): string {
     if (!fecha) return '-';
     return new Date(fecha).toLocaleDateString('es-ES');
+  }
+
+  // ============================================================================
+  // MÉTODOS PARA CARGA MASIVA Y EXPORTACIÓN
+  // ============================================================================
+
+  abrirCargaMasiva(): void {
+    console.log('🚀 Abrir carga masiva de insumos');
+    // TODO: Implementar diálogo de carga masiva
+    alert(
+      'Funcionalidad de carga masiva próximamente disponible.\n\nPermitirá importar múltiples insumos desde Excel.'
+    );
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  exportarExcel(): void {
+    console.log('📊 Exportando a Excel...');
+    this.dropdownExportAbierto = false;
+
+    const datosExportacion = {
+      materiales: this.materialesFiltrados,
+      timestamp: new Date(),
+      filtros: this.obtenerFiltrosActivos(),
+    };
+
+    console.log('Datos para exportar a Excel:', datosExportacion);
+    alert(
+      `📊 Exportando ${this.materialesFiltrados.length} insumos a Excel.\n\nFuncionalidad completa próximamente.`
+    );
+  }
+
+  exportarPDF(): void {
+    console.log('📄 Exportando a PDF...');
+    this.dropdownExportAbierto = false;
+
+    const datosExportacion = {
+      materiales: this.materialesFiltrados,
+      timestamp: new Date(),
+      filtros: this.obtenerFiltrosActivos(),
+    };
+
+    console.log('Datos para exportar a PDF:', datosExportacion);
+    alert(
+      `📄 Exportando ${this.materialesFiltrados.length} insumos a PDF.\n\nFuncionalidad completa próximamente.`
+    );
+  }
+
+  private obtenerFiltrosActivos(): any {
+    return {
+      busquedaGeneral:
+        this.filtroGeneralForm.get('busquedaGeneral')?.value || '',
+      filtrosColumna: this.filtrosColumnaForm.value,
+      cantidadResultados: this.materialesFiltrados.length,
+      cantidadTotal: this.materiales.length,
+    };
+  }
+
+  // Cerrar dropdown al hacer click fuera
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (this.dropdownExportAbierto) {
+      const target = event.target as HTMLElement;
+      const dropdownElement = document.querySelector('.dropdown-export');
+
+      if (dropdownElement && !dropdownElement.contains(target)) {
+        this.dropdownExportAbierto = false;
+      }
+    }
   }
 }

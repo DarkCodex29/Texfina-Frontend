@@ -36,6 +36,7 @@ import {
 
 import { MaterialService } from '../services/material.service';
 import { Ingreso, Insumo, Unidad, Lote } from '../models/insumo.model';
+import { IngresoMaterialDialogComponent } from './ingreso-material-dialog/ingreso-material-dialog.component';
 
 @Component({
   selector: 'app-ingresos',
@@ -406,8 +407,18 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
   // MÉTODOS DE ACCIONES
   // ============================================================================
   abrirRegistroIngreso(): void {
-    console.log('Abrir registro de ingreso');
-    // TODO: Implementar modal de registro
+    const dialogRef = this.dialog.open(IngresoMaterialDialogComponent, {
+      width: '800px',
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // Actualizar la lista de ingresos después de crear uno nuevo
+        this.cargarDatos();
+        console.log('✅ Ingreso registrado exitosamente:', result);
+      }
+    });
   }
 
   abrirIngresoMasivo(): void {

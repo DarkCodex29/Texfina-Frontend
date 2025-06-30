@@ -11,19 +11,52 @@
         </p>
       </div>
       <div class="header-actions">
+        <!-- Botón de Carga Masiva -->
+        <button
+          class="btn-texfina btn-secondary"
+          (click)="abrirCargaMasiva()"
+          matTooltip="Importar múltiples insumos desde Excel"
+        >
+          <mat-icon>upload_file</mat-icon>
+          Carga Masiva
+        </button>
+
+        <!-- Dropdown de Exportar -->
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
+            [class.active]="dropdownExportAbierto"
+            matTooltip="Exportar listado de insumos"
+          >
+            <mat-icon>download</mat-icon>
+            Exportar
+            <mat-icon class="dropdown-arrow">keyboard_arrow_down</mat-icon>
+          </button>
+
+          <div
+            class="dropdown-menu"
+            [class.show]="dropdownExportAbierto"
+            (click)="$event.stopPropagation()"
+          >
+            <button class="dropdown-item" (click)="exportarExcel()">
+              <mat-icon>table_chart</mat-icon>
+              <span>Exportar a Excel</span>
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              <mat-icon>picture_as_pdf</mat-icon>
+              <span>Exportar a PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón principal de la pantalla -->
         <button
           class="btn-texfina btn-primary"
           (click)="abrirRegistroMaterial()"
         >
           <mat-icon>add_circle_outline</mat-icon>
           Agregar Insumo
-        </button>
-        <button
-          class="btn-texfina btn-success"
-          (click)="abrirIngresoMaterial()"
-        >
-          <mat-icon>add_box</mat-icon>
-          Registrar Ingreso
         </button>
       </div>
     </div>
