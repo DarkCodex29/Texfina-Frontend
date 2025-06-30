@@ -8,6 +8,9 @@
         </p>
       </div>
       <div class="header-actions">
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
+          Carga Masiva
+        </button>
         <div class="dropdown-export">
           <button
             class="btn-texfina btn-neutral dropdown-trigger"
@@ -29,144 +32,192 @@
 
     <div class="filters-card">
       <div class="filters-header">
-        <div class="filters-title">
-          <mat-icon>filter_list</mat-icon>
-          Filtros de Búsqueda
-        </div>
+        <div class="filters-title">Búsqueda General</div>
       </div>
+
       <div class="filters-content">
-        <form [formGroup]="filtroGeneralForm">
+        <form [formGroup]="filtroGeneralForm" class="filters-form">
           <div class="filters-grid">
-            <input
-              class="simple-input"
-              formControlName="busquedaGeneral"
-              placeholder="Buscar por usuario, acción, tabla..."
-              (input)="aplicarFiltroGeneral()"
-            />
-            <button
-              type="button"
-              class="btn-clear-filters"
-              (click)="limpiarFiltros()"
-              *ngIf="filtroGeneralForm.get('busquedaGeneral')?.value"
-            >
-              Limpiar filtros
-            </button>
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <input
+                  class="simple-input"
+                  formControlName="busquedaGeneral"
+                  placeholder="Buscar por usuario, acción, tabla..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-actions">
+              <button
+                class="btn-clear-filters"
+                type="button"
+                (click)="limpiarFiltroGeneral()"
+                matTooltip="Limpiar búsqueda"
+              >
+                Limpiar
+              </button>
+            </div>
           </div>
         </form>
       </div>
     </div>
 
-    <div class="table-card table-with-headers">
-      <div class="table-container">
-        <div *ngIf="cargando" class="loading-state">
-          <mat-spinner diameter="40"></mat-spinner>
-          <p>Cargando auditoría...</p>
-        </div>
-
-        <div *ngIf="!cargando && error" class="error-state">
-          <mat-icon>error_outline</mat-icon>
-          <h3>Error al cargar los datos</h3>
-          <p>{{ error }}</p>
-          <button class="btn-texfina btn-primary" (click)="cargarDatos()">
-            Reintentar
-          </button>
-        </div>
-
-        <div
-          *ngIf="!cargando && !error && dataSource.data.length === 0"
-          class="empty-state"
-        >
-          <mat-icon>assignment</mat-icon>
-          <h3>No hay registros de auditoría</h3>
-          <p>
-            No se encontraron registros que coincidan con los filtros aplicados.
-          </p>
-        </div>
-
-        <table
-          mat-table
-          [dataSource]="dataSource"
-          class="auditoria-table"
-          *ngIf="!cargando && !error && dataSource.data.length > 0"
-        >
-          <ng-container matColumnDef="id_auditoria">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-            <td mat-cell *matCellDef="let registro">
-              {{ formatearCodigo(registro.id_auditoria) }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="usuario">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>USUARIO</th>
-            <td mat-cell *matCellDef="let registro">
-              {{ formatearTexto(registro.usuario) }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="accion">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>ACCIÓN</th>
-            <td mat-cell *matCellDef="let registro">
-              <span [class]="'badge-' + obtenerTipoAccion(registro.accion)">
-                {{ formatearAccion(registro.accion) }}
-              </span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="tabla">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>TABLA</th>
-            <td mat-cell *matCellDef="let registro">
-              {{ formatearTexto(registro.tabla) }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="registro_id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>REGISTRO</th>
-            <td mat-cell *matCellDef="let registro">
-              {{ formatearTexto(registro.registro_id) }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="fecha">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>FECHA</th>
-            <td mat-cell *matCellDef="let registro">
-              {{ formatearFecha(registro.fecha) }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
-            <td mat-cell *matCellDef="let registro">
-              <div class="action-buttons">
-                <button
-                  mat-mini-fab
-                  color="accent"
-                  class="btn-action btn-detail"
-                  (click)="verDetalle(registro)"
-                  matTooltip="Ver detalle"
-                >
-                  <mat-icon>visibility</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
-
-        <div
-          class="pagination-container"
-          *ngIf="!cargando && !error && dataSource.data.length > 0"
-        >
-          <div class="pagination-info">
-            Mostrando {{ dataSource.data.length }} registros
+    <div class="table-card">
+      <div class="table-with-headers">
+        <div class="column-headers">
+          <div class="header-row header-titles">
+            <div class="header-col id-col" (click)="sortData('id_auditoria')">
+              <span>ID</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col usuario-col" (click)="sortData('usuario')">
+              <span>Usuario</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col accion-col" (click)="sortData('accion')">
+              <span>Acción</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col tabla-col" (click)="sortData('tabla')">
+              <span>Tabla</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div
+              class="header-col registro-col"
+              (click)="sortData('registro_id')"
+            >
+              <span>Registro</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col fecha-col" (click)="sortData('fecha')">
+              <span>Fecha</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col acciones-col">
+              <span>ACCIONES</span>
+            </div>
           </div>
-          <div class="pagination-buttons">
-            <mat-paginator
-              [pageSize]="10"
-              [pageSizeOptions]="[10, 25, 50, 100]"
-              showFirstLastButtons
-            ></mat-paginator>
+        </div>
+
+        <div class="table-container">
+          <div *ngIf="cargando" class="loading-state">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>Cargando auditoría...</p>
+          </div>
+
+          <div *ngIf="!cargando && error" class="error-state">
+            <mat-icon>error_outline</mat-icon>
+            <h3>Error al cargar los datos</h3>
+            <p>{{ error }}</p>
+            <button class="btn-texfina btn-primary" (click)="cargarDatos()">
+              Reintentar
+            </button>
+          </div>
+
+          <div
+            *ngIf="!cargando && !error && dataSource.data.length === 0"
+            class="empty-state"
+          >
+            <mat-icon>assignment</mat-icon>
+            <h3>No hay registros de auditoría</h3>
+            <p>
+              No se encontraron registros que coincidan con los filtros
+              aplicados.
+            </p>
+          </div>
+
+          <table
+            mat-table
+            [dataSource]="dataSource"
+            class="auditoria-table"
+            *ngIf="!cargando && !error && dataSource.data.length > 0"
+          >
+            <ng-container matColumnDef="id_auditoria">
+              <td mat-cell *matCellDef="let registro" class="table-cell">
+                <span class="badge-texfina badge-neutral">
+                  {{ formatearCodigo(registro.id_auditoria) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="usuario">
+              <td mat-cell *matCellDef="let registro" class="table-cell">
+                <div class="usuario-cell">
+                  <span class="usuario-name">
+                    {{ formatearTexto(registro.usuario) }}
+                  </span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="accion">
+              <td mat-cell *matCellDef="let registro" class="table-cell">
+                <span
+                  class="badge-texfina"
+                  [ngClass]="obtenerClaseAccion(registro.accion)"
+                >
+                  {{ formatearAccion(registro.accion) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="tabla">
+              <td mat-cell *matCellDef="let registro" class="table-cell">
+                {{ formatearTexto(registro.tabla) }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="registro_id">
+              <td mat-cell *matCellDef="let registro" class="table-cell">
+                {{ formatearTexto(registro.registro_id) }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="fecha">
+              <td mat-cell *matCellDef="let registro" class="table-cell">
+                <div class="fecha-cell">
+                  <span class="fecha-text">
+                    {{ formatearFecha(registro.fecha) }}
+                  </span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="acciones">
+              <td mat-cell *matCellDef="let registro" class="table-cell">
+                <div class="action-buttons">
+                  <button
+                    mat-mini-fab
+                    color="accent"
+                    class="btn-action btn-detail"
+                    (click)="verDetalle(registro)"
+                    matTooltip="Ver detalles"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+
+          <div
+            class="pagination-container"
+            *ngIf="!cargando && !error && dataSource.data.length > 0"
+          >
+            <div class="pagination-info">
+              Mostrando {{ dataSource.data.length }} registros
+            </div>
+            <div class="pagination-buttons">
+              <mat-paginator
+                [pageSize]="10"
+                [pageSizeOptions]="[10, 25, 50, 100]"
+                showFirstLastButtons
+              ></mat-paginator>
+            </div>
           </div>
         </div>
       </div>

@@ -8,6 +8,9 @@
         </p>
       </div>
       <div class="header-actions">
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
+          Carga Masiva
+        </button>
         <div class="dropdown-export">
           <button
             class="btn-texfina btn-neutral dropdown-trigger"
@@ -29,139 +32,185 @@
 
     <div class="filters-card">
       <div class="filters-header">
-        <div class="filters-title">
-          <mat-icon>filter_list</mat-icon>
-          Filtros de Búsqueda
-        </div>
+        <div class="filters-title">Búsqueda General</div>
       </div>
+
       <div class="filters-content">
-        <form [formGroup]="filtroGeneralForm">
+        <form [formGroup]="filtroGeneralForm" class="filters-form">
           <div class="filters-grid">
-            <input
-              class="simple-input"
-              formControlName="busquedaGeneral"
-              placeholder="Buscar por nivel, módulo, mensaje..."
-              (input)="aplicarFiltroGeneral()"
-            />
-            <button
-              type="button"
-              class="btn-clear-filters"
-              (click)="limpiarFiltros()"
-              *ngIf="filtroGeneralForm.get('busquedaGeneral')?.value"
-            >
-              Limpiar filtros
-            </button>
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <input
+                  class="simple-input"
+                  formControlName="busquedaGeneral"
+                  placeholder="Buscar por nivel, módulo, mensaje..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div class="filter-actions">
+              <button
+                class="btn-clear-filters"
+                type="button"
+                (click)="limpiarFiltroGeneral()"
+                matTooltip="Limpiar búsqueda"
+              >
+                Limpiar
+              </button>
+            </div>
           </div>
         </form>
       </div>
     </div>
 
-    <div class="table-card table-with-headers">
-      <div class="table-container">
-        <div *ngIf="cargando" class="loading-state">
-          <mat-spinner diameter="40"></mat-spinner>
-          <p>Cargando logs...</p>
+    <div class="table-card">
+      <div class="table-with-headers">
+        <div class="column-headers">
+          <div class="header-row header-titles">
+            <div class="header-col id-col" (click)="sortData('id_log')">
+              <span>ID</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col nivel-col" (click)="sortData('nivel')">
+              <span>Nivel</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col modulo-col" (click)="sortData('modulo')">
+              <span>Módulo</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col mensaje-col" (click)="sortData('mensaje')">
+              <span>Mensaje</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col usuario-col" (click)="sortData('usuario')">
+              <span>Usuario</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col fecha-col" (click)="sortData('fecha')">
+              <span>Fecha</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col acciones-col">
+              <span>ACCIONES</span>
+            </div>
+          </div>
         </div>
 
-        <div *ngIf="!cargando && error" class="error-state">
-          <mat-icon>error_outline</mat-icon>
-          <h3>Error al cargar los datos</h3>
-          <p>{{ error }}</p>
-          <button class="btn-texfina btn-primary" (click)="cargarDatos()">
-            Reintentar
-          </button>
-        </div>
+        <div class="table-container">
+          <div *ngIf="hasError" class="error-state">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <h3 class="error-title text-texfina text-primary">
+              Error al cargar datos
+            </h3>
+            <p class="error-subtitle text-texfina text-muted">
+              {{ errorMessage }}
+            </p>
+            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
+              <mat-icon>refresh</mat-icon>
+              Reintentar
+            </button>
+          </div>
 
-        <div *ngIf="!cargando && !error && dataSource.data.length === 0" class="empty-state">
-          <mat-icon>description</mat-icon>
-          <h3>No hay logs del sistema</h3>
-          <p>No se encontraron logs que coincidan con los filtros aplicados.</p>
-        </div>
+          <div *ngIf="isEmpty" class="empty-state">
+            <mat-icon class="empty-icon">description</mat-icon>
+            <h3 class="empty-title text-texfina text-primary">
+              No hay logs del sistema
+            </h3>
+            <p class="empty-subtitle text-texfina text-muted">
+              No se encontraron eventos registrados en el sistema
+            </p>
+          </div>
 
-        <table
-          mat-table
-          [dataSource]="dataSource"
-          class="logs-table"
-          *ngIf="!cargando && !error && dataSource.data.length > 0"
-        >
-          <ng-container matColumnDef="id_log">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-            <td mat-cell *matCellDef="let log">
-              {{ formatearCodigo(log.id_log) }}
-            </td>
-          </ng-container>
+          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
+            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
+            <h3 class="filtered-empty-title text-texfina text-primary">
+              No se encontraron resultados
+            </h3>
+            <p class="filtered-empty-subtitle text-texfina text-muted">
+              Intenta ajustar los filtros o limpiar la búsqueda
+            </p>
+          </div>
 
-          <ng-container matColumnDef="nivel">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>NIVEL</th>
-            <td mat-cell *matCellDef="let log">
-              <span [class]="'badge-' + obtenerTipoNivel(log.nivel)">
-                {{ formatearNivel(log.nivel) }}
-              </span>
-            </td>
-          </ng-container>
+          <table mat-table [dataSource]="dataSource" matSort class="data-table">
+            <ng-container matColumnDef="id_log">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <span class="badge-texfina badge-neutral">
+                  {{ formatearCodigo(log.id_log) }}
+                </span>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="modulo">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>MÓDULO</th>
-            <td mat-cell *matCellDef="let log">
-              {{ formatearTexto(log.modulo) }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="mensaje">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>MENSAJE</th>
-            <td mat-cell *matCellDef="let log">
-              <div class="mensaje-log">
-                {{ formatearMensaje(log.mensaje) }}
-              </div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="usuario">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>USUARIO</th>
-            <td mat-cell *matCellDef="let log">
-              {{ formatearTexto(log.usuario) }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="fecha">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>FECHA</th>
-            <td mat-cell *matCellDef="let log">
-              {{ formatearFecha(log.fecha) }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
-            <td mat-cell *matCellDef="let log">
-              <div class="action-buttons">
-                <button
-                  mat-mini-fab
-                  color="accent"
-                  class="btn-action btn-detail"
-                  (click)="verDetalle(log)"
-                  matTooltip="Ver detalle"
+            <ng-container matColumnDef="nivel">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <span
+                  class="badge-texfina"
+                  [ngClass]="obtenerClaseNivel(log.nivel)"
                 >
-                  <mat-icon>visibility</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
+                  {{ formatearNivel(log.nivel) }}
+                </span>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
+            <ng-container matColumnDef="modulo">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <div class="modulo-cell">
+                  <span class="modulo-name">
+                    {{ formatearTexto(log.modulo) }}
+                  </span>
+                </div>
+              </td>
+            </ng-container>
 
-        <div class="pagination-container" *ngIf="!cargando && !error && dataSource.data.length > 0">
-          <div class="pagination-info">
-            Mostrando {{ dataSource.data.length }} registros
-          </div>
-          <div class="pagination-buttons">
-            <mat-paginator
-              [pageSize]="10"
-              [pageSizeOptions]="[10, 25, 50, 100]"
-              showFirstLastButtons
-            ></mat-paginator>
-          </div>
+            <ng-container matColumnDef="mensaje">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <div class="mensaje-cell">
+                  <span class="mensaje-text" [title]="log.mensaje">
+                    {{ formatearMensaje(log.mensaje) }}
+                  </span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="usuario">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <div class="usuario-cell">
+                  <span class="usuario-name">
+                    {{ formatearTexto(log.usuario) }}
+                  </span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="fecha">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <div class="fecha-cell">
+                  <span class="fecha-text">
+                    {{ formatearFecha(log.fecha) }}
+                  </span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="acciones">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <div class="action-buttons">
+                  <button
+                    mat-mini-fab
+                    color="accent"
+                    class="btn-action btn-detail"
+                    (click)="verDetalle(log)"
+                    matTooltip="Ver detalles"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
         </div>
       </div>
     </div>

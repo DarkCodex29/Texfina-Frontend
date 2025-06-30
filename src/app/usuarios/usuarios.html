@@ -71,123 +71,6 @@
 
     <div class="table-card">
       <div class="table-with-headers">
-        <div class="column-headers">
-          <div class="header-row header-titles">
-            <div class="header-col id-col" (click)="sortData('id_usuario')">
-              <span>ID</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col username-col" (click)="sortData('username')">
-              <span>Usuario</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col email-col" (click)="sortData('email')">
-              <span>Email</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col rol-col" (click)="sortData('id_rol')">
-              <span>Rol</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col tipo-col"
-              (click)="sortData('id_tipo_usuario')"
-            >
-              <span>Tipo</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col estado-col" (click)="sortData('activo')">
-              <span>Estado</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col fecha-col" (click)="sortData('last_login')">
-              <span>Último Acceso</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col acciones-col">
-              <span>ACCIONES</span>
-            </div>
-          </div>
-
-          <div
-            class="header-row header-filters"
-            *ngIf="filtrosColumnaHabilitados"
-            [formGroup]="filtrosColumnaForm"
-          >
-            <div class="header-col id-col">
-              <input
-                class="column-filter-input"
-                formControlName="idUsuario"
-                placeholder="ID..."
-                type="number"
-              />
-            </div>
-            <div class="header-col username-col">
-              <input
-                class="column-filter-input"
-                formControlName="username"
-                placeholder="Usuario..."
-                type="text"
-              />
-            </div>
-            <div class="header-col email-col">
-              <input
-                class="column-filter-input"
-                formControlName="email"
-                placeholder="Email..."
-                type="text"
-              />
-            </div>
-            <div class="header-col rol-col">
-              <select class="column-filter-select" formControlName="idRol">
-                <option value="">Todos</option>
-                <option *ngFor="let rol of roles" [value]="rol.id_rol">
-                  {{ rol.nombre }}
-                </option>
-              </select>
-            </div>
-            <div class="header-col tipo-col">
-              <select
-                class="column-filter-select"
-                formControlName="idTipoUsuario"
-              >
-                <option value="">Todos</option>
-                <option
-                  *ngFor="let tipo of tiposUsuario"
-                  [value]="tipo.id_tipo_usuario"
-                >
-                  {{ tipo.descripcion }}
-                </option>
-              </select>
-            </div>
-            <div class="header-col estado-col">
-              <select class="column-filter-select" formControlName="activo">
-                <option value="">Todos</option>
-                <option value="true">Activo</option>
-                <option value="false">Inactivo</option>
-              </select>
-            </div>
-            <div class="header-col fecha-col">
-              <input
-                class="column-filter-input"
-                formControlName="fechaDesde"
-                placeholder="Desde..."
-                type="date"
-              />
-            </div>
-            <div class="header-col acciones-col">
-              <button
-                class="btn-clear-column-filters"
-                type="button"
-                (click)="limpiarFiltrosColumna()"
-                matTooltip="Limpiar filtros de columna"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          </div>
-        </div>
-
         <div class="table-container">
           <div *ngIf="hasError" class="error-state">
             <mat-icon class="error-icon">error_outline</mat-icon>
@@ -227,17 +110,39 @@
             </p>
           </div>
 
-          <table mat-table [dataSource]="dataSource" matSort class="data-table">
+          <table
+            mat-table
+            [dataSource]="dataSource"
+            matSort
+            class="data-table"
+            *ngIf="!hasError && !isEmpty && !isFilteredEmpty"
+          >
+            <!-- Columna ID -->
             <ng-container matColumnDef="id_usuario">
-              <td mat-cell *matCellDef="let usuario" class="table-cell">
+              <th mat-header-cell *matHeaderCellDef class="header-cell id-col">
+                ID
+              </th>
+              <td mat-cell *matCellDef="let usuario" class="table-cell id-col">
                 <span class="badge-texfina badge-neutral">
                   {{ formatearCodigo(usuario.id_usuario) }}
                 </span>
               </td>
             </ng-container>
 
+            <!-- Columna Usuario -->
             <ng-container matColumnDef="username">
-              <td mat-cell *matCellDef="let usuario" class="table-cell">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="header-cell username-col"
+              >
+                Usuario
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let usuario"
+                class="table-cell username-col"
+              >
                 <div class="usuario-cell">
                   <div class="usuario-name text-texfina text-primary">
                     {{ formatearTexto(usuario.username) }}
@@ -246,32 +151,72 @@
               </td>
             </ng-container>
 
+            <!-- Columna Email -->
             <ng-container matColumnDef="email">
-              <td mat-cell *matCellDef="let usuario" class="table-cell">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="header-cell email-col"
+              >
+                Email
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let usuario"
+                class="table-cell email-col"
+              >
                 <div class="email-cell text-texfina text-muted">
                   {{ formatearTexto(usuario.email) }}
                 </div>
               </td>
             </ng-container>
 
+            <!-- Columna Rol -->
             <ng-container matColumnDef="id_rol">
-              <td mat-cell *matCellDef="let usuario" class="table-cell">
+              <th mat-header-cell *matHeaderCellDef class="header-cell rol-col">
+                Rol
+              </th>
+              <td mat-cell *matCellDef="let usuario" class="table-cell rol-col">
                 <span class="badge-texfina badge-secondary">
                   {{ obtenerNombreRol(usuario.id_rol) }}
                 </span>
               </td>
             </ng-container>
 
+            <!-- Columna Tipo -->
             <ng-container matColumnDef="id_tipo_usuario">
-              <td mat-cell *matCellDef="let usuario" class="table-cell">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="header-cell tipo-col"
+              >
+                Tipo
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let usuario"
+                class="table-cell tipo-col"
+              >
                 <div class="tipo-cell text-texfina text-muted">
                   {{ obtenerNombreTipo(usuario.id_tipo_usuario) }}
                 </div>
               </td>
             </ng-container>
 
+            <!-- Columna Estado -->
             <ng-container matColumnDef="activo">
-              <td mat-cell *matCellDef="let usuario" class="table-cell">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="header-cell estado-col"
+              >
+                Estado
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let usuario"
+                class="table-cell estado-col"
+              >
                 <span
                   class="badge-texfina"
                   [ngClass]="usuario.activo ? 'badge-success' : 'badge-warning'"
@@ -281,16 +226,40 @@
               </td>
             </ng-container>
 
+            <!-- Columna Último Acceso -->
             <ng-container matColumnDef="last_login">
-              <td mat-cell *matCellDef="let usuario" class="table-cell">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="header-cell fecha-col"
+              >
+                Último Acceso
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let usuario"
+                class="table-cell fecha-col"
+              >
                 <div class="fecha-cell text-texfina text-muted">
                   {{ formatearFecha(usuario.last_login) }}
                 </div>
               </td>
             </ng-container>
 
+            <!-- Columna Acciones -->
             <ng-container matColumnDef="acciones">
-              <td mat-cell *matCellDef="let usuario" class="table-cell">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="header-cell acciones-col"
+              >
+                Acciones
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let usuario"
+                class="table-cell acciones-col"
+              >
                 <div class="action-buttons">
                   <button
                     class="btn-texfina btn-secondary btn-sm action-btn"
@@ -317,7 +286,16 @@
               </td>
             </ng-container>
 
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            <tr
+              mat-header-row
+              *matHeaderRowDef="displayedColumns"
+              class="header-row-mat"
+            ></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumns"
+              class="data-row"
+            ></tr>
           </table>
         </div>
       </div>
