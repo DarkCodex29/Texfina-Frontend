@@ -95,7 +95,7 @@
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: var(--texfina-spacing-xs);
+  justify-content: center;
   text-decoration: none;
 
   &:disabled {
@@ -4318,5 +4318,253 @@ app-reportes {
 .texfina-form-normal {
   .texfina-access-card {
     transition: all 0.3s ease;
+  }
+}
+
+// ===============================================
+// ALINEACIÓN DE COLUMNAS - TABLA DE MATERIALES
+// ===============================================
+
+// Sincronizar anchos de tabla Angular Material con headers grid
+.table-with-headers {
+  .mat-table {
+    // Asegurar que la tabla use todo el ancho disponible
+    width: 100%;
+    table-layout: fixed;
+
+    // Definir anchos específicos para cada columna que coincidan con el grid de headers
+    // Grid base: 1fr 2fr 0.8fr 0.8fr 1.2fr 1fr 1fr
+    .mat-column-id_fox {
+      width: 12.5%; // 1fr de 8fr total ≈ 12.5%
+    }
+
+    .mat-column-nombre {
+      width: 25%; // 2fr de 8fr total = 25%
+    }
+
+    .mat-column-peso_unitario {
+      width: 10%; // 0.8fr de 8fr total = 10%
+    }
+
+    .mat-column-id_unidad {
+      width: 10%; // 0.8fr de 8fr total = 10%
+    }
+
+    .mat-column-presentacion {
+      width: 15%; // 1.2fr de 8fr total = 15%
+    }
+
+    .mat-column-precio_unitario {
+      width: 12.5%; // 1fr de 8fr total ≈ 12.5%
+    }
+
+    .mat-column-acciones {
+      width: 15%; // 1fr de 8fr total + espacio extra para botones ≈ 15%
+    }
+
+    // Asegurar que las celdas respeten los anchos definidos
+    .mat-cell,
+    .mat-header-cell {
+      padding: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    // Alineación específica por tipo de contenido
+    .mat-column-id_fox .mat-cell {
+      text-align: left;
+    }
+
+    .mat-column-nombre .mat-cell {
+      text-align: left;
+      white-space: normal; // Permitir wrap para nombres largos
+      line-height: 1.3;
+    }
+
+    .mat-column-peso_unitario .mat-cell {
+      text-align: center;
+    }
+
+    .mat-column-id_unidad .mat-cell {
+      text-align: center;
+    }
+
+    .mat-column-presentacion .mat-cell {
+      text-align: left;
+    }
+
+    .mat-column-precio_unitario .mat-cell {
+      text-align: right;
+    }
+
+    .mat-column-acciones .mat-cell {
+      text-align: center;
+      white-space: normal; // Permitir que los botones se organicen
+    }
+  }
+
+  // Responsive design para tablets y laptops pequeñas (1200px)
+  @media (max-width: 1200px) {
+    .mat-table {
+      // Grid responsive: 0.9fr 1.9fr 0.8fr 0.8fr 1.1fr 1fr 1fr = 7.5fr total
+      .mat-column-id_fox {
+        width: 12%;
+      } // 0.9fr
+      .mat-column-nombre {
+        width: 25.3%;
+      } // 1.9fr
+      .mat-column-peso_unitario {
+        width: 10.7%;
+      } // 0.8fr
+      .mat-column-id_unidad {
+        width: 10.7%;
+      } // 0.8fr
+      .mat-column-presentacion {
+        width: 14.7%;
+      } // 1.1fr
+      .mat-column-precio_unitario {
+        width: 13.3%;
+      } // 1fr
+      .mat-column-acciones {
+        width: 13.3%;
+      } // 1fr
+    }
+  }
+
+  // Responsive design para tablets (1024px)
+  @media (max-width: 1024px) {
+    .mat-table {
+      // Grid responsive: 0.8fr 1.8fr 0.7fr 0.7fr 1fr 0.9fr 0.9fr = 6.8fr total
+      .mat-column-id_fox {
+        width: 11.8%;
+      } // 0.8fr
+      .mat-column-nombre {
+        width: 26.5%;
+      } // 1.8fr
+      .mat-column-peso_unitario {
+        width: 10.3%;
+      } // 0.7fr
+      .mat-column-id_unidad {
+        width: 10.3%;
+      } // 0.7fr
+      .mat-column-presentacion {
+        width: 14.7%;
+      } // 1fr
+      .mat-column-precio_unitario {
+        width: 13.2%;
+      } // 0.9fr
+      .mat-column-acciones {
+        width: 13.2%;
+      } // 0.9fr
+
+      .mat-cell,
+      .mat-header-cell {
+        padding: 10px 8px;
+        font-size: 13px;
+      }
+    }
+  }
+
+  // Responsive design para móviles grandes (768px)
+  @media (max-width: 768px) {
+    .mat-table {
+      // Grid responsive: 0.7fr 1.6fr 0.6fr 0.5fr 0.9fr 0.8fr 0.8fr = 6fr total
+      .mat-column-id_fox {
+        width: 11.7%;
+      } // 0.7fr
+      .mat-column-nombre {
+        width: 26.7%;
+      } // 1.6fr
+      .mat-column-peso_unitario {
+        width: 10%;
+      } // 0.6fr
+      .mat-column-id_unidad {
+        width: 8.3%;
+      } // 0.5fr
+      .mat-column-presentacion {
+        width: 15%;
+      } // 0.9fr
+      .mat-column-precio_unitario {
+        width: 13.3%;
+      } // 0.8fr
+      .mat-column-acciones {
+        width: 15%;
+      } // 0.8fr + extra
+
+      .mat-cell,
+      .mat-header-cell {
+        padding: 8px 6px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  // Responsive design para móviles pequeños (480px)
+  @media (max-width: 480px) {
+    .mat-table {
+      // Grid responsive: 0.8fr 2fr 0.7fr 0.6fr 1fr 0.8fr 0.8fr = 6.7fr total
+      .mat-column-id_fox {
+        width: 11.9%;
+      } // 0.8fr
+      .mat-column-nombre {
+        width: 29.9%;
+      } // 2fr
+      .mat-column-peso_unitario {
+        width: 10.4%;
+      } // 0.7fr
+      .mat-column-id_unidad {
+        width: 9%;
+      } // 0.6fr
+      .mat-column-presentacion {
+        width: 14.9%;
+      } // 1fr
+      .mat-column-precio_unitario {
+        width: 11.9%;
+      } // 0.8fr
+      .mat-column-acciones {
+        width: 12%;
+      } // 0.8fr + extra
+
+      .mat-cell,
+      .mat-header-cell {
+        padding: 8px 4px;
+        font-size: 11px;
+      }
+    }
+  }
+
+  // Responsive design para pantallas muy pequeñas (360px)
+  @media (max-width: 360px) {
+    .mat-table {
+      // Grid responsive: 0.5fr 1.3fr 0.4fr 0.4fr 0.6fr 0.5fr 0.5fr = 4.2fr total
+      .mat-column-id_fox {
+        width: 11.9%;
+      } // 0.5fr
+      .mat-column-nombre {
+        width: 31%;
+      } // 1.3fr
+      .mat-column-peso_unitario {
+        width: 9.5%;
+      } // 0.4fr
+      .mat-column-id_unidad {
+        width: 9.5%;
+      } // 0.4fr
+      .mat-column-presentacion {
+        width: 14.3%;
+      } // 0.6fr
+      .mat-column-precio_unitario {
+        width: 11.9%;
+      } // 0.5fr
+      .mat-column-acciones {
+        width: 11.9%;
+      } // 0.5fr + extra
+
+      .mat-cell,
+      .mat-header-cell {
+        padding: 4px 2px;
+        font-size: 9px;
+      }
+    }
   }
 }

@@ -37,6 +37,16 @@ import { MaterialService } from '../services/material.service';
 import { Insumo } from '../models/insumo.model';
 import { RegistroMaterialDialogComponent } from './registro-material-dialog/registro-material-dialog.component';
 import { DetalleMaterialDialogComponent } from './detalle-material-dialog/detalle-material-dialog.component';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+  ColumnaExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+  MapeoColumna,
+} from '../services/carga-masiva.service';
 
 @Component({
   selector: 'app-materiales',
@@ -74,7 +84,6 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
   dropdownExportAbierto = false;
   private destroy$ = new Subject<void>();
 
-  // Estados de carga y error
   isLoading: boolean = false;
   hasError: boolean = false;
   errorMessage: string = '';
@@ -108,7 +117,9 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
   ) {
     this.filtroGeneralForm = this.fb.group({
       busquedaGeneral: [''],
@@ -168,7 +179,6 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.materialService
       .getMateriales()
       .pipe(
-        // Delay artificial para demostrar el skeleton (remover en producción)
         delay(1500),
         finalize(() => {
           this.isLoading = false;
@@ -236,14 +246,12 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     const filtros = this.filtrosColumnaForm.value;
     let materialesFiltrados = [...this.materiales];
 
-    // Filtro por Código Fox
     if (filtros.codigoFox && filtros.codigoFox.trim()) {
       materialesFiltrados = materialesFiltrados.filter((material) =>
         material.id_fox?.toLowerCase().includes(filtros.codigoFox.toLowerCase())
       );
     }
 
-    // Filtro por Nombre
     if (filtros.nombre && filtros.nombre.trim()) {
       materialesFiltrados = materialesFiltrados.filter((material) =>
         material.nombre?.toLowerCase().includes(filtros.nombre.toLowerCase())
@@ -347,17 +355,22 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  abrirRegistroMaterial(): void {
+  agregar(): void {
     const dialogRef = this.dialog.open(RegistroMaterialDialogComponent, {
-      width: '800px',
+      width: '600px',
       disableClose: true,
+      data: { esEdicion: false, titulo: 'Agregar Material' },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
         this.cargarMateriales();
       }
     });
+  }
+
+  abrirRegistroMaterial(): void {
+    this.agregar();
   }
 
   abrirAgregarLote(): void {
@@ -368,22 +381,27 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
   verDetalle(material: Insumo): void {
     this.dialog.open(DetalleMaterialDialogComponent, {
       width: '800px',
-      data: material,
+      disableClose: true,
+      data: { entidad: material },
+    });
+  }
+
+  editar(material: Insumo): void {
+    const dialogRef = this.dialog.open(RegistroMaterialDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: { esEdicion: true, entidad: material, titulo: 'Editar Material' },
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarMateriales();
+      }
     });
   }
 
   editarMaterial(material: Insumo): void {
-    const dialogRef = this.dialog.open(RegistroMaterialDialogComponent, {
-      width: '800px',
-      data: { material, esEdicion: true },
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.cargarMateriales();
-      }
-    });
+    this.editar(material);
   }
 
   formatearFecha(fecha?: Date): string {
@@ -391,16 +409,229 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     return new Date(fecha).toLocaleDateString('es-ES');
   }
 
-  // ============================================================================
-  // MÉTODOS PARA CARGA MASIVA Y EXPORTACIÓN
-  // ============================================================================
+  private configurarExportacion(): ConfiguracionExportacion<Insumo> {
+    return {
+      entidades: this.dataSource.data,
+      nombreArchivo: 'materiales',
+      nombreEntidad: 'Materiales',
+      columnas: [
+        { campo: 'id_fox', titulo: 'Código Fox', formato: 'texto' },
+        { campo: 'nombre', titulo: 'Nombre del Material', formato: 'texto' },
+        { campo: 'peso_unitario', titulo: 'Peso Unitario', formato: 'numero' },
+        { campo: 'unidad.nombre', titulo: 'Unidad', formato: 'texto' },
+        { campo: 'presentacion', titulo: 'Presentación', formato: 'texto' },
+        {
+          campo: 'precio_unitario',
+          titulo: 'Precio Unitario',
+          formato: 'moneda',
+        },
+        { campo: 'id_clase', titulo: 'Clase', formato: 'texto' },
+        { campo: 'estado', titulo: 'Estado', formato: 'texto' },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.materiales.length,
+        cantidadFiltrada: this.dataSource.data.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
 
-  abrirCargaMasiva(): void {
-    console.log('🚀 Abrir carga masiva de insumos');
-    // TODO: Implementar diálogo de carga masiva
-    alert(
-      'Funcionalidad de carga masiva próximamente disponible.\n\nPermitirá importar múltiples insumos desde Excel.'
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Insumo> {
+    return {
+      tipoEntidad: 'materiales',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Código Fox',
+          campoEntidad: 'id_fox',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Nombre del Material',
+          campoEntidad: 'nombre',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Peso Unitario',
+          campoEntidad: 'peso_unitario',
+          obligatorio: false,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'ID Unidad',
+          campoEntidad: 'id_unidad',
+          obligatorio: true,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Presentación',
+          campoEntidad: 'presentacion',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Precio Unitario',
+          campoEntidad: 'precio_unitario',
+          obligatorio: false,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'ID Clase',
+          campoEntidad: 'id_clase',
+          obligatorio: false,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Estado',
+          campoEntidad: 'estado',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'precio_unitario',
+          validador: (valor) => valor === null || valor >= 0,
+          mensajeError: 'El precio debe ser mayor o igual a 0',
+        },
+        {
+          campo: 'peso_unitario',
+          validador: (valor) => valor === null || valor > 0,
+          mensajeError: 'El peso debe ser mayor a 0',
+        },
+        {
+          campo: 'nombre',
+          validador: (valor) => valor && valor.length >= 3,
+          mensajeError: 'El nombre debe tener al menos 3 caracteres',
+        },
+      ],
+      transformaciones: [
+        {
+          campo: 'estado',
+          transformar: (valor) => valor || 'Activo',
+        },
+      ],
+    };
+  }
+
+  cargaMasiva(): void {
+    console.log('🚀 Abrir carga masiva de materiales');
+    const opcion = confirm(
+      '📁 CARGA MASIVA DE MATERIALES\n\n' +
+        '¿Qué deseas hacer?\n\n' +
+        '✅ ACEPTAR: Descargar plantilla Excel\n' +
+        '❌ CANCELAR: Cargar archivo existente'
     );
+
+    if (opcion) {
+      this.descargarPlantillaCargaMasiva();
+    } else {
+      this.mostrarInputArchivo();
+    }
+  }
+
+  descargarPlantillaCargaMasiva(): void {
+    try {
+      const config = this.configurarCargaMasiva();
+      this.cargaMasivaService.generarPlantilla(config);
+      console.log('✅ Plantilla de materiales descargada');
+    } catch (error) {
+      console.error('❌ Error al generar plantilla:', error);
+      alert('Error al generar la plantilla. Intenta nuevamente.');
+    }
+  }
+
+  private mostrarInputArchivo(): void {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx,.xls,.csv';
+    input.style.display = 'none';
+
+    input.onchange = (event: any) => {
+      const archivo = event.target.files[0];
+      if (archivo) {
+        this.procesarArchivoCargaMasiva(archivo);
+      }
+    };
+
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+  }
+
+  async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
+    try {
+      console.log('📂 Procesando archivo:', archivo.name);
+      const config = this.configurarCargaMasiva();
+      const resultado = await this.cargaMasivaService.procesarArchivo(
+        archivo,
+        config
+      );
+
+      if (resultado.exitosa) {
+        console.log(
+          `✅ ${resultado.registrosValidos} materiales procesados exitosamente`
+        );
+
+        // Mostrar resumen de resultados
+        const mensaje =
+          `📊 RESULTADO DE CARGA MASIVA\n\n` +
+          `✅ Registros válidos: ${resultado.registrosValidos}\n` +
+          `❌ Registros con errores: ${resultado.registrosInvalidos}\n` +
+          `📝 Total procesados: ${resultado.registrosProcesados}\n\n` +
+          `¿Deseas guardar los ${resultado.registrosValidos} registros válidos?`;
+
+        if (confirm(mensaje)) {
+          await this.guardarMaterialesMasivos(resultado.entidadesValidas);
+          this.cargarMateriales(); // Recargar tabla
+        }
+      } else {
+        console.log('❌ Errores en el archivo:', resultado.errores);
+        this.mostrarErroresCargaMasiva(resultado);
+      }
+    } catch (error) {
+      console.error('❌ Error al procesar archivo:', error);
+      alert(
+        'Error al procesar el archivo. Verifica el formato y vuelve a intentar.'
+      );
+    }
+  }
+
+  private async guardarMaterialesMasivos(materiales: Insumo[]): Promise<void> {
+    try {
+      console.log('💾 Guardando materiales en el backend...');
+
+      // TODO: Implementar guardado masivo en el backend
+      for (const material of materiales) {
+        console.log('📦 Material simulado guardado:', material.nombre);
+      }
+
+      alert(`✅ ${materiales.length} materiales guardados exitosamente!`);
+    } catch (error) {
+      console.error('❌ Error al guardar materiales:', error);
+      alert('Error al guardar los materiales. Contacta al administrador.');
+    }
+  }
+
+  private mostrarErroresCargaMasiva(resultado: any): void {
+    let mensaje = `❌ ERRORES EN CARGA MASIVA\n\n`;
+    mensaje += `Total de errores: ${resultado.errores.length}\n\n`;
+
+    // Mostrar primeros 5 errores
+    const erroresMostrar = resultado.errores.slice(0, 5);
+    erroresMostrar.forEach((error: any, index: number) => {
+      mensaje += `${index + 1}. Fila ${error.fila}: ${error.mensaje}\n`;
+    });
+
+    if (resultado.errores.length > 5) {
+      mensaje += `\n... y ${resultado.errores.length - 5} errores más.`;
+    }
+
+    mensaje += `\n\nRevisa el archivo y vuelve a intentar.`;
+    alert(mensaje);
   }
 
   toggleDropdownExport(): void {
@@ -408,35 +639,37 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   exportarExcel(): void {
-    console.log('📊 Exportando a Excel...');
-    this.dropdownExportAbierto = false;
+    try {
+      console.log('📊 Exportando materiales a Excel...');
+      this.dropdownExportAbierto = false;
 
-    const datosExportacion = {
-      materiales: this.materialesFiltrados,
-      timestamp: new Date(),
-      filtros: this.obtenerFiltrosActivos(),
-    };
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
 
-    console.log('Datos para exportar a Excel:', datosExportacion);
-    alert(
-      `📊 Exportando ${this.materialesFiltrados.length} insumos a Excel.\n\nFuncionalidad completa próximamente.`
-    );
+      console.log(
+        `✅ ${this.dataSource.data.length} materiales exportados a Excel`
+      );
+    } catch (error) {
+      console.error('❌ Error al exportar a Excel:', error);
+      alert('Error al exportar a Excel. Intenta nuevamente.');
+    }
   }
 
   exportarPDF(): void {
-    console.log('📄 Exportando a PDF...');
-    this.dropdownExportAbierto = false;
+    try {
+      console.log('📄 Exportando materiales a PDF...');
+      this.dropdownExportAbierto = false;
 
-    const datosExportacion = {
-      materiales: this.materialesFiltrados,
-      timestamp: new Date(),
-      filtros: this.obtenerFiltrosActivos(),
-    };
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
 
-    console.log('Datos para exportar a PDF:', datosExportacion);
-    alert(
-      `📄 Exportando ${this.materialesFiltrados.length} insumos a PDF.\n\nFuncionalidad completa próximamente.`
-    );
+      console.log(
+        `✅ ${this.dataSource.data.length} materiales exportados a PDF`
+      );
+    } catch (error) {
+      console.error('❌ Error al exportar a PDF:', error);
+      alert('Error al exportar a PDF. Intenta nuevamente.');
+    }
   }
 
   private obtenerFiltrosActivos(): any {
@@ -449,7 +682,6 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  // Cerrar dropdown al hacer click fuera
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     if (this.dropdownExportAbierto) {

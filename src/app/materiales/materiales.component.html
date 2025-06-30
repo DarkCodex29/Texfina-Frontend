@@ -14,10 +14,9 @@
         <!-- Botón de Carga Masiva -->
         <button
           class="btn-texfina btn-secondary"
-          (click)="abrirCargaMasiva()"
+          (click)="cargaMasiva()"
           matTooltip="Importar múltiples insumos desde Excel"
         >
-          <mat-icon>upload_file</mat-icon>
           Carga Masiva
         </button>
 
@@ -29,9 +28,7 @@
             [class.active]="dropdownExportAbierto"
             matTooltip="Exportar listado de insumos"
           >
-            <mat-icon>download</mat-icon>
             Exportar
-            <mat-icon class="dropdown-arrow">keyboard_arrow_down</mat-icon>
           </button>
 
           <div
@@ -40,23 +37,17 @@
             (click)="$event.stopPropagation()"
           >
             <button class="dropdown-item" (click)="exportarExcel()">
-              <mat-icon>table_chart</mat-icon>
               <span>Exportar a Excel</span>
             </button>
             <button class="dropdown-item" (click)="exportarPDF()">
-              <mat-icon>picture_as_pdf</mat-icon>
               <span>Exportar a PDF</span>
             </button>
           </div>
         </div>
 
         <!-- Botón principal de la pantalla -->
-        <button
-          class="btn-texfina btn-primary"
-          (click)="abrirRegistroMaterial()"
-        >
-          <mat-icon>add_circle_outline</mat-icon>
-          Agregar Insumo
+        <button class="btn-texfina btn-primary" (click)="agregar()">
+          Agregar Material
         </button>
       </div>
     </div>
@@ -235,10 +226,7 @@
             <p class="empty-subtitle text-texfina text-muted">
               Comienza agregando tu primer material para gestionar el inventario
             </p>
-            <button
-              class="btn-texfina btn-primary"
-              (click)="abrirRegistroMaterial()"
-            >
+            <button class="btn-texfina btn-primary" (click)="agregar()">
               <mat-icon>add</mat-icon>
               Agregar Primer Material
             </button>
@@ -337,7 +325,7 @@
                   </button>
                   <button
                     class="btn-action btn-edit"
-                    (click)="editarMaterial(material)"
+                    (click)="editar(material)"
                     matTooltip="Editar"
                   >
                     <mat-icon>edit</mat-icon>
