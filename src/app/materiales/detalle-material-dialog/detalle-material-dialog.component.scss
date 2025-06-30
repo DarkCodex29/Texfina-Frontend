@@ -107,8 +107,8 @@
 
   &:disabled,
   &[readonly] {
-    background: var(--texfina-bg-tertiary);
-    color: var(--texfina-text-secondary);
+    background: var(--texfina-bg-tertiary) !important;
+    color: #1f2937 !important;
     cursor: not-allowed;
     border-color: var(--texfina-border-medium);
   }

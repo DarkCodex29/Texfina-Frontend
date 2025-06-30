@@ -38,31 +38,43 @@ export class ExportacionService {
    */
   exportarExcel<T>(config: ConfiguracionExportacion<T>): void {
     try {
-      // Crear workbook
-      const workbook = XLSX.utils.book_new();
-
-      // Preparar datos para la hoja principal
-      const datosParaExcel = this.prepararDatosParaExcel(config);
-      const hojaPrincipal = XLSX.utils.json_to_sheet(datosParaExcel);
-
-      // Configurar anchos de columnas
-      const anchosColumnas = config.columnas.map((col) => ({ width: 20 }));
-      hojaPrincipal['!cols'] = anchosColumnas;
-
-      // Agregar hoja principal
-      XLSX.utils.book_append_sheet(
-        workbook,
-        hojaPrincipal,
-        config.nombreEntidad
+      console.log(
+        '📊 Iniciando exportación Excel con:',
+        config.entidades.length,
+        'registros'
       );
 
-      // Agregar hoja de metadatos si existen
+      const workbook = XLSX.utils.book_new();
+
+      const datosParaExcel = this.prepararDatosParaExcel(config);
+      console.log(
+        '📋 Datos preparados para Excel:',
+        datosParaExcel.length,
+        'filas'
+      );
+
+      if (datosParaExcel.length === 0) {
+        const hojaVacia = XLSX.utils.aoa_to_sheet([
+          config.columnas.map((col) => col.titulo),
+          ['No hay datos para exportar'],
+        ]);
+        XLSX.utils.book_append_sheet(workbook, hojaVacia, config.nombreEntidad);
+      } else {
+        const hojaPrincipal = XLSX.utils.json_to_sheet(datosParaExcel);
+        const anchosColumnas = config.columnas.map(() => ({ width: 20 }));
+        hojaPrincipal['!cols'] = anchosColumnas;
+        XLSX.utils.book_append_sheet(
+          workbook,
+          hojaPrincipal,
+          config.nombreEntidad
+        );
+      }
+
       if (config.metadatos) {
         const hojaMetadatos = this.crearHojaMetadatos(config);
         XLSX.utils.book_append_sheet(workbook, hojaMetadatos, 'Información');
       }
 
-      // Descargar archivo
       const nombreArchivo = `${config.nombreArchivo}_${this.formatearFecha(
         new Date()
       )}.xlsx`;
@@ -297,9 +309,9 @@ export class ExportacionService {
       case 'numero':
         return parseFloat(valor).toLocaleString('es-ES');
       case 'moneda':
-        return new Intl.NumberFormat('es-ES', {
+        return new Intl.NumberFormat('es-PE', {
           style: 'currency',
-          currency: 'COP',
+          currency: 'PEN',
         }).format(parseFloat(valor));
       case 'fecha':
         return this.formatearFechaCompleta(new Date(valor));

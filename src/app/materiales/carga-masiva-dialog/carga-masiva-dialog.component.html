@@ -1,0 +1,139 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="header-content">
+      <h2 class="dialog-title">Carga Masiva de Materiales</h2>
+      <p class="dialog-subtitle">
+        Carga múltiples materiales desde un archivo Excel
+      </p>
+    </div>
+    <button
+      mat-icon-button
+      class="close-button"
+      (click)="cerrar()"
+      aria-label="Cerrar"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <div class="upload-container">
+      <div class="upload-section">
+        <div class="step-header">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3 class="step-title">Descargar Plantilla</h3>
+            <p class="step-description">
+              Descarga la plantilla Excel con la estructura correcta
+            </p>
+          </div>
+        </div>
+        <button
+          class="btn-texfina btn-outline"
+          (click)="descargarPlantilla()"
+          type="button"
+        >
+          <mat-icon>download</mat-icon>
+          Descargar Plantilla Excel
+        </button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="upload-section">
+        <div class="step-header">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3 class="step-title">Seleccionar Archivo</h3>
+            <p class="step-description">
+              Selecciona el archivo Excel completado con los datos
+            </p>
+          </div>
+        </div>
+
+        <input
+          #fileInput
+          type="file"
+          accept=".xlsx,.xls"
+          (change)="onArchivoSeleccionado($event)"
+          style="display: none"
+        />
+
+        <button
+          class="btn-texfina btn-neutral"
+          (click)="seleccionarArchivo()"
+          type="button"
+        >
+          <mat-icon>upload_file</mat-icon>
+          {{ archivoSeleccionado ? "Cambiar Archivo" : "Seleccionar Archivo" }}
+        </button>
+
+        <div *ngIf="archivoSeleccionado" class="archivo-info">
+          <mat-icon class="archivo-icon">description</mat-icon>
+          <span class="archivo-nombre">{{ archivoSeleccionado.name }}</span>
+          <span class="archivo-tamaño">
+            ({{ (archivoSeleccionado.size / 1024 / 1024).toFixed(2) }} MB)
+          </span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="upload-section">
+        <div class="step-header">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3 class="step-title">Procesar Archivo</h3>
+            <p class="step-description">
+              Procesa el archivo y carga los materiales al sistema
+            </p>
+          </div>
+        </div>
+
+        <button
+          class="btn-texfina btn-primary"
+          [disabled]="!puedeCargar"
+          (click)="procesar()"
+          type="button"
+        >
+          <mat-icon *ngIf="!procesando">upload</mat-icon>
+          <mat-icon *ngIf="procesando" class="rotating"
+            >hourglass_empty</mat-icon
+          >
+          {{ procesando ? "Procesando..." : "Procesar y Cargar" }}
+        </button>
+      </div>
+
+      <div *ngIf="mensaje" class="mensaje-container">
+        <div
+          class="mensaje"
+          [class.mensaje-info]="tipoMensaje === 'info'"
+          [class.mensaje-success]="tipoMensaje === 'success'"
+          [class.mensaje-error]="tipoMensaje === 'error'"
+        >
+          <mat-icon class="mensaje-icon">
+            {{
+              tipoMensaje === "success"
+                ? "check_circle"
+                : tipoMensaje === "error"
+                ? "error"
+                : "info"
+            }}
+          </mat-icon>
+          <span>{{ mensaje }}</span>
+        </div>
+      </div>
+
+      <div class="instrucciones">
+        <h4 class="instrucciones-titulo">Instrucciones importantes:</h4>
+        <ul class="instrucciones-lista">
+          <li>El archivo debe estar en formato Excel (.xlsx o .xls)</li>
+          <li>Use la plantilla descargada para evitar errores</li>
+          <li>No modifique los nombres de las columnas</li>
+          <li>Los campos obligatorios deben estar completos</li>
+          <li>El tamaño máximo del archivo es 10MB</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

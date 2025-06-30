@@ -37,6 +37,7 @@ import { MaterialService } from '../services/material.service';
 import { Insumo } from '../models/insumo.model';
 import { RegistroMaterialDialogComponent } from './registro-material-dialog/registro-material-dialog.component';
 import { DetalleMaterialDialogComponent } from './detalle-material-dialog/detalle-material-dialog.component';
+import { CargaMasivaDialogComponent } from './carga-masiva-dialog/carga-masiva-dialog.component';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -518,19 +519,22 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cargaMasiva(): void {
-    console.log('🚀 Abrir carga masiva de materiales');
-    const opcion = confirm(
-      '📁 CARGA MASIVA DE MATERIALES\n\n' +
-        '¿Qué deseas hacer?\n\n' +
-        '✅ ACEPTAR: Descargar plantilla Excel\n' +
-        '❌ CANCELAR: Cargar archivo existente'
-    );
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
+    });
 
-    if (opcion) {
-      this.descargarPlantillaCargaMasiva();
-    } else {
-      this.mostrarInputArchivo();
-    }
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarMateriales();
+      }
+    });
   }
 
   descargarPlantillaCargaMasiva(): void {
@@ -540,98 +544,40 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
       console.log('✅ Plantilla de materiales descargada');
     } catch (error) {
       console.error('❌ Error al generar plantilla:', error);
-      alert('Error al generar la plantilla. Intenta nuevamente.');
+      throw new Error('Error al generar la plantilla');
     }
   }
 
-  private mostrarInputArchivo(): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.xlsx,.xls,.csv';
-    input.style.display = 'none';
-
-    input.onchange = (event: any) => {
-      const archivo = event.target.files[0];
-      if (archivo) {
-        this.procesarArchivoCargaMasiva(archivo);
-      }
-    };
-
-    document.body.appendChild(input);
-    input.click();
-    document.body.removeChild(input);
-  }
-
   async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
-    try {
-      console.log('📂 Procesando archivo:', archivo.name);
-      const config = this.configurarCargaMasiva();
-      const resultado = await this.cargaMasivaService.procesarArchivo(
-        archivo,
-        config
+    console.log('📂 Procesando archivo:', archivo.name);
+    const config = this.configurarCargaMasiva();
+    const resultado = await this.cargaMasivaService.procesarArchivo(
+      archivo,
+      config
+    );
+
+    if (resultado.exitosa) {
+      console.log(
+        `✅ ${resultado.registrosValidos} materiales procesados exitosamente`
       );
-
-      if (resultado.exitosa) {
-        console.log(
-          `✅ ${resultado.registrosValidos} materiales procesados exitosamente`
-        );
-
-        // Mostrar resumen de resultados
-        const mensaje =
-          `📊 RESULTADO DE CARGA MASIVA\n\n` +
-          `✅ Registros válidos: ${resultado.registrosValidos}\n` +
-          `❌ Registros con errores: ${resultado.registrosInvalidos}\n` +
-          `📝 Total procesados: ${resultado.registrosProcesados}\n\n` +
-          `¿Deseas guardar los ${resultado.registrosValidos} registros válidos?`;
-
-        if (confirm(mensaje)) {
-          await this.guardarMaterialesMasivos(resultado.entidadesValidas);
-          this.cargarMateriales(); // Recargar tabla
-        }
-      } else {
-        console.log('❌ Errores en el archivo:', resultado.errores);
-        this.mostrarErroresCargaMasiva(resultado);
-      }
-    } catch (error) {
-      console.error('❌ Error al procesar archivo:', error);
-      alert(
-        'Error al procesar el archivo. Verifica el formato y vuelve a intentar.'
+      await this.guardarMaterialesMasivos(resultado.entidadesValidas);
+    } else {
+      console.log('❌ Errores en el archivo:', resultado.errores);
+      throw new Error(
+        `${resultado.errores.length} errores encontrados en el archivo`
       );
     }
   }
 
   private async guardarMaterialesMasivos(materiales: Insumo[]): Promise<void> {
-    try {
-      console.log('💾 Guardando materiales en el backend...');
+    console.log('💾 Guardando materiales en el backend...');
 
-      // TODO: Implementar guardado masivo en el backend
-      for (const material of materiales) {
-        console.log('📦 Material simulado guardado:', material.nombre);
-      }
-
-      alert(`✅ ${materiales.length} materiales guardados exitosamente!`);
-    } catch (error) {
-      console.error('❌ Error al guardar materiales:', error);
-      alert('Error al guardar los materiales. Contacta al administrador.');
-    }
-  }
-
-  private mostrarErroresCargaMasiva(resultado: any): void {
-    let mensaje = `❌ ERRORES EN CARGA MASIVA\n\n`;
-    mensaje += `Total de errores: ${resultado.errores.length}\n\n`;
-
-    // Mostrar primeros 5 errores
-    const erroresMostrar = resultado.errores.slice(0, 5);
-    erroresMostrar.forEach((error: any, index: number) => {
-      mensaje += `${index + 1}. Fila ${error.fila}: ${error.mensaje}\n`;
-    });
-
-    if (resultado.errores.length > 5) {
-      mensaje += `\n... y ${resultado.errores.length - 5} errores más.`;
+    // TODO: Implementar guardado masivo en el backend
+    for (const material of materiales) {
+      console.log('📦 Material simulado guardado:', material.nombre);
     }
 
-    mensaje += `\n\nRevisa el archivo y vuelve a intentar.`;
-    alert(mensaje);
+    console.log(`✅ ${materiales.length} materiales guardados exitosamente!`);
   }
 
   toggleDropdownExport(): void {
@@ -641,9 +587,15 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
   exportarExcel(): void {
     try {
       console.log('📊 Exportando materiales a Excel...');
+      console.log('🔍 Datos en dataSource:', this.dataSource.data.length);
+      console.log('🔍 Materiales totales:', this.materiales.length);
+      console.log('🔍 Datos a exportar:', this.dataSource.data);
+
       this.dropdownExportAbierto = false;
 
       const config = this.configurarExportacion();
+      console.log('⚙️ Configuración de exportación:', config);
+
       this.exportacionService.exportarExcel(config);
 
       console.log(
@@ -651,7 +603,6 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     } catch (error) {
       console.error('❌ Error al exportar a Excel:', error);
-      alert('Error al exportar a Excel. Intenta nuevamente.');
     }
   }
 
@@ -668,7 +619,6 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     } catch (error) {
       console.error('❌ Error al exportar a PDF:', error);
-      alert('Error al exportar a PDF. Intenta nuevamente.');
     }
   }
 
