@@ -2,9 +2,9 @@
   <div class="page-content">
     <div class="page-header">
       <div class="header-content">
-        <h1 class="page-title text-texfina text-primary">Logs del Sistema</h1>
+        <h1 class="page-title text-texfina text-primary">Auditoría</h1>
         <p class="page-subtitle text-texfina text-muted">
-          Registro de eventos y errores del sistema
+          Registro de actividades y cambios del sistema
         </p>
       </div>
       <div class="header-actions">
@@ -40,7 +40,7 @@
             <input
               class="simple-input"
               formControlName="busquedaGeneral"
-              placeholder="Buscar por nivel, módulo, mensaje..."
+              placeholder="Buscar por usuario, acción, tabla..."
               (input)="aplicarFiltroGeneral()"
             />
             <button
@@ -60,7 +60,7 @@
       <div class="table-container">
         <div *ngIf="cargando" class="loading-state">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>Cargando logs...</p>
+          <p>Cargando auditoría...</p>
         </div>
 
         <div *ngIf="!cargando && error" class="error-state">
@@ -72,73 +72,76 @@
           </button>
         </div>
 
-        <div *ngIf="!cargando && !error && dataSource.data.length === 0" class="empty-state">
-          <mat-icon>description</mat-icon>
-          <h3>No hay logs del sistema</h3>
-          <p>No se encontraron logs que coincidan con los filtros aplicados.</p>
+        <div
+          *ngIf="!cargando && !error && dataSource.data.length === 0"
+          class="empty-state"
+        >
+          <mat-icon>assignment</mat-icon>
+          <h3>No hay registros de auditoría</h3>
+          <p>
+            No se encontraron registros que coincidan con los filtros aplicados.
+          </p>
         </div>
 
         <table
           mat-table
           [dataSource]="dataSource"
-          class="logs-table"
+          class="auditoria-table"
           *ngIf="!cargando && !error && dataSource.data.length > 0"
         >
-          <ng-container matColumnDef="id_log">
+          <ng-container matColumnDef="id_auditoria">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-            <td mat-cell *matCellDef="let log">
-              {{ formatearCodigo(log.id_log) }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="nivel">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>NIVEL</th>
-            <td mat-cell *matCellDef="let log">
-              <span [class]="'badge-' + obtenerTipoNivel(log.nivel)">
-                {{ formatearNivel(log.nivel) }}
-              </span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="modulo">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>MÓDULO</th>
-            <td mat-cell *matCellDef="let log">
-              {{ formatearTexto(log.modulo) }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="mensaje">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>MENSAJE</th>
-            <td mat-cell *matCellDef="let log">
-              <div class="mensaje-log">
-                {{ formatearMensaje(log.mensaje) }}
-              </div>
+            <td mat-cell *matCellDef="let registro">
+              {{ formatearCodigo(registro.id_auditoria) }}
             </td>
           </ng-container>
 
           <ng-container matColumnDef="usuario">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>USUARIO</th>
-            <td mat-cell *matCellDef="let log">
-              {{ formatearTexto(log.usuario) }}
+            <td mat-cell *matCellDef="let registro">
+              {{ formatearTexto(registro.usuario) }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="accion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>ACCIÓN</th>
+            <td mat-cell *matCellDef="let registro">
+              <span [class]="'badge-' + obtenerTipoAccion(registro.accion)">
+                {{ formatearAccion(registro.accion) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="tabla">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>TABLA</th>
+            <td mat-cell *matCellDef="let registro">
+              {{ formatearTexto(registro.tabla) }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="registro_id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>REGISTRO</th>
+            <td mat-cell *matCellDef="let registro">
+              {{ formatearTexto(registro.registro_id) }}
             </td>
           </ng-container>
 
           <ng-container matColumnDef="fecha">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>FECHA</th>
-            <td mat-cell *matCellDef="let log">
-              {{ formatearFecha(log.fecha) }}
+            <td mat-cell *matCellDef="let registro">
+              {{ formatearFecha(registro.fecha) }}
             </td>
           </ng-container>
 
           <ng-container matColumnDef="acciones">
             <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
-            <td mat-cell *matCellDef="let log">
+            <td mat-cell *matCellDef="let registro">
               <div class="action-buttons">
                 <button
                   mat-mini-fab
                   color="accent"
                   class="btn-action btn-detail"
-                  (click)="verDetalle(log)"
+                  (click)="verDetalle(registro)"
                   matTooltip="Ver detalle"
                 >
                   <mat-icon>visibility</mat-icon>
@@ -151,7 +154,10 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
 
-        <div class="pagination-container" *ngIf="!cargando && !error && dataSource.data.length > 0">
+        <div
+          class="pagination-container"
+          *ngIf="!cargando && !error && dataSource.data.length > 0"
+        >
           <div class="pagination-info">
             Mostrando {{ dataSource.data.length }} registros
           </div>

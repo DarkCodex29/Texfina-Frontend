@@ -16,20 +16,20 @@ import {
   ConfiguracionExportacion,
 } from '../services/exportacion.service';
 
-interface LogSistema {
-  id_log: number;
-  nivel: string;
-  modulo: string;
-  mensaje: string;
-  usuario?: string;
-  detalles?: string;
-  stack_trace?: string;
+interface RegistroAuditoria {
+  id_auditoria: number;
+  usuario: string;
+  accion: string;
+  tabla: string;
+  registro_id: string;
+  datos_anteriores?: string;
+  datos_nuevos?: string;
   fecha: Date;
   ip_address?: string;
 }
 
 @Component({
-  selector: 'app-logs',
+  selector: 'app-auditoria',
   standalone: true,
   imports: [
     CommonModule,
@@ -44,18 +44,18 @@ interface LogSistema {
     MatPaginatorModule,
     MatTooltipModule,
   ],
-  templateUrl: './logs.html',
-  styleUrl: './logs.scss',
+  templateUrl: './auditoria.html',
+  styleUrl: './auditoria.scss',
 })
-export class LogsComponent implements OnInit {
-  logs: LogSistema[] = [];
-  dataSource = new MatTableDataSource<LogSistema>([]);
+export class AuditoriaComponent implements OnInit {
+  registros: RegistroAuditoria[] = [];
+  dataSource = new MatTableDataSource<RegistroAuditoria>([]);
   displayedColumns: string[] = [
-    'id_log',
-    'nivel',
-    'modulo',
-    'mensaje',
+    'id_auditoria',
     'usuario',
+    'accion',
+    'tabla',
+    'registro_id',
     'fecha',
     'acciones',
   ];
@@ -83,49 +83,39 @@ export class LogsComponent implements OnInit {
     this.cargando = true;
     this.error = null;
 
-    const datosSimulados: LogSistema[] = [
+    const datosSimulados: RegistroAuditoria[] = [
       {
-        id_log: 1,
-        nivel: 'ERROR',
-        modulo: 'Autenticación',
-        mensaje: 'Error al validar credenciales de usuario',
+        id_auditoria: 1,
         usuario: 'admin',
+        accion: 'CREATE',
+        tabla: 'USUARIO',
+        registro_id: 'USR001',
         fecha: new Date('2024-01-15T10:30:00'),
         ip_address: '192.168.1.100',
-        detalles:
-          'Usuario intentó acceder con credenciales incorrectas 3 veces consecutivas',
       },
       {
-        id_log: 2,
-        nivel: 'INFO',
-        modulo: 'Inventario',
-        mensaje: 'Sincronización de stock completada exitosamente',
-        usuario: 'sistema',
-        fecha: new Date('2024-01-15T09:15:00'),
-        ip_address: '192.168.1.1',
-      },
-      {
-        id_log: 3,
-        nivel: 'WARNING',
-        modulo: 'Base de Datos',
-        mensaje: 'Conexión lenta detectada en consulta de reportes',
-        fecha: new Date('2024-01-14T16:45:00'),
-        detalles: 'Tiempo de respuesta: 5.2 segundos (normal: <2s)',
-      },
-      {
-        id_log: 4,
-        nivel: 'DEBUG',
-        modulo: 'API',
-        mensaje: 'Endpoint /api/materiales consultado',
+        id_auditoria: 2,
         usuario: 'supervisor01',
-        fecha: new Date('2024-01-14T14:20:00'),
+        accion: 'UPDATE',
+        tabla: 'INSUMO',
+        registro_id: 'INS001',
+        fecha: new Date('2024-01-15T09:15:00'),
         ip_address: '192.168.1.101',
+      },
+      {
+        id_auditoria: 3,
+        usuario: 'operario01',
+        accion: 'DELETE',
+        tabla: 'LOTE',
+        registro_id: 'LOT001',
+        fecha: new Date('2024-01-14T16:45:00'),
+        ip_address: '192.168.1.102',
       },
     ];
 
     setTimeout(() => {
-      this.logs = datosSimulados;
-      this.dataSource.data = this.logs;
+      this.registros = datosSimulados;
+      this.dataSource.data = this.registros;
       this.cargando = false;
     }, 1000);
   }
@@ -135,41 +125,41 @@ export class LogsComponent implements OnInit {
       this.filtroGeneralForm.get('busquedaGeneral')?.value?.toLowerCase() || '';
 
     if (!filtro.trim()) {
-      this.dataSource.data = this.logs;
+      this.dataSource.data = this.registros;
       return;
     }
 
-    this.dataSource.data = this.logs.filter(
-      (log) =>
-        log.nivel.toLowerCase().includes(filtro) ||
-        log.modulo.toLowerCase().includes(filtro) ||
-        log.mensaje.toLowerCase().includes(filtro) ||
-        (log.usuario && log.usuario.toLowerCase().includes(filtro))
+    this.dataSource.data = this.registros.filter(
+      (registro) =>
+        registro.usuario.toLowerCase().includes(filtro) ||
+        registro.accion.toLowerCase().includes(filtro) ||
+        registro.tabla.toLowerCase().includes(filtro) ||
+        registro.registro_id.toLowerCase().includes(filtro)
     );
   }
 
   limpiarFiltros(): void {
     this.filtroGeneralForm.reset();
-    this.dataSource.data = this.logs;
+    this.dataSource.data = this.registros;
   }
 
-  private configurarExportacion(): ConfiguracionExportacion<LogSistema> {
+  private configurarExportacion(): ConfiguracionExportacion<RegistroAuditoria> {
     return {
       entidades: this.dataSource.data,
-      nombreArchivo: 'logs_sistema',
-      nombreEntidad: 'Logs del Sistema',
+      nombreArchivo: 'auditoria',
+      nombreEntidad: 'Registros de Auditoría',
       columnas: [
-        { campo: 'id_log', titulo: 'ID', formato: 'numero' },
-        { campo: 'nivel', titulo: 'Nivel', formato: 'texto' },
-        { campo: 'modulo', titulo: 'Módulo', formato: 'texto' },
-        { campo: 'mensaje', titulo: 'Mensaje', formato: 'texto' },
+        { campo: 'id_auditoria', titulo: 'ID', formato: 'numero' },
         { campo: 'usuario', titulo: 'Usuario', formato: 'texto' },
+        { campo: 'accion', titulo: 'Acción', formato: 'texto' },
+        { campo: 'tabla', titulo: 'Tabla', formato: 'texto' },
+        { campo: 'registro_id', titulo: 'Registro ID', formato: 'texto' },
         { campo: 'fecha', titulo: 'Fecha', formato: 'fecha' },
         { campo: 'ip_address', titulo: 'IP Address', formato: 'texto' },
       ],
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
-        cantidadTotal: this.logs.length,
+        cantidadTotal: this.registros.length,
         cantidadFiltrada: this.dataSource.data.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
@@ -209,8 +199,8 @@ export class LogsComponent implements OnInit {
     }
   }
 
-  verDetalle(log: LogSistema): void {
-    console.log('Ver detalle de log:', log);
+  verDetalle(registro: RegistroAuditoria): void {
+    console.log('Ver detalle de registro de auditoría:', registro);
   }
 
   toggleDropdownExport(): void {
@@ -226,36 +216,31 @@ export class LogsComponent implements OnInit {
     return texto && texto.trim() ? texto : '-';
   }
 
-  formatearNivel(nivel?: string): string {
-    if (!nivel) return '-';
-    const niveles: { [key: string]: string } = {
-      ERROR: 'Error',
-      WARNING: 'Advertencia',
-      INFO: 'Información',
-      DEBUG: 'Debug',
-      CRITICAL: 'Crítico',
+  formatearAccion(accion?: string): string {
+    if (!accion) return '-';
+    const acciones: { [key: string]: string } = {
+      CREATE: 'Crear',
+      UPDATE: 'Actualizar',
+      DELETE: 'Eliminar',
+      LOGIN: 'Iniciar Sesión',
+      LOGOUT: 'Cerrar Sesión',
     };
-    return niveles[nivel.toUpperCase()] || nivel;
+    return acciones[accion.toUpperCase()] || accion;
   }
 
-  formatearMensaje(mensaje?: string): string {
-    if (!mensaje) return '-';
-    return mensaje.length > 80 ? mensaje.substring(0, 80) + '...' : mensaje;
-  }
-
-  obtenerTipoNivel(nivel?: string): string {
-    if (!nivel) return 'neutral';
-    switch (nivel.toUpperCase()) {
-      case 'ERROR':
-        return 'danger';
-      case 'CRITICAL':
-        return 'danger';
-      case 'WARNING':
+  obtenerTipoAccion(accion?: string): string {
+    if (!accion) return 'neutral';
+    switch (accion.toUpperCase()) {
+      case 'CREATE':
+        return 'success';
+      case 'UPDATE':
         return 'warning';
-      case 'INFO':
+      case 'DELETE':
+        return 'danger';
+      case 'LOGIN':
         return 'info';
-      case 'DEBUG':
-        return 'neutral';
+      case 'LOGOUT':
+        return 'info';
       default:
         return 'neutral';
     }
