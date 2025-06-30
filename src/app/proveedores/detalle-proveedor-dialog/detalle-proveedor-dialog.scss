@@ -1,7 +1,9 @@
 .dialog-container {
-  padding: 0;
-  margin: 0;
-  background-color: white;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  width: 100%;
+  background: white;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -9,29 +11,48 @@
 .dialog-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e0e0e0;
-  background-color: #fafafa;
+  align-items: flex-start;
+  padding: 24px;
+  background: linear-gradient(
+    135deg,
+    var(--texfina-secondary),
+    var(--texfina-secondary-dark)
+  );
+  color: white;
+  border-bottom: 1px solid var(--texfina-border-light);
+
+  .header-content {
+    flex: 1;
+  }
 
   .dialog-title {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: white !important;
+  }
+
+  .dialog-subtitle {
     margin: 0;
-    font-size: 1.25rem;
-    font-weight: 500;
-    color: #333;
+    font-size: 14px;
+    opacity: 0.9;
+    color: white !important;
   }
 
   .close-button {
-    color: #666;
-
-    &:hover {
-      background-color: #f0f0f0;
-    }
+    color: white;
+    width: 40px;
+    height: 40px;
+    margin-left: 16px;
   }
 }
 
-.detalle-content {
-  padding: 2rem;
+.dialog-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  max-height: calc(90vh - 160px);
+  background: var(--texfina-bg-primary);
 
   .form-row {
     display: flex;
@@ -49,7 +70,6 @@
     }
   }
 
-  // Estilos específicos para los campos de formulario de solo lectura
   .mat-mdc-form-field {
     width: 100%;
 
@@ -66,7 +86,6 @@
       }
     }
 
-    // Estilo para campos deshabilitados
     &.mat-form-field-disabled {
       .mat-mdc-form-field-label {
         color: #6c757d;
@@ -75,7 +94,6 @@
   }
 }
 
-// Media queries para responsividad
 @media (max-width: 768px) {
   .dialog-container {
     margin: 0.5rem;
@@ -84,15 +102,19 @@
   }
 
   .dialog-header {
-    padding: 1rem 1.5rem;
+    padding: 20px;
 
     .dialog-title {
-      font-size: 1.1rem;
+      font-size: 18px;
+    }
+
+    .dialog-subtitle {
+      font-size: 13px;
     }
   }
 
-  .detalle-content {
-    padding: 1.5rem;
+  .dialog-content {
+    padding: 20px;
 
     .form-row {
       flex-direction: column;
@@ -111,10 +133,10 @@
   }
 
   .dialog-header {
-    padding: 0.75rem 1rem;
+    padding: 16px;
   }
 
-  .detalle-content {
-    padding: 1rem;
+  .dialog-content {
+    padding: 16px;
   }
 }

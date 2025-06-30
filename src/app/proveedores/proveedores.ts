@@ -35,6 +35,17 @@ import { MaterialService } from '../services/material.service';
 import { Proveedor } from '../models/insumo.model';
 import { DetalleProveedorDialogComponent } from './detalle-proveedor-dialog/detalle-proveedor-dialog';
 import { EditarProveedorDialogComponent } from './editar-proveedor-dialog/editar-proveedor-dialog';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+  ColumnaExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+  MapeoColumna,
+} from '../services/carga-masiva.service';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 
 @Component({
   selector: 'app-proveedores',
@@ -73,6 +84,7 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading: boolean = false;
   hasError: boolean = false;
   errorMessage: string = '';
+  dropdownExportAbierto: boolean = false;
 
   displayedColumns: string[] = [
     'empresa',
@@ -101,7 +113,9 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
   ) {
     this.filtroGeneralForm = this.fb.group({
       busquedaGeneral: [''],
@@ -326,24 +340,209 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  verDetalle(proveedor: Proveedor): void {
-    this.dialog.open(DetalleProveedorDialogComponent, {
+  private configurarExportacion(): ConfiguracionExportacion<Proveedor> {
+    return {
+      entidades: this.dataSource.data,
+      nombreArchivo: 'proveedores',
+      nombreEntidad: 'Proveedores',
+      columnas: [
+        { campo: 'id_proveedor', titulo: 'ID', formato: 'numero' },
+        { campo: 'empresa', titulo: 'Empresa', formato: 'texto' },
+        { campo: 'ruc', titulo: 'RUC', formato: 'texto' },
+        { campo: 'contacto', titulo: 'Contacto', formato: 'texto' },
+        { campo: 'direccion', titulo: 'Dirección', formato: 'texto' },
+        { campo: 'created_at', titulo: 'Fecha Creación', formato: 'fecha' },
+        {
+          campo: 'updated_at',
+          titulo: 'Última Actualización',
+          formato: 'fecha',
+        },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.proveedores.length,
+        cantidadFiltrada: this.dataSource.data.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Proveedor> {
+    return {
+      tipoEntidad: 'proveedores',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Empresa',
+          campoEntidad: 'empresa',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'RUC',
+          campoEntidad: 'ruc',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Contacto',
+          campoEntidad: 'contacto',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Dirección',
+          campoEntidad: 'direccion',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'ruc',
+          validador: (valor) => valor && valor.length <= 20,
+          mensajeError: 'El RUC debe tener máximo 20 caracteres',
+        },
+        {
+          campo: 'empresa',
+          validador: (valor) => valor && valor.length <= 200,
+          mensajeError: 'La empresa debe tener máximo 200 caracteres',
+        },
+        {
+          campo: 'contacto',
+          validador: (valor) => !valor || valor.length <= 200,
+          mensajeError: 'El contacto debe tener máximo 200 caracteres',
+        },
+        {
+          campo: 'direccion',
+          validador: (valor) => !valor || valor.length <= 500,
+          mensajeError: 'La dirección debe tener máximo 500 caracteres',
+        },
+      ],
+    };
+  }
+
+  private obtenerFiltrosActivos(): any {
+    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
+    const filtrosColumna = this.filtrosColumnaForm.value;
+
+    return {
+      busquedaGeneral: filtroGeneral || null,
+      ...filtrosColumna,
+    };
+  }
+
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
+    }
+  }
+
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
+
+  cargaMasiva(): void {
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
       width: '600px',
-      data: proveedor,
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
     });
   }
 
-  editarProveedor(proveedor: Proveedor): void {
+  descargarPlantillaCargaMasiva(): void {
+    try {
+      const config = this.configurarCargaMasiva();
+      this.cargaMasivaService.generarPlantilla(config);
+    } catch (error) {
+      console.error('Error al generar plantilla:', error);
+    }
+  }
+
+  async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
+    try {
+      const config = this.configurarCargaMasiva();
+      const resultado = await this.cargaMasivaService.procesarArchivo(
+        archivo,
+        config
+      );
+
+      if (resultado.exitosa) {
+        await this.guardarProveedoresMasivos(resultado.entidadesValidas);
+        console.log(
+          `✅ ${resultado.registrosValidos} registros procesados exitosamente`
+        );
+        this.cargarProveedores();
+      } else {
+        console.log('❌ Errores en el archivo:', resultado.errores);
+      }
+    } catch (error) {
+      console.error('Error al procesar archivo:', error);
+    }
+  }
+
+  private async guardarProveedoresMasivos(
+    proveedores: Proveedor[]
+  ): Promise<void> {
+    for (const proveedor of proveedores) {
+      await this.materialService.crearProveedor(proveedor).toPromise();
+    }
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  agregar(): void {
     const dialogRef = this.dialog.open(EditarProveedorDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { proveedor, esNuevo: false },
+      data: { esEdicion: false, titulo: 'Agregar Proveedor' },
     });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
         this.cargarProveedores();
       }
+    });
+  }
+
+  editar(proveedor: Proveedor): void {
+    const dialogRef = this.dialog.open(EditarProveedorDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        esEdicion: true,
+        proveedor: proveedor,
+        titulo: 'Editar Proveedor',
+      },
+    });
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarProveedores();
+      }
+    });
+  }
+
+  verDetalle(proveedor: Proveedor): void {
+    this.dialog.open(DetalleProveedorDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: { proveedor: proveedor },
     });
   }
 }
