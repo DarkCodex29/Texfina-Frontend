@@ -46,6 +46,7 @@ import {
   MapeoColumna,
 } from '../services/carga-masiva.service';
 import { DetalleRecetaDialogComponent } from './detalle-receta-dialog/detalle-receta-dialog';
+import { EditarRecetaDialogComponent } from './editar-receta-dialog/editar-receta-dialog';
 
 @Component({
   selector: 'app-recetas',
@@ -457,13 +458,29 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
   // MÉTODOS DE ACCIONES CRUD
   // ============================================================================
   agregar(): void {
-    console.log('➕ Abriendo formulario para nueva receta');
-    // TODO: Implementar dialog para crear nueva receta
+    const dialogRef = this.dialog.open(EditarRecetaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: { esNuevo: true },
+    });
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarRecetas();
+      }
+    });
   }
 
   editar(receta: Receta): void {
-    console.log('✏️ Editando receta:', receta.nombre);
-    // TODO: Implementar dialog de edición de receta
+    const dialogRef = this.dialog.open(EditarRecetaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: { esNuevo: false, receta: receta },
+    });
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarRecetas();
+      }
+    });
   }
 
   verDetalle(receta: Receta): void {

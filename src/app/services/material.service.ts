@@ -1911,6 +1911,13 @@ export class MaterialService {
     return of(receta);
   }
 
+  editarReceta(receta: Receta): Observable<Receta> {
+    if (this.useApi) {
+      return this.apiService.actualizarReceta(receta);
+    }
+    return of(receta);
+  }
+
   eliminarReceta(id: number): Observable<boolean> {
     if (this.useApi) {
       return this.apiService.eliminarReceta(id);
