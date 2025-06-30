@@ -1,77 +1,99 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2 class="dialog-title">Detalle de usuario</h2>
+    <div class="header-content">
+      <h2 class="dialog-title">Detalle de Usuario</h2>
+      <p class="dialog-subtitle">
+        Información completa del usuario seleccionado
+      </p>
+    </div>
     <button mat-icon-button mat-dialog-close class="close-button">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <div class="detalle-content">
-    <!-- Primera fila - Código y Usuario -->
-    <div class="form-row form-row-two">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Código</mat-label>
-        <input
-          matInput
-          [value]="formatearCodigo(usuario.id_usuario)"
-          readonly
-        />
-      </mat-form-field>
+  <div class="dialog-content">
+    <div class="form-container">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Código</label>
+          <input
+            class="form-input"
+            [value]="formatearCodigo(usuario.id_usuario)"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Usuario</label>
+          <input
+            class="form-input"
+            [value]="formatearTexto(usuario.username)"
+            readonly
+          />
+        </div>
+      </div>
 
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Usuario</mat-label>
-        <input matInput [value]="usuario.username" readonly />
-      </mat-form-field>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input
+            class="form-input"
+            [value]="formatearTexto(usuario.email)"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rol</label>
+          <input
+            class="form-input"
+            [value]="obtenerNombreRol(usuario.id_rol)"
+            readonly
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tipo de Usuario</label>
+          <input
+            class="form-input"
+            [value]="obtenerNombreTipo(usuario.id_tipo_usuario)"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Estado</label>
+          <input
+            class="form-input"
+            [value]="usuario.activo ? 'Activo' : 'Inactivo'"
+            readonly
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha de Creación</label>
+          <input
+            class="form-input"
+            [value]="formatearFecha(usuario.created_at)"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Último Acceso</label>
+          <input
+            class="form-input"
+            [value]="formatearFecha(usuario.last_login)"
+            readonly
+          />
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Segunda fila - Email -->
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Email</mat-label>
-        <input matInput [value]="usuario.email || '-'" readonly />
-      </mat-form-field>
-    </div>
-
-    <!-- Tercera fila - Rol y Tipo -->
-    <div class="form-row form-row-two">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Rol</mat-label>
-        <input matInput [value]="obtenerNombreRol(usuario.id_rol)" readonly />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Tipo de usuario</mat-label>
-        <input
-          matInput
-          [value]="obtenerNombreTipo(usuario.id_tipo_usuario)"
-          readonly
-        />
-      </mat-form-field>
-    </div>
-
-    <!-- Cuarta fila - Estado -->
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Estado</mat-label>
-        <input
-          matInput
-          [value]="usuario.activo ? 'Activo' : 'Inactivo'"
-          readonly
-        />
-      </mat-form-field>
-    </div>
-
-    <!-- Quinta fila - Fecha de creación y Último ingreso -->
-    <div class="form-row form-row-two">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Fecha de creación</mat-label>
-        <input matInput [value]="formatearFecha(usuario.created_at)" readonly />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Último ingreso</mat-label>
-        <input matInput [value]="formatearFecha(usuario.last_login)" readonly />
-      </mat-form-field>
-    </div>
+  <div class="dialog-actions">
+    <button mat-button mat-dialog-close class="btn-texfina btn-neutral">
+      Cerrar
+    </button>
   </div>
 </div>

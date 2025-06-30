@@ -1,1 +1,182 @@
-<p>editar-usuario-dialog works!</p>
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="header-content">
+      <h2 class="dialog-title">{{ data.titulo }}</h2>
+      <p class="dialog-subtitle">
+        {{ data.esEdicion ? 'Modifica los datos del usuario' : 'Completa la
+        información del nuevo usuario' }}
+      </p>
+    </div>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <form [formGroup]="usuarioForm" class="form-container">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Usuario *</label>
+          <input
+            class="form-input"
+            formControlName="username"
+            placeholder="Nombre de usuario"
+            maxlength="50"
+          />
+          <div
+            class="error-message"
+            *ngIf="usuarioForm.get('username')?.errors && usuarioForm.get('username')?.touched"
+          >
+            <span *ngIf="usuarioForm.get('username')?.errors?.['required']"
+              >El usuario es obligatorio</span
+            >
+            <span *ngIf="usuarioForm.get('username')?.errors?.['maxlength']"
+              >Máximo 50 caracteres</span
+            >
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input
+            class="form-input"
+            formControlName="email"
+            type="email"
+            placeholder="correo@ejemplo.com"
+            maxlength="100"
+          />
+          <div
+            class="error-message"
+            *ngIf="usuarioForm.get('email')?.errors && usuarioForm.get('email')?.touched"
+          >
+            <span *ngIf="usuarioForm.get('email')?.errors?.['email']"
+              >Email inválido</span
+            >
+            <span *ngIf="usuarioForm.get('email')?.errors?.['maxlength']"
+              >Máximo 100 caracteres</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Rol *</label>
+          <select class="form-select" formControlName="id_rol">
+            <option value="">Seleccionar rol</option>
+            <option *ngFor="let rol of data.roles" [value]="rol.id_rol">
+              {{ rol.nombre }}
+            </option>
+          </select>
+          <div
+            class="error-message"
+            *ngIf="usuarioForm.get('id_rol')?.errors && usuarioForm.get('id_rol')?.touched"
+          >
+            <span *ngIf="usuarioForm.get('id_rol')?.errors?.['required']"
+              >El rol es obligatorio</span
+            >
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo de Usuario *</label>
+          <select class="form-select" formControlName="id_tipo_usuario">
+            <option value="">Seleccionar tipo</option>
+            <option
+              *ngFor="let tipo of data.tiposUsuario"
+              [value]="tipo.id_tipo_usuario"
+            >
+              {{ tipo.descripcion }}
+            </option>
+          </select>
+          <div
+            class="error-message"
+            *ngIf="usuarioForm.get('id_tipo_usuario')?.errors && usuarioForm.get('id_tipo_usuario')?.touched"
+          >
+            <span
+              *ngIf="usuarioForm.get('id_tipo_usuario')?.errors?.['required']"
+              >El tipo de usuario es obligatorio</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row" *ngIf="!data.esEdicion">
+        <div class="form-group">
+          <label class="form-label">Contraseña *</label>
+          <input
+            class="form-input"
+            type="password"
+            formControlName="password"
+            placeholder="Contraseña segura"
+            maxlength="255"
+          />
+          <div
+            class="error-message"
+            *ngIf="usuarioForm.get('password')?.errors && usuarioForm.get('password')?.touched"
+          >
+            <span *ngIf="usuarioForm.get('password')?.errors?.['required']"
+              >La contraseña es obligatoria</span
+            >
+            <span *ngIf="usuarioForm.get('password')?.errors?.['minlength']"
+              >Mínimo 6 caracteres</span
+            >
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar Contraseña *</label>
+          <input
+            class="form-input"
+            type="password"
+            formControlName="confirmarPassword"
+            placeholder="Repetir contraseña"
+          />
+          <div
+            class="error-message"
+            *ngIf="usuarioForm.get('confirmarPassword')?.errors && usuarioForm.get('confirmarPassword')?.touched"
+          >
+            <span
+              *ngIf="usuarioForm.get('confirmarPassword')?.errors?.['required']"
+              >Confirmar la contraseña</span
+            >
+            <span
+              *ngIf="usuarioForm.get('confirmarPassword')?.errors?.['passwordMismatch']"
+              >Las contraseñas no coinciden</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Estado</label>
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                formControlName="activo"
+                class="checkbox-input"
+              />
+              <span class="checkbox-text">Usuario activo</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-actions">
+    <button mat-button mat-dialog-close class="btn-texfina btn-neutral">
+      Cancelar
+    </button>
+    <button
+      mat-button
+      class="btn-texfina btn-primary"
+      [disabled]="usuarioForm.invalid || guardando"
+      (click)="guardar()"
+    >
+      <span *ngIf="guardando">Guardando...</span>
+      <span *ngIf="!guardando"
+        >{{ data.esEdicion ? 'Actualizar' : 'Crear Usuario' }}</span
+      >
+    </button>
+  </div>
+</div>

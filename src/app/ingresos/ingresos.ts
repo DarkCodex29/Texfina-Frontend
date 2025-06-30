@@ -35,6 +35,16 @@ import {
 } from 'rxjs';
 
 import { MaterialService } from '../services/material.service';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+  ColumnaExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+  MapeoColumna,
+} from '../services/carga-masiva.service';
 import { Ingreso, Insumo, Unidad, Lote } from '../models/insumo.model';
 import { IngresoMaterialDialogComponent } from './ingreso-material-dialog/ingreso-material-dialog.component';
 
@@ -78,6 +88,7 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
   filtrosExpanded = true;
   filtrosColumnaHabilitados = false;
   filtrosColumnaActivos = false;
+  dropdownExportAbierto = false;
   private destroy$ = new Subject<void>();
 
   // ============================================================================
@@ -120,7 +131,9 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
   ) {
     this.filtroGeneralForm = this.fb.group({
       busquedaGeneral: [''],
@@ -431,7 +444,7 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
     // TODO: Implementar modal de detalle
   }
 
-  editarIngreso(ingreso: Ingreso): void {
+  editar(ingreso: Ingreso): void {
     console.log('Editar ingreso:', ingreso);
     // TODO: Implementar modal de edición
   }
@@ -491,12 +504,180 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   formatearPrecio(precio?: number): string {
-    if (!precio) return 'S/ 0.00';
-    return precio.toLocaleString('es-ES', {
-      style: 'currency',
-      currency: 'PEN',
-      currencyDisplay: 'symbol',
-    });
+    if (!precio || precio === 0) return 'S/ 0.00';
+    return `S/ ${precio.toFixed(2)}`;
+  }
+
+  // ============================================================================
+  // CONFIGURACIONES ESPECÍFICAS SEGÚN BD REAL
+  // ============================================================================
+
+  private configurarExportacion(): ConfiguracionExportacion<Ingreso> {
+    return {
+      entidades: this.dataSource.data,
+      nombreArchivo: 'ingresos',
+      nombreEntidad: 'Ingresos',
+      columnas: [
+        { campo: 'id_ingreso', titulo: 'ID', formato: 'numero' },
+        { campo: 'fecha', titulo: 'Fecha', formato: 'fecha' },
+        { campo: 'id_insumo', titulo: 'ID Insumo', formato: 'numero' },
+        { campo: 'presentacion', titulo: 'Presentación', formato: 'texto' },
+        { campo: 'id_unidad', titulo: 'Unidad', formato: 'texto' },
+        { campo: 'cantidad', titulo: 'Cantidad', formato: 'numero' },
+        { campo: 'id_lote', titulo: 'ID Lote', formato: 'numero' },
+        {
+          campo: 'precio_total_formula',
+          titulo: 'Precio Total',
+          formato: 'numero',
+        },
+        { campo: 'numero_remision', titulo: 'N° Remisión', formato: 'texto' },
+        { campo: 'orden_compra', titulo: 'Orden Compra', formato: 'texto' },
+        { campo: 'estado', titulo: 'Estado', formato: 'texto' },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.ingresos.length,
+        cantidadFiltrada: this.dataSource.data.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Ingreso> {
+    return {
+      tipoEntidad: 'ingresos',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Fecha',
+          campoEntidad: 'fecha',
+          obligatorio: true,
+          tipoEsperado: 'fecha',
+        },
+        {
+          columnaArchivo: 'ID Insumo',
+          campoEntidad: 'id_insumo',
+          obligatorio: true,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Presentación',
+          campoEntidad: 'presentacion',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Cantidad',
+          campoEntidad: 'cantidad',
+          obligatorio: true,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'N° Remisión',
+          campoEntidad: 'numero_remision',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Estado',
+          campoEntidad: 'estado',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'presentacion',
+          validador: (valor) => !valor || valor.length <= 100,
+          mensajeError: 'La presentación debe tener máximo 100 caracteres',
+        },
+        {
+          campo: 'numero_remision',
+          validador: (valor) => !valor || valor.length <= 50,
+          mensajeError: 'El número de remisión debe tener máximo 50 caracteres',
+        },
+        {
+          campo: 'estado',
+          validador: (valor) => !valor || valor.length <= 50,
+          mensajeError: 'El estado debe tener máximo 50 caracteres',
+        },
+      ],
+    };
+  }
+
+  private obtenerFiltrosActivos(): any {
+    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
+    const filtrosColumna = this.filtrosColumnaForm.value;
+
+    return {
+      filtroGeneral: filtroGeneral || '',
+      filtrosColumna: Object.entries(filtrosColumna)
+        .filter(([_, valor]) => valor && valor.toString().trim())
+        .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {}),
+    };
+  }
+
+  // ============================================================================
+  // EXPORTACIÓN
+  // ============================================================================
+
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
+    }
+  }
+
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
+
+  // ============================================================================
+  // CARGA MASIVA
+  // ============================================================================
+
+  cargaMasiva(): void {
+    // const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+    //   width: '600px', disableClose: true,
+    //   data: {
+    //     configuracion: this.configurarCargaMasiva(),
+    //     onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+    //     onProcesarArchivo: (archivo: File) => this.procesarArchivoCargaMasiva(archivo)
+    //   }
+    // });
+    console.log('Carga masiva - Funcionalidad en desarrollo');
+  }
+
+  // ============================================================================
+  // CRUD COMPLETO
+  // ============================================================================
+
+  agregar(): void {
+    this.abrirRegistroIngreso();
+  }
+
+  eliminar(ingreso: Ingreso): void {
+    const confirmacion = confirm(
+      `¿Está seguro que desea eliminar el ingreso del ${this.formatearFecha(
+        ingreso.fecha
+      )}?`
+    );
+    if (confirmacion && ingreso.id_ingreso) {
+      console.log('Eliminar ingreso - Funcionalidad en desarrollo');
+    }
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
   }
 }
 

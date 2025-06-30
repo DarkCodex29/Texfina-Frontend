@@ -31,7 +31,7 @@ export class DetalleUsuarioDialogComponent {
   tiposUsuario: TipoUsuario[];
 
   constructor(
-    public dialogRef: MatDialogRef<DetalleUsuarioDialogComponent>,
+    private dialogRef: MatDialogRef<DetalleUsuarioDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       usuario: Usuario;
@@ -42,11 +42,16 @@ export class DetalleUsuarioDialogComponent {
     this.usuario = data.usuario;
     this.roles = data.roles;
     this.tiposUsuario = data.tiposUsuario;
+    console.log('Data recibida en modal:', this.usuario);
   }
 
   formatearCodigo(id?: number): string {
-    if (!id) return '00000';
+    if (!id) return '00001';
     return id.toString().padStart(5, '0');
+  }
+
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
   }
 
   obtenerNombreRol(idRol?: string): string {
@@ -75,5 +80,9 @@ export class DetalleUsuarioDialogComponent {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  onClose(): void {
+    this.dialogRef.close();
   }
 }

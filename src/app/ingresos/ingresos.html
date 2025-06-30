@@ -11,16 +11,37 @@
         </p>
       </div>
       <div class="header-actions">
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
+          <mat-icon>upload_file</mat-icon>
+          Carga Masiva
+        </button>
+
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
+          >
+            <mat-icon>file_download</mat-icon>
+            Exportar
+          </button>
+          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+            <button class="dropdown-item" (click)="exportarExcel()">
+              <mat-icon>description</mat-icon>
+              Exportar a Excel
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              <mat-icon>picture_as_pdf</mat-icon>
+              Exportar a PDF
+            </button>
+          </div>
+        </div>
+
         <button
           class="btn-texfina btn-primary"
           (click)="abrirRegistroIngreso()"
         >
           <mat-icon>add_circle_outline</mat-icon>
           Agregar Ingreso
-        </button>
-        <button class="btn-texfina btn-success" (click)="abrirIngresoMasivo()">
-          <mat-icon>upload_file</mat-icon>
-          Ingreso Masivo
         </button>
       </div>
     </div>
@@ -327,7 +348,7 @@
                   </button>
                   <button
                     class="btn-action btn-edit"
-                    (click)="editarIngreso(ingreso)"
+                    (click)="editar(ingreso)"
                     matTooltip="Editar"
                     [disabled]="ingreso.estado === 'PROCESADO'"
                   >

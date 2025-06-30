@@ -1,202 +1,326 @@
-<div class="usuarios-container page-container">
-  <!-- Header de la página -->
-  <div class="page-header">
-    <h1 class="page-title">Gestión de Usuarios</h1>
-    <div class="action-buttons">
-      <button
-        mat-raised-button
-        class="btn-texfina btn-primary"
-        (click)="abrirNuevoUsuario()"
-      >
-        <mat-icon>add</mat-icon>
-        Agregar usuario
-      </button>
-    </div>
-  </div>
-
-  <!-- Tarjeta de filtros -->
-  <mat-card class="filtros-card">
-    <form [formGroup]="filtrosForm" class="filtros-form">
-      <div class="filtros-row">
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Usuario</mat-label>
-          <input
-            matInput
-            formControlName="username"
-            placeholder="Buscar por usuario"
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Email</mat-label>
-          <input
-            matInput
-            formControlName="email"
-            placeholder="Buscar por email"
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Rol</mat-label>
-          <mat-select formControlName="rol">
-            <mat-option value="">Todos los roles</mat-option>
-            <mat-option *ngFor="let rol of roles" [value]="rol.id_rol">
-              {{ rol.nombre }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <div class="filtro-buttons">
-          <button
-            mat-raised-button
-            type="button"
-            class="btn-texfina btn-primary"
-            (click)="buscar()"
-          >
-            <mat-icon>search</mat-icon>
-            Buscar
-          </button>
-          <button
-            mat-stroked-button
-            type="button"
-            class="btn-texfina btn-outline-primary"
-            (click)="limpiarFiltros()"
-          >
-            <mat-icon>clear</mat-icon>
-            Limpiar
-          </button>
-        </div>
-      </div>
-    </form>
-  </mat-card>
-
-  <!-- Tabla de usuarios -->
+<div class="page-container">
   <div class="page-content">
-    <mat-card class="table-card">
-      <div class="table-container">
-        <table mat-table [dataSource]="usuarios" class="usuarios-table">
-          <!-- Columna Código -->
-          <ng-container matColumnDef="codigo">
-            <th mat-header-cell *matHeaderCellDef>Código</th>
-            <td mat-cell *matCellDef="let usuario">
-              <span class="badge-texfina badge-neutral">
-                {{ formatearCodigo(usuario.id_usuario) }}
-              </span>
-            </td>
-          </ng-container>
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title text-texfina text-primary">
+          Gestión de Usuarios
+        </h1>
+        <p class="page-subtitle text-texfina text-muted">
+          Administra usuarios del sistema con sus roles y permisos
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
+          Carga Masiva
+        </button>
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
+          >
+            Exportar
+          </button>
+          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+            <button class="dropdown-item" (click)="exportarExcel()">
+              Exportar a Excel
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              Exportar a PDF
+            </button>
+          </div>
+        </div>
+        <button class="btn-texfina btn-primary" (click)="agregar()">
+          Agregar Usuario
+        </button>
+      </div>
+    </div>
 
-          <!-- Columna Usuario -->
-          <ng-container matColumnDef="username">
-            <th mat-header-cell *matHeaderCellDef>Usuario</th>
-            <td mat-cell *matCellDef="let usuario">
-              <strong class="text-texfina text-primary"
-                >{{ usuario.username }}</strong
-              >
-            </td>
-          </ng-container>
+    <div class="filters-card">
+      <div class="filters-header">
+        <div class="filters-title">Búsqueda General</div>
+      </div>
 
-          <!-- Columna Email -->
-          <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef>Email</th>
-            <td mat-cell *matCellDef="let usuario">
-              {{ usuario.email || '-' }}
-            </td>
-          </ng-container>
-
-          <!-- Columna Rol -->
-          <ng-container matColumnDef="rol">
-            <th mat-header-cell *matHeaderCellDef>Rol</th>
-            <td mat-cell *matCellDef="let usuario">
-              <span class="badge-texfina badge-secondary">
-                {{ obtenerNombreRol(usuario.id_rol) }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Columna Tipo -->
-          <ng-container matColumnDef="tipo">
-            <th mat-header-cell *matHeaderCellDef>Tipo</th>
-            <td mat-cell *matCellDef="let usuario">
-              {{ obtenerNombreTipo(usuario.id_tipo_usuario) }}
-            </td>
-          </ng-container>
-
-          <!-- Columna Estado -->
-          <ng-container matColumnDef="estado">
-            <th mat-header-cell *matHeaderCellDef>Estado</th>
-            <td mat-cell *matCellDef="let usuario">
-              <span
-                class="badge-texfina"
-                [ngClass]="usuario.activo ? 'badge-success' : 'badge-warning'"
-              >
-                {{ usuario.activo ? 'Activo' : 'Inactivo' }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Columna Último ingreso -->
-          <ng-container matColumnDef="ultimo_ingreso">
-            <th mat-header-cell *matHeaderCellDef>Último ingreso</th>
-            <td mat-cell *matCellDef="let usuario">
-              <span class="text-texfina text-muted">
-                {{ formatearFecha(usuario.last_login) }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Columna Acciones -->
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let usuario">
-              <div class="action-buttons">
-                <button
-                  mat-icon-button
-                  class="btn-texfina btn-secondary btn-sm"
-                  (click)="verDetalle(usuario)"
-                  matTooltip="Ver detalle"
-                >
-                  <mat-icon>visibility</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  class="btn-texfina btn-success btn-sm"
-                  (click)="editarUsuario(usuario)"
-                  matTooltip="Editar usuario"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
+      <div class="filters-content">
+        <form [formGroup]="filtroGeneralForm" class="filters-form">
+          <div class="filters-grid">
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <input
+                  class="simple-input"
+                  formControlName="busquedaGeneral"
+                  placeholder="Buscar en ID, usuario, email..."
+                  type="text"
+                />
               </div>
-            </td>
-          </ng-container>
+            </div>
 
-          <!-- Definición de headers y filas -->
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
+            <div class="filter-actions">
+              <button
+                class="btn-clear-filters"
+                type="button"
+                (click)="limpiarFiltroGeneral()"
+                matTooltip="Limpiar búsqueda"
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
+    </div>
 
-      <!-- Paginación -->
-      <div class="pagination-container">
-        <div class="pagination-info text-texfina text-muted">
-          Página 1 de 1 ({{ usuarios.length }} usuarios)
+    <div class="table-card">
+      <div class="table-with-headers">
+        <div class="column-headers">
+          <div class="header-row header-titles">
+            <div class="header-col id-col" (click)="sortData('id_usuario')">
+              <span>ID</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col username-col" (click)="sortData('username')">
+              <span>Usuario</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col email-col" (click)="sortData('email')">
+              <span>Email</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col rol-col" (click)="sortData('id_rol')">
+              <span>Rol</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div
+              class="header-col tipo-col"
+              (click)="sortData('id_tipo_usuario')"
+            >
+              <span>Tipo</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col estado-col" (click)="sortData('activo')">
+              <span>Estado</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col fecha-col" (click)="sortData('last_login')">
+              <span>Último Acceso</span>
+              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div class="header-col acciones-col">
+              <span>ACCIONES</span>
+            </div>
+          </div>
+
+          <div
+            class="header-row header-filters"
+            *ngIf="filtrosColumnaHabilitados"
+            [formGroup]="filtrosColumnaForm"
+          >
+            <div class="header-col id-col">
+              <input
+                class="column-filter-input"
+                formControlName="idUsuario"
+                placeholder="ID..."
+                type="number"
+              />
+            </div>
+            <div class="header-col username-col">
+              <input
+                class="column-filter-input"
+                formControlName="username"
+                placeholder="Usuario..."
+                type="text"
+              />
+            </div>
+            <div class="header-col email-col">
+              <input
+                class="column-filter-input"
+                formControlName="email"
+                placeholder="Email..."
+                type="text"
+              />
+            </div>
+            <div class="header-col rol-col">
+              <select class="column-filter-select" formControlName="idRol">
+                <option value="">Todos</option>
+                <option *ngFor="let rol of roles" [value]="rol.id_rol">
+                  {{ rol.nombre }}
+                </option>
+              </select>
+            </div>
+            <div class="header-col tipo-col">
+              <select
+                class="column-filter-select"
+                formControlName="idTipoUsuario"
+              >
+                <option value="">Todos</option>
+                <option
+                  *ngFor="let tipo of tiposUsuario"
+                  [value]="tipo.id_tipo_usuario"
+                >
+                  {{ tipo.descripcion }}
+                </option>
+              </select>
+            </div>
+            <div class="header-col estado-col">
+              <select class="column-filter-select" formControlName="activo">
+                <option value="">Todos</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+              </select>
+            </div>
+            <div class="header-col fecha-col">
+              <input
+                class="column-filter-input"
+                formControlName="fechaDesde"
+                placeholder="Desde..."
+                type="date"
+              />
+            </div>
+            <div class="header-col acciones-col">
+              <button
+                class="btn-clear-column-filters"
+                type="button"
+                (click)="limpiarFiltrosColumna()"
+                matTooltip="Limpiar filtros de columna"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="pagination-buttons">
-          <button
-            mat-icon-button
-            class="btn-texfina btn-neutral btn-sm"
-            disabled
-          >
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            class="btn-texfina btn-neutral btn-sm"
-            disabled
-          >
-            <mat-icon>chevron_right</mat-icon>
-          </button>
+
+        <div class="table-container">
+          <div *ngIf="hasError" class="error-state">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <h3 class="error-title text-texfina text-primary">
+              Error al cargar datos
+            </h3>
+            <p class="error-subtitle text-texfina text-muted">
+              {{ errorMessage }}
+            </p>
+            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
+              <mat-icon>refresh</mat-icon>
+              Reintentar
+            </button>
+          </div>
+
+          <div *ngIf="isEmpty" class="empty-state">
+            <mat-icon class="empty-icon">person</mat-icon>
+            <h3 class="empty-title text-texfina text-primary">
+              No hay usuarios registrados
+            </h3>
+            <p class="empty-subtitle text-texfina text-muted">
+              Comienza agregando tu primer usuario para gestionar el sistema
+            </p>
+            <button class="btn-texfina btn-primary" (click)="agregar()">
+              <mat-icon>add</mat-icon>
+              Agregar Primer Usuario
+            </button>
+          </div>
+
+          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
+            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
+            <h3 class="filtered-empty-title text-texfina text-primary">
+              No se encontraron resultados
+            </h3>
+            <p class="filtered-empty-subtitle text-texfina text-muted">
+              Intenta ajustar los filtros o limpiar la búsqueda
+            </p>
+          </div>
+
+          <table mat-table [dataSource]="dataSource" matSort class="data-table">
+            <ng-container matColumnDef="id_usuario">
+              <td mat-cell *matCellDef="let usuario" class="table-cell">
+                <span class="badge-texfina badge-neutral">
+                  {{ formatearCodigo(usuario.id_usuario) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="username">
+              <td mat-cell *matCellDef="let usuario" class="table-cell">
+                <div class="usuario-cell">
+                  <div class="usuario-name text-texfina text-primary">
+                    {{ formatearTexto(usuario.username) }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+              <td mat-cell *matCellDef="let usuario" class="table-cell">
+                <div class="email-cell text-texfina text-muted">
+                  {{ formatearTexto(usuario.email) }}
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="id_rol">
+              <td mat-cell *matCellDef="let usuario" class="table-cell">
+                <span class="badge-texfina badge-secondary">
+                  {{ obtenerNombreRol(usuario.id_rol) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="id_tipo_usuario">
+              <td mat-cell *matCellDef="let usuario" class="table-cell">
+                <div class="tipo-cell text-texfina text-muted">
+                  {{ obtenerNombreTipo(usuario.id_tipo_usuario) }}
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="activo">
+              <td mat-cell *matCellDef="let usuario" class="table-cell">
+                <span
+                  class="badge-texfina"
+                  [ngClass]="usuario.activo ? 'badge-success' : 'badge-warning'"
+                >
+                  {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="last_login">
+              <td mat-cell *matCellDef="let usuario" class="table-cell">
+                <div class="fecha-cell text-texfina text-muted">
+                  {{ formatearFecha(usuario.last_login) }}
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="acciones">
+              <td mat-cell *matCellDef="let usuario" class="table-cell">
+                <div class="action-buttons">
+                  <button
+                    class="btn-texfina btn-secondary btn-sm action-btn"
+                    (click)="verDetalle(usuario)"
+                    matTooltip="Ver detalle"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button
+                    class="btn-texfina btn-success btn-sm action-btn"
+                    (click)="editar(usuario)"
+                    matTooltip="Editar usuario"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    class="btn-texfina btn-warning btn-sm action-btn"
+                    (click)="eliminar(usuario)"
+                    matTooltip="Eliminar usuario"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
         </div>
       </div>
-    </mat-card>
+    </div>
   </div>
 </div>
