@@ -1,5 +1,16 @@
 <mat-toolbar class="main-toolbar">
-  <!-- Logo solo visible en móvil -->
+  <!-- Botón hamburguesa para móvil -->
+  <button
+    mat-icon-button
+    class="menu-toggle"
+    (click)="toggleSidenav()"
+    [attr.aria-label]="null"
+    [title]="null"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <!-- Logo -->
   <div class="toolbar-logos">
     <img src="assets/logo.svg" alt="Texfina" class="toolbar-logo" />
   </div>

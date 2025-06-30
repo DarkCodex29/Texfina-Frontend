@@ -12,7 +12,7 @@
 
   <!-- Contenido principal -->
   <mat-sidenav-content class="content-container">
-    <app-toolbar></app-toolbar>
+    <app-toolbar (menuToggle)="sidenav.toggle()"></app-toolbar>
     <div class="content">
       <div class="content-wrapper">
         <router-outlet></router-outlet>

@@ -30,14 +30,19 @@ export class DetalleProveedorDialogComponent {
 
   constructor(
     private dialogRef: MatDialogRef<DetalleProveedorDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Proveedor
+    @Inject(MAT_DIALOG_DATA) public data: { proveedor: Proveedor }
   ) {
-    this.proveedor = data;
+    this.proveedor = data.proveedor;
+    console.log('Data recibida en modal:', this.proveedor);
   }
 
   formatearCodigo(id?: number): string {
     if (!id) return '00001';
     return id.toString().padStart(5, '0');
+  }
+
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
   }
 
   onClose(): void {

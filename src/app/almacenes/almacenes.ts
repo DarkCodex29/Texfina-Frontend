@@ -29,6 +29,17 @@ import { Almacen } from '../models/insumo.model';
 import { EditarAlmacenDialogComponent } from './editar-almacen-dialog/editar-almacen-dialog';
 import { DetalleAlmacenDialogComponent } from './detalle-almacen-dialog/detalle-almacen-dialog';
 import {
+  ExportacionService,
+  ConfiguracionExportacion,
+  ColumnaExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+  MapeoColumna,
+} from '../services/carga-masiva.service';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import {
   Subject,
   debounceTime,
   distinctUntilChanged,
@@ -80,6 +91,7 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = false;
   hasError = false;
   errorMessage = '';
+  dropdownExportAbierto: boolean = false;
 
   // ============================================================================
   // CONFIGURACIÓN DE TABLA
@@ -110,7 +122,9 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
   ) {
     this.filtroGeneralForm = this.fb.group({
       busquedaGeneral: [''],
@@ -313,17 +327,171 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ============================================================================
-  // MÉTODOS DE ACCIONES
+  // CONFIGURACIONES SEGÚN REGLA DE ORO
   // ============================================================================
-  abrirNuevoAlmacen(): void {
+  private configurarExportacion(): ConfiguracionExportacion<Almacen> {
+    return {
+      entidades: this.dataSource.data,
+      nombreArchivo: 'almacenes',
+      nombreEntidad: 'Almacenes',
+      columnas: [
+        { campo: 'id_almacen', titulo: 'ID', formato: 'numero' },
+        { campo: 'nombre', titulo: 'Nombre', formato: 'texto' },
+        { campo: 'ubicacion', titulo: 'Ubicación', formato: 'texto' },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.almacenes.length,
+        cantidadFiltrada: this.dataSource.data.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Almacen> {
+    return {
+      tipoEntidad: 'almacenes',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Nombre',
+          campoEntidad: 'nombre',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Ubicación',
+          campoEntidad: 'ubicacion',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'nombre',
+          validador: (valor) => valor && valor.length <= 100,
+          mensajeError: 'El nombre debe tener máximo 100 caracteres',
+        },
+        {
+          campo: 'ubicacion',
+          validador: (valor) => valor && valor.length <= 200,
+          mensajeError: 'La ubicación debe tener máximo 200 caracteres',
+        },
+      ],
+    };
+  }
+
+  private obtenerFiltrosActivos(): any {
+    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
+    const filtrosColumna = this.filtrosColumnaForm.value;
+
+    return {
+      busquedaGeneral: filtroGeneral || null,
+      ...filtrosColumna,
+    };
+  }
+
+  // ============================================================================
+  // FUNCIONES DE EXPORTACIÓN Y CARGA MASIVA
+  // ============================================================================
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
+    }
+  }
+
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
+
+  cargaMasiva(): void {
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
+    });
+  }
+
+  descargarPlantillaCargaMasiva(): void {
+    try {
+      const config = this.configurarCargaMasiva();
+      this.cargaMasivaService.generarPlantilla(config);
+    } catch (error) {
+      console.error('Error al generar plantilla:', error);
+    }
+  }
+
+  async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
+    try {
+      const config = this.configurarCargaMasiva();
+      const resultado = await this.cargaMasivaService.procesarArchivo(
+        archivo,
+        config
+      );
+
+      if (resultado.exitosa) {
+        await this.guardarAlmacenesMasivos(resultado.entidadesValidas);
+        console.log(
+          `✅ ${resultado.registrosValidos} registros procesados exitosamente`
+        );
+        this.cargarAlmacenes();
+      } else {
+        console.log('❌ Errores en el archivo:', resultado.errores);
+      }
+    } catch (error) {
+      console.error('Error al procesar archivo:', error);
+    }
+  }
+
+  private async guardarAlmacenesMasivos(almacenes: Almacen[]): Promise<void> {
+    for (const almacen of almacenes) {
+      await this.materialService.crearAlmacen(almacen).toPromise();
+    }
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  // ============================================================================
+  // MÉTODOS CRUD SEGÚN REGLA DE ORO
+  // ============================================================================
+  agregar(): void {
     const dialogRef = this.dialog.open(EditarAlmacenDialogComponent, {
       width: '600px',
       disableClose: true,
       data: { esNuevo: true },
     });
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarAlmacenes();
+      }
+    });
+  }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
+  editar(almacen: Almacen): void {
+    const dialogRef = this.dialog.open(EditarAlmacenDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: { esNuevo: false, almacen: almacen },
+    });
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
         this.cargarAlmacenes();
       }
     });
@@ -331,30 +499,34 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   verDetalle(almacen: Almacen): void {
     this.dialog.open(DetalleAlmacenDialogComponent, {
-      width: '600px',
-      data: almacen,
-    });
-  }
-
-  editarAlmacen(almacen: Almacen): void {
-    const dialogRef = this.dialog.open(EditarAlmacenDialogComponent, {
-      width: '600px',
+      width: '800px',
       disableClose: true,
-      data: { almacen, esNuevo: false },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.cargarAlmacenes();
-      }
+      data: { almacen: almacen },
     });
   }
 
-  // ============================================================================
-  // MÉTODOS UTILITARIOS
-  // ============================================================================
+  eliminar(almacen: Almacen): void {
+    const nombreTexto =
+      almacen.nombre || `el almacén con ID ${almacen.id_almacen}`;
+    const confirmacion = confirm(
+      `¿Está seguro que desea eliminar ${nombreTexto}?`
+    );
+
+    if (confirmacion && almacen.id_almacen) {
+      this.materialService.eliminarAlmacen(almacen.id_almacen).subscribe({
+        next: () => {
+          console.log('✅ Almacén eliminado exitosamente');
+          this.cargarAlmacenes();
+        },
+        error: (error: any) => {
+          console.error('❌ Error al eliminar almacén:', error);
+        },
+      });
+    }
+  }
+
   formatearCodigo(id?: number): string {
-    if (!id) return '00000';
+    if (!id) return '00001';
     return id.toString().padStart(5, '0');
   }
 }

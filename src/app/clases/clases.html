@@ -9,8 +9,42 @@
         </p>
       </div>
       <div class="header-actions">
-        <button class="btn-texfina btn-primary" (click)="abrirNuevaClase()">
-          <mat-icon>add_circle_outline</mat-icon>
+        <!-- Botón de Carga Masiva -->
+        <button
+          class="btn-texfina btn-secondary"
+          (click)="cargaMasiva()"
+          matTooltip="Importar múltiples clases desde Excel"
+        >
+          Carga Masiva
+        </button>
+
+        <!-- Dropdown de Exportar -->
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
+            [class.active]="dropdownExportAbierto"
+            matTooltip="Exportar listado de clases"
+          >
+            Exportar
+          </button>
+
+          <div
+            class="dropdown-menu"
+            [class.show]="dropdownExportAbierto"
+            (click)="$event.stopPropagation()"
+          >
+            <button class="dropdown-item" (click)="exportarExcel()">
+              <span>Exportar a Excel</span>
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              <span>Exportar a PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón principal de la pantalla -->
+        <button class="btn-texfina btn-primary" (click)="agregar()">
           Agregar Clase
         </button>
       </div>
@@ -146,7 +180,7 @@
             <p class="empty-subtitle text-texfina text-muted">
               Comienza agregando tu primera clase para organizar los insumos
             </p>
-            <button class="btn-texfina btn-primary" (click)="abrirNuevaClase()">
+            <button class="btn-texfina btn-primary" (click)="agregar()">
               <mat-icon>add</mat-icon>
               Agregar Primera Clase
             </button>
@@ -169,7 +203,7 @@
             <ng-container matColumnDef="id_clase">
               <td mat-cell *matCellDef="let clase" class="table-cell">
                 <span class="badge-texfina badge-neutral">
-                  {{ clase.id_clase || "-" }}
+                  {{ formatearTexto(clase.id_clase) }}
                 </span>
               </td>
             </ng-container>
@@ -179,7 +213,7 @@
               <td mat-cell *matCellDef="let clase" class="table-cell">
                 <div class="clase-cell">
                   <div class="clase-familia text-texfina font-medium">
-                    {{ clase.familia }}
+                    {{ formatearTexto(clase.familia) }}
                   </div>
                   <div class="clase-type text-texfina text-muted">
                     Clasificación Principal
@@ -192,7 +226,7 @@
             <ng-container matColumnDef="sub_familia">
               <td mat-cell *matCellDef="let clase" class="table-cell">
                 <span class="badge-texfina badge-secondary">
-                  {{ clase.sub_familia || "-" }}
+                  {{ formatearTexto(clase.sub_familia) }}
                 </span>
               </td>
             </ng-container>
@@ -214,7 +248,7 @@
                   </button>
                   <button
                     class="btn-action btn-edit"
-                    (click)="editarClase(clase)"
+                    (click)="editar(clase)"
                     matTooltip="Editar"
                   >
                     <mat-icon>edit</mat-icon>

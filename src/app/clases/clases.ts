@@ -25,6 +25,17 @@ import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { MaterialService } from '../services/material.service';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+  ColumnaExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+  MapeoColumna,
+} from '../services/carga-masiva.service';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 import { Clase } from '../models/insumo.model';
 import { EditarClaseDialogComponent } from './editar-clase-dialog/editar-clase-dialog';
 import { DetalleClaseDialogComponent } from './detalle-clase-dialog/detalle-clase-dialog';
@@ -70,10 +81,10 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
   filtrosColumnaActivos = false;
   private destroy$ = new Subject<void>();
 
-  // Estados de carga y error
   isLoading: boolean = false;
   hasError: boolean = false;
   errorMessage: string = '';
+  dropdownExportAbierto: boolean = false;
 
   displayedColumns: string[] = [
     'id_clase',
@@ -99,14 +110,13 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   constructor(
+    private fb: FormBuilder,
     private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
   ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
+    this.filtroGeneralForm = this.fb.group({ busquedaGeneral: [''] });
     this.filtrosColumnaForm = this.fb.group({
       codigo: [''],
       familia: [''],
@@ -155,7 +165,6 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.materialService
       .getClases()
       .pipe(
-        // Delay artificial para demostrar el skeleton (remover en producción)
         delay(1500),
         finalize(() => {
           this.isLoading = false;
@@ -198,12 +207,12 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
     const clasesFiltradas = this.clases.filter((clase) => {
       const codigo = clase.id_clase?.toLowerCase() || '';
       const familia = clase.familia?.toLowerCase() || '';
-      const subfamilia = clase.sub_familia?.toLowerCase() || '';
+      const subFamilia = clase.sub_familia?.toLowerCase() || '';
 
       return (
         codigo.includes(busqueda) ||
         familia.includes(busqueda) ||
-        subfamilia.includes(busqueda)
+        subFamilia.includes(busqueda)
       );
     });
 
@@ -214,21 +223,18 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
     const filtros = this.filtrosColumnaForm.value;
     let clasesFiltradas = [...this.clases];
 
-    // Filtro por Código
     if (filtros.codigo && filtros.codigo.trim()) {
       clasesFiltradas = clasesFiltradas.filter((clase) =>
         clase.id_clase?.toLowerCase().includes(filtros.codigo.toLowerCase())
       );
     }
 
-    // Filtro por Familia
     if (filtros.familia && filtros.familia.trim()) {
       clasesFiltradas = clasesFiltradas.filter((clase) =>
         clase.familia?.toLowerCase().includes(filtros.familia.toLowerCase())
       );
     }
 
-    // Filtro por Subfamilia
     if (filtros.sub_familia && filtros.sub_familia.trim()) {
       clasesFiltradas = clasesFiltradas.filter((clase) =>
         clase.sub_familia
@@ -277,11 +283,9 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   sortData(column: string): void {
     if (this.sort) {
-      // Si ya está ordenado por esta columna, cambiar dirección
       if (this.sort.active === column) {
         this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc';
       } else {
-        // Nueva columna, empezar con ascendente
         this.sort.active = column;
         this.sort.direction = 'asc';
       }
@@ -292,15 +296,174 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  abrirNuevaClase(): void {
+  private configurarExportacion(): ConfiguracionExportacion<Clase> {
+    return {
+      entidades: this.dataSource.data,
+      nombreArchivo: 'clases',
+      nombreEntidad: 'Clases',
+      columnas: [
+        { campo: 'id_clase', titulo: 'Código Clase', formato: 'texto' },
+        { campo: 'familia', titulo: 'Familia', formato: 'texto' },
+        { campo: 'sub_familia', titulo: 'Subfamilia', formato: 'texto' },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.clases.length,
+        cantidadFiltrada: this.dataSource.data.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Clase> {
+    return {
+      tipoEntidad: 'clases',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Código Clase',
+          campoEntidad: 'id_clase',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Familia',
+          campoEntidad: 'familia',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Subfamilia',
+          campoEntidad: 'sub_familia',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'id_clase',
+          validador: (valor) => valor && valor.length <= 50,
+          mensajeError: 'El código debe tener máximo 50 caracteres',
+        },
+        {
+          campo: 'familia',
+          validador: (valor) => valor && valor.length <= 100,
+          mensajeError: 'La familia debe tener máximo 100 caracteres',
+        },
+        {
+          campo: 'sub_familia',
+          validador: (valor) => !valor || valor.length <= 100,
+          mensajeError: 'La subfamilia debe tener máximo 100 caracteres',
+        },
+      ],
+    };
+  }
+
+  private obtenerFiltrosActivos(): any {
+    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
+    const filtrosColumna = this.filtrosColumnaForm.value;
+
+    return {
+      busquedaGeneral: filtroGeneral || null,
+      ...filtrosColumna,
+    };
+  }
+
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
+    }
+  }
+
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
+
+  cargaMasiva(): void {
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
+    });
+  }
+
+  descargarPlantillaCargaMasiva(): void {
+    try {
+      const config = this.configurarCargaMasiva();
+      this.cargaMasivaService.generarPlantilla(config);
+    } catch (error) {
+      console.error('Error al generar plantilla:', error);
+    }
+  }
+
+  async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
+    try {
+      const config = this.configurarCargaMasiva();
+      const resultado = await this.cargaMasivaService.procesarArchivo(
+        archivo,
+        config
+      );
+
+      if (resultado.exitosa) {
+        await this.guardarClasesMasivas(resultado.entidadesValidas);
+        console.log(
+          `✅ ${resultado.registrosValidos} registros procesados exitosamente`
+        );
+        this.cargarClases();
+      } else {
+        console.log('❌ Errores en el archivo:', resultado.errores);
+      }
+    } catch (error) {
+      console.error('Error al procesar archivo:', error);
+    }
+  }
+
+  private async guardarClasesMasivas(clases: Clase[]): Promise<void> {
+    for (const clase of clases) {
+      await this.materialService.crearClase(clase).toPromise();
+    }
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  agregar(): void {
     const dialogRef = this.dialog.open(EditarClaseDialogComponent, {
       width: '600px',
       disableClose: true,
       data: { esNuevo: true },
     });
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarClases();
+      }
+    });
+  }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
+  editar(clase: Clase): void {
+    const dialogRef = this.dialog.open(EditarClaseDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: { esNuevo: false, clase: clase },
+    });
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
         this.cargarClases();
       }
     });
@@ -308,23 +471,22 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   verDetalle(clase: Clase): void {
     this.dialog.open(DetalleClaseDialogComponent, {
-      width: '600px',
-      data: clase,
+      width: '800px',
+      disableClose: true,
+      data: { clase: clase },
     });
   }
 
-  editarClase(clase: Clase): void {
-    const dialogRef = this.dialog.open(EditarClaseDialogComponent, {
-      width: '600px',
-      disableClose: true,
-      data: { clase, esNuevo: false },
-    });
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
+  }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.cargarClases();
-      }
-    });
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-export')) {
+      this.dropdownExportAbierto = false;
+    }
   }
 }
 

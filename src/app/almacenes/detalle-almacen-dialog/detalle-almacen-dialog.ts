@@ -27,17 +27,26 @@ import { Almacen } from '../../models/insumo.model';
   styleUrls: ['./detalle-almacen-dialog.scss'],
 })
 export class DetalleAlmacenDialogComponent {
+  almacen: Almacen;
+
   constructor(
     private dialogRef: MatDialogRef<DetalleAlmacenDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public almacen: Almacen
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: { almacen: Almacen }
+  ) {
+    this.almacen = data.almacen;
+    console.log('Data recibida en modal de detalle almacén:', this.almacen);
+  }
 
   formatearCodigo(id?: number): string {
-    if (!id) return '00000';
+    if (!id) return '00001';
     return id.toString().padStart(5, '0');
   }
 
-  cerrar(): void {
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
+  }
+
+  onClose(): void {
     this.dialogRef.close();
   }
 }

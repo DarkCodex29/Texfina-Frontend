@@ -411,3 +411,52 @@ mat-icon {
     }
   }
 }
+
+// ============================================================================
+// BOTÓN HAMBURGUESA - SOLO MÓVIL
+// ============================================================================
+
+.menu-toggle {
+  display: none !important;
+  color: var(--texfina-text-primary) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 8px !important;
+  margin-right: 8px !important;
+  border-radius: var(--texfina-radius-sm) !important;
+  transition: background-color 0.2s ease !important;
+
+  &:hover {
+    background: var(--texfina-secondary-bg) !important;
+    color: var(--texfina-secondary) !important;
+  }
+
+  mat-icon {
+    font-size: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+    color: inherit !important;
+  }
+}
+
+// Mostrar botón hamburguesa solo en móvil
+@media (max-width: 800px) {
+  .menu-toggle {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-toggle {
+    padding: 6px !important;
+    margin-right: 6px !important;
+
+    mat-icon {
+      font-size: 22px !important;
+      width: 22px !important;
+      height: 22px !important;
+    }
+  }
+}

@@ -26,7 +26,11 @@
 
         <div class="form-group">
           <label class="form-label">RUC</label>
-          <input class="form-input" [value]="proveedor.ruc || '-'" readonly />
+          <input
+            class="form-input"
+            [value]="formatearTexto(proveedor.ruc)"
+            readonly
+          />
         </div>
       </div>
 
@@ -36,7 +40,7 @@
           <label class="form-label">Empresa</label>
           <input
             class="form-input"
-            [value]="proveedor.empresa || '-'"
+            [value]="formatearTexto(proveedor.empresa)"
             readonly
           />
         </div>
@@ -48,7 +52,7 @@
           <label class="form-label">Dirección</label>
           <input
             class="form-input"
-            [value]="proveedor.direccion || '-'"
+            [value]="formatearTexto(proveedor.direccion)"
             readonly
           />
         </div>
@@ -60,7 +64,7 @@
           <label class="form-label">Contacto</label>
           <input
             class="form-input"
-            [value]="proveedor.contacto || '-'"
+            [value]="formatearTexto(proveedor.contacto)"
             readonly
           />
         </div>

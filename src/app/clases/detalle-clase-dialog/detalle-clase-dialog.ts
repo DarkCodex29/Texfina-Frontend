@@ -27,10 +27,19 @@ import { Clase } from '../../models/insumo.model';
   styleUrls: ['./detalle-clase-dialog.scss'],
 })
 export class DetalleClaseDialogComponent {
+  clase: Clase;
+
   constructor(
     private dialogRef: MatDialogRef<DetalleClaseDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public clase: Clase
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: { clase: Clase }
+  ) {
+    this.clase = data.clase;
+    console.log('Data recibida en modal:', this.clase);
+  }
+
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
+  }
 
   onClose(): void {
     this.dialogRef.close();

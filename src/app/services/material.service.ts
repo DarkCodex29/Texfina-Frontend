@@ -1011,6 +1011,10 @@ export class MaterialService {
     });
   }
 
+  eliminarProveedor(id: number): Observable<boolean> {
+    return of(true);
+  }
+
   crearAlmacen(almacen: Almacen): Observable<Almacen> {
     const nuevoId =
       Math.max(...this.getAlmacenesMock().map((a) => a.id_almacen || 0)) + 1;

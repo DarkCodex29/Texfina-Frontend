@@ -512,7 +512,7 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
     const dialogRef = this.dialog.open(EditarProveedorDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esEdicion: false, titulo: 'Agregar Proveedor' },
+      data: { esNuevo: true },
     });
     dialogRef.afterClosed().subscribe((resultado) => {
       if (resultado) {
@@ -526,9 +526,8 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
       width: '600px',
       disableClose: true,
       data: {
-        esEdicion: true,
+        esNuevo: false,
         proveedor: proveedor,
-        titulo: 'Editar Proveedor',
       },
     });
     dialogRef.afterClosed().subscribe((resultado) => {
@@ -544,5 +543,25 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
       disableClose: true,
       data: { proveedor: proveedor },
     });
+  }
+
+  eliminar(proveedor: Proveedor): void {
+    const empresaTexto =
+      proveedor.empresa || `el proveedor con ID ${proveedor.id_proveedor}`;
+    const confirmacion = confirm(
+      `¿Está seguro que desea eliminar ${empresaTexto}?`
+    );
+
+    if (confirmacion && proveedor.id_proveedor) {
+      this.materialService.eliminarProveedor(proveedor.id_proveedor).subscribe({
+        next: () => {
+          console.log('✅ Proveedor eliminado exitosamente');
+          this.cargarProveedores();
+        },
+        error: (error: any) => {
+          console.error('❌ Error al eliminar proveedor:', error);
+        },
+      });
+    }
   }
 }

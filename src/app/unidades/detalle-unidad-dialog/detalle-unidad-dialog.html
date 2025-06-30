@@ -1,29 +1,34 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2 class="dialog-title">Detalle de unidad</h2>
-    <button mat-icon-button (click)="onClose()" class="close-button">
+    <div class="header-content">
+      <h2 class="dialog-title">Detalle de Unidad</h2>
+      <p class="dialog-subtitle">
+        Información completa de la unidad seleccionada
+      </p>
+    </div>
+    <button mat-icon-button mat-dialog-close class="close-button">
       <mat-icon>close</mat-icon>
     </button>
   </div>
-
   <div class="dialog-content">
-    <div class="info-grid">
-      <!-- Código -->
-      <div class="info-item">
-        <div class="info-label">
-          <mat-icon class="label-icon">tag</mat-icon>
-          Código
+    <div class="form-container">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Código de Unidad</label>
+          <input
+            class="form-input"
+            [value]="formatearTexto(unidad.id_unidad)"
+            readonly
+          />
         </div>
-        <div class="info-value codigo">{{ unidad.id_unidad }}</div>
-      </div>
-
-      <!-- Nombre -->
-      <div class="info-item">
-        <div class="info-label">
-          <mat-icon class="label-icon">straighten</mat-icon>
-          Nombre
+        <div class="form-group">
+          <label class="form-label">Descripción</label>
+          <input
+            class="form-input"
+            [value]="formatearTexto(unidad.nombre)"
+            readonly
+          />
         </div>
-        <div class="info-value">{{ unidad.nombre }}</div>
       </div>
     </div>
 

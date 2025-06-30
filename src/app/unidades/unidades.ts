@@ -34,6 +34,17 @@ import {
   delay,
 } from 'rxjs';
 import { MaterialService } from '../services/material.service';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+  ColumnaExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+  MapeoColumna,
+} from '../services/carga-masiva.service';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 import { Unidad } from '../models/insumo.model';
 import { EditarUnidadDialogComponent } from './editar-unidad-dialog/editar-unidad-dialog';
 import { DetalleUnidadDialogComponent } from './detalle-unidad-dialog/detalle-unidad-dialog';
@@ -73,10 +84,10 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
   filtrosColumnaActivos = false;
   private destroy$ = new Subject<void>();
 
-  // Estados de carga y error
   isLoading: boolean = false;
   hasError: boolean = false;
   errorMessage: string = '';
+  dropdownExportAbierto: boolean = false;
 
   displayedColumns: string[] = ['id_unidad', 'nombre', 'acciones'];
 
@@ -97,14 +108,13 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   constructor(
+    private fb: FormBuilder,
     private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
   ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
+    this.filtroGeneralForm = this.fb.group({ busquedaGeneral: [''] });
     this.filtrosColumnaForm = this.fb.group({
       id_unidad: [''],
       nombre: [''],
@@ -152,7 +162,6 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.materialService
       .getUnidades()
       .pipe(
-        // Delay artificial para demostrar el skeleton (remover en producción)
         delay(1500),
         finalize(() => {
           this.isLoading = false;
@@ -206,7 +215,6 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     const filtros = this.filtrosColumnaForm.value;
     let unidadesFiltradas = [...this.unidades];
 
-    // Filtro por Código
     if (filtros.id_unidad && filtros.id_unidad.trim()) {
       unidadesFiltradas = unidadesFiltradas.filter((unidad) =>
         unidad.id_unidad
@@ -215,7 +223,6 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     }
 
-    // Filtro por Nombre
     if (filtros.nombre && filtros.nombre.trim()) {
       unidadesFiltradas = unidadesFiltradas.filter((unidad) =>
         unidad.nombre?.toLowerCase().includes(filtros.nombre.toLowerCase())
@@ -262,11 +269,9 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   sortData(column: string): void {
     if (this.sort) {
-      // Si ya está ordenado por esta columna, cambiar dirección
       if (this.sort.active === column) {
         this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc';
       } else {
-        // Nueva columna, empezar con ascendente
         this.sort.active = column;
         this.sort.direction = 'asc';
       }
@@ -277,15 +282,162 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  abrirNuevaUnidad(): void {
+  private configurarExportacion(): ConfiguracionExportacion<Unidad> {
+    return {
+      entidades: this.dataSource.data,
+      nombreArchivo: 'unidades',
+      nombreEntidad: 'Unidades',
+      columnas: [
+        { campo: 'id_unidad', titulo: 'Código', formato: 'texto' },
+        { campo: 'nombre', titulo: 'Descripción', formato: 'texto' },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.unidades.length,
+        cantidadFiltrada: this.dataSource.data.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Unidad> {
+    return {
+      tipoEntidad: 'unidades',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Código',
+          campoEntidad: 'id_unidad',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Descripción',
+          campoEntidad: 'nombre',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'id_unidad',
+          validador: (valor) => valor && valor.length <= 50,
+          mensajeError: 'El código debe tener máximo 50 caracteres',
+        },
+        {
+          campo: 'nombre',
+          validador: (valor) => valor && valor.length <= 100,
+          mensajeError: 'La descripción debe tener máximo 100 caracteres',
+        },
+      ],
+    };
+  }
+
+  private obtenerFiltrosActivos(): any {
+    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
+    const filtrosColumna = this.filtrosColumnaForm.value;
+
+    return {
+      busquedaGeneral: filtroGeneral || null,
+      ...filtrosColumna,
+    };
+  }
+
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
+    }
+  }
+
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
+
+  cargaMasiva(): void {
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
+    });
+  }
+
+  descargarPlantillaCargaMasiva(): void {
+    try {
+      const config = this.configurarCargaMasiva();
+      this.cargaMasivaService.generarPlantilla(config);
+    } catch (error) {
+      console.error('Error al generar plantilla:', error);
+    }
+  }
+
+  async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
+    try {
+      const config = this.configurarCargaMasiva();
+      const resultado = await this.cargaMasivaService.procesarArchivo(
+        archivo,
+        config
+      );
+
+      if (resultado.exitosa) {
+        await this.guardarUnidadesMasivas(resultado.entidadesValidas);
+        console.log(
+          `✅ ${resultado.registrosValidos} registros procesados exitosamente`
+        );
+        this.cargarUnidades();
+      } else {
+        console.log('❌ Errores en el archivo:', resultado.errores);
+      }
+    } catch (error) {
+      console.error('Error al procesar archivo:', error);
+    }
+  }
+
+  private async guardarUnidadesMasivas(unidades: Unidad[]): Promise<void> {
+    for (const unidad of unidades) {
+      await this.materialService.crearUnidad(unidad).toPromise();
+    }
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  agregar(): void {
     const dialogRef = this.dialog.open(EditarUnidadDialogComponent, {
       width: '600px',
       disableClose: true,
       data: { esNuevo: true },
     });
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarUnidades();
+      }
+    });
+  }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
+  editar(unidad: Unidad): void {
+    const dialogRef = this.dialog.open(EditarUnidadDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: { esNuevo: false, unidad: unidad },
+    });
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
         this.cargarUnidades();
       }
     });
@@ -293,23 +445,22 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   verDetalle(unidad: Unidad): void {
     this.dialog.open(DetalleUnidadDialogComponent, {
-      width: '500px',
-      data: unidad,
+      width: '800px',
+      disableClose: true,
+      data: { unidad: unidad },
     });
   }
 
-  editarUnidad(unidad: Unidad): void {
-    const dialogRef = this.dialog.open(EditarUnidadDialogComponent, {
-      width: '600px',
-      disableClose: true,
-      data: { unidad, esNuevo: false },
-    });
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
+  }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.cargarUnidades();
-      }
-    });
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-export')) {
+      this.dropdownExportAbierto = false;
+    }
   }
 }
 

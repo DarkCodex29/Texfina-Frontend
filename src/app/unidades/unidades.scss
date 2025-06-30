@@ -1,15 +1,150 @@
 // ============================================================================
-// UNIDADES - ESTILOS ESPECÍFICOS DEL SISTEMA TEXFINA
-// ============================================================================
-// Los estilos base están en styles.scss - aquí solo lo específico de unidades
-
-// ============================================================================
-// UNIDADES - ESTILOS ESPECÍFICOS (SIN LAYOUT)
+// UNIDADES - SISTEMA DE COLORES OBLIGATORIO
 // ============================================================================
 
-/* Usar clases globales de Texfina - sin estilos locales que interfieran */
+:host {
+  --texfina-primary: #bd2126;
+  --texfina-secondary: #121e66;
+  --texfina-neutral: #989594;
+  --texfina-success: #16a34a;
+  --texfina-border-light: #e5e7eb;
+  --texfina-text-primary: #111827;
+  --texfina-text-muted: #6b7280;
+  --texfina-primary-bg: #fef2f2;
+  --texfina-secondary-bg: #f1f5f9;
+  --texfina-neutral-bg: #f8fafc;
+}
 
-/* Solo estilos muy específicos para la celda de unidad */
+// ============================================================================
+// DROPDOWN EXPORTAR OBLIGATORIO CON RESPONSIVE
+// ============================================================================
+
+.dropdown-export {
+  position: relative;
+  display: inline-block;
+
+  .dropdown-trigger {
+    cursor: pointer;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid var(--texfina-border-light);
+    border-radius: var(--texfina-radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    min-width: 160px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+
+    &.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--texfina-text-primary);
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: var(--texfina-secondary-bg);
+        color: var(--texfina-secondary);
+      }
+
+      &:first-child {
+        border-radius: var(--texfina-radius-md) var(--texfina-radius-md) 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 0 var(--texfina-radius-md) var(--texfina-radius-md);
+      }
+    }
+  }
+
+  // MÓVIL: Dropdown de ancho completo
+  @media (max-width: 768px) {
+    .dropdown-menu {
+      left: 0;
+      right: 0;
+      min-width: 100%;
+      width: 100%;
+    }
+  }
+}
+
+// ============================================================================
+// HEADER ACTIONS RESPONSIVE OBLIGATORIO
+// ============================================================================
+
+.header-actions {
+  display: flex;
+  gap: var(--texfina-spacing-md);
+  align-items: center;
+  flex-wrap: nowrap;
+
+  // MÓVIL: Reorganizar botones
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-sm);
+    width: 100%;
+
+    .btn-texfina {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .dropdown-export {
+      width: 100%;
+
+      .dropdown-trigger {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  // MÓVIL PEQUEÑO: Stack vertical
+  @media (max-width: 480px) {
+    gap: var(--texfina-spacing-xs);
+
+    .btn-texfina {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+}
+
+.page-header {
+  // MÓVIL: Header en columna
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-lg);
+    align-items: stretch;
+
+    .header-content {
+      text-align: center;
+    }
+  }
+}
+
+// ============================================================================
+// ESTILOS ESPECÍFICOS DE UNIDADES
+// ============================================================================
+
 .unidad-cell {
   .unidad-name {
     font-weight: 600;
@@ -40,61 +175,6 @@
       background-color: var(--texfina-success);
       color: white;
     }
-  }
-}
-
-// ============================================================================
-// FILTROS SIMPLIFICADOS
-// ============================================================================
-
-.single-filter-container {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.filter-group-single {
-  flex: 1;
-}
-
-.filter-actions-single {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.btn-toggle-column-filters {
-  background: white;
-  border: 2px solid var(--texfina-secondary);
-  color: var(--texfina-secondary);
-  padding: 10px 16px;
-  border-radius: var(--texfina-border-radius);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:hover {
-    background: var(--texfina-secondary-light);
-  }
-
-  &.active {
-    background: var(--texfina-secondary);
-    border-color: var(--texfina-secondary);
-    color: white;
-
-    &:hover {
-      background: var(--texfina-secondary-dark);
-      border-color: var(--texfina-secondary-dark);
-    }
-  }
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
   }
 }
 
@@ -173,117 +253,5 @@
   @media (max-width: 768px) {
     width: 100% !important;
     min-width: auto !important;
-  }
-}
-
-// Filtros de búsqueda
-.filters-card {
-  background: var(--surface-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 2rem;
-  border: 1px solid var(--border-color);
-
-  .filters-header {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    user-select: none;
-    border-bottom: 1px solid var(--border-color);
-
-    @media (max-width: 768px) {
-      padding: var(--spacing-md) var(--spacing-lg);
-    }
-
-    .filters-title {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      font-weight: 600;
-      color: var(--text-primary);
-      font-size: var(--font-size-lg);
-    }
-  }
-
-  .filters-content {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: var(--background-subtle);
-
-    @media (max-width: 768px) {
-      padding: var(--spacing-md) var(--spacing-lg);
-    }
-  }
-
-  .filters-form {
-    .filters-grid {
-      display: flex;
-      gap: 3rem;
-      align-items: stretch;
-
-      @media (max-width: 768px) {
-        flex-direction: column;
-        gap: var(--spacing-lg);
-      }
-    }
-
-    .filter-group {
-      flex: 1;
-
-      .simple-input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-
-        .simple-input {
-          width: 100%;
-          padding: var(--spacing-lg) var(--spacing-xl);
-          border: 1px solid var(--border-color);
-          border-radius: var(--border-radius-md);
-          background: var(--surface-color);
-          font-size: var(--font-size-base);
-          color: var(--text-primary);
-          height: 48px;
-          line-height: 1.4;
-
-          &::placeholder {
-            color: var(--text-muted);
-          }
-
-          &:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--primary-color-alpha);
-          }
-        }
-      }
-    }
-
-    .filter-actions {
-      display: flex;
-      gap: 2rem;
-      align-items: stretch;
-      flex-shrink: 0;
-    }
-
-    .btn-clear-filters {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--spacing-md) var(--spacing-lg);
-      border: 2px solid var(--border-color);
-      border-radius: var(--border-radius-md);
-      background: var(--surface-color);
-      color: var(--text-muted);
-      font-size: var(--font-size-sm);
-      font-weight: 500;
-      cursor: pointer;
-      white-space: nowrap;
-      height: 48px;
-      min-width: 100px;
-
-      &:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px var(--primary-color-alpha);
-      }
-    }
   }
 }

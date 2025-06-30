@@ -1,4 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -28,6 +34,8 @@ import { Usuario } from '../../models/insumo.model';
   styleUrls: ['./toolbar.scss'],
 })
 export class ToolbarComponent implements OnInit, OnDestroy {
+  @Output() menuToggle = new EventEmitter<void>();
+
   title = 'Inicio';
   currentUser: Usuario | null = null;
   private destroy$ = new Subject<void>();
@@ -58,6 +66,10 @@ export class ToolbarComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  toggleSidenav(): void {
+    this.menuToggle.emit();
   }
 
   private updateTitle(url: string): void {

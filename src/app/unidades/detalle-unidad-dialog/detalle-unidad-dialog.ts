@@ -27,10 +27,19 @@ import { Unidad } from '../../models/insumo.model';
   styleUrls: ['./detalle-unidad-dialog.scss'],
 })
 export class DetalleUnidadDialogComponent {
+  unidad: Unidad;
+
   constructor(
     private dialogRef: MatDialogRef<DetalleUnidadDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public unidad: Unidad
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: { unidad: Unidad }
+  ) {
+    this.unidad = data.unidad;
+    console.log('Data recibida en modal:', this.unidad);
+  }
+
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
+  }
 
   onClose(): void {
     this.dialogRef.close();

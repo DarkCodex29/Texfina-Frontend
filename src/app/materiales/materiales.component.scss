@@ -104,12 +104,13 @@
     }
   }
 
-  // Responsive
+  // MÓVIL: Dropdown de ancho completo
   @media (max-width: 768px) {
     .dropdown-menu {
-      right: auto;
       left: 0;
-      min-width: 180px;
+      right: 0;
+      min-width: 100%;
+      width: 100%;
     }
   }
 }
@@ -395,6 +396,56 @@
         border-color: var(--primary-color);
         box-shadow: 0 0 0 3px var(--primary-color-alpha);
       }
+    }
+  }
+}
+
+// ============================================================================
+// HEADER ACTIONS RESPONSIVE
+// ============================================================================
+
+.header-actions {
+  // MÓVIL: Reorganizar botones
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-sm);
+    width: 100%;
+
+    .btn-texfina {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .dropdown-export {
+      width: 100%;
+
+      .dropdown-trigger {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  // MÓVIL PEQUEÑO: Stack vertical
+  @media (max-width: 480px) {
+    gap: var(--texfina-spacing-xs);
+
+    .btn-texfina {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+}
+
+.page-header {
+  // MÓVIL: Header en columna
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-lg);
+    align-items: stretch;
+
+    .header-content {
+      text-align: center;
     }
   }
 }

@@ -1,38 +1,53 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2 class="dialog-title">Detalle de almacén</h2>
+    <div class="header-content">
+      <h2 class="dialog-title">Detalle de Almacén</h2>
+      <p class="dialog-subtitle">
+        Información completa del almacén seleccionado
+      </p>
+    </div>
     <button mat-icon-button mat-dialog-close class="close-button">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <div class="detalle-content">
-    <!-- Primera fila - Código -->
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Código</mat-label>
-        <input
-          matInput
-          [value]="formatearCodigo(almacen.id_almacen)"
-          readonly
-        />
-      </mat-form-field>
-    </div>
+  <div class="dialog-content">
+    <div class="form-container">
+      <!-- Primera fila: Código -->
+      <div class="form-row">
+        <div class="form-group form-group-full">
+          <label class="form-label">Código</label>
+          <input
+            class="form-input"
+            [value]="formatearCodigo(almacen.id_almacen)"
+            readonly
+          />
+        </div>
+      </div>
 
-    <!-- Segunda fila - Nombre -->
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Nombre</mat-label>
-        <input matInput [value]="almacen.nombre || '-'" readonly />
-      </mat-form-field>
-    </div>
+      <!-- Segunda fila: Nombre -->
+      <div class="form-row">
+        <div class="form-group form-group-full">
+          <label class="form-label">Nombre</label>
+          <input
+            class="form-input"
+            [value]="formatearTexto(almacen.nombre)"
+            readonly
+          />
+        </div>
+      </div>
 
-    <!-- Tercera fila - Ubicación -->
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Ubicación</mat-label>
-        <input matInput [value]="almacen.ubicacion || '-'" readonly />
-      </mat-form-field>
+      <!-- Tercera fila: Ubicación -->
+      <div class="form-row">
+        <div class="form-group form-group-full">
+          <label class="form-label">Ubicación</label>
+          <input
+            class="form-input"
+            [value]="formatearTexto(almacen.ubicacion)"
+            readonly
+          />
+        </div>
+      </div>
     </div>
   </div>
 </div>

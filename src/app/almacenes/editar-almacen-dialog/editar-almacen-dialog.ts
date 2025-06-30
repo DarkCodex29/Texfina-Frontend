@@ -11,8 +11,7 @@ import {
   MAT_DIALOG_DATA,
   MatDialogModule,
 } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -31,8 +30,6 @@ interface DialogData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatButtonModule,
     MatIconModule,
   ],
@@ -54,8 +51,8 @@ export class EditarAlmacenDialogComponent implements OnInit {
     this.almacen = data.almacen;
 
     this.almacenForm = this.fb.group({
-      nombre: ['', [Validators.required]],
-      ubicacion: [''],
+      nombre: ['', [Validators.required, Validators.maxLength(100)]],
+      ubicacion: ['', [Validators.maxLength(200)]],
     });
   }
 

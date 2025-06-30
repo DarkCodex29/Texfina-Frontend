@@ -1,65 +1,45 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2 class="dialog-title">Detalle de clase</h2>
-    <button mat-icon-button (click)="onClose()" class="close-button">
+    <div class="header-content">
+      <h2 class="dialog-title">Detalle de Clase</h2>
+      <p class="dialog-subtitle">
+        Información completa de la clase seleccionada
+      </p>
+    </div>
+    <button mat-icon-button mat-dialog-close class="close-button">
       <mat-icon>close</mat-icon>
     </button>
   </div>
-
   <div class="dialog-content">
-    <div class="info-grid">
-      <!-- Código -->
-      <div class="info-item">
-        <div class="info-label">
-          <mat-icon class="label-icon">tag</mat-icon>
-          Código
+    <div class="form-container">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Código de Clase</label>
+          <input
+            class="form-input"
+            [value]="formatearTexto(clase.id_clase)"
+            readonly
+          />
         </div>
-        <div class="info-value codigo">{{ clase.id_clase }}</div>
+        <div class="form-group">
+          <label class="form-label">Familia</label>
+          <input
+            class="form-input"
+            [value]="formatearTexto(clase.familia)"
+            readonly
+          />
+        </div>
       </div>
-
-      <!-- Familia -->
-      <div class="info-item">
-        <div class="info-label">
-          <mat-icon class="label-icon">category</mat-icon>
-          Familia
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Subfamilia</label>
+          <input
+            class="form-input"
+            [value]="formatearTexto(clase.sub_familia)"
+            readonly
+          />
         </div>
-        <div class="info-value">{{ clase.familia }}</div>
-      </div>
-
-      <!-- Subfamilia -->
-      <div class="info-item">
-        <div class="info-label">
-          <mat-icon class="label-icon">label</mat-icon>
-          Subfamilia
-        </div>
-        <div class="info-value">{{ clase.sub_familia }}</div>
       </div>
     </div>
-
-    <mat-divider class="divider"></mat-divider>
-
-    <!-- Información adicional -->
-    <div class="additional-info">
-      <h3 class="section-title">
-        <mat-icon>info_outline</mat-icon>
-        Información adicional
-      </h3>
-      <div class="info-text">
-        Esta clase permite categorizar los insumos según su familia y
-        subfamilia, facilitando la organización y búsqueda en el sistema.
-      </div>
-    </div>
-  </div>
-
-  <div class="dialog-actions">
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onClose()"
-      class="btn-cerrar"
-    >
-      <mat-icon>check</mat-icon>
-      Entendido
-    </button>
   </div>
 </div>
