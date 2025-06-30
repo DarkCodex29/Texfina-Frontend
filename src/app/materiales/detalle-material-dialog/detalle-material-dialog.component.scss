@@ -30,14 +30,14 @@
     margin: 0 0 8px 0;
     font-size: var(--texfina-font-size-xl);
     font-weight: 600;
-    color: white;
+    color: white !important;
   }
 
   .dialog-subtitle {
     margin: 0;
     font-size: var(--texfina-font-size-sm);
     opacity: 0.9;
-    color: white;
+    color: white !important;
   }
 
   .close-button {
