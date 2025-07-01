@@ -221,12 +221,14 @@
           width: 100%;
           padding: var(--spacing-lg) var(--spacing-xl);
           border: 1px solid var(--border-color);
-          border-radius: var(--border-radius-md);
-          background: var(--surface-color);
+          border-radius: 16px;
+          background: transparent;
           font-size: var(--font-size-base);
           color: var(--text-primary);
           height: 48px;
           line-height: 1.4;
+          outline: none;
+          transition: all 0.3s ease;
 
           &::placeholder {
             color: var(--text-muted);
@@ -236,6 +238,10 @@
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px var(--primary-color-alpha);
+          }
+
+          &:hover {
+            border-color: var(--border-hover-color, #94a3b8);
           }
         }
       }

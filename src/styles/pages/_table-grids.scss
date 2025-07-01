@@ -1,0 +1,229 @@
+@use "sass:map";
+@use "../base/mixins" as *;
+
+$grid-configurations: (
+  materiales: (
+    columns: (
+      1fr 2fr 0.8fr 0.8fr 1.2fr 1fr 1fr,
+    ),
+    tablet: (
+      0.8fr 1.8fr 0.7fr 0.7fr 1fr 0.9fr 0.9fr,
+    ),
+    mobile: (
+      0.7fr 1.6fr 0.6fr 0.5fr 0.9fr 0.8fr 0.8fr,
+    ),
+    min-width: 900px,
+  ),
+  ingresos: (
+    columns: (
+      1fr 2fr 1.5fr 1fr 1.5fr 1.5fr 1fr 1fr,
+    ),
+    tablet: (
+      0.8fr 1.8fr 1.3fr 0.8fr 1.3fr 1.3fr 0.8fr 0.8fr,
+    ),
+    mobile: (
+      0.7fr 1.7fr 1.2fr 0.7fr 1.2fr 1.2fr 0.7fr 0.7fr,
+    ),
+    min-width: 1000px,
+  ),
+  proveedores: (
+    columns: (
+      2fr 1.2fr 1.5fr 2fr 1fr,
+    ),
+    tablet: (
+      1.6fr 1fr 1.3fr 1.6fr 0.9fr,
+    ),
+    mobile: (
+      1.4fr 0.9fr 1.2fr 1.4fr 0.8fr,
+    ),
+    min-width: 750px,
+  ),
+  almacenes: (
+    columns: (
+      1fr 2.5fr 2fr 1fr,
+    ),
+    tablet: (
+      1fr 2.5fr 2fr 1fr,
+    ),
+    mobile: (
+      1fr 2.5fr 2fr 1fr,
+    ),
+    min-width: 700px,
+  ),
+  clases: (
+    columns: (
+      1fr 2fr 1.5fr 1fr,
+    ),
+    tablet: (
+      0.8fr 1.8fr 1.3fr 0.8fr,
+    ),
+    mobile: (
+      0.6fr 1.6fr 1.1fr 0.6fr,
+    ),
+    min-width: 650px,
+  ),
+  unidades: (
+    columns: (
+      1fr 2.5fr 1fr,
+    ),
+    tablet: (
+      0.8fr 2.3fr 0.8fr,
+    ),
+    mobile: (
+      0.6fr 2.1fr 0.6fr,
+    ),
+    min-width: 500px,
+  ),
+  recetas: (
+    columns: (
+      1fr 2.5fr 1.5fr 1fr 1fr,
+    ),
+    tablet: (
+      0.8fr 2.3fr 1.3fr 0.8fr 0.8fr,
+    ),
+    mobile: (
+      0.6fr 2.1fr 1.1fr 0.6fr 0.6fr,
+    ),
+    min-width: 700px,
+  ),
+  consumos: (
+    columns: (
+      1fr 2fr 1fr 1.5fr 1fr 1fr 1fr,
+    ),
+    tablet: (
+      0.8fr 1.8fr 0.8fr 1.2fr 0.8fr 0.8fr 0.8fr,
+    ),
+    mobile: (
+      0.6fr 1.4fr 0.6fr 0.8fr 0.6fr 0.6fr 0.6fr,
+    ),
+    min-width: 900px,
+  ),
+  stock: (
+    columns: (
+      0.8fr 1.8fr 1.2fr 0.9fr 1.3fr 0.7fr 1.1fr 0.8fr,
+    ),
+    tablet: (
+      0.7fr 1.6fr 1.1fr 0.8fr 1.2fr 0.6fr 1fr 0.7fr,
+    ),
+    mobile: (
+      0.6fr 1.4fr 1fr 0.7fr 1.1fr 0.5fr 0.9fr 0.6fr,
+    ),
+    min-width: 1000px,
+  ),
+);
+
+@each $page, $config in $grid-configurations {
+  app-#{$page} {
+    $columns: map.get($config, columns);
+    $tablet-columns: map.get($config, tablet);
+    $mobile-columns: map.get($config, mobile);
+    $min-width: map.get($config, min-width);
+
+    .column-headers .header-row {
+      @include responsive-table-grid(
+        $columns,
+        $tablet-columns,
+        $mobile-columns
+      );
+    }
+
+    .data-table .mat-mdc-row {
+      @include responsive-table-grid(
+        $columns,
+        $tablet-columns,
+        $mobile-columns
+      );
+    }
+
+    @include respond-to-max(sm) {
+      .table-with-headers {
+        .column-headers,
+        .table-container {
+          min-width: $min-width !important;
+        }
+      }
+    }
+  }
+}
+
+$cell-alignments: (
+  materiales: (
+    1: center,
+    2: left,
+    3: center,
+    4: center,
+    5: left,
+    6: right,
+    7: center,
+  ),
+  ingresos: (
+    1: center,
+    2: left,
+    3: center,
+    4: center,
+    5: right,
+    6: center,
+    7: center,
+    8: center,
+  ),
+  proveedores: (
+    1: left,
+    2: center,
+    3: left,
+    4: left,
+    5: center,
+  ),
+  almacenes: (
+    1: center,
+    2: left,
+    3: left,
+    4: center,
+  ),
+  clases: (
+    1: center,
+    2: left,
+    3: left,
+    4: center,
+  ),
+  unidades: (
+    1: center,
+    2: left,
+    3: center,
+  ),
+  recetas: (
+    1: center,
+    2: left,
+    3: center,
+    4: center,
+    5: center,
+  ),
+  consumos: (
+    1: center,
+    2: left,
+    3: center,
+    4: right,
+    5: center,
+    6: center,
+    7: center,
+  ),
+  stock: (
+    1: center,
+    2: left,
+    3: center,
+    4: center,
+    5: right,
+    6: center,
+    7: right,
+    8: center,
+  ),
+);
+
+@each $page, $alignments in $cell-alignments {
+  app-#{$page} {
+    @each $index, $alignment in $alignments {
+      .mat-mdc-cell:nth-child(#{$index}) {
+        @include table-cell-alignment($alignment);
+      }
+    }
+  }
+}

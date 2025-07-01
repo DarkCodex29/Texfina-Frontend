@@ -1,0 +1,244 @@
+@use "../base/mixins" as *;
+
+.loading-state,
+.error-state,
+.empty-state,
+.filtered-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 300px;
+  @include gradient-bg(#ffffff, #f8fafc);
+  border-radius: 12px;
+  border: 2px dashed #e2e8f0;
+  margin: 20px 0;
+}
+
+.loading-state {
+  border-color: var(--texfina-secondary);
+  @include gradient-bg(#ffffff, #f0f4ff);
+
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .loading-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--texfina-primary);
+  }
+
+  .loading-subtitle {
+    font-size: 0.875rem;
+    margin: 0;
+    color: var(--texfina-text-muted);
+  }
+
+  mat-spinner {
+    margin-bottom: 8px;
+  }
+}
+
+.error-state {
+  border-color: var(--texfina-error);
+  @include gradient-bg(#ffffff, #fef2f2);
+
+  .error-icon {
+    font-size: 48px;
+    color: var(--texfina-error);
+    margin-bottom: 16px;
+  }
+
+  .error-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--texfina-error);
+  }
+
+  .error-subtitle {
+    font-size: 0.875rem;
+    margin: 0 0 24px 0;
+    color: var(--texfina-text-muted);
+    max-width: 400px;
+  }
+}
+
+.empty-state {
+  border-color: var(--texfina-neutral);
+  @include gradient-bg(#ffffff, #f9fafb);
+
+  .empty-icon {
+    font-size: 64px;
+    color: var(--texfina-neutral);
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+
+  .empty-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--texfina-primary);
+  }
+
+  .empty-subtitle {
+    font-size: 1rem;
+    margin: 0 0 32px 0;
+    color: var(--texfina-text-muted);
+    max-width: 500px;
+    line-height: 1.5;
+  }
+}
+
+.filtered-empty-state {
+  border-color: var(--texfina-warning);
+  @include gradient-bg(#ffffff, #fffbeb);
+
+  .filtered-empty-icon {
+    font-size: 48px;
+    color: var(--texfina-warning);
+    margin-bottom: 16px;
+  }
+
+  .filtered-empty-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--texfina-primary);
+  }
+
+  .filtered-empty-subtitle {
+    font-size: 0.875rem;
+    margin: 0 0 24px 0;
+    color: var(--texfina-text-muted);
+    max-width: 400px;
+  }
+}
+
+.loading-state,
+.error-state,
+.empty-state,
+.filtered-empty-state {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@include respond-to-max(md) {
+  .loading-state,
+  .error-state,
+  .empty-state,
+  .filtered-empty-state {
+    padding: 40px 16px;
+    min-height: 250px;
+  }
+
+  .empty-state {
+    .empty-icon {
+      font-size: 48px;
+    }
+
+    .empty-title {
+      font-size: 1.25rem;
+    }
+
+    .empty-subtitle {
+      font-size: 0.875rem;
+    }
+  }
+
+  .error-state {
+    .error-icon {
+      font-size: 40px;
+    }
+  }
+
+  .filtered-empty-state {
+    .filtered-empty-icon {
+      font-size: 40px;
+    }
+  }
+}
+
+.skeleton-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 10;
+
+  .skeleton-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+}
+
+.skeleton-row {
+  .table-cell {
+    padding: 12px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .skeleton-line {
+    border-radius: 4px;
+    @include skeleton-shimmer;
+    margin-bottom: 4px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &.skeleton-badge {
+      height: 28px;
+      width: 90%;
+      background: linear-gradient(90deg, #e3f2fd 25%, #bbdefb 50%, #e3f2fd 75%);
+      background-size: 200% 100%;
+    }
+
+    &.skeleton-text {
+      height: 20px;
+      width: 95%;
+    }
+
+    &.skeleton-subtext {
+      height: 14px;
+      width: 70%;
+      margin-top: 4px;
+    }
+
+    &.skeleton-price {
+      height: 22px;
+      width: 90%;
+      background: linear-gradient(90deg, #e8f5e8 25%, #c8e6c8 50%, #e8f5e8 75%);
+      background-size: 200% 100%;
+    }
+
+    &.skeleton-actions {
+      height: 36px;
+      width: 80px;
+      background: linear-gradient(90deg, #fff3e0 25%, #ffcc02 50%, #fff3e0 75%);
+      background-size: 200% 100%;
+    }
+  }
+}

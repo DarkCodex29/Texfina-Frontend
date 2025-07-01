@@ -1,0 +1,83 @@
+:root {
+  --texfina-primary: #bd2126;
+  --texfina-secondary: #121e66;
+  --texfina-neutral: #989594;
+
+  --texfina-primary-light: #d63a3f;
+  --texfina-primary-dark: #9a1b1f;
+  --texfina-primary-bg: #fdf2f2;
+
+  --texfina-secondary-light: #1e2a7a;
+  --texfina-secondary-dark: #0f1852;
+  --texfina-secondary-bg: #f1f2f8;
+
+  --texfina-neutral-light: #b5b3b2;
+  --texfina-neutral-dark: #7a7876;
+  --texfina-neutral-bg: #f8f8f7;
+
+  --texfina-success: #16a34a;
+  --texfina-warning: #d97706;
+  --texfina-error: var(--texfina-primary);
+  --texfina-info: var(--texfina-secondary);
+
+  --texfina-text-primary: #1f2937;
+  --texfina-text-secondary: var(--texfina-neutral);
+  --texfina-text-muted: #9ca3af;
+
+  --texfina-bg-primary: #ffffff;
+  --texfina-bg-secondary: #f9fafb;
+  --texfina-bg-tertiary: #f3f4f6;
+
+  --texfina-border-light: #e5e7eb;
+  --texfina-border-medium: #d1d5db;
+  --texfina-border-dark: var(--texfina-neutral);
+
+  --texfina-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --texfina-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --texfina-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  --texfina-font-family: "Roboto", "Helvetica Neue", sans-serif;
+  --texfina-font-size-xs: 0.75rem;
+  --texfina-font-size-sm: 0.875rem;
+  --texfina-font-size-base: 1rem;
+  --texfina-font-size-lg: 1.125rem;
+  --texfina-font-size-xl: 1.25rem;
+  --texfina-font-size-2xl: 1.5rem;
+  --texfina-font-size-3xl: 1.875rem;
+
+  --texfina-spacing-xs: 0.25rem;
+  --texfina-spacing-sm: 0.5rem;
+  --texfina-spacing-md: 1rem;
+  --texfina-spacing-lg: 1.5rem;
+  --texfina-spacing-xl: 2rem;
+  --texfina-spacing-2xl: 3rem;
+
+  --texfina-radius-sm: 4px;
+  --texfina-radius-md: 8px;
+  --texfina-radius-lg: 12px;
+  --texfina-radius-xl: 16px;
+
+  --primary-color: var(--texfina-secondary);
+  --primary-color-alpha: rgba(18, 30, 102, 0.1);
+  --surface-color: var(--texfina-bg-primary);
+  --background-subtle: var(--texfina-bg-secondary);
+  --border-color: var(--texfina-border-light);
+  --text-primary: var(--texfina-text-primary);
+  --font-size-lg: var(--texfina-font-size-lg);
+  --spacing-xs: var(--texfina-spacing-xs);
+  --spacing-sm: var(--texfina-spacing-sm);
+  --spacing-md: var(--texfina-spacing-md);
+  --spacing-lg: var(--texfina-spacing-lg);
+  --spacing-xl: var(--texfina-spacing-xl);
+  --border-radius-lg: var(--texfina-radius-lg);
+  --shadow-sm: var(--texfina-shadow-sm);
+}
+
+$breakpoints: (
+  xs: 0,
+  sm: 480px,
+  md: 768px,
+  lg: 960px,
+  xl: 1200px,
+  xxl: 1440px,
+);

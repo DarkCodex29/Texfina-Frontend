@@ -1,0 +1,35 @@
+.badge-texfina {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--texfina-spacing-xs) var(--texfina-spacing-sm);
+  border-radius: var(--texfina-radius-xl);
+  font-size: var(--texfina-font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.badge-primary {
+    background-color: var(--texfina-primary-bg);
+    color: var(--texfina-primary);
+  }
+
+  &.badge-secondary {
+    background-color: var(--texfina-secondary);
+    color: white;
+  }
+
+  &.badge-success {
+    background-color: #dcfce7;
+    color: var(--texfina-success);
+  }
+
+  &.badge-warning {
+    background-color: #fef3c7;
+    color: var(--texfina-warning);
+  }
+
+  &.badge-neutral {
+    background-color: var(--texfina-neutral-bg);
+    color: var(--texfina-neutral-dark);
+  }
+}

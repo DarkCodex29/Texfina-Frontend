@@ -1,0 +1,284 @@
+@use "../base/mixins" as *;
+@use "../base/variables" as *;
+
+.table-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  @include card-base;
+
+  @include respond-to-max(sm) {
+    border-radius: 8px !important;
+    margin: 0 -4px;
+  }
+
+  .table-with-headers {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    @include respond-to-max(sm) {
+      overflow-x: auto;
+      overflow-y: visible;
+
+      .column-headers,
+      .table-container {
+        min-width: 800px !important;
+      }
+    }
+  }
+
+  .table-container {
+    position: relative;
+    flex: 1;
+    overflow: auto;
+    min-height: 0;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+
+    @include respond-to-max(sm) {
+      overflow-x: visible;
+      overflow-y: auto;
+
+      .data-table,
+      .mat-mdc-table {
+        width: 100%;
+      }
+    }
+
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--texfina-bg-secondary);
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--texfina-border);
+      border-radius: 3px;
+
+      &:hover {
+        background: var(--texfina-text-secondary);
+      }
+    }
+  }
+}
+
+.column-headers {
+  background: var(--texfina-bg-secondary);
+  border-bottom: 2px solid var(--texfina-border);
+  border-radius: 12px 12px 0 0;
+
+  .header-row {
+    display: grid;
+    padding: 0;
+    align-items: center;
+
+    .header-col {
+      @include flex-center;
+      padding: 12px;
+      color: #1a1a1a;
+      font-weight: 700;
+      font-size: var(--texfina-font-size-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+
+      &:hover {
+        background: #f8fafc;
+        color: #000000;
+      }
+
+      span {
+        flex: 1;
+      }
+
+      .sort-icon {
+        font-size: 18px !important;
+        width: 18px !important;
+        height: 18px !important;
+        color: var(--texfina-secondary);
+        margin-left: 4px;
+        opacity: 0.7;
+        transition: all 0.2s ease;
+      }
+
+      &:hover .sort-icon {
+        opacity: 1;
+        color: var(--texfina-primary);
+      }
+
+      &.acciones-col {
+        cursor: default;
+        @include table-cell-alignment(center);
+
+        &:hover {
+          background: transparent;
+        }
+      }
+    }
+  }
+
+  @include respond-to-max(sm) {
+    .header-row {
+      min-height: 36px;
+    }
+
+    .header-col {
+      padding: 6px 4px !important;
+      font-size: 0.7rem !important;
+      min-height: 36px;
+
+      .sort-icon {
+        font-size: 14px !important;
+        width: 14px !important;
+        height: 14px !important;
+      }
+    }
+  }
+}
+
+.data-table {
+  width: 100%;
+  background: white;
+  border: none;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+
+  .mat-mdc-header-row {
+    display: none !important;
+  }
+
+  .mat-mdc-row {
+    display: grid !important;
+    min-height: 52px !important;
+    border-bottom: 1px solid var(--texfina-border-light);
+    transition: background-color 0.2s ease;
+    align-items: center;
+    padding: 0;
+
+    &:hover {
+      background-color: var(--texfina-bg-secondary) !important;
+    }
+
+    .mat-mdc-cell {
+      font-size: var(--texfina-font-size-sm);
+      padding: 8px 12px !important;
+      color: var(--texfina-text-primary);
+      vertical-align: middle;
+      height: auto !important;
+      border-bottom: none !important;
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.table-footer {
+  @include flex-between;
+  padding: 8px 16px;
+  border-top: 2px solid #e2e8f0;
+  @include gradient-bg(#f8fafc, #ffffff);
+  min-height: 48px;
+  border-radius: 0 0 12px 12px;
+
+  @include respond-to-max(sm) {
+    min-height: 40px;
+    padding: 6px 12px;
+
+    .pagination-info {
+      font-size: 0.75rem !important;
+    }
+
+    .pagination-controls .pagination-button {
+      width: 28px !important;
+      height: 28px !important;
+      min-width: 28px !important;
+
+      .mat-icon,
+      mat-icon {
+        font-size: 14px !important;
+        width: 14px !important;
+        height: 14px !important;
+      }
+    }
+  }
+
+  .pagination-info {
+    font-size: var(--texfina-font-size-sm);
+    color: var(--texfina-text-secondary);
+    font-weight: 500;
+  }
+
+  .pagination-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+
+    .pagination-button {
+      width: 32px !important;
+      height: 32px !important;
+      min-width: 32px !important;
+      border-radius: 6px !important;
+      border: 1px solid var(--texfina-border) !important;
+      background: white !important;
+      color: var(--texfina-text-secondary) !important;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      @include flex-center;
+      padding: 0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+      &:hover:not(:disabled) {
+        border-color: var(--texfina-secondary) !important;
+        background: var(--texfina-secondary-bg) !important;
+        color: var(--texfina-secondary) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 3px 8px rgba(18, 30, 102, 0.2) !important;
+      }
+
+      &:disabled {
+        opacity: 0.3 !important;
+        cursor: not-allowed !important;
+        transform: none !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+      }
+
+      &.active {
+        background: var(--texfina-secondary) !important;
+        color: white !important;
+        border-color: var(--texfina-secondary) !important;
+        box-shadow: 0 2px 6px rgba(18, 30, 102, 0.25);
+        font-weight: 600;
+      }
+
+      .mat-icon,
+      mat-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+        line-height: 16px !important;
+        color: inherit !important;
+      }
+    }
+  }
+
+  @include respond-to-max(md) {
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+    padding: 8px;
+
+    .pagination-controls {
+      justify-content: center;
+    }
+  }
+}

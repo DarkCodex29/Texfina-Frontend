@@ -1,0 +1,205 @@
+@use "../base/mixins" as *;
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  padding: var(--texfina-spacing-lg);
+  background-color: var(--texfina-bg-secondary);
+  overflow: hidden;
+  font-family: var(--texfina-font-family);
+
+  @include respond-to-max(sm) {
+    padding: 8px;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+}
+
+.page-header {
+  @include flex-between;
+  margin-bottom: var(--texfina-spacing-lg);
+  flex-shrink: 0;
+  background-color: var(--texfina-bg-primary);
+  padding: var(--texfina-spacing-lg);
+  border-radius: var(--texfina-radius-lg);
+  box-shadow: var(--texfina-shadow-md);
+  border: 1px solid var(--texfina-border-light);
+
+  @include respond-to-max(sm) {
+    padding: 12px;
+    margin-bottom: 12px;
+    flex-direction: column;
+    gap: 8px;
+
+    .page-title {
+      font-size: 1.5rem !important;
+    }
+
+    .action-buttons {
+      width: 100%;
+      justify-content: stretch;
+
+      .btn-texfina {
+        flex: 1;
+        min-height: 44px;
+      }
+    }
+  }
+
+  .page-title {
+    font-size: var(--texfina-font-size-3xl);
+    font-weight: 600;
+    color: var(--texfina-text-primary);
+    margin: 0;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: var(--texfina-spacing-sm);
+    align-items: center;
+  }
+
+  .header-content {
+    .page-subtitle {
+      margin-top: var(--texfina-spacing-xs);
+      font-size: var(--texfina-font-size-sm);
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: var(--texfina-spacing-md);
+    align-items: center;
+
+    .btn-texfina {
+      min-width: 160px;
+      height: 48px;
+      font-size: var(--texfina-font-size-sm);
+      font-weight: 600;
+      letter-spacing: 0.25px;
+      border-radius: 12px;
+      padding: 0 var(--texfina-spacing-lg);
+      position: relative;
+      overflow: hidden;
+
+      &.btn-primary {
+        @include gradient-bg(
+          var(--texfina-secondary),
+          var(--texfina-secondary-dark)
+        );
+        color: white;
+        border: none;
+        box-shadow: 0 4px 16px rgba(18, 30, 102, 0.25);
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(18, 30, 102, 0.35);
+        }
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+          );
+          transition: left 0.6s;
+        }
+
+        &:hover::before {
+          left: 100%;
+        }
+      }
+
+      &.btn-success {
+        @include gradient-bg(var(--texfina-success), #15803d);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 16px rgba(34, 197, 94, 0.25);
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35);
+        }
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+          );
+          transition: left 0.6s;
+        }
+
+        &:hover::before {
+          left: 100%;
+        }
+      }
+
+      mat-icon {
+        font-size: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+        margin-right: var(--texfina-spacing-xs);
+        z-index: 1;
+        position: relative;
+      }
+    }
+
+    @include respond-to-max(md) {
+      flex-direction: column;
+      width: 100%;
+
+      .btn-texfina {
+        width: 100%;
+        min-width: unset;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      flex-wrap: wrap;
+
+      .btn-texfina {
+        flex: 1;
+        min-width: 140px;
+      }
+    }
+  }
+}
+
+.page-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @include respond-to-max(sm) {
+    overflow: visible;
+    min-height: auto;
+  }
+}
+
+@include respond-to-max(md) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--texfina-spacing-lg);
+  }
+}

@@ -1,0 +1,259 @@
+@use "../base/mixins" as *;
+
+.btn-texfina {
+  @include button-base;
+
+  &.btn-primary {
+    background-color: var(--texfina-secondary);
+    color: white;
+    box-shadow: 0 2px 8px rgba(18, 30, 102, 0.2);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-secondary-dark);
+      box-shadow: 0 4px 16px rgba(18, 30, 102, 0.3);
+      transform: translateY(-1px);
+    }
+  }
+
+  &.btn-secondary {
+    background-color: var(--texfina-primary);
+    color: white;
+    box-shadow: 0 2px 8px rgba(189, 33, 38, 0.2);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-primary-dark);
+      box-shadow: 0 4px 16px rgba(189, 33, 38, 0.3);
+      transform: translateY(-1px);
+    }
+  }
+
+  &.btn-outline {
+    background-color: transparent;
+    color: var(--texfina-secondary);
+    border: 2px solid var(--texfina-secondary);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-secondary);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(18, 30, 102, 0.2);
+    }
+  }
+
+  &.btn-outline-secondary {
+    background-color: transparent;
+    color: var(--texfina-primary);
+    border: 2px solid var(--texfina-primary);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-primary);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(189, 33, 38, 0.2);
+    }
+  }
+
+  &.btn-neutral {
+    background-color: var(--texfina-neutral);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-neutral-dark);
+    }
+  }
+
+  &.btn-success {
+    background-color: var(--texfina-success);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #15803d;
+    }
+  }
+
+  &.btn-warning {
+    background-color: var(--texfina-warning);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #c2410c;
+    }
+  }
+
+  &.btn-sm {
+    padding: var(--texfina-spacing-xs) var(--texfina-spacing-md);
+    font-size: var(--texfina-font-size-sm);
+  }
+
+  &.btn-lg {
+    padding: var(--texfina-spacing-md) var(--texfina-spacing-xl);
+    font-size: var(--texfina-font-size-lg);
+  }
+}
+
+.btn-action {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  @include flex-center;
+  position: relative;
+  overflow: hidden;
+  padding: 0 !important;
+
+  &.btn-view {
+    @include gradient-bg(
+      var(--texfina-secondary),
+      var(--texfina-secondary-dark)
+    );
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(18, 30, 102, 0.2);
+    @include hover-lift(-2px, rgba(18, 30, 102, 0.3));
+  }
+
+  &.btn-edit {
+    @include gradient-bg(var(--texfina-success), #15803d);
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+    @include hover-lift(-2px, rgba(34, 197, 94, 0.3));
+  }
+
+  &.btn-delete {
+    @include gradient-bg(#dc2626, #b91c1c);
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+    @include hover-lift(-2px, rgba(220, 38, 38, 0.3));
+  }
+
+  .mat-icon,
+  mat-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    z-index: 1;
+    color: inherit !important;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s;
+    z-index: 0;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+
+  @include respond-to-max(md) {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+
+    .mat-icon,
+    mat-icon {
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+    }
+  }
+
+  @include respond-to-max(sm) {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+
+    .mat-icon,
+    mat-icon {
+      font-size: 16px !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--texfina-spacing-sm);
+  justify-content: center;
+  align-items: center;
+
+  @include respond-to-max(md) {
+    gap: 6px;
+  }
+
+  @include respond-to-max(sm) {
+    gap: 6px;
+
+    .btn-action {
+      width: 36px !important;
+      height: 36px !important;
+
+      .mat-icon,
+      mat-icon {
+        font-size: 18px !important;
+        width: 18px !important;
+        height: 18px !important;
+      }
+    }
+  }
+}
+
+.btn-clear-filters {
+  min-width: 140px !important;
+  height: 48px !important;
+  border-radius: 10px !important;
+  border: 2px solid var(--texfina-primary) !important;
+  @include gradient-bg(white, #fef7f7);
+  color: var(--texfina-primary) !important;
+  cursor: pointer;
+  @include flex-center;
+  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 0 20px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+  }
+
+  @include respond-to-max(md) {
+    width: 100% !important;
+    min-width: auto !important;
+  }
+}

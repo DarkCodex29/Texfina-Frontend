@@ -1,0 +1,137 @@
+@use "sass:map";
+@use "variables" as *;
+
+$breakpoints: (
+  xs: 480px,
+  sm: 768px,
+  md: 1024px,
+  lg: 1280px,
+  xl: 1536px,
+);
+
+@mixin respond-to($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (min-width: map.get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  }
+}
+
+@mixin respond-to-max($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map.get($breakpoints, $breakpoint);
+    @media (max-width: #{$breakpoint-value - 1px}) {
+      @content;
+    }
+  }
+}
+
+@mixin table-grid($columns, $gap: 12px) {
+  display: grid !important;
+  grid-template-columns: $columns !important;
+  gap: $gap !important;
+  align-items: center;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin card-base {
+  background-color: var(--texfina-bg-primary);
+  border-radius: var(--texfina-radius-lg);
+  box-shadow: var(--texfina-shadow-md);
+  border: 1px solid var(--texfina-border-light);
+}
+
+@mixin button-base {
+  font-family: var(--texfina-font-family);
+  font-weight: 500;
+  border-radius: var(--texfina-radius-md);
+  padding: var(--texfina-spacing-sm) var(--texfina-spacing-lg);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@mixin hover-lift($lift: -2px, $shadow-color: rgba(0, 0, 0, 0.1)) {
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY($lift);
+    box-shadow: 0 6px 20px $shadow-color;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin table-cell-alignment($alignment: center) {
+  @if $alignment == "left" {
+    justify-content: flex-start;
+    text-align: left;
+  } @else if $alignment == "right" {
+    justify-content: flex-end;
+    text-align: right;
+  } @else {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@mixin responsive-table-grid($base-columns, $tablet-columns, $mobile-columns) {
+  @include table-grid($base-columns);
+
+  @include respond-to-max(lg) {
+    grid-template-columns: $tablet-columns !important;
+    gap: 8px !important;
+  }
+
+  @include respond-to-max(md) {
+    grid-template-columns: $mobile-columns !important;
+    gap: 6px !important;
+  }
+}
+
+@mixin truncate-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin gradient-bg($color1, $color2, $angle: 135deg) {
+  background: linear-gradient($angle, $color1 0%, $color2 100%);
+}
+
+@mixin skeleton-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite ease-in-out;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
