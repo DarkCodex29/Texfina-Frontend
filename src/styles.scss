@@ -37,34 +37,77 @@ html {
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
-  margin-bottom: var(--texfina-spacing-lg);
+  margin-bottom: clamp(8px, 2vw, 16px);
   flex-shrink: 0;
 
   .filters-header {
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: clamp(4px, 1vw, 6px) clamp(12px, 3vw, 16px);
     user-select: none;
     border-bottom: 1px solid var(--border-color);
+    min-height: unset;
+    background: white;
 
     .filters-title {
       gap: var(--spacing-sm);
       color: var(--text-primary);
-      font-size: var(--font-size-lg);
+      font-size: clamp(12px, 2vw, 14px);
+      font-weight: 500;
+      margin: 0;
+      line-height: 1.1;
     }
   }
 
   .filters-content {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: var(--background-subtle);
+    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 20px);
+    background: var(--texfina-bg-primary) !important;
+  }
+
+  .filters-form {
+    margin: 0;
+
+    .filters-grid {
+      display: flex;
+      gap: clamp(8px, 2vw, 12px);
+      align-items: center;
+      flex-wrap: wrap;
+
+      .filter-group {
+        flex: 1;
+        min-width: 200px;
+
+        .simple-input-wrapper {
+          height: clamp(40px, 8vw, 48px);
+
+          .simple-input {
+            height: 100%;
+            padding: 0 clamp(12px, 3vw, 16px);
+            font-size: clamp(13px, 2.5vw, 14px);
+          }
+        }
+      }
+
+      .filter-actions {
+        flex-shrink: 0;
+
+        .btn-clear-filters {
+          height: clamp(40px, 8vw, 48px);
+          padding: 0 clamp(12px, 3vw, 16px);
+          font-size: clamp(12px, 2.5vw, 13px);
+          white-space: nowrap;
+        }
+      }
+    }
   }
 
   .simple-input {
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px);
     border: 1px solid var(--border-color);
     background: transparent;
     color: var(--text-primary);
     outline: none;
     border-radius: 16px;
     transition: all 0.3s ease;
+    font-size: clamp(13px, 2.5vw, 14px);
 
     &:focus {
       border-color: var(--primary-color);
@@ -75,10 +118,106 @@ html {
     &:hover {
       border-color: var(--border-hover-color, #94a3b8);
     }
+
+    &::placeholder {
+      font-size: clamp(12px, 2.5vw, 13px);
+      opacity: 0.7;
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 8px;
+
+    .filters-header {
+      padding: 3px 12px;
+
+      .filters-title {
+        font-size: 12px;
+        line-height: 1;
+      }
+    }
+
+    .filters-content {
+      padding: 8px 12px;
+    }
+
+    .filters-form .filters-grid {
+      gap: 8px;
+
+      .filter-group {
+        min-width: unset;
+        width: 100%;
+
+        .simple-input-wrapper {
+          height: 44px;
+
+          .simple-input {
+            font-size: 13px;
+            padding: 0 12px;
+          }
+        }
+      }
+
+      .filter-actions {
+        width: 100%;
+        margin-top: 4px;
+
+        .btn-clear-filters {
+          width: 100%;
+          height: 40px;
+          font-size: 12px;
+          justify-content: center;
+        }
+      }
+    }
   }
 
   @media (max-width: 480px) {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+
+    .filters-header {
+      padding: 2px 10px;
+
+      .filters-title {
+        font-size: 11px;
+        line-height: 1;
+      }
+    }
+
+    .filters-content {
+      padding: 6px 10px;
+    }
+
+    .filters-form .filters-grid {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+
+      .filter-group {
+        .simple-input-wrapper {
+          height: 40px;
+
+          .simple-input {
+            font-size: 12px;
+            padding: 0 10px;
+
+            &::placeholder {
+              font-size: 11px;
+            }
+          }
+        }
+      }
+
+      .filter-actions {
+        margin-top: 2px;
+
+        .btn-clear-filters {
+          height: 36px;
+          font-size: 11px;
+          padding: 0 12px;
+        }
+      }
+    }
 
     .filtros-form {
       padding: 12px !important;
@@ -293,7 +432,7 @@ app-ingresos {
 }
 
 // ============================================================================
-// ESTILOS GLOBALES PRIORITARIOS PARA INPUTS
+// ESTILOS GLOBALES PRIORITARIOS PARA INPUTS Y FILTROS
 // ============================================================================
 .simple-input-wrapper .simple-input,
 .filter-group .simple-input,
@@ -311,5 +450,42 @@ input.simple-input {
 
   &:hover {
     border-color: var(--border-hover-color, #94a3b8) !important;
+  }
+}
+
+// Botón limpiar filtros optimizado
+.btn-clear-filters {
+  height: clamp(40px, 8vw, 48px) !important;
+  padding: 0 clamp(12px, 3vw, 16px) !important;
+  font-size: clamp(12px, 2.5vw, 13px) !important;
+  white-space: nowrap !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--surface-color) !important;
+  color: var(--text-secondary) !important;
+  transition: all 0.3s ease !important;
+  font-weight: 500 !important;
+
+  &:hover {
+    background: var(--texfina-neutral-bg) !important;
+    border-color: var(--texfina-neutral) !important;
+    color: var(--texfina-neutral) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  &:active {
+    transform: translateY(0) !important;
+  }
+
+  @media (max-width: 768px) {
+    height: 40px !important;
+    font-size: 12px !important;
+    padding: 0 12px !important;
+  }
+
+  @media (max-width: 480px) {
+    height: 36px !important;
+    font-size: 11px !important;
+    padding: 0 10px !important;
   }
 }

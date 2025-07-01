@@ -37,12 +37,16 @@
   .filters-header {
     cursor: default;
     user-select: none;
+    padding: clamp(4px, 1vw, 6px) clamp(12px, 3vw, 16px);
+    border-bottom: 1px solid var(--border-color);
+    background: white;
 
     .filters-title {
-      font-size: var(--texfina-font-size-lg);
-      font-weight: 600;
+      font-size: clamp(12px, 2vw, 14px);
+      font-weight: 500;
       color: var(--texfina-text-primary);
-      margin-bottom: 4px;
+      margin: 0;
+      line-height: 1.1;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -77,7 +81,8 @@
   }
 
   .filters-content {
-    margin-top: 16px;
+    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px);
+    background: white;
     animation: slideDown 0.3s ease-out;
   }
 
@@ -86,18 +91,15 @@
   }
 
   .filters-grid {
-    display: grid;
-    gap: 16px;
+    display: flex;
+    gap: clamp(8px, 2vw, 12px);
     align-items: center;
-    grid-template-columns: 1fr 1fr 1fr;
-
-    @include respond-to-max(xl) {
-      grid-template-columns: 1fr 1fr;
-    }
+    flex-wrap: wrap;
 
     @include respond-to-max(md) {
-      grid-template-columns: 1fr;
-      gap: 16px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
     }
   }
 
@@ -105,12 +107,12 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    grid-column: 1 / -1;
-    margin-top: 8px;
+    flex-shrink: 0;
 
     @include respond-to-max(md) {
-      margin-top: 16px;
+      width: 100%;
       justify-content: stretch;
+      margin-top: 4px;
     }
   }
 }
@@ -118,6 +120,8 @@
 .filter-group {
   position: relative;
   width: 100%;
+  flex: 1;
+  min-width: 200px;
 
   .simple-input-wrapper {
     position: relative;
@@ -128,7 +132,7 @@
     border-radius: 16px;
     padding: 0;
     transition: all 0.3s ease;
-    height: 56px;
+    height: clamp(40px, 8vw, 48px);
 
     &:hover {
       transform: translateY(-1px);
@@ -151,9 +155,9 @@
       border: 1px solid var(--border-color);
       outline: none;
       background: transparent;
-      font-size: 16px;
+      font-size: clamp(13px, 2.5vw, 14px);
       color: var(--text-primary);
-      padding: var(--spacing-lg) var(--spacing-xl);
+      padding: 0 clamp(12px, 3vw, 16px);
       height: 100%;
       border-radius: 16px;
       transition: all 0.3s ease;
@@ -171,6 +175,7 @@
       &::placeholder {
         color: var(--texfina-text-muted);
         opacity: 0.7;
+        font-size: clamp(12px, 2.5vw, 13px);
       }
 
       &:focus::placeholder {
