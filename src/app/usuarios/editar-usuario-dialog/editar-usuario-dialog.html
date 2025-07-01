@@ -164,12 +164,10 @@
   </div>
 
   <div class="dialog-actions">
-    <button mat-button mat-dialog-close class="btn-texfina btn-neutral">
-      Cancelar
-    </button>
+    <button mat-button mat-dialog-close class="btn-cancel">Cancelar</button>
     <button
       mat-button
-      class="btn-texfina btn-primary"
+      class="btn-save"
       [disabled]="usuarioForm.invalid || guardando"
       (click)="guardar()"
     >

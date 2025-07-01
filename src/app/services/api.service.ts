@@ -458,6 +458,54 @@ export class ApiService {
   }
 
   // ============================================================================
+  // CONSUMOS
+  // ============================================================================
+
+  getConsumos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/consumos`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  buscarConsumos(filtros: any): Observable<any[]> {
+    let params = new HttpParams();
+
+    if (filtros.insumo) {
+      params = params.set('insumo', filtros.insumo);
+    }
+    if (filtros.area) {
+      params = params.set('area', filtros.area);
+    }
+    if (filtros.estado) {
+      params = params.set('estado', filtros.estado);
+    }
+    if (filtros.responsable) {
+      params = params.set('responsable', filtros.responsable);
+    }
+
+    return this.http.get<any[]>(`${this.baseUrl}/consumos/buscar`, {
+      headers: this.getHeaders(),
+      params,
+    });
+  }
+
+  crearConsumo(consumo: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/consumos`, consumo, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  actualizarConsumo(consumo: any): Observable<any> {
+    return this.http.put(
+      `${this.baseUrl}/consumos/${consumo.id_consumo}`,
+      consumo,
+      {
+        headers: this.getHeaders(),
+      }
+    );
+  }
+
+  // ============================================================================
   // RECETAS
   // ============================================================================
 

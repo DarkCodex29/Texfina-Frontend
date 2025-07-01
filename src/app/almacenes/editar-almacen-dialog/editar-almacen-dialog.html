@@ -31,13 +31,13 @@
             type="text"
           />
           <div
-            class="form-error"
+            class="error-message"
             *ngIf="almacenForm.get('nombre')?.hasError('required') && almacenForm.get('nombre')?.touched"
           >
             El nombre es requerido
           </div>
           <div
-            class="form-error"
+            class="error-message"
             *ngIf="almacenForm.get('nombre')?.hasError('maxlength')"
           >
             El nombre no puede exceder 100 caracteres
@@ -56,30 +56,27 @@
             type="text"
           />
           <div
-            class="form-error"
+            class="error-message"
             *ngIf="almacenForm.get('ubicacion')?.hasError('maxlength')"
           >
             La ubicación no puede exceder 200 caracteres
           </div>
         </div>
       </div>
-
-      <div class="dialog-actions">
-        <button
-          type="button"
-          class="btn-texfina btn-neutral"
-          (click)="onCancel()"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          class="btn-texfina btn-primary"
-          [disabled]="!almacenForm.valid"
-        >
-          {{ esNuevo ? 'Crear Almacén' : 'Actualizar Almacén' }}
-        </button>
-      </div>
     </form>
+  </div>
+
+  <div class="dialog-actions">
+    <button type="button" class="btn-cancel" (click)="onCancel()">
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="btn-save"
+      [disabled]="!almacenForm.valid"
+      (click)="onSubmit()"
+    >
+      {{ esNuevo ? 'Crear Almacén' : 'Actualizar Almacén' }}
+    </button>
   </div>
 </div>

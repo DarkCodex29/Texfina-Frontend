@@ -281,9 +281,9 @@
                 <span
                   class="badge-texfina"
                   [ngClass]="{
-                    'badge-success': getEstadoConsumo(consumo) === 'CONFIRMADO',
+                    'badge-success': getEstadoConsumo(consumo) === 'CONSUMIDO',
                     'badge-warning': getEstadoConsumo(consumo) === 'PENDIENTE',
-                    'badge-error': getEstadoConsumo(consumo) === 'CANCELADO'
+                    'badge-error': getEstadoConsumo(consumo) === 'ANULADO'
                   }"
                 >
                   {{ getEstadoConsumo(consumo) }}
@@ -310,7 +310,7 @@
                     class="btn-action btn-edit"
                     (click)="editarConsumo(consumo)"
                     matTooltip="Editar"
-                    [disabled]="consumo.estado === 'CONFIRMADO'"
+                    [disabled]="consumo.estado === 'CONSUMIDO'"
                   >
                     <mat-icon>edit</mat-icon>
                   </button>

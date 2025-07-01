@@ -1,0 +1,177 @@
+@use "../../../styles/base/variables" as *;
+
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 95vh;
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--texfina-spacing-lg);
+  background: linear-gradient(
+    135deg,
+    var(--texfina-secondary),
+    var(--texfina-secondary-dark)
+  );
+  color: white;
+  border-bottom: 1px solid var(--texfina-border-light);
+
+  .header-content {
+    flex: 1;
+  }
+
+  .dialog-title {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: white !important;
+  }
+
+  .dialog-subtitle {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+    color: white !important;
+  }
+
+  .close-button {
+    color: white;
+    width: 40px;
+    height: 40px;
+    margin-left: 16px;
+  }
+}
+
+.dialog-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--texfina-spacing-xl);
+  min-height: 60vh;
+  min-height: 400px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--texfina-spacing-lg);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--texfina-spacing-lg);
+
+  &.single-column {
+    grid-template-columns: 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: var(--texfina-spacing-md);
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--texfina-spacing-sm);
+
+  &.full-width {
+    grid-column: span 2;
+
+    @media (max-width: 768px) {
+      grid-column: span 1;
+    }
+  }
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--texfina-text-primary);
+  margin: 0;
+
+  .required {
+    color: var(--texfina-primary);
+    margin-left: 2px;
+  }
+}
+
+.form-input,
+.form-textarea {
+  padding: var(--texfina-spacing-md);
+  border: 1px solid var(--texfina-border-light);
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  color: var(--texfina-text-primary);
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-primary);
+    box-shadow: 0 0 0 3px var(--texfina-primary-alpha);
+  }
+
+  &.error {
+    border-color: var(--texfina-primary);
+    background: var(--texfina-primary-bg);
+  }
+
+  &[readonly] {
+    background: var(--texfina-neutral-bg);
+    cursor: default;
+
+    &:focus {
+      border-color: var(--texfina-border-light);
+      box-shadow: none;
+    }
+  }
+
+  &::placeholder {
+    color: var(--texfina-text-muted);
+  }
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.error-message {
+  font-size: 12px;
+  color: var(--texfina-primary);
+  margin-top: -var(--texfina-spacing-xs);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--texfina-spacing-md);
+  padding: var(--texfina-spacing-xl);
+  border-top: 1px solid var(--texfina-border-light);
+  background: var(--texfina-neutral-bg);
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .btn-texfina {
+      width: 100%;
+    }
+  }
+}
+
+.btn-texfina {
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

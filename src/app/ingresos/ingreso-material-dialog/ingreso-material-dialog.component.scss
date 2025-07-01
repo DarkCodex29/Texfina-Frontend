@@ -2,10 +2,20 @@
 // MODAL INGRESO MATERIAL - ESTILOS TEXFINA ESTÁNDAR
 // ============================================================================
 
+// Variables faltantes para alpha colors
+:host {
+  --texfina-secondary-alpha: rgba(18, 30, 102, 0.1);
+  --texfina-neutral-alpha: rgba(152, 149, 148, 0.1);
+  --texfina-bg-primary: #ffffff;
+  --texfina-secondary-dark: #0f1a4f;
+}
+
 .dialog-container {
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  height: auto;
+  min-height: 60vh;
+  max-height: 95vh;
   width: 100%;
   max-width: 800px;
   background: var(--texfina-bg-primary);
@@ -62,7 +72,8 @@
   flex: 1;
   padding: var(--texfina-spacing-xl);
   overflow-y: auto;
-  max-height: calc(90vh - 160px);
+  max-height: calc(95vh - 200px);
+  min-height: 400px;
 }
 
 .form-row {
@@ -148,6 +159,7 @@
   gap: var(--texfina-spacing-md);
   justify-content: flex-end;
   margin-top: auto;
+  flex-shrink: 0;
 
   @media (max-width: 768px) {
     flex-direction: column-reverse;

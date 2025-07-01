@@ -16,7 +16,6 @@ import {
   Permiso,
   RolPermiso,
   Stock,
-  Consumo,
   Receta,
   RecetaDetalle,
   UsuarioFormDto,
@@ -28,6 +27,7 @@ import {
   LoteFormDto,
   LogEvento,
 } from '../models/insumo.model';
+import { Consumo } from '../models/consumo.model';
 
 @Injectable({
   providedIn: 'root',

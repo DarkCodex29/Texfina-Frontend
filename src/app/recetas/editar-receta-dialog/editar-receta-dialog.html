@@ -38,11 +38,11 @@
   </div>
 
   <div class="dialog-actions">
-    <button class="btn-texfina btn-neutral" (click)="onCancel()" type="button">
+    <button class="btn-cancel" (click)="onCancel()" type="button">
       Cancelar
     </button>
     <button
-      class="btn-texfina btn-primary"
+      class="btn-save"
       (click)="onSave()"
       type="button"
       [disabled]="!recetaForm.valid"

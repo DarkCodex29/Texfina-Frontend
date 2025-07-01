@@ -189,22 +189,6 @@ export interface Ingreso {
   lote?: Lote;
 }
 
-export interface Consumo {
-  id_consumo?: number;
-  id_insumo?: number;
-  area?: string; // NVARCHAR(100)
-  fecha?: Date; // DATE
-  cantidad?: number; // FLOAT
-  id_lote?: number;
-  estado?: string; // NVARCHAR(50)
-  responsable?: string; // NVARCHAR(200)
-  observaciones?: string; // NVARCHAR(500)
-
-  // Relaciones
-  insumo?: Insumo;
-  lote?: Lote;
-}
-
 // ===== RECETAS =====
 export interface Receta {
   id_receta?: number;

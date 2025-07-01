@@ -23,7 +23,8 @@ import {
   delay,
 } from 'rxjs';
 
-import { Consumo, Insumo, Lote } from '../models/insumo.model';
+import { Consumo } from '../models/consumo.model';
+import { Insumo, Lote } from '../models/insumo.model';
 import { MaterialService } from '../services/material.service';
 import {
   ExportacionService,
@@ -36,6 +37,8 @@ import {
   MapeoColumna,
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import { DetalleConsumoDialogComponent } from './detalle-consumo-dialog/detalle-consumo-dialog.component';
+import { RegistroConsumoDialogComponent } from './registro-consumo-dialog/registro-consumo-dialog.component';
 
 @Component({
   selector: 'app-consumos',
@@ -356,22 +359,57 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
   // ============================================================================
   // MÉTODOS DE ACCIONES
   // ============================================================================
-  verDetalle(consumo: Consumo) {
-    console.log('👁️ Ver detalle de consumo:', consumo);
-    // TODO: Implementar modal de detalle
+  verDetalle(consumo: Consumo): void {
+    this.dialog.open(DetalleConsumoDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: {
+        consumo: consumo,
+        insumos: this.insumos,
+        lotes: this.lotes,
+      },
+    });
   }
 
-  editarConsumo(consumo: Consumo) {
-    console.log('✏️ Editar consumo:', consumo);
-    // TODO: Implementar modal de edición
+  editarConsumo(consumo: Consumo): void {
+    const dialogRef = this.dialog.open(RegistroConsumoDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        esEdicion: true,
+        consumo: consumo,
+        insumos: this.insumos,
+        lotes: this.lotes,
+        titulo: 'Editar Consumo',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        console.log('Consumo editado:', resultado);
+        this.cargarDatos();
+      }
+    });
   }
 
-  abrirRegistroConsumo() {
-    console.log('➕ Abrir registro de consumo');
-    // Modal de registro de consumo en desarrollo
-    alert(
-      `🚧 MODAL EN DESARROLLO 🚧\n\nEl modal de "Agregar Consumo" se implementará próximamente siguiendo el nuevo diseño Texfina.\n\n✅ Por ahora, los modales ya actualizados son:\n  • Ingresos: Completamente funcional\n  • Almacenes: Modal de detalle/edición\n  • Unidades: Modal de detalle\n  \n📋 Próximos modales a implementar:\n  • Consumos: Agregar/Editar\n  • Stock: Ajustar/Detalle\n  • Y más...`
-    );
+  abrirRegistroConsumo(): void {
+    const dialogRef = this.dialog.open(RegistroConsumoDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        esEdicion: false,
+        insumos: this.insumos,
+        lotes: this.lotes,
+        titulo: 'Agregar Consumo',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        console.log('Nuevo consumo registrado:', resultado);
+        this.cargarDatos();
+      }
+    });
   }
 
   agregar(): void {

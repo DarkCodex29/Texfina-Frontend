@@ -162,15 +162,11 @@
   </div>
 
   <div class="dialog-actions">
-    <button
-      class="btn-texfina btn-neutral"
-      (click)="cancelar()"
-      [disabled]="cargando"
-    >
+    <button class="btn-cancel" (click)="cancelar()" [disabled]="cargando">
       Cancelar
     </button>
     <button
-      class="btn-texfina btn-primary"
+      class="btn-save"
       (click)="guardar()"
       [disabled]="loteForm.invalid || cargando"
     >
