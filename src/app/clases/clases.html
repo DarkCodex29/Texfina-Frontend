@@ -52,10 +52,6 @@
 
     <!-- Filtro General -->
     <div class="filters-card">
-      <div class="filters-header">
-        <div class="filters-title">Búsqueda General</div>
-      </div>
-
       <div class="filters-content">
         <form [formGroup]="filtroGeneralForm" class="filters-form">
           <div class="filters-grid">
@@ -67,18 +63,15 @@
                   placeholder="Buscar en código, familia, subfamilia..."
                   type="text"
                 />
+                <button
+                  class="btn-limpiar"
+                  type="button"
+                  (click)="limpiarFiltroGeneral()"
+                  matTooltip="Limpiar búsqueda"
+                >
+                  Limpiar
+                </button>
               </div>
-            </div>
-
-            <div class="filter-actions">
-              <button
-                class="btn-clear-filters"
-                type="button"
-                (click)="limpiarFiltroGeneral()"
-                matTooltip="Limpiar búsqueda"
-              >
-                Limpiar
-              </button>
             </div>
           </div>
         </form>
