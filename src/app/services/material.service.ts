@@ -38,7 +38,7 @@ export class MaterialService {
   // ============================================================================
   // CONFIGURACIÓN
   // ============================================================================
-  private useApi = true; // Cambiar a false para usar datos mock
+  private useApi = false; // Cambiar a false para usar datos mock
 
   // ============================================================================
   // DATOS DE CONFIGURACIÓN INICIALES (FALLBACK PARA MODO MOCK)
@@ -1234,6 +1234,16 @@ export class MaterialService {
     return of(this.getIngresosMock());
   }
 
+  getConsumos(): Observable<Consumo[]> {
+    if (this.useApi) {
+      return this.apiService.getConsumos().pipe(
+        map((response: any) => response.data || response),
+        catchError(() => of(this.getConsumosMock()))
+      );
+    }
+    return of(this.getConsumosMock());
+  }
+
   private getIngresosMock(): Ingreso[] {
     return [
       {
@@ -1309,7 +1319,130 @@ export class MaterialService {
         precio_unitario_historico: 12.0,
         numero_remision: 'REM-2024-005',
         orden_compra: 'OC-2024-005',
+        estado: 'PENDIENTE',
+      },
+      {
+        id_ingreso: 6,
+        id_insumo: 1,
+        id_insumo_proveedor: 1,
+        fecha: new Date('2024-06-02'),
+        presentacion: 'Bidón de 50L',
+        id_unidad: 'LT',
+        cantidad: 50,
+        id_lote: 6,
+        precio_total_formula: 625.0,
+        precio_unitario_historico: 12.5,
+        numero_remision: 'REM-2024-006',
+        orden_compra: 'OC-2024-006',
+        estado: 'PENDIENTE',
+      },
+      {
+        id_ingreso: 7,
+        id_insumo: 3,
+        id_insumo_proveedor: 3,
+        fecha: new Date('2024-06-05'),
+        presentacion: 'Caja de 10L',
+        id_unidad: 'LT',
+        cantidad: 10,
+        id_lote: 7,
+        precio_total_formula: 210.0,
+        precio_unitario_historico: 21.0,
+        numero_remision: 'REM-2024-007',
+        orden_compra: 'OC-2024-007',
+        estado: 'PENDIENTE',
+      },
+    ];
+  }
+
+  private getConsumosMock(): Consumo[] {
+    return [
+      {
+        id_consumo: 1,
+        id_insumo: 1,
+        fecha: new Date('2024-05-16'),
+        cantidad: 15.5,
+        area: 'Producción A',
+        id_lote: 1,
+        estado: 'CONSUMIDO',
+        responsable: 'Juan Pérez',
+        observaciones: 'Consumo normal de producción',
+      },
+      {
+        id_consumo: 2,
+        id_insumo: 2,
+        fecha: new Date('2024-05-18'),
+        cantidad: 3.2,
+        area: 'Laboratorio',
+        id_lote: 2,
+        estado: 'CONSUMIDO',
+        responsable: 'María González',
+        observaciones: 'Análisis de calidad',
+      },
+      {
+        id_consumo: 3,
+        id_insumo: 3,
+        fecha: new Date('2024-05-22'),
+        cantidad: 8.0,
+        area: 'Producción B',
+        id_lote: 3,
+        estado: 'PENDIENTE',
+        responsable: 'Carlos Ruiz',
+        observaciones: 'Pendiente de confirmación',
+      },
+      {
+        id_consumo: 4,
+        id_insumo: 4,
+        fecha: new Date('2024-05-25'),
+        cantidad: 2.5,
+        area: 'Control de Calidad',
+        id_lote: 4,
+        estado: 'CONSUMIDO',
+        responsable: 'Ana Torres',
+        observaciones: 'Pruebas de resistencia',
+      },
+      {
+        id_consumo: 5,
+        id_insumo: 5,
+        fecha: new Date('2024-05-28'),
+        cantidad: 12.0,
+        area: 'Producción A',
+        id_lote: 5,
         estado: 'ANULADO',
+        responsable: 'Luis Mendoza',
+        observaciones: 'Consumo anulado por error de registro',
+      },
+      {
+        id_consumo: 6,
+        id_insumo: 1,
+        fecha: new Date('2024-06-03'),
+        cantidad: 25.0,
+        area: 'Producción C',
+        id_lote: 6,
+        estado: 'CONSUMIDO',
+        responsable: 'Patricia Silva',
+        observaciones: 'Lote especial para cliente premium',
+      },
+      {
+        id_consumo: 7,
+        id_insumo: 3,
+        fecha: new Date('2024-06-06'),
+        cantidad: 6.8,
+        area: 'Laboratorio',
+        id_lote: 7,
+        estado: 'PENDIENTE',
+        responsable: 'Roberto Vargas',
+        observaciones: 'Esperando autorización de gerencia',
+      },
+      {
+        id_consumo: 8,
+        id_insumo: 2,
+        fecha: new Date('2024-06-08'),
+        cantidad: 4.5,
+        area: 'Producción B',
+        id_lote: 2,
+        estado: 'CONSUMIDO',
+        responsable: 'Diana Castro',
+        observaciones: 'Producción urgente',
       },
     ];
   }

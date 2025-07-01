@@ -10,11 +10,9 @@
     </div>
     <div class="header-actions">
       <button class="btn-texfina btn-primary" (click)="ajustarStock()">
-        <mat-icon>tune</mat-icon>
         Ajustar Stock
       </button>
       <button class="btn-texfina btn-success" (click)="exportarReporte()">
-        <mat-icon>download</mat-icon>
         Exportar Reporte
       </button>
     </div>
@@ -73,9 +71,6 @@
           >expand_more</mat-icon
         >
       </div>
-      <span class="filter-subtitle" *ngIf="filtrosExpanded"
-        >Los resultados se actualizan automáticamente</span
-      >
     </div>
 
     <div class="filters-content" *ngIf="filtrosExpanded">
@@ -143,7 +138,7 @@
 
           <div class="filter-actions">
             <button
-              class="btn-clear-filters"
+              class="btn-limpiar"
               type="button"
               (click)="limpiarFiltros()"
               matTooltip="Limpiar todos los filtros"

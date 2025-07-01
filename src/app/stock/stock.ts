@@ -14,6 +14,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+} from '../services/exportacion.service';
 
 export interface Stock {
   id_insumo: number;
@@ -99,7 +104,12 @@ export class StockComponent implements OnInit, AfterViewInit, OnDestroy {
   itemsCriticos = 0;
   itemsBajos = 0;
 
-  constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
+  constructor(
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private exportacionService: ExportacionService
+  ) {
     this.filtrosForm = this.fb.group({
       codigo: [''],
       material: [''],
@@ -391,12 +401,71 @@ export class StockComponent implements OnInit, AfterViewInit, OnDestroy {
   // Acciones principales
   ajustarStock() {
     console.log('Abrir ajuste de stock general');
-    // Implementar navegación o modal de ajuste general
+    this.snackBar.open('Función de ajuste de stock en desarrollo', 'Cerrar', {
+      duration: 3000,
+    });
   }
 
   exportarReporte() {
-    console.log('Exportar reporte de stock');
-    // Implementar exportación de reportes
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.snackBar.open('Reporte de stock exportado exitosamente', 'Cerrar', {
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Error al exportar reporte:', error);
+      this.snackBar.open('Error al exportar reporte', 'Cerrar', {
+        duration: 3000,
+      });
+    }
+  }
+
+  private configurarExportacion(): ConfiguracionExportacion<Stock> {
+    return {
+      entidades: this.dataSource.filteredData,
+      nombreArchivo: 'reporte_stock',
+      nombreEntidad: 'Stock',
+      columnas: [
+        { campo: 'codigo_fox', titulo: 'Código', formato: 'texto' },
+        { campo: 'nombre', titulo: 'Material', formato: 'texto' },
+        { campo: 'almacen', titulo: 'Almacén', formato: 'texto' },
+        { campo: 'clase', titulo: 'Clase', formato: 'texto' },
+        { campo: 'stock_actual', titulo: 'Stock Actual', formato: 'numero' },
+        { campo: 'stock_minimo', titulo: 'Stock Mínimo', formato: 'numero' },
+        { campo: 'stock_maximo', titulo: 'Stock Máximo', formato: 'numero' },
+        {
+          campo: 'costo_unitario',
+          titulo: 'Costo Unitario',
+          formato: 'moneda',
+        },
+        { campo: 'valor_total', titulo: 'Valor Total', formato: 'moneda' },
+        { campo: 'estado_stock', titulo: 'Estado', formato: 'texto' },
+        {
+          campo: 'fecha_ultimo_movimiento',
+          titulo: 'Último Movimiento',
+          formato: 'fecha',
+        },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.stocks.length,
+        cantidadFiltrada: this.dataSource.filteredData.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private obtenerFiltrosActivos(): any {
+    const filtros: any = {};
+    const filtrosForm = this.filtrosForm.value;
+    Object.keys(filtrosForm).forEach((key) => {
+      if (filtrosForm[key]) {
+        filtros[key] = filtrosForm[key];
+      }
+    });
+    return filtros;
   }
 
   reintentarCarga() {

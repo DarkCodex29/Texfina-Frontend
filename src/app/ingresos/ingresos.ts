@@ -47,6 +47,8 @@ import {
 } from '../services/carga-masiva.service';
 import { Ingreso, Insumo, Unidad, Lote } from '../models/insumo.model';
 import { IngresoMaterialDialogComponent } from './ingreso-material-dialog/ingreso-material-dialog.component';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import { DetalleIngresoDialogComponent } from './detalle-ingreso-dialog/detalle-ingreso-dialog.component';
 
 @Component({
   selector: 'app-ingresos',
@@ -441,12 +443,31 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
 
   verDetalle(ingreso: Ingreso): void {
     console.log('Ver detalle de ingreso:', ingreso);
-    // TODO: Implementar modal de detalle
+    this.dialog.open(DetalleIngresoDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: { ingreso: ingreso },
+    });
   }
 
   editar(ingreso: Ingreso): void {
     console.log('Editar ingreso:', ingreso);
-    // TODO: Implementar modal de edición
+    const dialogRef = this.dialog.open(IngresoMaterialDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: {
+        esEdicion: true,
+        ingreso: ingreso,
+        titulo: 'Editar Ingreso',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.cargarDatos();
+        console.log('✅ Ingreso editado exitosamente:', result);
+      }
+    });
   }
 
   // ============================================================================
@@ -646,15 +667,33 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
   // ============================================================================
 
   cargaMasiva(): void {
-    // const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
-    //   width: '600px', disableClose: true,
-    //   data: {
-    //     configuracion: this.configurarCargaMasiva(),
-    //     onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
-    //     onProcesarArchivo: (archivo: File) => this.procesarArchivoCargaMasiva(archivo)
-    //   }
-    // });
-    console.log('Carga masiva - Funcionalidad en desarrollo');
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
+    });
+  }
+
+  private descargarPlantillaCargaMasiva(): void {
+    this.cargaMasivaService.generarPlantilla(this.configurarCargaMasiva());
+  }
+
+  private async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
+    try {
+      const resultado = await this.cargaMasivaService.procesarArchivo(
+        archivo,
+        this.configurarCargaMasiva()
+      );
+      console.log('Carga masiva completada:', resultado);
+      this.cargarDatos();
+    } catch (error) {
+      console.error('Error en carga masiva:', error);
+    }
   }
 
   // ============================================================================

@@ -71,6 +71,12 @@
   --spacing-xl: var(--texfina-spacing-xl);
   --border-radius-lg: var(--texfina-radius-lg);
   --shadow-sm: var(--texfina-shadow-sm);
+
+  // Colores con transparencia alfa
+  --texfina-primary-alpha: rgba(189, 33, 38, 0.1);
+  --texfina-secondary-alpha: rgba(18, 30, 102, 0.1);
+  --texfina-neutral-alpha: rgba(152, 149, 148, 0.1);
+  --texfina-success-alpha: rgba(22, 163, 74, 0.1);
 }
 
 $breakpoints: (

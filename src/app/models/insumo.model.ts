@@ -197,6 +197,8 @@ export interface Consumo {
   cantidad?: number; // FLOAT
   id_lote?: number;
   estado?: string; // NVARCHAR(50)
+  responsable?: string; // NVARCHAR(200)
+  observaciones?: string; // NVARCHAR(500)
 
   // Relaciones
   insumo?: Insumo;

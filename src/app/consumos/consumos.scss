@@ -162,12 +162,7 @@
   }
 
   .filters-content {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: var(--background-subtle);
-
-    @media (max-width: 768px) {
-      padding: var(--spacing-md) var(--spacing-lg);
-    }
+    padding: var(--spacing-md) var(--spacing-lg) !important;
   }
 
   .filters-form {
@@ -192,13 +187,13 @@
 
         .simple-input {
           width: 100%;
-          padding: var(--spacing-lg) var(--spacing-xl);
+          padding: var(--spacing-sm) var(--spacing-md) !important;
           border: 1px solid var(--border-color);
           border-radius: var(--border-radius-md);
           background: var(--surface-color);
           font-size: var(--font-size-base);
           color: var(--text-primary);
-          height: 48px;
+          height: 44px !important;
           line-height: 1.4;
 
           &::placeholder {
@@ -234,7 +229,7 @@
       font-weight: 500;
       cursor: pointer;
       white-space: nowrap;
-      height: 48px;
+      height: calc(100% - 8px) !important;
       min-width: 100px;
 
       &:focus {
@@ -242,6 +237,14 @@
         border-color: var(--primary-color);
         box-shadow: 0 0 0 3px var(--primary-color-alpha);
       }
+    }
+  }
+
+  .btn-limpiar {
+    height: calc(100% - 8px) !important;
+
+    @media (max-width: 768px) {
+      height: calc(100% - 6px) !important;
     }
   }
 }

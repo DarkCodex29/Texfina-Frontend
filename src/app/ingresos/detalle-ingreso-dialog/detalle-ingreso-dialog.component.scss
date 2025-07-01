@@ -1,5 +1,5 @@
 // ============================================================================
-// MODAL INGRESO MATERIAL - ESTILOS TEXFINA ESTÁNDAR
+// DETALLE INGRESO DIALOG STYLES - PATRÓN TEXFINA ESTÁNDAR
 // ============================================================================
 
 .dialog-container {
@@ -52,12 +52,6 @@
   }
 }
 
-.form-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
 .dialog-content {
   flex: 1;
   padding: var(--texfina-spacing-xl);
@@ -65,17 +59,21 @@
   max-height: calc(90vh - 160px);
 }
 
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--texfina-spacing-lg);
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--texfina-spacing-lg);
-  margin-bottom: var(--texfina-spacing-lg);
   align-items: start;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: var(--texfina-spacing-md);
-    margin-bottom: var(--texfina-spacing-md);
   }
 }
 
@@ -96,48 +94,21 @@
   margin-bottom: 0;
 }
 
-.form-input,
-.form-select {
+.form-input {
   width: 100%;
   padding: var(--texfina-spacing-md);
   border: 1px solid var(--texfina-border-light);
   border-radius: var(--texfina-radius-md);
   font-size: var(--texfina-font-size-sm);
-  transition: all 0.2s ease;
-  background: var(--texfina-bg-primary);
+  background: var(--texfina-neutral-bg);
   color: var(--texfina-text-primary);
+  cursor: default;
 
   &:focus {
     outline: none;
     border-color: var(--texfina-secondary);
     box-shadow: 0 0 0 2px var(--texfina-secondary-alpha);
   }
-
-  &::placeholder {
-    color: var(--texfina-text-muted);
-  }
-
-  &:disabled,
-  &[readonly] {
-    background: var(--texfina-neutral-bg);
-    color: var(--texfina-text-muted);
-    cursor: not-allowed;
-  }
-}
-
-.form-select {
-  cursor: pointer;
-
-  option {
-    padding: 8px;
-  }
-}
-
-.error-message {
-  font-size: 12px;
-  color: var(--texfina-primary);
-  margin-top: 4px;
-  min-height: 16px;
 }
 
 .dialog-actions {
@@ -145,47 +116,14 @@
   border-top: 1px solid var(--texfina-border-light);
   background: var(--texfina-secondary-bg);
   display: flex;
-  gap: var(--texfina-spacing-md);
-  justify-content: flex-end;
-  margin-top: auto;
+  justify-content: center;
 
   @media (max-width: 768px) {
-    flex-direction: column-reverse;
-    gap: var(--texfina-spacing-sm);
-
-    .btn-cancel,
-    .btn-save {
-      width: 100%;
-      justify-content: center;
-    }
+    padding: var(--texfina-spacing-md) var(--texfina-spacing-lg);
   }
 }
 
-.btn-cancel {
-  padding: var(--texfina-spacing-md) var(--texfina-spacing-xl);
-  border: 1px solid var(--texfina-neutral);
-  background: var(--texfina-bg-primary);
-  color: var(--texfina-neutral);
-  border-radius: var(--texfina-radius-md);
-  font-size: var(--texfina-font-size-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-
-  &:hover {
-    background: var(--texfina-neutral-bg);
-    border-color: var(--texfina-neutral);
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--texfina-neutral-alpha);
-  }
-}
-
-.btn-save {
+.btn-primary {
   padding: var(--texfina-spacing-md) var(--texfina-spacing-xl);
   border: 1px solid var(--texfina-secondary);
   background: var(--texfina-secondary);
@@ -197,6 +135,8 @@
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  min-width: 120px;
+  justify-content: center;
 
   &:hover {
     background: var(--texfina-secondary-dark);
@@ -206,13 +146,6 @@
   &:focus {
     outline: none;
     box-shadow: 0 0 0 2px var(--texfina-secondary-alpha);
-  }
-
-  &:disabled {
-    background: var(--texfina-neutral-bg);
-    border-color: var(--texfina-border-light);
-    color: var(--texfina-text-muted);
-    cursor: not-allowed;
   }
 }
 

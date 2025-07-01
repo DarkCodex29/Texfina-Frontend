@@ -12,26 +12,36 @@
         </p>
       </div>
       <div class="header-actions">
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
+          Carga Masiva
+        </button>
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
+          >
+            Exportar
+          </button>
+          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+            <button class="dropdown-item" (click)="exportarExcel()">
+              Exportar a Excel
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              Exportar a PDF
+            </button>
+          </div>
+        </div>
         <button
           class="btn-texfina btn-primary"
           (click)="abrirRegistroConsumo()"
         >
-          <mat-icon>add_circle_outline</mat-icon>
           Agregar Consumo
-        </button>
-        <button class="btn-texfina btn-success" (click)="abrirConsumoMasivo()">
-          <mat-icon>upload_file</mat-icon>
-          Consumo Masivo
         </button>
       </div>
     </div>
 
     <!-- Filtro General -->
     <div class="filters-card">
-      <div class="filters-header">
-        <div class="filters-title">Búsqueda General</div>
-      </div>
-
       <div class="filters-content">
         <form [formGroup]="filtroGeneralForm" class="filters-form">
           <div class="filters-grid">
@@ -43,18 +53,15 @@
                   placeholder="Buscar en fecha, insumo, área, cantidad, lote, estado..."
                   type="text"
                 />
+                <button
+                  class="btn-limpiar"
+                  type="button"
+                  (click)="limpiarFiltroGeneral()"
+                  matTooltip="Limpiar búsqueda"
+                >
+                  Limpiar
+                </button>
               </div>
-            </div>
-
-            <div class="filter-actions">
-              <button
-                class="btn-clear-filters"
-                type="button"
-                (click)="limpiarFiltroGeneral()"
-                matTooltip="Limpiar búsqueda"
-              >
-                Limpiar
-              </button>
             </div>
           </div>
         </form>

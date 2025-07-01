@@ -12,6 +12,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import {
   Subject,
   of,
@@ -24,6 +25,17 @@ import {
 
 import { Consumo, Insumo, Lote } from '../models/insumo.model';
 import { MaterialService } from '../services/material.service';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+  ColumnaExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+  MapeoColumna,
+} from '../services/carga-masiva.service';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 
 @Component({
   selector: 'app-consumos',
@@ -54,6 +66,7 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
   filtrosExpanded = true;
   filtrosColumnaHabilitados = false;
   filtrosColumnaActivos = false;
+  dropdownExportAbierto = false;
   private destroy$ = new Subject<void>();
 
   // ============================================================================
@@ -90,7 +103,10 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private materialService: MaterialService
+    private materialService: MaterialService,
+    private dialog: MatDialog,
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
   ) {
     this.filtroGeneralForm = this.fb.group({
       busquedaGeneral: [''],
@@ -148,7 +164,7 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('🔄 Iniciando carga de consumos - isLoading:', this.isLoading);
 
     Promise.all([
-      of([]).toPromise(), // TODO: Implementar getConsumos() en MaterialService
+      this.materialService.getConsumos().toPromise(),
       this.materialService.getMateriales().toPromise(),
       this.materialService.getLotes().toPromise(),
     ])
@@ -202,8 +218,12 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const consumosFiltrados = this.consumos.filter((consumo) => {
       const fecha = this.formatearFecha(consumo.fecha).toLowerCase();
-      const insumoNombre = this.getInsumoNombre(consumo.id_insumo).toLowerCase();
-      const insumoCodigoFox = this.getInsumoCodigoFox(consumo.id_insumo).toLowerCase();
+      const insumoNombre = this.getInsumoNombre(
+        consumo.id_insumo
+      ).toLowerCase();
+      const insumoCodigoFox = this.getInsumoCodigoFox(
+        consumo.id_insumo
+      ).toLowerCase();
       const area = (consumo.area || '').toLowerCase();
       const cantidad = this.formatearCantidad(consumo.cantidad);
       const loteNombre = this.getLoteNombre(consumo.id_lote).toLowerCase();
@@ -239,8 +259,12 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
     // Filtro por Insumo
     if (filtros.insumo && filtros.insumo.trim()) {
       consumosFiltrados = consumosFiltrados.filter((consumo) => {
-        const insumoNombre = this.getInsumoNombre(consumo.id_insumo).toLowerCase();
-        const insumoCodigoFox = this.getInsumoCodigoFox(consumo.id_insumo).toLowerCase();
+        const insumoNombre = this.getInsumoNombre(
+          consumo.id_insumo
+        ).toLowerCase();
+        const insumoCodigoFox = this.getInsumoCodigoFox(
+          consumo.id_insumo
+        ).toLowerCase();
         return (
           insumoNombre.includes(filtros.insumo.toLowerCase()) ||
           insumoCodigoFox.includes(filtros.insumo.toLowerCase())
@@ -344,7 +368,14 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
 
   abrirRegistroConsumo() {
     console.log('➕ Abrir registro de consumo');
-    // TODO: Implementar modal de registro
+    // Modal de registro de consumo en desarrollo
+    alert(
+      `🚧 MODAL EN DESARROLLO 🚧\n\nEl modal de "Agregar Consumo" se implementará próximamente siguiendo el nuevo diseño Texfina.\n\n✅ Por ahora, los modales ya actualizados son:\n  • Ingresos: Completamente funcional\n  • Almacenes: Modal de detalle/edición\n  • Unidades: Modal de detalle\n  \n📋 Próximos modales a implementar:\n  • Consumos: Agregar/Editar\n  • Stock: Ajustar/Detalle\n  • Y más...`
+    );
+  }
+
+  agregar(): void {
+    this.abrirRegistroConsumo();
   }
 
   abrirConsumoMasivo() {
@@ -394,10 +425,164 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   formatearCantidad(cantidad?: number): string {
-    if (cantidad === null || cantidad === undefined) return '0';
-    return cantidad.toLocaleString('es-ES', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+    if (!cantidad) return '-';
+    return `${cantidad.toFixed(2)}`;
+  }
+
+  cargaMasiva(): void {
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
     });
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
+    }
+  }
+
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
+
+  private configurarExportacion(): ConfiguracionExportacion<Consumo> {
+    return {
+      entidades: this.dataSource.data,
+      nombreArchivo: 'consumos',
+      nombreEntidad: 'Consumos',
+      columnas: [
+        { campo: 'id_consumo', titulo: 'ID', formato: 'numero' },
+        { campo: 'fecha', titulo: 'Fecha', formato: 'fecha' },
+        { campo: 'id_insumo', titulo: 'Insumo', formato: 'texto' },
+        { campo: 'area', titulo: 'Área', formato: 'texto' },
+        { campo: 'cantidad', titulo: 'Cantidad', formato: 'numero' },
+        { campo: 'id_lote', titulo: 'Lote', formato: 'texto' },
+        { campo: 'estado', titulo: 'Estado', formato: 'texto' },
+        { campo: 'created_at', titulo: 'Fecha Creación', formato: 'fecha' },
+        {
+          campo: 'updated_at',
+          titulo: 'Última Actualización',
+          formato: 'fecha',
+        },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.consumos.length,
+        cantidadFiltrada: this.dataSource.data.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Consumo> {
+    return {
+      tipoEntidad: 'consumos',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Fecha',
+          campoEntidad: 'fecha',
+          obligatorio: true,
+          tipoEsperado: 'fecha',
+        },
+        {
+          columnaArchivo: 'Insumo',
+          campoEntidad: 'id_insumo',
+          obligatorio: true,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Área',
+          campoEntidad: 'area',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Cantidad',
+          campoEntidad: 'cantidad',
+          obligatorio: true,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Lote',
+          campoEntidad: 'id_lote',
+          obligatorio: false,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Estado',
+          campoEntidad: 'estado',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'area',
+          validador: (valor) => valor && valor.length <= 100,
+          mensajeError: 'El área debe tener máximo 100 caracteres',
+        },
+        {
+          campo: 'cantidad',
+          validador: (valor) => valor && valor > 0,
+          mensajeError: 'La cantidad debe ser mayor a 0',
+        },
+      ],
+    };
+  }
+
+  private obtenerFiltrosActivos(): any {
+    const filtros: any = {};
+    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
+    if (filtroGeneral) {
+      filtros.busquedaGeneral = filtroGeneral;
+    }
+
+    const filtrosColumna = this.filtrosColumnaForm.value;
+    Object.keys(filtrosColumna).forEach((key) => {
+      if (filtrosColumna[key]) {
+        filtros[key] = filtrosColumna[key];
+      }
+    });
+
+    return filtros;
+  }
+
+  private descargarPlantillaCargaMasiva(): void {
+    this.cargaMasivaService.generarPlantilla(this.configurarCargaMasiva());
+  }
+
+  private async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
+    try {
+      const resultado = await this.cargaMasivaService.procesarArchivo(
+        archivo,
+        this.configurarCargaMasiva()
+      );
+      console.log('Carga masiva completada:', resultado);
+      this.cargarDatos();
+    } catch (error) {
+      console.error('Error en carga masiva:', error);
+    }
   }
 }

@@ -1,9 +1,13 @@
 <div class="dialog-container">
   <div class="dialog-header">
     <div class="header-content">
-      <h2 class="dialog-title">Registrar Ingreso</h2>
+      <h2 class="dialog-title">{{ titulo }}</h2>
       <p class="dialog-subtitle">
-        Complete los datos del ingreso de material al inventario
+        {{
+          esEdicion
+            ? "Modifique los datos del ingreso de material"
+            : "Complete los datos del ingreso de material al inventario"
+        }}
       </p>
     </div>
     <button mat-icon-button mat-dialog-close class="close-button">
@@ -207,7 +211,7 @@
         Cancelar
       </button>
       <button type="submit" class="btn-save" [disabled]="!ingresoForm.valid">
-        Registrar Ingreso
+        {{ esEdicion ? "Actualizar Ingreso" : "Registrar Ingreso" }}
       </button>
     </div>
   </form>

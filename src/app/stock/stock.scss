@@ -98,3 +98,30 @@
     cursor: not-allowed;
   }
 }
+
+// ============================================================================
+// ALTURA NORMALIZADA PARA FILTROS DE STOCK
+// ============================================================================
+
+.filters-card {
+  .filters-content {
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+  }
+
+  .simple-input {
+    height: 44px !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+
+    @media (max-width: 768px) {
+      height: 40px !important;
+    }
+  }
+
+  .btn-limpiar {
+    height: calc(100% - 8px) !important;
+
+    @media (max-width: 768px) {
+      height: calc(100% - 6px) !important;
+    }
+  }
+}
