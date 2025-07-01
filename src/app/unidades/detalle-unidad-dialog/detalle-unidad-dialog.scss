@@ -1,31 +1,5 @@
 // ============================================================================
-// MODAL DETALLE UNIDAD - REGLA DE ORO TEXFINA
-// ============================================================================
-
-:host {
-  --texfina-primary: #bd2126;
-  --texfina-secondary: #121e66;
-  --texfina-secondary-dark: #0f1b5c;
-  --texfina-neutral: #989594;
-  --texfina-success: #16a34a;
-  --texfina-border-light: #e5e7eb;
-  --texfina-border-medium: #d1d5db;
-  --texfina-text-primary: #111827;
-  --texfina-text-muted: #6b7280;
-  --texfina-bg-primary: #ffffff;
-  --texfina-bg-secondary: #f9fafb;
-  --texfina-bg-tertiary: #f3f4f6;
-  --texfina-radius-md: 8px;
-  --texfina-spacing-xs: 4px;
-  --texfina-spacing-sm: 8px;
-  --texfina-spacing-md: 16px;
-  --texfina-spacing-lg: 24px;
-  --texfina-spacing-xl: 32px;
-  --texfina-font-size-sm: 14px;
-}
-
-// ============================================================================
-// ESTRUCTURA OBLIGATORIA DEL MODAL
+// DETALLE UNIDAD DIALOG STYLES
 // ============================================================================
 
 .dialog-container {
@@ -33,20 +7,17 @@
   flex-direction: column;
   max-height: 90vh;
   width: 100%;
-  background: white;
-  border-radius: var(--texfina-radius-md);
+  max-width: 800px;
+  background: var(--texfina-bg-primary);
+  border-radius: var(--texfina-radius-lg);
   overflow: hidden;
 }
-
-// ============================================================================
-// HEADER AZUL MARINO OBLIGATORIO (SIN CLASES DE COLOR)
-// ============================================================================
 
 .dialog-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: var(--texfina-spacing-lg);
+  padding: var(--texfina-spacing-xl);
   background: linear-gradient(
     135deg,
     var(--texfina-secondary),
@@ -60,8 +31,8 @@
   }
 
   .dialog-title {
-    margin: 0 0 var(--texfina-spacing-xs) 0;
-    font-size: 20px;
+    margin: 0 0 8px 0;
+    font-size: var(--texfina-font-size-xl);
     font-weight: 600;
     color: white !important;
   }
@@ -77,25 +48,19 @@
     color: white;
     width: 40px;
     height: 40px;
-    margin-left: var(--texfina-spacing-md);
+    margin-left: 16px;
+    border-radius: var(--texfina-radius-sm);
+    transition: background-color 0.2s ease;
 
     &:hover {
       background: rgba(255, 255, 255, 0.1);
     }
-
-    mat-icon {
-      font-size: 20px;
-    }
   }
 }
 
-// ============================================================================
-// CONTENIDO CON ESTRUCTURA OBLIGATORIA
-// ============================================================================
-
 .dialog-content {
   flex: 1;
-  padding: var(--texfina-spacing-lg);
+  padding: var(--texfina-spacing-xl);
   overflow-y: auto;
   max-height: calc(90vh - 160px);
   background: var(--texfina-bg-primary);
@@ -112,11 +77,6 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--texfina-spacing-lg);
   align-items: start;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: var(--texfina-spacing-md);
-  }
 }
 
 .form-group {
@@ -162,55 +122,49 @@
 }
 
 // ============================================================================
-// RESPONSIVE OBLIGATORIO
+// RESPONSIVE DESIGN
 // ============================================================================
 
+// ===== TABLET Y MÓVIL =====
 @media (max-width: 768px) {
+  .dialog-container {
+    max-width: 95vw;
+  }
+
   .dialog-header {
-    padding: var(--texfina-spacing-md);
-    flex-direction: column;
-    gap: var(--texfina-spacing-sm);
-    align-items: stretch;
+    padding: var(--texfina-spacing-lg);
 
-    .header-content {
-      text-align: center;
-    }
-
-    .close-button {
-      align-self: flex-end;
-      margin-left: 0;
-      margin-top: calc(-1 * var(--texfina-spacing-lg));
+    .dialog-title {
+      font-size: var(--texfina-font-size-lg);
     }
   }
 
   .dialog-content {
-    padding: var(--texfina-spacing-md);
+    padding: var(--texfina-spacing-lg);
   }
 
-  .form-container {
+  .form-row {
+    grid-template-columns: 1fr;
     gap: var(--texfina-spacing-md);
   }
 }
 
+// ===== MÓVIL PEQUEÑO =====
 @media (max-width: 480px) {
+  .dialog-container {
+    max-width: 100vw;
+    margin: 0;
+    border-radius: 0;
+    height: 100vh;
+    max-height: none;
+  }
+
   .dialog-header {
-    padding: var(--texfina-spacing-sm);
-
-    .dialog-title {
-      font-size: 18px;
-    }
-
-    .dialog-subtitle {
-      font-size: 12px;
-    }
+    padding: var(--texfina-spacing-md);
   }
 
   .dialog-content {
-    padding: var(--texfina-spacing-sm);
-  }
-
-  .form-input {
-    padding: 10px 12px;
-    font-size: 13px;
+    padding: var(--texfina-spacing-md);
+    max-height: none;
   }
 }
