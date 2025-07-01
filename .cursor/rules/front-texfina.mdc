@@ -1,0 +1,720 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+// ============================================================================
+// @FRONT-TEXFINA.MDC - REGLA DE ORO CURSOR COMPLETA UI/UX
+// ============================================================================
+// 📋 Análisis basado en TODAS las screens maestros de Texfina
+// 🎯 Objetivo: Unificar estilos, eliminar DRY, aplicar SOLID, funcionalidad completa
+// 🔧 Solución: Regla única para todo el front-end de Texfina
+// ============================================================================
+
+// ============================================================================
+// PASO 0: REVISAR SCRIPT DE BASE DE DATOS OBLIGATORIO
+// ============================================================================
+/*
+ANTES DE IMPLEMENTAR CUALQUIER PANTALLA:
+1. ABRIR crear_bd_texfina.sql
+2. IDENTIFICAR estructura exacta de la tabla
+3. USAR SOLO campos que existen realmente
+4. VERIFICAR restricciones (NVARCHAR longitudes, NOT NULL, etc.)
+5. CONFIGURAR validaciones según restricciones de BD
+*/
+
+// ============================================================================
+// PASO 0.5: CONSISTENCIA DE VARIABLES CSS OBLIGATORIO
+// ============================================================================
+/*
+ANTES DE IMPLEMENTAR FILTROS DE BÚSQUEDA:
+1. USAR EXCLUSIVAMENTE variables SIN prefijo texfina en filtros
+2. VERIFICAR que filters-card use: var(--surface-color), var(--border-radius-lg), var(--shadow-sm)
+3. VERIFICAR que filters-title use: var(--spacing-sm), var(--text-primary), var(--font-size-lg)
+4. VERIFICAR que simple-input focus use: var(--primary-color), var(--primary-color-alpha)
+5. COMPARAR siempre con almacenes.scss como referencia estándar
+*/
+
+// ============================================================================
+// 1. SISTEMA DE COLORES OBLIGATORIO
+// ============================================================================
+/*
+--texfina-primary: #bd2126;     // Rojo carmesí (CTAs principales)
+--texfina-secondary: #121e66;   // Azul marino (acciones secundarias) 
+--texfina-neutral: #989594;     // Gris cemento (elementos neutros)
+--texfina-success: #16a34a;     // Verde éxito (editar)
+--texfina-border-light: #e5e7eb;
+--texfina-text-primary: #111827;
+--texfina-text-muted: #6b7280;
+--texfina-primary-bg: #fef2f2;
+--texfina-secondary-bg: #f1f5f9;
+--texfina-neutral-bg: #f8fafc;
+*/
+
+// ============================================================================
+// 2. SISTEMA DE ESPACIADO AUTOAJUSTABLE (NUEVO)
+// ============================================================================
+/*
+// ESPACIADO ADAPTATIVO - SE AJUSTA AUTOMÁTICAMENTE AL TAMAÑO DE PANTALLA
+--texfina-spacing-xs: clamp(0.125rem, 0.5vw, 0.25rem); // 2-4px
+--texfina-spacing-sm: clamp(0.25rem, 1vw, 0.5rem);     // 4-8px
+--texfina-spacing-md: clamp(0.5rem, 1.5vw, 0.75rem);   // 8-12px
+--texfina-spacing-lg: clamp(0.75rem, 2vw, 1rem);       // 12-16px
+--texfina-spacing-xl: clamp(1rem, 2.5vw, 1.25rem);     // 16-20px
+--texfina-spacing-2xl: clamp(1.25rem, 3vw, 1.5rem);    // 20-24px
+
+// Variables sin prefijo para filtros (también autoajustables)
+--spacing-xs: clamp(0.125rem, 0.5vw, 0.25rem);
+--spacing-sm: clamp(0.25rem, 1vw, 0.5rem);
+--spacing-md: clamp(0.5rem, 1.5vw, 0.75rem);
+--spacing-lg: clamp(0.75rem, 2vw, 1rem);
+--spacing-xl: clamp(1rem, 2.5vw, 1.25rem);
+*/
+
+// ============================================================================
+// 3. ESTRUCTURA HTML OBLIGATORIA (AUTOAJUSTABLE)
+// ============================================================================
+/*
+<div class="page-container">
+  <div class="page-content">
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title text-texfina text-primary">Título</h1>
+        <p class="page-subtitle text-texfina text-muted">Descripción</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">Carga Masiva</button>
+        <div class="dropdown-export">
+          <button class="btn-texfina btn-neutral dropdown-trigger" (click)="toggleDropdownExport()">Exportar</button>
+          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+            <button class="dropdown-item" (click)="exportarExcel()">Exportar a Excel</button>
+            <button class="dropdown-item" (click)="exportarPDF()">Exportar a PDF</button>
+          </div>
+        </div>
+        <button class="btn-texfina btn-primary" (click)="agregar()">Agregar [Entidad]</button>
+      </div>
+    </div>
+    <div class="filters-card"><!-- Filtros --></div>
+    <div class="table-card table-with-headers"><!-- Tabla --></div>
+  </div>
+</div>
+*/
+
+// ============================================================================
+// 4. CONTENEDORES AUTOAJUSTABLES (NUEVO)
+// ============================================================================
+/*
+.page-container {
+  padding: var(--texfina-spacing-md); // Se autoajusta 8-12px
+  gap: var(--texfina-spacing-sm);     // Espacio automático entre elementos
+  
+  @media (max-width: 768px) {
+    padding: var(--texfina-spacing-sm);
+    gap: var(--texfina-spacing-xs);
+  }
+  
+  @media (max-width: 480px) {
+    padding: var(--texfina-spacing-xs);
+  }
+}
+
+.page-header {
+  padding: var(--texfina-spacing-md); // Se autoajusta 8-12px
+  
+  .page-title {
+    font-size: var(--texfina-font-size-2xl); // Reducido para menos espacio
+  }
+  
+  @media (max-width: 768px) {
+    padding: var(--texfina-spacing-sm);
+    
+    .page-title {
+      font-size: var(--texfina-font-size-xl);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    padding: var(--texfina-spacing-xs);
+    
+    .page-title {
+      font-size: var(--texfina-font-size-lg);
+    }
+  }
+}
+
+.page-content {
+  gap: var(--texfina-spacing-sm); // Espacio automático entre filtros y tabla
+  
+  @media (max-width: 480px) {
+    gap: var(--texfina-spacing-xs);
+  }
+}
+*/
+
+// ============================================================================
+// 5. FILTROS DE BÚSQUEDA GENERAL - ESTRUCTURA EXACTA OBLIGATORIA
+// ============================================================================
+/*
+.filters-card {
+  background: var(--surface-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+
+  .filters-header {
+    padding: var(--spacing-lg) var(--spacing-xl);  // Autoajustable
+    user-select: none;
+    border-bottom: 1px solid var(--border-color);
+
+    .filters-title {
+      gap: var(--spacing-sm);
+      color: var(--text-primary);
+      font-size: var(--font-size-lg);
+    }
+  }
+
+  .filters-content {
+    padding: var(--spacing-lg) var(--spacing-xl);  // Autoajustable
+    background: var(--background-subtle);
+  }
+
+  .simple-input {
+    padding: var(--spacing-lg) var(--spacing-xl);  // Autoajustable
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    color: var(--text-primary);
+
+    &:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-color-alpha);
+    }
+  }
+}
+*/
+
+// ============================================================================
+// 6. ESTILOS OBLIGATORIOS PARA MODALES (HEADER AZUL MARINO - SIN CLASES DE COLOR)
+// ============================================================================
+/*
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--texfina-spacing-lg); // Autoajustable
+  background: linear-gradient(135deg, var(--texfina-secondary), var(--texfina-secondary-dark));
+  color: white;
+  border-bottom: 1px solid var(--texfina-border-light);
+
+  .header-content { flex: 1; }
+  .dialog-title { margin: 0 0 8px 0; font-size: 20px; font-weight: 600; color: white !important; }
+  .dialog-subtitle { margin: 0; font-size: 14px; opacity: 0.9; color: white !important; }
+  .close-button { color: white; width: 40px; height: 40px; margin-left: 16px; }
+}
+
+// HTML OBLIGATORIO SIN CLASES DE COLOR:
+<h2 class="dialog-title">Título</h2>
+<p class="dialog-subtitle">Descripción</p>
+*/
+
+// ============================================================================
+// 7. DROPDOWN EXPORTAR OBLIGATORIO CON RESPONSIVE
+// ============================================================================
+/*
+.dropdown-export {
+  position: relative;
+  display: inline-block;
+
+  .dropdown-trigger {
+    cursor: pointer;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid var(--texfina-border-light);
+    border-radius: var(--texfina-radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    min-width: 160px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+
+    &.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--texfina-text-primary);
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: var(--texfina-secondary-bg);
+        color: var(--texfina-secondary);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .dropdown-menu {
+      left: 0;
+      right: 0;
+      min-width: 100%;
+      width: 100%;
+    }
+  }
+}
+*/
+
+// ============================================================================
+// 8. HEADER ACTIONS RESPONSIVE OBLIGATORIO
+// ============================================================================
+/*
+.header-actions {
+  display: flex;
+  gap: var(--texfina-spacing-md); // Autoajustable
+  align-items: center;
+  flex-wrap: nowrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-sm);
+    width: 100%;
+
+    .btn-texfina {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .dropdown-export {
+      width: 100%;
+      
+      .dropdown-trigger {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    gap: var(--texfina-spacing-xs);
+
+    .btn-texfina {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+}
+
+.page-header {
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-lg); // Autoajustable
+    align-items: stretch;
+
+    .header-content {
+      text-align: center;
+    }
+  }
+}
+*/
+
+// ============================================================================
+// 9. IMPORTS OBLIGATORIOS TYPESCRIPT
+// ============================================================================
+/*
+import { ExportacionService, ConfiguracionExportacion, ColumnaExportacion } from '../services/exportacion.service';
+import { CargaMasivaService, ConfiguracionCargaMasiva, MapeoColumna } from '../services/carga-masiva.service';
+*/
+
+// ============================================================================
+// 10. CONSTRUCTOR OBLIGATORIO
+// ============================================================================
+/*
+constructor(
+  private fb: FormBuilder,
+  private service: EntidadService,
+  private dialog: MatDialog,
+  private exportacionService: ExportacionService,
+  private cargaMasivaService: CargaMasivaService
+) {
+  this.filtroGeneralForm = this.fb.group({ busquedaGeneral: [''] });
+  this.filtrosColumnaForm = this.fb.group({ campo1: [''], campo2: [''] });
+}
+*/
+
+// ============================================================================
+// 11. CONFIGURACIONES ESPECÍFICAS POR ENTIDAD (REVISAR crear_bd_texfina.sql PRIMERO)
+// ============================================================================
+/*
+private configurarExportacion(): ConfiguracionExportacion<Entidad> {
+  return {
+    entidades: this.dataSource.data,
+    nombreArchivo: '[entidades]',
+    nombreEntidad: '[Entidades]',
+    columnas: [
+      { campo: 'id_entidad', titulo: 'ID', formato: 'numero' },
+      { campo: 'campo_real_1', titulo: 'Campo 1', formato: 'texto' },
+      { campo: 'campo_real_2', titulo: 'Campo 2', formato: 'numero' },
+      { campo: 'created_at', titulo: 'Fecha Creación', formato: 'fecha' },
+      { campo: 'updated_at', titulo: 'Última Actualización', formato: 'fecha' }
+    ],
+    filtrosActivos: this.obtenerFiltrosActivos(),
+    metadatos: {
+      cantidadTotal: this.entidades.length,
+      cantidadFiltrada: this.dataSource.data.length,
+      fechaExportacion: new Date(),
+      usuario: 'Usuario Actual'
+    }
+  };
+}
+
+private configurarCargaMasiva(): ConfiguracionCargaMasiva<Entidad> {
+  return {
+    tipoEntidad: '[entidades]',
+    mapeoColumnas: [
+      { columnaArchivo: 'Campo 1', campoEntidad: 'campo_real_1', obligatorio: true, tipoEsperado: 'texto' },
+      { columnaArchivo: 'Campo 2', campoEntidad: 'campo_real_2', obligatorio: false, tipoEsperado: 'numero' }
+    ],
+    validaciones: [
+      {
+        campo: 'campo_real_1',
+        validador: (valor) => valor && valor.length <= 200,
+        mensajeError: 'El campo debe tener máximo 200 caracteres'
+      }
+    ]
+  };
+}
+*/
+
+// ============================================================================
+// 12. FUNCIONALIDAD COMPLETA DE TODOS LOS BOTONES
+// ============================================================================
+/*
+exportarExcel(): void {
+  try {
+    const config = this.configurarExportacion();
+    this.exportacionService.exportarExcel(config);
+    this.dropdownExportAbierto = false;
+  } catch (error) {
+    console.error('Error al exportar Excel:', error);
+  }
+}
+
+exportarPDF(): void {
+  try {
+    const config = this.configurarExportacion();
+    this.exportacionService.exportarPDF(config);
+    this.dropdownExportAbierto = false;
+  } catch (error) {
+    console.error('Error al exportar PDF:', error);
+  }
+}
+
+cargaMasiva(): void {
+  const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+    width: '600px', disableClose: true,
+    data: {
+      configuracion: this.configurarCargaMasiva(),
+      onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+      onProcesarArchivo: (archivo: File) => this.procesarArchivoCargaMasiva(archivo)
+    }
+  });
+}
+
+agregar(): void {
+  const dialogRef = this.dialog.open(RegistroEntidadDialogComponent, {
+    width: '600px', disableClose: true,
+    data: { esEdicion: false, titulo: 'Agregar [Entidad]' }
+  });
+  dialogRef.afterClosed().subscribe(resultado => {
+    if (resultado) { this.cargarDatos(); }
+  });
+}
+
+editar(entidad: Entidad): void {
+  const dialogRef = this.dialog.open(RegistroEntidadDialogComponent, {
+    width: '600px', disableClose: true,
+    data: { esEdicion: true, entidad: entidad, titulo: 'Editar [Entidad]' }
+  });
+  dialogRef.afterClosed().subscribe(resultado => {
+    if (resultado) { this.cargarDatos(); }
+  });
+}
+
+verDetalle(entidad: Entidad): void {
+  this.dialog.open(DetalleEntidadDialogComponent, {
+    width: '800px', disableClose: true,
+    data: { entidad: entidad }
+  });
+}
+
+eliminar(entidad: Entidad): void {
+  const confirmacion = confirm(`¿Está seguro que desea eliminar ${entidad.nombre}?`);
+  if (confirmacion && entidad.id) {
+    this.service.eliminar(entidad.id).subscribe(() => {
+      this.cargarDatos();
+    });
+  }
+}
+
+toggleDropdownExport(): void {
+  this.dropdownExportAbierto = !this.dropdownExportAbierto;
+}
+*/
+
+// ============================================================================
+// 13. MODAL DETALLE ESTRUCTURA OBLIGATORIA
+// ============================================================================
+/*
+HTML:
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="header-content">
+      <h2 class="dialog-title">Detalle de [Entidad]</h2>
+      <p class="dialog-subtitle">Información completa de la [entidad] seleccionada</p>
+    </div>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="dialog-content">
+    <div class="form-container">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Campo</label>
+          <input class="form-input" [value]="formatearTexto(entidad.campo)" readonly />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+TYPESCRIPT:
+export class DetalleEntidadDialogComponent {
+  entidad: Entidad;
+
+  constructor(
+    private dialogRef: MatDialogRef<DetalleEntidadDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { entidad: Entidad }
+  ) {
+    this.entidad = data.entidad;
+    console.log('Data recibida en modal:', this.entidad);
+  }
+
+  formatearCodigo(id?: number): string {
+    if (!id) return '00001';
+    return id.toString().padStart(5, '0');
+  }
+
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
+  }
+
+  onClose(): void {
+    this.dialogRef.close();
+  }
+}
+*/
+
+// ============================================================================
+// 14. MENÚ HAMBURGUESA OBLIGATORIO (TOOLBAR)
+// ============================================================================
+/*
+HTML:
+<button
+  mat-icon-button
+  class="menu-toggle"
+  (click)="toggleSidenav()"
+>
+  <mat-icon>menu</mat-icon>
+</button>
+
+SCSS:
+.menu-toggle {
+  display: none !important;
+  color: var(--texfina-text-primary) !important;
+  
+  @media (max-width: 800px) {
+    display: flex !important;
+  }
+}
+
+TYPESCRIPT:
+@Output() menuToggle = new EventEmitter<void>();
+
+toggleSidenav(): void {
+  this.menuToggle.emit();
+}
+
+// En main-layout.html
+<app-toolbar (menuToggle)="sidenav.toggle()"></app-toolbar>
+*/
+
+// ============================================================================
+// 15. MIGRACIÓN DE PANTALLAS EXISTENTES - PROCESO DE ALINEACIÓN
+// ============================================================================
+/*
+CUANDO SE SOLICITE ALINEAR UNA PANTALLA EXISTENTE:
+
+PASO 1: ANÁLISIS ACTUAL
+1. Leer HTML, SCSS y TypeScript actuales
+2. Identificar qué elementos NO siguen los patrones
+3. Listar cambios necesarios para cumplir la regla
+
+PASO 2: MIGRACIÓN ESTRUCTURA HTML
+1. Envolver en: <div class="page-container"><div class="page-content">
+2. Verificar que page-header tenga: header-content + header-actions
+3. Confirmar que filters-card use variables SIN prefijo
+4. Asegurar que table-card tenga table-with-headers
+
+PASO 3: MIGRACIÓN ESTILOS SCSS
+1. ELIMINAR estilos redundantes que ya están en la regla
+2. CONVERTIR padding/margin fijos a variables autoajustables
+3. ACTUALIZAR colores a variables --texfina-*
+4. AÑADIR responsive queries si no existen
+
+PASO 4: MIGRACIÓN TYPESCRIPT
+1. AGREGAR imports de ExportacionService y CargaMasivaService
+2. IMPLEMENTAR métodos faltantes: exportarExcel, exportarPDF, cargaMasiva
+3. CREAR configurarExportacion() y configurarCargaMasiva()
+4. VERIFICAR que todos los botones tengan funcionalidad
+
+PASO 5: MIGRACIÓN MODALES
+1. ACTUALIZAR structure: dialog-container + dialog-header + dialog-content
+2. CAMBIAR header a azul marino con gradient
+3. IMPLEMENTAR formateo defensivo en campos
+4. ASEGURAR responsive en formularios
+
+PASO 6: VALIDACIÓN FINAL
+1. Verificar que cumple las 15 reglas críticas
+2. Confirmar espaciado autoajustable funciona
+3. Testear responsive en móvil
+4. Validar que todos los botones son funcionales
+
+MANTENER FUNCIONALIDAD EXISTENTE:
+- NO eliminar lógica de negocio específica
+- CONSERVAR métodos únicos del componente
+- RESPETAR validaciones personalizadas
+- MANTENER servicios específicos funcionando
+
+IMPLEMENTAR FUNCIONALIDAD FALTANTE:
+- Si botones NO tienen funcionalidad, IMPLEMENTARLA COMPLETA
+- Si modales NO existen, CREARLOS desde cero
+- Si tablas NO están optimizadas, MEJORARLAS con responsive
+- Si NO hay dropdown export, AGREGARLO funcional
+- Si NO hay carga masiva, IMPLEMENTARLA
+- Usar screens maestros como referencia: materiales, almacenes, clases, usuarios
+*/
+
+// ============================================================================
+// 16. SCREENS MAESTROS COMO REFERENCIA - PATRONES ESTABLECIDOS
+// ============================================================================
+/*
+USAR COMO REFERENCIA ESTAS SCREENS MAESTROS EXISTENTES:
+
+📋 MATERIALES (materiales.component.*):
+- 7 columnas tabla: ID, Código, Nombre, Clase, Stock, Precio, Acciones
+- Filtros por columna avanzados
+- Modal registro completo con validaciones
+- Modal carga masiva con steps
+- Modal detalle con formateo defensivo
+- Dropdown export funcional
+- Responsive tabla optimizado
+
+🏪 ALMACENES (almacenes.*):
+- 4 columnas tabla: ID, Nombre, Ubicación, Acciones  
+- Filtros básicos de búsqueda general
+- Modales edición/detalle estándar
+- Variables CSS sin prefijo perfectas
+- Header actions responsive
+- Espaciado autoajustable implementado
+
+👥 USUARIOS (usuarios.*):
+- 6 columnas tabla: ID, Usuario, Email, Rol, Tipo, Acciones
+- Filtros múltiples por columna
+- Sistema de roles complejo
+- Validaciones específicas
+- Modal detalle avanzado
+- Responsive mobile optimizado
+
+📚 CLASES (clases.*):
+- 4 columnas tabla: Código, Familia, Subfamilia, Acciones
+- Códigos con formato específico
+- Jerarquía familia/subfamilia
+- Modal detalle con datos relacionados
+- Filtros por categorías
+
+🏷️ UNIDADES (unidades.*):
+- 3 columnas tabla: Código, Nombre, Acciones
+- Tabla más simple, ideal para entidades básicas
+- Modales minimalistas pero funcionales
+
+EXTRAER DE ESTAS SCREENS:
+✅ Estilos responsive que funcionan
+✅ Estructura de modales probada
+✅ Funcionalidad TypeScript completa  
+✅ Variables CSS correctas
+✅ Patrones de filtros efectivos
+✅ Layouts de tabla optimizados
+✅ Validaciones reales implementadas
+✅ Espaciado que se ve bien en todos los dispositivos
+*/
+
+// ============================================================================
+// 17. REGLAS CRÍTICAS OBLIGATORIAS
+// ============================================================================
+/*
+✅ PASO 0 OBLIGATORIO: Revisar crear_bd_texfina.sql ANTES de implementar
+✅ ESPACIADO AUTOAJUSTABLE: Usar clamp() para espaciado que se adapta automáticamente
+✅ MENOS ESPACIO: Títulos más pequeños, padding reducido, gaps automáticos
+✅ VARIABLES SIN PREFIJO: En filtros usar var(--surface-color), var(--spacing-lg), var(--text-primary)
+✅ VARIABLES CON PREFIJO: Solo en dropdown, header actions, modales usar var(--texfina-*)
+✅ COMPARAR CON ALMACENES: Usar almacenes.scss como referencia estándar para filtros
+✅ SERVICIOS REALES: Todos los métodos de service deben existir
+✅ FUNCIONALIDAD COMPLETA: Todos los botones deben ser funcionales
+✅ ESTRUCTURA MODAL: form-container + form-group + form-label + form-input
+✅ NO COMENTARIOS: Prohibido usar comentarios en TypeScript
+✅ SIN SÍMBOLOS: No usar ▼ en botón "Exportar"
+✅ DATOS REALES: Los modales deben mostrar data real con formateo defensivo
+✅ HEADER AZUL: Todos los modales con header azul marino (secondary)
+✅ RESPONSIVE COMPLETO: Header actions en columna en móvil, dropdown de ancho completo
+✅ MENÚ HAMBURGUESA: Obligatorio en toolbar para móvil con funcionalidad completa
+✅ AUTOAJUSTABLE: El espaciado se adapta automáticamente sin problemas de "mucho espacio"
+✅ MIGRACIÓN SEGURA: Al alinear pantallas existentes, mantener funcionalidad específica
+✅ IMPLEMENTAR FUNCIONALIDAD: Si botones no funcionan, implementar funcionalidad completa
+✅ CREAR MODALES: Si no existen modales, crearlos desde cero con funcionalidad real
+✅ OPTIMIZAR TABLAS: Mejorar tablas con responsive y filtros si no los tienen
+✅ USAR REFERENCIAS: Extraer patrones de screens maestros (materiales, almacenes, usuarios, clases, unidades)
+✅ FUNCIONALIDAD COMPLETA: Todos los componentes deben ser 100% funcionales, no solo visuales
+*/
+
+
+
+
+
+
+
