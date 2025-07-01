@@ -46,8 +46,11 @@ import {
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 import { Unidad } from '../models/insumo.model';
-import { EditarUnidadDialogComponent } from './editar-unidad-dialog/editar-unidad-dialog';
-import { DetalleUnidadDialogComponent } from './detalle-unidad-dialog/detalle-unidad-dialog';
+import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import { UnidadesConfig } from '../shared/configs/unidades-config';
+import { ConfirmacionConfig } from '../shared/configs/confirmacion-config';
 
 @Component({
   selector: 'app-unidades',
@@ -418,36 +421,69 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   agregar(): void {
-    const dialogRef = this.dialog.open(EditarUnidadDialogComponent, {
+    const config = UnidadesConfig.getConfiguracionFormulario(false);
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esNuevo: true },
+      data: config,
     });
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarUnidades();
+      if (resultado?.accion === 'guardar') {
+        this.materialService.crearUnidad(resultado.datos).subscribe(() => {
+          this.cargarUnidades();
+        });
       }
     });
   }
 
   editar(unidad: Unidad): void {
-    const dialogRef = this.dialog.open(EditarUnidadDialogComponent, {
+    const config = UnidadesConfig.getConfiguracionFormulario(true, unidad);
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esNuevo: false, unidad: unidad },
+      data: config,
     });
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarUnidades();
+      if (resultado?.accion === 'guardar') {
+        const unidadActualizada = { ...resultado.datos };
+        this.materialService
+          .actualizarUnidad(unidadActualizada)
+          .subscribe(() => {
+            this.cargarUnidades();
+          });
       }
     });
   }
 
   verDetalle(unidad: Unidad): void {
-    this.dialog.open(DetalleUnidadDialogComponent, {
+    const config = UnidadesConfig.getConfiguracionDetalle(unidad);
+    this.dialog.open(DetalleDialogComponent, {
       width: '800px',
       disableClose: true,
-      data: { unidad: unidad },
+      data: config,
+    });
+  }
+
+  eliminar(unidad: Unidad): void {
+    const config = ConfirmacionConfig.eliminarUnidad(unidad);
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      data: config,
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado && unidad.id_unidad) {
+        this.materialService.eliminarUnidad(unidad.id_unidad).subscribe({
+          next: () => {
+            console.log('✅ Unidad eliminada exitosamente');
+            this.cargarUnidades();
+          },
+          error: (error: any) => {
+            console.error('❌ Error al eliminar unidad:', error);
+          },
+        });
+      }
     });
   }
 

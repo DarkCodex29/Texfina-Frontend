@@ -1,0 +1,44 @@
+<div class="dialog-overlay">
+  <div class="dialog-container">
+    <div class="dialog-header">
+      <div class="header-info">
+        <h2 class="dialog-title">{{ config.titulo }}</h2>
+        <p class="dialog-subtitle">{{ config.subtitulo }}</p>
+      </div>
+      <button class="dialog-close" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <div class="confirmation-content">
+        <div class="confirmation-message">
+          <p class="message-primary">{{ config.mensaje }}</p>
+          <p class="message-secondary" *ngIf="config.mensajeSecundario">
+            {{ config.mensajeSecundario }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn-cancel" (click)="onCancel()">
+        {{ config.textoBotonCancelar || "Cancelar" }}
+      </button>
+      <button
+        class="btn-danger"
+        *ngIf="config.tipo === 'danger'"
+        (click)="onConfirm()"
+      >
+        {{ config.textoBotonConfirmar || "Eliminar" }}
+      </button>
+      <button
+        class="btn-save"
+        *ngIf="config.tipo === 'warning' || config.tipo === 'info'"
+        (click)="onConfirm()"
+      >
+        {{ config.textoBotonConfirmar || "Confirmar" }}
+      </button>
+    </div>
+  </div>
+</div>

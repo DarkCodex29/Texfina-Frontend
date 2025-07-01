@@ -26,8 +26,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { MaterialService } from '../services/material.service';
 import { Almacen } from '../models/insumo.model';
-import { EditarAlmacenDialogComponent } from './editar-almacen-dialog/editar-almacen-dialog';
-import { DetalleAlmacenDialogComponent } from './detalle-almacen-dialog/detalle-almacen-dialog';
+import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import { AlmacenesConfig } from '../shared/configs/almacenes-config';
+import { ConfirmacionConfig } from '../shared/configs/confirmacion-config';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -472,57 +475,73 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
   // MÉTODOS CRUD SEGÚN REGLA DE ORO
   // ============================================================================
   agregar(): void {
-    const dialogRef = this.dialog.open(EditarAlmacenDialogComponent, {
+    const config = AlmacenesConfig.getConfiguracionFormulario(false);
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esNuevo: true },
+      data: config,
     });
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarAlmacenes();
+      if (resultado?.accion === 'guardar') {
+        this.materialService.crearAlmacen(resultado.datos).subscribe(() => {
+          this.cargarAlmacenes();
+        });
       }
     });
   }
 
   editar(almacen: Almacen): void {
-    const dialogRef = this.dialog.open(EditarAlmacenDialogComponent, {
+    const config = AlmacenesConfig.getConfiguracionFormulario(true, almacen);
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esNuevo: false, almacen: almacen },
+      data: config,
     });
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarAlmacenes();
+      if (resultado?.accion === 'guardar') {
+        const almacenActualizado = {
+          ...resultado.datos,
+          id_almacen: almacen.id_almacen,
+        };
+        this.materialService
+          .actualizarAlmacen(almacenActualizado)
+          .subscribe(() => {
+            this.cargarAlmacenes();
+          });
       }
     });
   }
 
   verDetalle(almacen: Almacen): void {
-    this.dialog.open(DetalleAlmacenDialogComponent, {
+    const config = AlmacenesConfig.getConfiguracionDetalle(almacen);
+    this.dialog.open(DetalleDialogComponent, {
       width: '800px',
       disableClose: true,
-      data: { almacen: almacen },
+      data: config,
     });
   }
 
   eliminar(almacen: Almacen): void {
-    const nombreTexto =
-      almacen.nombre || `el almacén con ID ${almacen.id_almacen}`;
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar ${nombreTexto}?`
-    );
+    const config = ConfirmacionConfig.eliminarAlmacen(almacen);
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      data: config,
+    });
 
-    if (confirmacion && almacen.id_almacen) {
-      this.materialService.eliminarAlmacen(almacen.id_almacen).subscribe({
-        next: () => {
-          console.log('✅ Almacén eliminado exitosamente');
-          this.cargarAlmacenes();
-        },
-        error: (error: any) => {
-          console.error('❌ Error al eliminar almacén:', error);
-        },
-      });
-    }
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado && almacen.id_almacen) {
+        this.materialService.eliminarAlmacen(almacen.id_almacen).subscribe({
+          next: () => {
+            console.log('✅ Almacén eliminado exitosamente');
+            this.cargarAlmacenes();
+          },
+          error: (error: any) => {
+            console.error('❌ Error al eliminar almacén:', error);
+          },
+        });
+      }
+    });
   }
 
   formatearCodigo(id?: number): string {

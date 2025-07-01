@@ -39,7 +39,9 @@ import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/ca
 import { Clase } from '../models/insumo.model';
 import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
 import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
 import { ClasesConfig } from '../shared/configs/clases-config';
+import { ConfirmacionConfig } from '../shared/configs/confirmacion-config';
 import {
   Subject,
   debounceTime,
@@ -486,6 +488,29 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
       width: '800px',
       disableClose: true,
       data: config,
+    });
+  }
+
+  eliminar(clase: Clase): void {
+    const config = ConfirmacionConfig.eliminarClase(clase);
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      data: config,
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado && clase.id_clase) {
+        this.materialService.eliminarClase(clase.id_clase).subscribe({
+          next: () => {
+            console.log('✅ Clase eliminada exitosamente');
+            this.cargarClases();
+          },
+          error: (error: any) => {
+            console.error('❌ Error al eliminar clase:', error);
+          },
+        });
+      }
     });
   }
 

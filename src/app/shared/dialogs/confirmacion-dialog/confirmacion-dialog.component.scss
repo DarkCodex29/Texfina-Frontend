@@ -1,0 +1,235 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px;
+  background: linear-gradient(
+    135deg,
+    var(--texfina-secondary),
+    var(--texfina-secondary-dark)
+  );
+  color: white;
+  border-bottom: 1px solid var(--texfina-border-light);
+
+  .header-info {
+    flex: 1;
+  }
+
+  .dialog-title {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .dialog-subtitle {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+    color: white;
+  }
+
+  .dialog-close {
+    color: white;
+    width: 40px;
+    height: 40px;
+    margin-left: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.dialog-body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  max-height: calc(90vh - 160px);
+}
+
+.confirmation-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.confirmation-message {
+  text-align: center;
+
+  .message-primary {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1e293b;
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+  }
+
+  .message-secondary {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+.dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid var(--texfina-border-light);
+  background: var(--texfina-bg-secondary);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  padding: 10px 20px;
+  border: 2px solid var(--texfina-neutral);
+  background: var(--texfina-bg-primary);
+  color: var(--texfina-neutral);
+  border-radius: var(--texfina-radius-md);
+  font-size: var(--texfina-font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(152, 149, 148, 0.1);
+  }
+}
+
+.btn-save {
+  padding: 10px 20px;
+  border: 2px solid var(--texfina-secondary);
+  background: var(--texfina-secondary);
+  color: white;
+  border-radius: var(--texfina-radius-md);
+  font-size: var(--texfina-font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(18, 30, 102, 0.1);
+  }
+
+  &:disabled {
+    background: var(--texfina-bg-tertiary);
+    border-color: var(--texfina-border-medium);
+    color: var(--texfina-text-muted);
+    cursor: not-allowed;
+  }
+}
+
+.btn-danger {
+  padding: 10px 20px;
+  border: 2px solid #dc2626;
+  background: #dc2626;
+  color: white;
+  border-radius: var(--texfina-radius-md);
+  font-size: var(--texfina-font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+
+  &:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .dialog-container {
+    margin: 8px;
+    max-height: calc(100vh - 16px);
+  }
+
+  .dialog-header {
+    padding: 16px;
+
+    .dialog-title {
+      font-size: 18px;
+    }
+
+    .dialog-subtitle {
+      font-size: 13px;
+    }
+  }
+
+  .dialog-body {
+    padding: 16px;
+  }
+
+  .confirmation-content {
+    padding: 20px 0;
+  }
+
+  .message-primary {
+    font-size: 15px;
+  }
+
+  .message-secondary {
+    font-size: 13px;
+  }
+
+  .dialog-actions {
+    padding: 12px 16px;
+    flex-direction: column-reverse;
+    gap: 8px;
+
+    .btn-cancel,
+    .btn-save,
+    .btn-danger {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
