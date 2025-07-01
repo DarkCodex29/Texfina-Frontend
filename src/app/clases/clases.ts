@@ -37,8 +37,9 @@ import {
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 import { Clase } from '../models/insumo.model';
-import { EditarClaseDialogComponent } from './editar-clase-dialog/editar-clase-dialog';
-import { DetalleClaseDialogComponent } from './detalle-clase-dialog/detalle-clase-dialog';
+import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ClasesConfig } from '../shared/configs/clases-config';
 import {
   Subject,
   debounceTime,
@@ -118,7 +119,7 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {
     this.filtroGeneralForm = this.fb.group({ busquedaGeneral: [''] });
     this.filtrosColumnaForm = this.fb.group({
-      codigo: [''],
+      id_clase: [''],
       familia: [''],
       sub_familia: [''],
     });
@@ -223,9 +224,9 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
     const filtros = this.filtrosColumnaForm.value;
     let clasesFiltradas = [...this.clases];
 
-    if (filtros.codigo && filtros.codigo.trim()) {
+    if (filtros.id_clase && filtros.id_clase.trim()) {
       clasesFiltradas = clasesFiltradas.filter((clase) =>
-        clase.id_clase?.toLowerCase().includes(filtros.codigo.toLowerCase())
+        clase.id_clase?.toLowerCase().includes(filtros.id_clase.toLowerCase())
       );
     }
 
@@ -444,36 +445,47 @@ export class ClasesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   agregar(): void {
-    const dialogRef = this.dialog.open(EditarClaseDialogComponent, {
+    const config = ClasesConfig.getConfiguracionFormulario(false);
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esNuevo: true },
+      data: config,
     });
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarClases();
+      if (resultado?.accion === 'guardar') {
+        this.materialService.crearClase(resultado.datos).subscribe(() => {
+          this.cargarClases();
+        });
       }
     });
   }
 
   editar(clase: Clase): void {
-    const dialogRef = this.dialog.open(EditarClaseDialogComponent, {
+    const config = ClasesConfig.getConfiguracionFormulario(true, clase);
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esNuevo: false, clase: clase },
+      data: config,
     });
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarClases();
+      if (resultado?.accion === 'guardar') {
+        const claseActualizada = {
+          ...resultado.datos,
+          id_clase: clase.id_clase,
+        };
+        this.materialService.actualizarClase(claseActualizada).subscribe(() => {
+          this.cargarClases();
+        });
       }
     });
   }
 
   verDetalle(clase: Clase): void {
-    this.dialog.open(DetalleClaseDialogComponent, {
+    const config = ClasesConfig.getConfiguracionDetalle(clase);
+    this.dialog.open(DetalleDialogComponent, {
       width: '800px',
       disableClose: true,
-      data: { clase: clase },
+      data: config,
     });
   }
 

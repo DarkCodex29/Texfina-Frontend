@@ -1,0 +1,56 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="header-content">
+      <h2 class="dialog-title">Detalle de {{ config.entidad }}</h2>
+      <p class="dialog-subtitle">
+        Información completa {{ config.entidadArticulo }} seleccionada
+      </p>
+    </div>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <div class="form-container">
+      <!-- Generar filas dinámicamente -->
+      <div
+        class="form-row"
+        *ngFor="let fila of config.filas"
+        [ngClass]="{ 'form-row-three': fila.length === 3 }"
+      >
+        <!-- Generar campos por fila -->
+        <div
+          class="form-group"
+          *ngFor="let campo of fila"
+          [ngClass]="{ 'form-group-full': campo.ancho === 'completo' }"
+        >
+          <label class="form-label">{{ campo.label }}</label>
+
+          <!-- Input de solo lectura -->
+          <input
+            *ngIf="campo.tipo === 'text' || campo.tipo === 'number'"
+            class="form-input"
+            [value]="obtenerValorCampo(campo.key)"
+            readonly
+          />
+
+          <!-- Select deshabilitado -->
+          <select
+            *ngIf="campo.tipo === 'select'"
+            class="form-select"
+            [value]="obtenerValorCampo(campo.key)"
+            disabled
+          >
+            <option
+              *ngFor="let opcion of campo.opciones"
+              [value]="opcion.value"
+            >
+              {{ opcion.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

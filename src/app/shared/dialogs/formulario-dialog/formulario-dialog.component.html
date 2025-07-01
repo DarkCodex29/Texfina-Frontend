@@ -1,0 +1,88 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="header-content">
+      <h2 class="dialog-title">
+        {{ config.esEdicion ? "Editar" : "Registrar" }} {{ config.entidad }}
+      </h2>
+      <p class="dialog-subtitle">
+        Complete los campos para
+        {{ config.esEdicion ? "actualizar" : "registrar" }}
+        {{ config.entidadArticulo }} en el sistema
+      </p>
+    </div>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <form [formGroup]="formulario" class="form-container">
+      <!-- Generar filas dinámicamente -->
+      <div class="form-row" *ngFor="let fila of config.filas">
+        <!-- Generar campos por fila -->
+        <div
+          class="form-group"
+          *ngFor="let campo of fila"
+          [ngClass]="{ 'form-group-full': campo.ancho === 'completo' }"
+        >
+          <label class="form-label">{{ campo.label }}</label>
+
+          <!-- Input de texto/número -->
+          <input
+            *ngIf="campo.tipo === 'text' || campo.tipo === 'number'"
+            class="form-input"
+            [type]="campo.tipo"
+            [formControlName]="campo.key"
+            [placeholder]="campo.placeholder || ''"
+            [maxlength]="campo.maxLength || null"
+            [step]="campo.step || null"
+            [min]="campo.min || null"
+          />
+
+          <!-- Select -->
+          <select
+            *ngIf="campo.tipo === 'select'"
+            class="form-select"
+            [formControlName]="campo.key"
+          >
+            <option value="">{{ campo.placeholder || "Seleccionar" }}</option>
+            <option
+              *ngFor="let opcion of campo.opciones"
+              [value]="opcion.value"
+            >
+              {{ opcion.label }}
+            </option>
+          </select>
+
+          <!-- Mensajes de error -->
+          <div
+            class="error-message"
+            *ngIf="
+              formulario.get(campo.key)?.hasError('required') &&
+              formulario.get(campo.key)?.touched
+            "
+          >
+            {{ campo.label }} es requerido
+          </div>
+          <div
+            class="error-message"
+            *ngIf="formulario.get(campo.key)?.hasError('maxlength')"
+          >
+            {{ campo.label }} no puede exceder {{ campo.maxLength }} caracteres
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="onCancel()">Cancelar</button>
+    <button
+      class="btn-save"
+      [disabled]="formulario.invalid"
+      (click)="onSubmit()"
+    >
+      {{ config.esEdicion ? "Actualizar" : "Registrar" }} {{ config.entidad }}
+    </button>
+  </div>
+</div>
