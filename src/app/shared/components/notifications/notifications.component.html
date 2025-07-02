@@ -3,13 +3,9 @@
     mat-icon-button
     [matMenuTriggerFor]="notificationsMenu"
     class="notifications-button"
-    matBadge="{{ alertasCount }}"
-    [matBadgeHidden]="alertasCount === 0"
-    matBadgeColor="warn"
-    matBadgeSize="small"
-    matBadgePosition="after"
   >
     <mat-icon>notifications</mat-icon>
+    <span class="custom-badge" *ngIf="alertasCount > 0">{{ badgeText }}</span>
   </button>
 
   <mat-menu

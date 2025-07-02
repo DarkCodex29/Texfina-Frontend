@@ -2,11 +2,13 @@
   display: flex;
   align-items: center;
   margin-right: var(--texfina-spacing-md);
+  overflow: visible;
 
   .notifications-button {
     position: relative;
     color: var(--texfina-secondary);
     transition: all 0.2s ease;
+    overflow: visible;
 
     &:hover {
       background: rgba(18, 30, 102, 0.08);
@@ -14,30 +16,32 @@
     }
 
     mat-icon {
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
       color: var(--texfina-secondary);
     }
 
-    ::ng-deep .mat-badge-content {
-      top: 12px !important;
-      right: -14px !important;
-      transform: none !important;
-      background-color: var(--texfina-primary) !important;
-      color: white !important;
-      font-size: 10px !important;
-      font-weight: 500 !important;
-      min-width: 18px !important;
-      width: 18px !important;
-      height: 18px !important;
-      line-height: 18px !important;
-      border-radius: 50% !important;
-      border: 2px solid white !important;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
+    .custom-badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background-color: var(--texfina-primary);
+      color: white;
+      font-size: 9px;
+      font-weight: 600;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 4px;
+      border-radius: 10px;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      white-space: nowrap;
+      overflow: hidden;
     }
   }
 }
@@ -152,24 +156,21 @@
     margin-right: var(--texfina-spacing-sm);
 
     .notifications-button mat-icon {
-      font-size: 22px;
-      width: 22px;
-      height: 22px;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
     }
 
-    .notifications-button ::ng-deep .mat-badge-content {
-      top: -4px !important;
-      right: -10px !important;
-      font-size: 9px !important;
-      font-weight: 500 !important;
-      min-width: 16px !important;
-      width: 16px !important;
-      height: 16px !important;
-      line-height: 16px !important;
-      border: 1px solid white !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
+    .notifications-button .custom-badge {
+      top: 2px;
+      right: 2px;
+      font-size: 8px;
+      font-weight: 600;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 3px;
+      border-radius: 9px;
+      border: 1px solid white;
     }
   }
 
