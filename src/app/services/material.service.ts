@@ -2082,4 +2082,96 @@ export class MaterialService {
 
     return of(recetasFiltradas);
   }
+
+  // ============================================================================
+  // MÉTODOS DE CONSUMOS
+  // ============================================================================
+
+  crearConsumo(consumo: Consumo): Observable<Consumo> {
+    if (this.useApi) {
+      return this.apiService.crearConsumo(consumo);
+    }
+
+    const nuevoConsumo = {
+      ...consumo,
+      id_consumo:
+        Math.max(...this.getConsumosMock().map((c) => c.id_consumo || 0)) + 1,
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+
+    return of(nuevoConsumo);
+  }
+
+  actualizarConsumo(consumo: Consumo): Observable<Consumo> {
+    if (this.useApi) {
+      return this.apiService.actualizarConsumo(consumo);
+    }
+
+    const consumoActualizado = {
+      ...consumo,
+      updated_at: new Date(),
+    };
+
+    return of(consumoActualizado);
+  }
+
+  eliminarConsumo(id: number): Observable<boolean> {
+    if (this.useApi) {
+      // El API service no tiene este método, así que usamos HTTP directamente
+      return this.apiService['http'].delete<boolean>(
+        `${this.apiService['baseUrl']}/consumos/${id}`,
+        {
+          headers: this.apiService['getHeaders'](),
+        }
+      );
+    }
+
+    return of(true);
+  }
+
+  buscarConsumos(filtros: {
+    insumo?: string;
+    area?: string;
+    estado?: string;
+  }): Observable<Consumo[]> {
+    if (this.useApi) {
+      return this.apiService.buscarConsumos(filtros);
+    }
+
+    return this.buscarConsumosMock(filtros);
+  }
+
+  private buscarConsumosMock(filtros: {
+    insumo?: string;
+    area?: string;
+    estado?: string;
+  }): Observable<Consumo[]> {
+    let consumosFiltrados = this.getConsumosMock();
+
+    if (filtros.insumo?.trim()) {
+      const insumoBusqueda = filtros.insumo.toLowerCase();
+      consumosFiltrados = consumosFiltrados.filter((consumo) => {
+        const insumo = this.getMaterialesMock().find(
+          (i) => i.id_insumo === consumo.id_insumo
+        );
+        return insumo?.nombre?.toLowerCase().includes(insumoBusqueda);
+      });
+    }
+
+    if (filtros.area?.trim()) {
+      const areaBusqueda = filtros.area.toLowerCase();
+      consumosFiltrados = consumosFiltrados.filter((consumo) =>
+        consumo.area?.toLowerCase().includes(areaBusqueda)
+      );
+    }
+
+    if (filtros.estado?.trim()) {
+      consumosFiltrados = consumosFiltrados.filter(
+        (consumo) => consumo.estado === filtros.estado
+      );
+    }
+
+    return of(consumosFiltrados);
+  }
 }

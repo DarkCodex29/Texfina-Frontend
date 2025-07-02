@@ -248,3 +248,253 @@
     }
   }
 }
+
+// ============================================================================
+// CONSUMOS - REGLA DE ORO TEXFINA CON ESPACIADO AUTOAJUSTABLE
+// ============================================================================
+
+// ============================================================================
+// 1. CONTENEDORES AUTOAJUSTABLES
+// ============================================================================
+.page-container {
+  padding: var(--texfina-spacing-md);
+  gap: var(--texfina-spacing-sm);
+
+  @media (max-width: 768px) {
+    padding: var(--texfina-spacing-sm);
+    gap: var(--texfina-spacing-xs);
+  }
+
+  @media (max-width: 480px) {
+    padding: var(--texfina-spacing-xs);
+  }
+}
+
+.page-header {
+  padding: var(--texfina-spacing-md);
+
+  .page-title {
+    font-size: var(--texfina-font-size-2xl);
+  }
+
+  @media (max-width: 768px) {
+    padding: var(--texfina-spacing-sm);
+    flex-direction: column;
+    gap: var(--texfina-spacing-lg);
+    align-items: stretch;
+
+    .header-content {
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: var(--texfina-font-size-xl);
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: var(--texfina-spacing-xs);
+
+    .page-title {
+      font-size: var(--texfina-font-size-lg);
+    }
+  }
+}
+
+.page-content {
+  gap: var(--texfina-spacing-sm);
+
+  @media (max-width: 480px) {
+    gap: var(--texfina-spacing-xs);
+  }
+}
+
+// ============================================================================
+// 2. HEADER ACTIONS RESPONSIVE CON DROPDOWN EXPORT
+// ============================================================================
+.header-actions {
+  display: flex;
+  gap: var(--texfina-spacing-md);
+  align-items: center;
+  flex-wrap: nowrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-sm);
+    width: 100%;
+
+    .btn-texfina {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .dropdown-export {
+      width: 100%;
+
+      .dropdown-trigger {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    gap: var(--texfina-spacing-xs);
+
+    .btn-texfina {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+}
+
+.dropdown-export {
+  position: relative;
+  display: inline-block;
+
+  .dropdown-trigger {
+    cursor: pointer;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid var(--texfina-border-light);
+    border-radius: var(--texfina-radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    min-width: 160px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+
+    &.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--texfina-text-primary);
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: var(--texfina-secondary-bg);
+        color: var(--texfina-secondary);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .dropdown-menu {
+      left: 0;
+      right: 0;
+      min-width: 100%;
+      width: 100%;
+    }
+  }
+}
+
+// ============================================================================
+// 3. FILTROS CON VARIABLES SIN PREFIJO (AUTOAJUSTABLES)
+// ============================================================================
+.filters-card {
+  background: var(--surface-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+
+  .filters-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    user-select: none;
+    border-bottom: 1px solid var(--border-color);
+
+    .filters-title {
+      gap: var(--spacing-sm);
+      color: var(--text-primary);
+      font-size: var(--font-size-lg);
+    }
+  }
+
+  .filters-content {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--background-subtle);
+  }
+
+  .simple-input {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    color: var(--text-primary);
+
+    &:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-color-alpha);
+    }
+  }
+}
+
+// ============================================================================
+// 4. BADGES DE ESTADO
+// ============================================================================
+.estado-badge {
+  &.estado-pendiente {
+    background-color: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fbbf24;
+  }
+
+  &.estado-completado {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+  }
+
+  &.estado-cancelado {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #f87171;
+  }
+
+  &.estado-en-proceso {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #3b82f6;
+  }
+
+  &.estado-anulado {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #9ca3af;
+  }
+}
+
+// ============================================================================
+// 5. TABLA RESPONSIVE
+// ============================================================================
+.table-card {
+  @media (max-width: 768px) {
+    .mat-column-numero_remision,
+    .mat-column-orden_compra {
+      display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .mat-column-lote,
+    .mat-column-area {
+      display: none;
+    }
+  }
+}

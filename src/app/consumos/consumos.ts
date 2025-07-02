@@ -37,8 +37,19 @@ import {
   MapeoColumna,
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
-import { DetalleConsumoDialogComponent } from './detalle-consumo-dialog/detalle-consumo-dialog.component';
-import { RegistroConsumoDialogComponent } from './registro-consumo-dialog/registro-consumo-dialog.component';
+import {
+  FormularioDialogComponent,
+  ConfiguracionFormulario,
+} from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import {
+  DetalleDialogComponent,
+  ConfiguracionDetalle,
+} from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import {
+  ConsumosConfig,
+  CONSUMOS_CONFIG,
+} from '../shared/configs/consumos-config';
 
 @Component({
   selector: 'app-consumos',
@@ -164,7 +175,7 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
     this.hasError = false;
     this.errorMessage = '';
 
-    console.log('🔄 Iniciando carga de consumos - isLoading:', this.isLoading);
+    console.log('�� Iniciando carga de consumos - isLoading:', this.isLoading);
 
     Promise.all([
       this.materialService.getConsumos().toPromise(),
@@ -360,65 +371,316 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
   // MÉTODOS DE ACCIONES
   // ============================================================================
   verDetalle(consumo: Consumo): void {
-    this.dialog.open(DetalleConsumoDialogComponent, {
+    const configuracion: ConfiguracionDetalle = {
+      entidad: 'Consumo',
+      entidadArticulo: 'el consumo',
+      datos: consumo,
+      filas: [
+        [
+          {
+            key: 'id_consumo',
+            label: 'Código',
+            tipo: 'text',
+            formateo: (valor) => ConsumosConfig.formatearCodigo(valor),
+            ancho: 'normal',
+          },
+          {
+            key: 'fecha',
+            label: 'Fecha',
+            tipo: 'text',
+            formateo: (valor) => ConsumosConfig.formatearFecha(valor),
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'id_insumo',
+            label: 'Insumo',
+            tipo: 'text',
+            formateo: (valor) =>
+              ConsumosConfig.formatearTexto(this.getInsumoNombre(valor)),
+            ancho: 'completo',
+          },
+        ],
+        [
+          {
+            key: 'area',
+            label: 'Área',
+            tipo: 'text',
+            formateo: (valor) => ConsumosConfig.formatearTexto(valor),
+            ancho: 'normal',
+          },
+          {
+            key: 'cantidad',
+            label: 'Cantidad',
+            tipo: 'number',
+            formateo: (valor) => ConsumosConfig.formatearCantidad(valor),
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'id_lote',
+            label: 'Lote',
+            tipo: 'text',
+            formateo: (valor) =>
+              ConsumosConfig.formatearTexto(this.getLoteNombre(valor)),
+            ancho: 'normal',
+          },
+          {
+            key: 'estado',
+            label: 'Estado',
+            tipo: 'text',
+            formateo: (valor) => ConsumosConfig.formatearEstado(valor).texto,
+            ancho: 'normal',
+          },
+        ],
+      ],
+    };
+
+    this.dialog.open(DetalleDialogComponent, {
       width: '800px',
       disableClose: true,
-      data: {
-        consumo: consumo,
-        insumos: this.insumos,
-        lotes: this.lotes,
+      data: configuracion,
+    });
+  }
+
+  editar(consumo: Consumo): void {
+    const configuracion: ConfiguracionFormulario = {
+      titulo: {
+        agregar: 'Agregar Consumo',
+        editar: 'Editar Consumo',
       },
+      entidad: 'Consumo',
+      entidadArticulo: 'el consumo',
+      esEdicion: true,
+      datosIniciales: consumo,
+      filas: [
+        [
+          {
+            key: 'id_insumo',
+            label: 'Insumo',
+            tipo: 'select',
+            opciones: this.insumos.map((i) => ({
+              value: i.id_insumo!,
+              label: i.nombre,
+            })),
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+        [
+          {
+            key: 'fecha',
+            label: 'Fecha',
+            tipo: 'text',
+            placeholder: 'dd/mm/aaaa',
+            obligatorio: true,
+            ancho: 'normal',
+          },
+          {
+            key: 'area',
+            label: 'Área',
+            tipo: 'text',
+            placeholder: 'Área de consumo',
+            obligatorio: true,
+            maxLength: 100,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'cantidad',
+            label: 'Cantidad',
+            tipo: 'number',
+            placeholder: 'Cantidad consumida',
+            obligatorio: true,
+            min: 0.01,
+            ancho: 'normal',
+          },
+          {
+            key: 'id_lote',
+            label: 'Lote',
+            tipo: 'select',
+            opciones: this.lotes.map((l) => ({
+              value: l.id_lote!,
+              label: l.lote || '',
+            })),
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'estado',
+            label: 'Estado',
+            tipo: 'select',
+            opciones: Object.entries(CONSUMOS_CONFIG.ESTADOS).map(
+              ([key, value]: [string, any]) => ({
+                value: key,
+                label: value.texto,
+              })
+            ),
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+      ],
+    };
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: configuracion,
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado && resultado.datos) {
+        this.materialService.actualizarConsumo(resultado.datos).subscribe({
+          next: () => {
+            this.cargarDatos();
+          },
+          error: (error: any) => {
+            console.error('Error al editar consumo:', error);
+          },
+        });
+      }
+    });
+  }
+
+  eliminar(consumo: Consumo): void {
+    const configuracion = ConsumosConfig.eliminarConsumo(consumo);
+
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      data: configuracion,
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado && consumo.id_consumo) {
+        this.materialService.eliminarConsumo(consumo.id_consumo).subscribe({
+          next: () => {
+            this.cargarDatos();
+          },
+          error: (error: any) => {
+            console.error('Error al eliminar consumo:', error);
+          },
+        });
+      }
     });
   }
 
   editarConsumo(consumo: Consumo): void {
-    const dialogRef = this.dialog.open(RegistroConsumoDialogComponent, {
-      width: '600px',
-      disableClose: true,
-      data: {
-        esEdicion: true,
-        consumo: consumo,
-        insumos: this.insumos,
-        lotes: this.lotes,
-        titulo: 'Editar Consumo',
+    this.editar(consumo);
+  }
+
+  agregar(): void {
+    const configuracion: ConfiguracionFormulario = {
+      titulo: {
+        agregar: 'Agregar Consumo',
+        editar: 'Editar Consumo',
       },
+      entidad: 'Consumo',
+      entidadArticulo: 'el consumo',
+      esEdicion: false,
+      filas: [
+        [
+          {
+            key: 'id_insumo',
+            label: 'Insumo',
+            tipo: 'select',
+            opciones: this.insumos.map((i) => ({
+              value: i.id_insumo!,
+              label: i.nombre,
+            })),
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+        [
+          {
+            key: 'fecha',
+            label: 'Fecha',
+            tipo: 'text',
+            placeholder: 'dd/mm/aaaa',
+            obligatorio: true,
+            ancho: 'normal',
+          },
+          {
+            key: 'area',
+            label: 'Área',
+            tipo: 'text',
+            placeholder: 'Área de consumo',
+            obligatorio: true,
+            maxLength: 100,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'cantidad',
+            label: 'Cantidad',
+            tipo: 'number',
+            placeholder: 'Cantidad consumida',
+            obligatorio: true,
+            min: 0.01,
+            ancho: 'normal',
+          },
+          {
+            key: 'id_lote',
+            label: 'Lote',
+            tipo: 'select',
+            opciones: this.lotes.map((l) => ({
+              value: l.id_lote!,
+              label: l.lote || '',
+            })),
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'estado',
+            label: 'Estado',
+            tipo: 'select',
+            opciones: Object.entries(CONSUMOS_CONFIG.ESTADOS).map(
+              ([key, value]: [string, any]) => ({
+                value: key,
+                label: value.texto,
+              })
+            ),
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+      ],
+    };
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: configuracion,
     });
 
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        console.log('Consumo editado:', resultado);
-        this.cargarDatos();
+      if (resultado && resultado.datos) {
+        this.materialService.crearConsumo(resultado.datos).subscribe({
+          next: () => {
+            this.cargarDatos();
+          },
+          error: (error: any) => {
+            console.error('Error al crear consumo:', error);
+          },
+        });
       }
     });
   }
 
   abrirRegistroConsumo(): void {
-    const dialogRef = this.dialog.open(RegistroConsumoDialogComponent, {
-      width: '600px',
-      disableClose: true,
-      data: {
-        esEdicion: false,
-        insumos: this.insumos,
-        lotes: this.lotes,
-        titulo: 'Agregar Consumo',
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        console.log('Nuevo consumo registrado:', resultado);
-        this.cargarDatos();
-      }
-    });
-  }
-
-  agregar(): void {
-    this.abrirRegistroConsumo();
+    this.agregar();
   }
 
   abrirConsumoMasivo() {
-    console.log('📤 Abrir consumo masivo');
-    // TODO: Implementar modal de carga masiva
+    this.cargaMasiva();
   }
 
   // ============================================================================
