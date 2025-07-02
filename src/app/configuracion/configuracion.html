@@ -1,49 +1,51 @@
 <div class="page-container">
   <div class="page-content">
-    <!-- Header de la página -->
     <div class="page-header">
       <div class="header-content">
         <h1 class="page-title text-texfina text-primary">
           Configuración del Sistema
         </h1>
         <p class="page-subtitle text-texfina text-muted">
-          Gestiona la configuración general del sistema
+          Gestiona la configuración general y parámetros del sistema
         </p>
       </div>
       <div class="header-actions">
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
+          Carga Masiva
+        </button>
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
+          >
+            Exportar
+          </button>
+          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+            <button class="dropdown-item" (click)="exportarExcel()">
+              Exportar a Excel
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              Exportar a PDF
+            </button>
+          </div>
+        </div>
         <button
-          mat-raised-button
           class="btn-texfina btn-primary"
           (click)="guardarConfiguracion()"
           [disabled]="!hayCambios"
         >
-          <mat-icon>save</mat-icon>
           Guardar Cambios
-        </button>
-        <button
-          mat-stroked-button
-          class="btn-texfina btn-outline"
-          (click)="exportarConfiguracion()"
-        >
-          <mat-icon>download</mat-icon>
-          Exportar
         </button>
       </div>
     </div>
 
-    <!-- Tabs de Configuración -->
     <div class="table-card">
       <mat-tab-group [(selectedIndex)]="tabActual" class="config-tabs">
-        <!-- TAB: Configuración General -->
         <mat-tab label="General">
           <div class="tab-content">
-            <!-- Tarjeta Información de la Empresa -->
             <div class="card-texfina">
               <div class="card-header">
                 <div class="card-title">
-                  <mat-icon class="text-texfina text-primary"
-                    >business</mat-icon
-                  >
                   <span class="text-texfina text-primary"
                     >Información de la Empresa</span
                   >
@@ -109,11 +111,9 @@
               </div>
             </div>
 
-            <!-- Tarjeta Configuración del Sistema -->
             <div class="card-texfina">
               <div class="card-header">
                 <div class="card-title">
-                  <mat-icon class="text-texfina text-primary">tune</mat-icon>
                   <span class="text-texfina text-primary"
                     >Configuración del Sistema</span
                   >
@@ -198,15 +198,11 @@
           </div>
         </mat-tab>
 
-        <!-- TAB: Inventario -->
         <mat-tab label="Inventario">
           <div class="tab-content">
             <div class="card-texfina">
               <div class="card-header">
                 <div class="card-title">
-                  <mat-icon class="text-texfina text-primary"
-                    >inventory</mat-icon
-                  >
                   <span class="text-texfina text-primary"
                     >Configuración de Inventario</span
                   >
@@ -215,33 +211,29 @@
               <div class="card-content">
                 <div class="config-grid">
                   <mat-form-field appearance="outline">
-                    <mat-label>Umbral de Stock Mínimo (%)</mat-label>
+                    <mat-label>Stock Mínimo por Defecto</mat-label>
                     <input
                       matInput
                       type="number"
-                      [(ngModel)]="configuracion.inventario.umbral_stock_minimo"
+                      [(ngModel)]="configuracion.inventario.stock_minimo_defecto"
                       (ngModelChange)="marcarCambios()"
-                      min="0"
-                      max="100"
                     />
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
-                    <mat-label>Días para Alerta de Vencimiento</mat-label>
+                    <mat-label>Stock Máximo por Defecto</mat-label>
                     <input
                       matInput
                       type="number"
-                      [(ngModel)]="configuracion.inventario.dias_alerta_vencimiento"
+                      [(ngModel)]="configuracion.inventario.stock_maximo_defecto"
                       (ngModelChange)="marcarCambios()"
-                      min="1"
-                      max="365"
                     />
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
-                    <mat-label>Método de Valoración</mat-label>
+                    <mat-label>Método de Valorización</mat-label>
                     <mat-select
-                      [(ngModel)]="configuracion.inventario.metodo_valoracion"
+                      [(ngModel)]="configuracion.inventario.metodo_valorizacion"
                       (ngModelChange)="marcarCambios()"
                     >
                       <mat-option value="FIFO"
@@ -258,27 +250,27 @@
 
                   <div class="checkbox-grid">
                     <mat-checkbox
-                      [(ngModel)]="configuracion.inventario.permitir_stock_negativo"
+                      [(ngModel)]="configuracion.inventario.alerta_stock_bajo"
                       (ngModelChange)="marcarCambios()"
                       class="text-texfina text-primary"
                     >
-                      Permitir Stock Negativo
+                      Alertas de Stock Bajo
                     </mat-checkbox>
 
                     <mat-checkbox
-                      [(ngModel)]="configuracion.inventario.alertas_automaticas"
+                      [(ngModel)]="configuracion.inventario.seguimiento_lotes"
                       (ngModelChange)="marcarCambios()"
                       class="text-texfina text-primary"
                     >
-                      Alertas Automáticas
+                      Seguimiento por Lotes
                     </mat-checkbox>
 
                     <mat-checkbox
-                      [(ngModel)]="configuracion.inventario.auditoria_movimientos"
+                      [(ngModel)]="configuracion.inventario.control_fechas_vencimiento"
                       (ngModelChange)="marcarCambios()"
                       class="text-texfina text-primary"
                     >
-                      Auditoría de Movimientos
+                      Control de Fechas de Vencimiento
                     </mat-checkbox>
                   </div>
                 </div>
@@ -287,90 +279,72 @@
           </div>
         </mat-tab>
 
-        <!-- TAB: Seguridad -->
-        <mat-tab label="Seguridad">
+        <mat-tab label="Usuarios">
           <div class="tab-content">
             <div class="card-texfina">
               <div class="card-header">
                 <div class="card-title">
-                  <mat-icon class="text-texfina text-primary"
-                    >security</mat-icon
-                  >
                   <span class="text-texfina text-primary"
-                    >Configuración de Seguridad</span
+                    >Configuración de Usuarios</span
                   >
                 </div>
               </div>
               <div class="card-content">
                 <div class="config-grid">
                   <mat-form-field appearance="outline">
-                    <mat-label>Tiempo de Sesión (minutos)</mat-label>
+                    <mat-label>Días para Expirar Contraseña</mat-label>
                     <input
                       matInput
                       type="number"
-                      [(ngModel)]="configuracion.seguridad.tiempo_sesion"
+                      [(ngModel)]="configuracion.usuarios.dias_expiracion_password"
                       (ngModelChange)="marcarCambios()"
-                      min="5"
-                      max="480"
                     />
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
-                    <mat-label>Intentos de Login</mat-label>
+                    <mat-label>Máximo Intentos de Login</mat-label>
                     <input
                       matInput
                       type="number"
-                      [(ngModel)]="configuracion.seguridad.intentos_login"
+                      [(ngModel)]="configuracion.usuarios.max_intentos_login"
                       (ngModelChange)="marcarCambios()"
-                      min="3"
-                      max="10"
                     />
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
-                    <mat-label>Longitud Mínima de Contraseña</mat-label>
+                    <mat-label>Duración de Sesión (horas)</mat-label>
                     <input
                       matInput
                       type="number"
-                      [(ngModel)]="configuracion.seguridad.longitud_password"
+                      [(ngModel)]="configuracion.usuarios.duracion_sesion_horas"
                       (ngModelChange)="marcarCambios()"
-                      min="6"
-                      max="20"
                     />
                   </mat-form-field>
 
                   <div class="checkbox-grid">
                     <mat-checkbox
-                      [(ngModel)]="configuracion.seguridad.requiere_mayusculas"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Requiere Mayúsculas
-                    </mat-checkbox>
-
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.seguridad.requiere_numeros"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Requiere Números
-                    </mat-checkbox>
-
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.seguridad.requiere_simbolos"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Requiere Símbolos
-                    </mat-checkbox>
-
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.seguridad.doble_factor"
+                      [(ngModel)]="configuracion.usuarios.autenticacion_doble_factor"
                       (ngModelChange)="marcarCambios()"
                       class="text-texfina text-primary"
                     >
                       Autenticación de Doble Factor
                     </mat-checkbox>
+
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.usuarios.bloqueo_automatico"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Bloqueo Automático de Usuarios
+                    </mat-checkbox>
+
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.usuarios.historial_passwords"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Recordar Historial de Contraseñas
+                    </mat-checkbox>
                   </div>
                 </div>
               </div>
@@ -378,90 +352,72 @@
           </div>
         </mat-tab>
 
-        <!-- TAB: Respaldos -->
-        <mat-tab label="Respaldos">
+        <mat-tab label="Auditoría">
           <div class="tab-content">
             <div class="card-texfina">
               <div class="card-header">
                 <div class="card-title">
-                  <mat-icon class="text-texfina text-primary">backup</mat-icon>
                   <span class="text-texfina text-primary"
-                    >Configuración de Respaldos</span
+                    >Configuración de Auditoría</span
                   >
                 </div>
               </div>
               <div class="card-content">
                 <div class="config-grid">
                   <mat-form-field appearance="outline">
-                    <mat-label>Frecuencia de Respaldo</mat-label>
-                    <mat-select
-                      [(ngModel)]="configuracion.respaldos.frecuencia"
-                      (ngModelChange)="marcarCambios()"
-                    >
-                      <mat-option value="DIARIO">Diario</mat-option>
-                      <mat-option value="SEMANAL">Semanal</mat-option>
-                      <mat-option value="MENSUAL">Mensual</mat-option>
-                    </mat-select>
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline">
-                    <mat-label>Hora de Respaldo</mat-label>
-                    <input
-                      matInput
-                      type="time"
-                      [(ngModel)]="configuracion.respaldos.hora"
-                      (ngModelChange)="marcarCambios()"
-                    />
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline">
-                    <mat-label>Días de Retención</mat-label>
+                    <mat-label>Días de Retención de Logs</mat-label>
                     <input
                       matInput
                       type="number"
-                      [(ngModel)]="configuracion.respaldos.dias_retencion"
+                      [(ngModel)]="configuracion.auditoria.dias_retencion_logs"
                       (ngModelChange)="marcarCambios()"
-                      min="7"
-                      max="365"
                     />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Nivel de Log</mat-label>
+                    <mat-select
+                      [(ngModel)]="configuracion.auditoria.nivel_log"
+                      (ngModelChange)="marcarCambios()"
+                    >
+                      <mat-option value="ERROR">Solo Errores</mat-option>
+                      <mat-option value="WARNING"
+                        >Advertencias y Errores</mat-option
+                      >
+                      <mat-option value="INFO"
+                        >Información, Advertencias y Errores</mat-option
+                      >
+                      <mat-option value="DEBUG"
+                        >Todos los Eventos (Debug)</mat-option
+                      >
+                    </mat-select>
                   </mat-form-field>
 
                   <div class="checkbox-grid">
                     <mat-checkbox
-                      [(ngModel)]="configuracion.respaldos.compresion"
+                      [(ngModel)]="configuracion.auditoria.auditoria_activa"
                       (ngModelChange)="marcarCambios()"
                       class="text-texfina text-primary"
                     >
-                      Habilitar Compresión
+                      Auditoría Activa
                     </mat-checkbox>
 
                     <mat-checkbox
-                      [(ngModel)]="configuracion.respaldos.notificar_email"
+                      [(ngModel)]="configuracion.auditoria.log_cambios_datos"
                       (ngModelChange)="marcarCambios()"
                       class="text-texfina text-primary"
                     >
-                      Notificar por Email
+                      Registrar Cambios en Datos
+                    </mat-checkbox>
+
+                    <mat-checkbox
+                      [(ngModel)]="configuracion.auditoria.log_acceso_usuarios"
+                      (ngModelChange)="marcarCambios()"
+                      class="text-texfina text-primary"
+                    >
+                      Registrar Acceso de Usuarios
                     </mat-checkbox>
                   </div>
-                </div>
-
-                <div class="backup-actions">
-                  <button
-                    mat-raised-button
-                    class="btn-texfina btn-success"
-                    (click)="crearRespaldoManual()"
-                  >
-                    <mat-icon>backup</mat-icon>
-                    Crear Respaldo Ahora
-                  </button>
-                  <button
-                    mat-stroked-button
-                    class="btn-texfina btn-outline"
-                    (click)="verHistorialRespaldos()"
-                  >
-                    <mat-icon>history</mat-icon>
-                    Ver Historial
-                  </button>
                 </div>
               </div>
             </div>

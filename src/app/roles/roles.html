@@ -1,216 +1,264 @@
-<div class="roles-container page-container">
-  <!-- Header de la página -->
-  <div class="page-header">
-    <h1 class="page-title">Gestión de Roles y Permisos</h1>
-    <div class="action-buttons">
-      <button
-        mat-raised-button
-        class="btn-agregar"
-        (click)="abrirDialogoCrear()"
-      >
-        <mat-icon>add</mat-icon>
-        Agregar Rol
-      </button>
+<div class="page-container">
+  <div class="page-content">
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title text-texfina text-primary">Gestión de Roles</h1>
+        <p class="page-subtitle text-texfina text-muted">
+          Administra roles de usuario y sus permisos asociados
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
+          Carga Masiva
+        </button>
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
+          >
+            Exportar
+          </button>
+          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+            <button class="dropdown-item" (click)="exportarExcel()">
+              Exportar a Excel
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              Exportar a PDF
+            </button>
+          </div>
+        </div>
+        <button class="btn-texfina btn-primary" (click)="agregar()">
+          Agregar Rol
+        </button>
+      </div>
     </div>
-  </div>
 
-  <!-- Tarjeta de filtros -->
-  <mat-card class="filtros-card">
-    <div class="filtros-form">
-      <div class="filtros-row">
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Buscar rol</mat-label>
-          <input
-            matInput
-            [(ngModel)]="filtros.rol"
-            placeholder="Nombre del rol..."
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Tipo</mat-label>
-          <mat-select [(ngModel)]="filtros.tipo">
-            <mat-option value="">Todos los tipos</mat-option>
-            <mat-option value="ADMIN">Administrador</mat-option>
-            <mat-option value="SUPERVISOR">Supervisor</mat-option>
-            <mat-option value="OPERARIO">Operario</mat-option>
-            <mat-option value="CONSULTOR">Consultor</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filtro-field">
-          <mat-label>Estado</mat-label>
-          <mat-select [(ngModel)]="filtros.activo">
-            <mat-option value="">Todos</mat-option>
-            <mat-option value="true">Activos</mat-option>
-            <mat-option value="false">Inactivos</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <div class="filtro-buttons">
-          <button
-            mat-raised-button
-            type="button"
-            class="btn-buscar"
-            (click)="buscar()"
-          >
-            <mat-icon>search</mat-icon>
-            Buscar
-          </button>
-          <button
-            mat-stroked-button
-            color="accent"
-            type="button"
-            (click)="limpiarFiltros()"
-            class="btn-limpiar"
-          >
-            <mat-icon>clear</mat-icon>
-            Limpiar
-          </button>
+    <div class="summary-cards">
+      <div
+        class="card-texfina"
+        *ngFor="let estadistica of estadisticas"
+        [ngClass]="getCardClass(estadistica.tipo)"
+      >
+        <div class="card-content">
+          <div class="summary-header">
+            <div class="summary-value text-texfina text-primary">
+              {{ estadistica.valor }}
+            </div>
+            <div
+              class="summary-trend"
+              [ngClass]="getTrendClass(estadistica.tipo)"
+            >
+              <span *ngIf="estadistica.porcentaje"
+                >{{ estadistica.porcentaje }}%</span
+              >
+            </div>
+          </div>
+          <div class="summary-label text-texfina text-muted">
+            {{ estadistica.nombre }}
+          </div>
+          <div class="summary-description text-texfina text-muted">
+            {{ estadistica.descripcion }}
+          </div>
         </div>
       </div>
     </div>
-  </mat-card>
 
-  <!-- Tabla de roles -->
-  <div class="page-content">
-    <mat-card class="table-card">
+    <div class="filters-card">
+      <div class="filters-header">
+        <div class="filters-title">Búsqueda General</div>
+      </div>
+
+      <div class="filters-content">
+        <form [formGroup]="filtroGeneralForm" class="filters-form">
+          <div class="filters-grid">
+            <div class="filter-group">
+              <div class="simple-input-wrapper">
+                <input
+                  class="simple-input"
+                  formControlName="busquedaGeneral"
+                  placeholder="Buscar por nombre de rol, descripción, estado..."
+                  type="text"
+                />
+                <button
+                  *ngIf="filtroGeneralForm.get('busquedaGeneral')?.value"
+                  class="btn-limpiar"
+                  type="button"
+                  (click)="limpiarFiltroGeneral()"
+                >
+                  Limpiar
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="table-card table-with-headers">
+      <div class="column-headers">
+        <div class="header-row">
+          <div class="header-col codigo-col" (click)="sortData('id_rol')">
+            <span>Código</span>
+          </div>
+          <div class="header-col rol-col" (click)="sortData('nombre')">
+            <span>Rol</span>
+          </div>
+          <div class="header-col usuarios-col" (click)="sortData('usuarios')">
+            <span>Usuarios</span>
+          </div>
+          <div class="header-col permisos-col" (click)="sortData('permisos')">
+            <span>Permisos</span>
+          </div>
+          <div class="header-col estado-col" (click)="sortData('activo')">
+            <span>Estado</span>
+          </div>
+          <div class="header-col acciones-col">
+            <span>Acciones</span>
+          </div>
+        </div>
+      </div>
+
       <div class="table-container">
-        <table mat-table [dataSource]="roles" class="roles-table">
-          <!-- Columna Código -->
+        <div *ngIf="hasError" class="error-state">
+          <h3 class="error-title text-texfina text-primary">
+            Error al cargar datos
+          </h3>
+          <p class="error-subtitle text-texfina text-muted">
+            {{ errorMessage }}
+          </p>
+          <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
+            Reintentar
+          </button>
+        </div>
+
+        <div *ngIf="isEmpty" class="empty-state">
+          <h3 class="empty-title text-texfina text-primary">
+            No hay roles registrados
+          </h3>
+          <p class="empty-subtitle text-texfina text-muted">
+            No se encontraron roles en el sistema
+          </p>
+          <button class="btn-texfina btn-primary" (click)="agregar()">
+            Agregar Primer Rol
+          </button>
+        </div>
+
+        <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
+          <h3 class="filtered-empty-title text-texfina text-primary">
+            No se encontraron resultados
+          </h3>
+          <p class="filtered-empty-subtitle text-texfina text-muted">
+            Intenta ajustar los filtros o limpiar la búsqueda
+          </p>
+          <button
+            class="btn-texfina btn-secondary"
+            (click)="limpiarFiltroGeneral()"
+          >
+            Limpiar Filtros
+          </button>
+        </div>
+
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          matSort
+          class="data-table"
+          *ngIf="!isEmpty && !isFilteredEmpty && !hasError"
+        >
           <ng-container matColumnDef="codigo">
             <th mat-header-cell *matHeaderCellDef>Código</th>
-            <td mat-cell *matCellDef="let rol">{{ rol.id_rol }}</td>
+            <td mat-cell *matCellDef="let rol" class="table-cell">
+              <span class="badge-texfina badge-neutral">
+                {{ formatearCodigo(rol.id_rol) }}
+              </span>
+            </td>
           </ng-container>
 
-          <!-- Columna Rol -->
           <ng-container matColumnDef="rol">
             <th mat-header-cell *matHeaderCellDef>Rol</th>
-            <td mat-cell *matCellDef="let rol">
+            <td mat-cell *matCellDef="let rol" class="table-cell">
               <div class="rol-info">
-                <div class="rol-nombre">{{ rol.id_rol }}</div>
-                <div class="rol-descripcion">{{ rol.descripcion }}</div>
+                <div class="rol-nombre">{{ formatearTexto(rol.nombre) }}</div>
+                <div class="rol-descripcion text-texfina text-muted">
+                  {{ formatearTexto(rol.descripcion) }}
+                </div>
               </div>
             </td>
           </ng-container>
 
-          <!-- Columna Usuarios -->
           <ng-container matColumnDef="usuarios">
             <th mat-header-cell *matHeaderCellDef>Usuarios</th>
-            <td mat-cell *matCellDef="let rol">
-              <span class="usuarios-count">
-                {{ contarUsuariosPorRol(rol.id_rol) }}
+            <td mat-cell *matCellDef="let rol" class="table-cell">
+              <span class="badge-texfina badge-info">
+                {{ contarUsuarios(rol.id_rol) }}
               </span>
             </td>
           </ng-container>
 
-          <!-- Columna Permisos -->
           <ng-container matColumnDef="permisos">
             <th mat-header-cell *matHeaderCellDef>Permisos</th>
-            <td mat-cell *matCellDef="let rol">
-              <div class="permisos-info">
-                {{ obtenerPermisosPorRol(rol.id_rol).length }} permisos
+            <td mat-cell *matCellDef="let rol" class="table-cell">
+              <span class="badge-texfina badge-secondary">
+                {{ contarPermisos(rol.id_rol) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let rol" class="table-cell">
+              <span
+                class="badge-texfina"
+                [ngClass]="getEstadoBadgeClass(rol.activo)"
+              >
+                {{ getEstadoTexto(rol.activo) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let rol" class="table-cell">
+              <div class="action-buttons">
+                <button
+                  mat-mini-fab
+                  class="btn-action btn-view"
+                  (click)="verDetalle(rol)"
+                  matTooltip="Ver detalle"
+                >
+                  V
+                </button>
+                <button
+                  mat-mini-fab
+                  class="btn-action btn-edit"
+                  (click)="editar(rol)"
+                  matTooltip="Editar rol"
+                >
+                  E
+                </button>
+                <button
+                  mat-mini-fab
+                  class="btn-action btn-permisos"
+                  (click)="gestionarPermisos(rol)"
+                  matTooltip="Gestionar permisos"
+                >
+                  P
+                </button>
               </div>
             </td>
           </ng-container>
 
-          <!-- Columna Estado -->
-          <ng-container matColumnDef="estado">
-            <th mat-header-cell *matHeaderCellDef>Estado</th>
-            <td mat-cell *matCellDef="let rol">
-              <span
-                class="estado-badge"
-                [ngClass]="rol.activo ? 'estado-activo' : 'estado-inactivo'"
-              >
-                {{ rol.activo ? 'Activo' : 'Inactivo' }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Columna Acciones -->
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let rol">
-              <button
-                mat-icon-button
-                class="btn-ver"
-                (click)="abrirDialogoDetalle(rol)"
-                matTooltip="Ver detalle"
-              >
-                <mat-icon class="icon-ver">visibility</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                class="btn-editar"
-                (click)="abrirDialogoEditar(rol)"
-                matTooltip="Editar rol"
-              >
-                <mat-icon class="icon-editar">edit</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                class="btn-permisos"
-                (click)="abrirDialogoPermisos(rol)"
-                matTooltip="Gestionar permisos"
-              >
-                <mat-icon class="icon-permisos">security</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
-          <!-- Definición de headers y filas -->
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns;"
+            class="data-row"
+          ></tr>
         </table>
       </div>
-
-      <!-- Paginación -->
-      <div class="pagination-container">
-        <div class="pagination-info">
-          Página 1 de 1 ({{ roles.length }} roles)
-        </div>
-        <div class="pagination-buttons">
-          <button mat-icon-button disabled>
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button mat-icon-button disabled>
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
-      </div>
-    </mat-card>
-  </div>
-
-  <!-- Resumen estadístico -->
-  <div class="resumen-container">
-    <div class="resumen-grid">
-      <mat-card class="resumen-card">
-        <div class="resumen-content">
-          <div class="resumen-number">{{ totalRoles }}</div>
-          <div class="resumen-label">Total Roles</div>
-        </div>
-      </mat-card>
-
-      <mat-card class="resumen-card">
-        <div class="resumen-content">
-          <div class="resumen-number">{{ totalPermisos }}</div>
-          <div class="resumen-label">Total Permisos</div>
-        </div>
-      </mat-card>
-
-      <mat-card class="resumen-card">
-        <div class="resumen-content">
-          <div class="resumen-number">{{ usuariosConRol }}</div>
-          <div class="resumen-label">Usuarios con Rol</div>
-        </div>
-      </mat-card>
-
-      <mat-card class="resumen-card">
-        <div class="resumen-content">
-          <div class="resumen-number">{{ rolesActivos }}</div>
-          <div class="resumen-label">Roles Activos</div>
-        </div>
-      </mat-card>
     </div>
   </div>
 </div>

@@ -4,7 +4,8 @@
       <div class="header-content">
         <h1 class="page-title text-texfina text-primary">Logs del Sistema</h1>
         <p class="page-subtitle text-texfina text-muted">
-          Registro de eventos y errores del sistema
+          Supervisa la actividad del sistema y eventos importantes en tiempo
+          real
         </p>
       </div>
       <div class="header-actions">
@@ -27,14 +28,13 @@
             </button>
           </div>
         </div>
+        <button class="btn-texfina btn-primary" (click)="agregar()">
+          Agregar Log
+        </button>
       </div>
     </div>
 
     <div class="filters-card">
-      <div class="filters-header">
-        <div class="filters-title">Búsqueda General</div>
-      </div>
-
       <div class="filters-content">
         <form [formGroup]="filtroGeneralForm" class="filters-form">
           <div class="filters-grid">
@@ -43,21 +43,18 @@
                 <input
                   class="simple-input"
                   formControlName="busquedaGeneral"
-                  placeholder="Buscar por nivel, módulo, mensaje..."
+                  placeholder="Buscar en nivel, fecha, usuario, acción..."
                   type="text"
                 />
+                <button
+                  class="btn-limpiar"
+                  type="button"
+                  (click)="limpiarFiltroGeneral()"
+                  matTooltip="Limpiar búsqueda"
+                >
+                  Limpiar
+                </button>
               </div>
-            </div>
-
-            <div class="filter-actions">
-              <button
-                class="btn-clear-filters"
-                type="button"
-                (click)="limpiarFiltroGeneral()"
-                matTooltip="Limpiar búsqueda"
-              >
-                Limpiar
-              </button>
             </div>
           </div>
         </form>
@@ -68,39 +65,97 @@
       <div class="table-with-headers">
         <div class="column-headers">
           <div class="header-row header-titles">
-            <div class="header-col id-col" (click)="sortData('id_log')">
-              <span>ID</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
             <div class="header-col nivel-col" (click)="sortData('nivel')">
               <span>Nivel</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
             </div>
-            <div class="header-col modulo-col" (click)="sortData('modulo')">
-              <span>Módulo</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col mensaje-col" (click)="sortData('mensaje')">
-              <span>Mensaje</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            <div class="header-col fecha-col" (click)="sortData('fecha')">
+              <span>Fecha/Hora</span>
             </div>
             <div class="header-col usuario-col" (click)="sortData('usuario')">
               <span>Usuario</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
             </div>
-            <div class="header-col fecha-col" (click)="sortData('fecha')">
-              <span>Fecha</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            <div class="header-col accion-col" (click)="sortData('accion')">
+              <span>Acción</span>
+            </div>
+            <div class="header-col mensaje-col" (click)="sortData('mensaje')">
+              <span>Mensaje</span>
+            </div>
+            <div class="header-col ip-col" (click)="sortData('ip')">
+              <span>IP</span>
             </div>
             <div class="header-col acciones-col">
               <span>ACCIONES</span>
+            </div>
+          </div>
+
+          <div
+            class="header-row header-filters"
+            *ngIf="filtrosColumnaHabilitados"
+            [formGroup]="filtrosColumnaForm"
+          >
+            <div class="header-col nivel-col">
+              <input
+                class="column-filter-input"
+                formControlName="nivel"
+                placeholder="Nivel..."
+                type="text"
+              />
+            </div>
+            <div class="header-col fecha-col">
+              <input
+                class="column-filter-input"
+                formControlName="fecha"
+                placeholder="Fecha..."
+                type="date"
+              />
+            </div>
+            <div class="header-col usuario-col">
+              <input
+                class="column-filter-input"
+                formControlName="usuario"
+                placeholder="Usuario..."
+                type="text"
+              />
+            </div>
+            <div class="header-col accion-col">
+              <input
+                class="column-filter-input"
+                formControlName="accion"
+                placeholder="Acción..."
+                type="text"
+              />
+            </div>
+            <div class="header-col mensaje-col">
+              <input
+                class="column-filter-input"
+                formControlName="mensaje"
+                placeholder="Mensaje..."
+                type="text"
+              />
+            </div>
+            <div class="header-col ip-col">
+              <input
+                class="column-filter-input"
+                formControlName="ip"
+                placeholder="IP..."
+                type="text"
+              />
+            </div>
+            <div class="header-col acciones-col">
+              <button
+                class="btn-clear-column-filters"
+                type="button"
+                (click)="limpiarFiltrosColumna()"
+                matTooltip="Limpiar filtros de columna"
+              >
+                Limpiar filtros
+              </button>
             </div>
           </div>
         </div>
 
         <div class="table-container">
           <div *ngIf="hasError" class="error-state">
-            <mat-icon class="error-icon">error_outline</mat-icon>
             <h3 class="error-title text-texfina text-primary">
               Error al cargar datos
             </h3>
@@ -108,88 +163,91 @@
               {{ errorMessage }}
             </p>
             <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
-              <mat-icon>refresh</mat-icon>
               Reintentar
             </button>
           </div>
 
           <div *ngIf="isEmpty" class="empty-state">
-            <mat-icon class="empty-icon">description</mat-icon>
             <h3 class="empty-title text-texfina text-primary">
-              No hay logs del sistema
+              No hay logs registrados
             </h3>
             <p class="empty-subtitle text-texfina text-muted">
-              No se encontraron eventos registrados en el sistema
+              Los logs del sistema aparecerán aquí automáticamente
             </p>
+            <button class="btn-texfina btn-primary" (click)="agregar()">
+              Agregar Primer Log
+            </button>
           </div>
 
           <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
-            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
             <h3 class="filtered-empty-title text-texfina text-primary">
               No se encontraron resultados
             </h3>
             <p class="filtered-empty-subtitle text-texfina text-muted">
               Intenta ajustar los filtros o limpiar la búsqueda
             </p>
+            <button
+              class="btn-texfina btn-secondary"
+              (click)="limpiarFiltroGeneral()"
+            >
+              Limpiar Filtros
+            </button>
           </div>
 
           <table mat-table [dataSource]="dataSource" matSort class="data-table">
-            <ng-container matColumnDef="id_log">
-              <td mat-cell *matCellDef="let log" class="table-cell">
-                <span class="badge-texfina badge-neutral">
-                  {{ formatearCodigo(log.id_log) }}
-                </span>
-              </td>
-            </ng-container>
-
             <ng-container matColumnDef="nivel">
               <td mat-cell *matCellDef="let log" class="table-cell">
                 <span
                   class="badge-texfina"
-                  [ngClass]="obtenerClaseNivel(log.nivel)"
+                  [ngClass]="getNivelBadgeClass(log.nivel)"
                 >
-                  {{ formatearNivel(log.nivel) }}
+                  {{ formatearTexto(log.nivel) }}
                 </span>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="modulo">
-              <td mat-cell *matCellDef="let log" class="table-cell">
-                <div class="modulo-cell">
-                  <span class="modulo-name">
-                    {{ formatearTexto(log.modulo) }}
-                  </span>
-                </div>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="mensaje">
-              <td mat-cell *matCellDef="let log" class="table-cell">
-                <div class="mensaje-cell">
-                  <span class="mensaje-text" [title]="log.mensaje">
-                    {{ formatearMensaje(log.mensaje) }}
-                  </span>
-                </div>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="usuario">
-              <td mat-cell *matCellDef="let log" class="table-cell">
-                <div class="usuario-cell">
-                  <span class="usuario-name">
-                    {{ formatearTexto(log.usuario) }}
-                  </span>
-                </div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="fecha">
               <td mat-cell *matCellDef="let log" class="table-cell">
                 <div class="fecha-cell">
-                  <span class="fecha-text">
-                    {{ formatearFecha(log.fecha) }}
-                  </span>
+                  <div class="fecha-text text-texfina font-medium">
+                    {{ formatearFecha(log.fecha_hora) }}
+                  </div>
+                  <div class="hora-text text-texfina text-muted">
+                    {{ formatearHora(log.fecha_hora) }}
+                  </div>
                 </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="usuario">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <span class="usuario-name">
+                  {{ formatearTexto(log.usuario) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="accion">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <span class="accion-text">
+                  {{ formatearTexto(log.accion) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="mensaje">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <span class="mensaje-text" [title]="log.mensaje">
+                  {{ formatearMensaje(log.mensaje) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="ip">
+              <td mat-cell *matCellDef="let log" class="table-cell">
+                <span class="ip-text">
+                  {{ formatearTexto(log.ip_address) }}
+                </span>
               </td>
             </ng-container>
 
@@ -197,13 +255,18 @@
               <td mat-cell *matCellDef="let log" class="table-cell">
                 <div class="action-buttons">
                   <button
-                    mat-mini-fab
-                    color="accent"
-                    class="btn-action btn-detail"
+                    class="btn-action btn-view"
                     (click)="verDetalle(log)"
                     matTooltip="Ver detalles"
                   >
-                    <mat-icon>visibility</mat-icon>
+                    👁
+                  </button>
+                  <button
+                    class="btn-action btn-delete"
+                    (click)="eliminar(log)"
+                    matTooltip="Eliminar log"
+                  >
+                    🗑
                   </button>
                 </div>
               </td>

@@ -1,6 +1,5 @@
-<div class="reportes-container page-container">
+<div class="page-container">
   <div class="page-content">
-    <!-- Header de la página -->
     <div class="page-header">
       <div class="header-content">
         <h1 class="page-title text-texfina text-primary">
@@ -11,523 +10,282 @@
         </p>
       </div>
       <div class="header-actions">
-        <button
-          class="btn-texfina btn-success"
-          (click)="exportarExcel()"
-          [disabled]="cargandoReporte"
-        >
-          <mat-icon>file_download</mat-icon>
-          Exportar Excel
+        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
+          Carga Masiva
         </button>
-        <button
-          class="btn-texfina btn-secondary"
-          (click)="exportarPDF()"
-          [disabled]="cargandoReporte"
-        >
-          <mat-icon>picture_as_pdf</mat-icon>
-          Exportar PDF
-        </button>
-        <button class="btn-texfina btn-primary" (click)="programarReporte()">
-          <mat-icon>schedule</mat-icon>
-          Programar Reporte
-        </button>
-      </div>
-    </div>
-
-    <!-- KPIs Dashboard -->
-    <div class="summary-cards">
-      <div
-        class="card-texfina"
-        *ngFor="let kpi of kpis"
-        [ngClass]="getCardClass(kpi.tendencia)"
-      >
-        <div class="card-content">
-          <div class="summary-header">
-            <div class="summary-value text-texfina text-primary">
-              {{ kpi.valor }}
-            </div>
-            <div class="summary-trend" [ngClass]="getTrendClass(kpi.tendencia)">
-              <mat-icon>{{ getIconoTendencia(kpi.tendencia) }}</mat-icon>
-              <span *ngIf="kpi.porcentaje">{{ kpi.porcentaje }}%</span>
-            </div>
-          </div>
-          <div class="summary-label text-texfina text-muted">
-            {{ kpi.nombre }}
-          </div>
-          <div class="summary-description text-texfina text-muted">
-            {{ kpi.descripcion }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filtros -->
-    <div class="filters-card" [class.expanded]="filtrosExpanded">
-      <div class="filters-header" (click)="toggleFiltros()">
-        <div class="filters-title">
-          <mat-icon>tune</mat-icon>
-          Filtros de Búsqueda
-          <mat-icon class="expand-icon" [class.rotated]="filtrosExpanded"
-            >expand_more</mat-icon
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
           >
+            Exportar
+          </button>
+          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+            <button class="dropdown-item" (click)="exportarExcel()">
+              Exportar a Excel
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              Exportar a PDF
+            </button>
+          </div>
         </div>
-        <span class="filter-subtitle" *ngIf="filtrosExpanded">
-          Los resultados se actualizan automáticamente
-        </span>
+        <button class="btn-texfina btn-primary" (click)="agregar()">
+          Generar Reporte
+        </button>
       </div>
+    </div>
 
-      <div class="filters-content" *ngIf="filtrosExpanded">
-        <form [formGroup]="filtrosForm" class="filters-form">
+    <div class="filters-card">
+      <div class="filters-content">
+        <form [formGroup]="filtroGeneralForm" class="filters-form">
           <div class="filters-grid">
             <div class="filter-group">
               <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">assessment</mat-icon>
                 <input
                   class="simple-input"
-                  formControlName="tipo_reporte_text"
-                  placeholder="Filtrar por tipo reporte..."
+                  formControlName="busquedaGeneral"
+                  placeholder="Buscar en tipo, fecha, usuario, estado..."
                   type="text"
                 />
+                <button
+                  class="btn-limpiar"
+                  type="button"
+                  (click)="limpiarFiltroGeneral()"
+                  matTooltip="Limpiar búsqueda"
+                >
+                  Limpiar
+                </button>
               </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">calendar_today</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="fecha_desde_text"
-                  placeholder="Filtrar por fecha desde..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">event</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="fecha_hasta_text"
-                  placeholder="Filtrar por fecha hasta..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">warehouse</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="almacen"
-                  placeholder="Filtrar por almacén..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <mat-icon class="input-icon">category</mat-icon>
-                <input
-                  class="simple-input"
-                  formControlName="clase"
-                  placeholder="Filtrar por clase..."
-                  type="text"
-                />
-              </div>
-            </div>
-
-            <div class="filter-actions">
-              <button
-                class="btn-clear-filters"
-                type="button"
-                (click)="limpiarFiltros()"
-                matTooltip="Limpiar todos los filtros"
-              >
-                Limpiar todos
-              </button>
             </div>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- Tabla de reportes -->
     <div class="table-card">
       <div class="table-with-headers">
-        <!-- Encabezados según tipo de reporte -->
-        <div class="column-headers" *ngIf="currentReportType === 'inventario'">
-          <div class="header-row">
-            <div class="header-col codigo-col" (click)="sortData('codigo')">
-              <span>Código</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col material-col" (click)="sortData('material')">
-              <span>Material</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col almacen-col" (click)="sortData('almacen')">
-              <span>Almacén</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col clase-col" (click)="sortData('clase')">
-              <span>Clase</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col stock-col" (click)="sortData('stock')">
-              <span>Stock Actual</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col valor-col" (click)="sortData('valor')">
-              <span>Valor Total</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col rotacion-col" (click)="sortData('rotacion')">
-              <span>Rotación</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col dias-col" (click)="sortData('dias')">
-              <span>Días Inventario</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-          </div>
-        </div>
-
-        <div class="column-headers" *ngIf="currentReportType === 'movimientos'">
-          <div class="header-row">
-            <div class="header-col fecha-col" (click)="sortData('fecha')">
-              <span>Fecha</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
+        <div class="column-headers">
+          <div class="header-row header-titles">
             <div class="header-col tipo-col" (click)="sortData('tipo')">
-              <span>Tipo</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
+              <span>Tipo Reporte</span>
             </div>
-            <div class="header-col codigo-col" (click)="sortData('codigo')">
-              <span>Código</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col material-col" (click)="sortData('material')">
-              <span>Material</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col cantidad-col" (click)="sortData('cantidad')">
-              <span>Cantidad</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col almacen-col" (click)="sortData('almacen')">
-              <span>Almacén</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            <div class="header-col fecha-col" (click)="sortData('fecha')">
+              <span>Fecha Generación</span>
             </div>
             <div class="header-col usuario-col" (click)="sortData('usuario')">
               <span>Usuario</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            </div>
+            <div
+              class="header-col parametros-col"
+              (click)="sortData('parametros')"
+            >
+              <span>Parámetros</span>
+            </div>
+            <div class="header-col estado-col" (click)="sortData('estado')">
+              <span>Estado</span>
+            </div>
+            <div class="header-col tamano-col" (click)="sortData('tamano')">
+              <span>Tamaño</span>
+            </div>
+            <div class="header-col acciones-col">
+              <span>ACCIONES</span>
+            </div>
+          </div>
+
+          <div
+            class="header-row header-filters"
+            *ngIf="filtrosColumnaHabilitados"
+            [formGroup]="filtrosColumnaForm"
+          >
+            <div class="header-col tipo-col">
+              <input
+                class="column-filter-input"
+                formControlName="tipo"
+                placeholder="Tipo..."
+                type="text"
+              />
+            </div>
+            <div class="header-col fecha-col">
+              <input
+                class="column-filter-input"
+                formControlName="fecha"
+                placeholder="Fecha..."
+                type="date"
+              />
+            </div>
+            <div class="header-col usuario-col">
+              <input
+                class="column-filter-input"
+                formControlName="usuario"
+                placeholder="Usuario..."
+                type="text"
+              />
+            </div>
+            <div class="header-col parametros-col">
+              <input
+                class="column-filter-input"
+                formControlName="parametros"
+                placeholder="Parámetros..."
+                type="text"
+              />
+            </div>
+            <div class="header-col estado-col">
+              <input
+                class="column-filter-input"
+                formControlName="estado"
+                placeholder="Estado..."
+                type="text"
+              />
+            </div>
+            <div class="header-col tamano-col">
+              <input
+                class="column-filter-input"
+                formControlName="tamano"
+                placeholder="Tamaño..."
+                type="text"
+              />
+            </div>
+            <div class="header-col acciones-col">
+              <button
+                class="btn-clear-column-filters"
+                type="button"
+                (click)="limpiarFiltrosColumna()"
+                matTooltip="Limpiar filtros de columna"
+              >
+                Limpiar filtros
+              </button>
             </div>
           </div>
         </div>
 
         <div class="table-container">
-          <!-- Estado de error -->
           <div *ngIf="hasError" class="error-state">
-            <mat-icon class="error-icon">error_outline</mat-icon>
             <h3 class="error-title text-texfina text-primary">
-              Error al generar reporte
+              Error al cargar datos
             </h3>
             <p class="error-subtitle text-texfina text-muted">
               {{ errorMessage }}
             </p>
-            <button class="btn-texfina btn-primary" (click)="aplicarFiltros()">
-              <mat-icon>refresh</mat-icon>
+            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
               Reintentar
             </button>
           </div>
 
-          <!-- Estado vacío -->
           <div *ngIf="isEmpty" class="empty-state">
-            <mat-icon class="empty-icon">assessment</mat-icon>
             <h3 class="empty-title text-texfina text-primary">
-              No hay datos para mostrar
+              No hay reportes generados
             </h3>
             <p class="empty-subtitle text-texfina text-muted">
-              No se encontraron datos para los filtros seleccionados
+              Comienza generando tu primer reporte del sistema
             </p>
-            <button class="btn-texfina btn-primary" (click)="limpiarFiltros()">
-              <mat-icon>clear</mat-icon>
+            <button class="btn-texfina btn-primary" (click)="agregar()">
+              Generar Primer Reporte
+            </button>
+          </div>
+
+          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
+            <h3 class="filtered-empty-title text-texfina text-primary">
+              No se encontraron resultados
+            </h3>
+            <p class="filtered-empty-subtitle text-texfina text-muted">
+              Intenta ajustar los filtros o limpiar la búsqueda
+            </p>
+            <button
+              class="btn-texfina btn-secondary"
+              (click)="limpiarFiltroGeneral()"
+            >
               Limpiar Filtros
             </button>
           </div>
 
-          <!-- Reporte de Inventario -->
-          <table
-            mat-table
-            [dataSource]="reporteInventarioFiltrado"
-            matSort
-            class="data-table"
-            *ngIf="currentReportType === 'inventario' && !isEmpty && !hasError"
-          >
-            <!-- Columna Código -->
-            <ng-container matColumnDef="codigo">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span class="badge-texfina badge-primary"
-                  >{{ item.codigo_fox }}</span
-                >
-              </td>
-            </ng-container>
-
-            <!-- Columna Material -->
-            <ng-container matColumnDef="material">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <div class="material-info">
-                  <div class="material-name text-texfina font-medium">
-                    {{ item.nombre }}
-                  </div>
-                  <div class="material-detail text-texfina text-muted">
-                    ID: {{ item.id_insumo }}
-                  </div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Columna Almacén -->
-            <ng-container matColumnDef="almacen">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span class="badge-texfina badge-secondary"
-                  >{{ item.almacen }}</span
-                >
-              </td>
-            </ng-container>
-
-            <!-- Columna Clase -->
-            <ng-container matColumnDef="clase">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span class="badge-texfina badge-neutral"
-                  >{{ item.clase }}</span
-                >
-              </td>
-            </ng-container>
-
-            <!-- Columna Stock -->
-            <ng-container matColumnDef="stock">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <div class="stock-info">
-                  <div class="stock-value text-texfina font-semibold">
-                    {{ formatearNumero(item.stock_actual) }}
-                  </div>
-                  <div class="stock-unit text-texfina text-muted">unidades</div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Columna Valor -->
-            <ng-container matColumnDef="valor">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <div class="valor-info">
-                  <div class="valor-total text-texfina font-semibold">
-                    {{ formatearMoneda(item.valor_total) }}
-                  </div>
-                  <div class="valor-unit text-texfina text-muted">
-                    Unit: {{ formatearMoneda(item.costo_unitario) }}
-                  </div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Columna Rotación -->
-            <ng-container matColumnDef="rotacion">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span
-                  class="badge-texfina"
-                  [ngClass]="getRotacionClass(item.rotacion)"
-                >
-                  {{ item.rotacion }}x
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Días -->
-            <ng-container matColumnDef="dias">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span class="text-texfina font-medium"
-                  >{{ item.dias_inventario }} días</span
-                >
-              </td>
-            </ng-container>
-
-            <!-- Filas de datos -->
-            <tr
-              mat-row
-              *matRowDef="let row; columns: displayedColumnsInventario"
-            ></tr>
-          </table>
-
-          <!-- Reporte de Movimientos -->
-          <table
-            mat-table
-            [dataSource]="reporteMovimientosFiltrado"
-            matSort
-            class="data-table"
-            *ngIf="currentReportType === 'movimientos' && !isEmpty && !hasError"
-          >
-            <!-- Columna Fecha -->
-            <ng-container matColumnDef="fecha">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span class="text-texfina font-medium"
-                  >{{ formatearFecha(item.fecha) }}</span
-                >
-              </td>
-            </ng-container>
-
-            <!-- Columna Tipo -->
+          <table mat-table [dataSource]="dataSource" matSort class="data-table">
             <ng-container matColumnDef="tipo">
-              <td mat-cell *matCellDef="let item" class="table-cell">
+              <td mat-cell *matCellDef="let reporte" class="table-cell">
+                <span class="badge-texfina badge-primary">
+                  {{ formatearTexto(reporte.tipo_reporte) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="fecha">
+              <td mat-cell *matCellDef="let reporte" class="table-cell">
+                <div class="fecha-cell">
+                  <div class="fecha-text text-texfina font-medium">
+                    {{ formatearFecha(reporte.fecha_generacion) }}
+                  </div>
+                  <div class="hora-text text-texfina text-muted">
+                    {{ formatearHora(reporte.fecha_generacion) }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="usuario">
+              <td mat-cell *matCellDef="let reporte" class="table-cell">
+                <span class="usuario-name">
+                  {{ formatearTexto(reporte.usuario) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="parametros">
+              <td mat-cell *matCellDef="let reporte" class="table-cell">
+                <span class="parametros-text">
+                  {{ formatearTexto(reporte.parametros) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="estado">
+              <td mat-cell *matCellDef="let reporte" class="table-cell">
                 <span
                   class="badge-texfina"
-                  [ngClass]="getTipoMovimientoClass(item.tipo_movimiento)"
+                  [ngClass]="getEstadoBadgeClass(reporte.estado)"
                 >
-                  {{ item.tipo_movimiento }}
+                  {{ getEstadoTexto(reporte.estado) }}
                 </span>
               </td>
             </ng-container>
 
-            <!-- Columna Código -->
-            <ng-container matColumnDef="codigo">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span class="badge-texfina badge-primary"
-                  >{{ item.codigo_fox }}</span
-                >
-              </td>
-            </ng-container>
-
-            <!-- Columna Material -->
-            <ng-container matColumnDef="material">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span class="text-texfina font-medium"
-                  >{{ item.material }}</span
-                >
-              </td>
-            </ng-container>
-
-            <!-- Columna Cantidad -->
-            <ng-container matColumnDef="cantidad">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span
-                  class="text-texfina font-semibold"
-                  [ngClass]="getCantidadClass(item.tipo_movimiento)"
-                >
-                  {{ formatearCantidad(item.cantidad) }}
+            <ng-container matColumnDef="tamano">
+              <td mat-cell *matCellDef="let reporte" class="table-cell">
+                <span class="tamano-text">
+                  {{ formatearTamano(reporte.tamano_archivo) }}
                 </span>
               </td>
             </ng-container>
 
-            <!-- Columna Almacén -->
-            <ng-container matColumnDef="almacen">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span class="badge-texfina badge-secondary"
-                  >{{ item.almacen }}</span
-                >
+            <ng-container matColumnDef="acciones">
+              <td mat-cell *matCellDef="let reporte" class="table-cell">
+                <div class="action-buttons">
+                  <button
+                    class="btn-action btn-view"
+                    (click)="verDetalle(reporte)"
+                    matTooltip="Ver detalles"
+                  >
+                    👁
+                  </button>
+                  <button
+                    class="btn-action btn-download"
+                    (click)="descargar(reporte)"
+                    matTooltip="Descargar reporte"
+                    [disabled]="reporte.estado !== 'COMPLETADO'"
+                  >
+                    ⬇
+                  </button>
+                  <button
+                    class="btn-action btn-delete"
+                    (click)="eliminar(reporte)"
+                    matTooltip="Eliminar reporte"
+                  >
+                    🗑
+                  </button>
+                </div>
               </td>
             </ng-container>
 
-            <!-- Columna Usuario -->
-            <ng-container matColumnDef="usuario">
-              <td mat-cell *matCellDef="let item" class="table-cell">
-                <span class="text-texfina">{{ item.usuario }}</span>
-              </td>
-            </ng-container>
-
-            <!-- Filas de datos -->
-            <tr
-              mat-row
-              *matRowDef="let row; columns: displayedColumnsMovimientos"
-            ></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
-
-          <!-- Skeleton superpuesto mientras carga -->
-          <div *ngIf="cargandoReporte" class="skeleton-overlay">
-            <table
-              class="skeleton-table"
-              *ngIf="filtrosForm.value.tipo_reporte === 'inventario'"
-            >
-              <tr class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6]">
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                  <div class="skeleton-line skeleton-subtext"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                  <div class="skeleton-line skeleton-subtext"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-price"></div>
-                  <div class="skeleton-line skeleton-subtext"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-              </tr>
-            </table>
-
-            <table
-              class="skeleton-table"
-              *ngIf="filtrosForm.value.tipo_reporte === 'movimientos'"
-            >
-              <tr class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6]">
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Paginación -->
-      <div class="table-footer">
-        <div class="pagination-info">
-          <span class="text-texfina text-muted">
-            Mostrando {{ getCurrentPageItems() }} de {{ getTotalItems() }}
-            registros
-          </span>
-        </div>
-        <div class="pagination-controls">
-          <button class="pagination-button" [disabled]="isFirstPage()">
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button class="pagination-button" [disabled]="isLastPage()">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
         </div>
       </div>
     </div>

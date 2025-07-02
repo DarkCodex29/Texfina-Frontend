@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +10,18 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { Subject } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+} from '../services/carga-masiva.service';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 
 export interface ConfiguracionSistema {
   empresa: {
@@ -29,30 +41,27 @@ export interface ConfiguracionSistema {
     notificaciones_email: boolean;
   };
   inventario: {
-    umbral_stock_minimo: number;
-    dias_alerta_vencimiento: number;
-    metodo_valoracion: string;
-    permitir_stock_negativo: boolean;
-    alertas_automaticas: boolean;
-    auditoria_movimientos: boolean;
+    stock_minimo_defecto: number;
+    stock_maximo_defecto: number;
+    metodo_valorizacion: string;
+    alerta_stock_bajo: boolean;
+    seguimiento_lotes: boolean;
+    control_fechas_vencimiento: boolean;
   };
-  seguridad: {
-    tiempo_sesion: number;
-    intentos_login: number;
-    longitud_password: number;
-    requiere_mayusculas: boolean;
-    requiere_numeros: boolean;
-    requiere_simbolos: boolean;
-    doble_factor: boolean;
-    log_accesos: boolean;
+  usuarios: {
+    dias_expiracion_password: number;
+    max_intentos_login: number;
+    duracion_sesion_horas: number;
+    autenticacion_doble_factor: boolean;
+    bloqueo_automatico: boolean;
+    historial_passwords: boolean;
   };
-  respaldos: {
-    frecuencia: string;
-    hora: string;
-    dias_retencion: number;
-    ruta: string;
-    compresion: boolean;
-    notificar_email: boolean;
+  auditoria: {
+    dias_retencion_logs: number;
+    nivel_log: string;
+    auditoria_activa: boolean;
+    log_cambios_datos: boolean;
+    log_acceso_usuarios: boolean;
   };
 }
 
@@ -62,6 +71,7 @@ export interface ConfiguracionSistema {
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -75,7 +85,9 @@ export interface ConfiguracionSistema {
   templateUrl: './configuracion.html',
   styleUrls: ['./configuracion.scss'],
 })
-export class ConfiguracionComponent implements OnInit {
+export class ConfiguracionComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   configuracion: ConfiguracionSistema = {
     empresa: {
       nombre: 'Texfina Industries',
@@ -94,30 +106,27 @@ export class ConfiguracionComponent implements OnInit {
       notificaciones_email: true,
     },
     inventario: {
-      umbral_stock_minimo: 20,
-      dias_alerta_vencimiento: 30,
-      metodo_valoracion: 'FIFO',
-      permitir_stock_negativo: false,
-      alertas_automaticas: true,
-      auditoria_movimientos: true,
+      stock_minimo_defecto: 10,
+      stock_maximo_defecto: 1000,
+      metodo_valorizacion: 'FIFO',
+      alerta_stock_bajo: true,
+      seguimiento_lotes: true,
+      control_fechas_vencimiento: true,
     },
-    seguridad: {
-      tiempo_sesion: 480,
-      intentos_login: 3,
-      longitud_password: 8,
-      requiere_mayusculas: true,
-      requiere_numeros: true,
-      requiere_simbolos: false,
-      doble_factor: false,
-      log_accesos: true,
+    usuarios: {
+      dias_expiracion_password: 90,
+      max_intentos_login: 3,
+      duracion_sesion_horas: 8,
+      autenticacion_doble_factor: false,
+      bloqueo_automatico: true,
+      historial_passwords: true,
     },
-    respaldos: {
-      frecuencia: 'DIARIO',
-      hora: '02:00',
-      dias_retencion: 30,
-      ruta: '/backup/texfina',
-      compresion: true,
-      notificar_email: true,
+    auditoria: {
+      dias_retencion_logs: 365,
+      nivel_log: 'INFO',
+      auditoria_activa: true,
+      log_cambios_datos: true,
+      log_acceso_usuarios: true,
     },
   };
 
@@ -125,15 +134,26 @@ export class ConfiguracionComponent implements OnInit {
   hayCambios = false;
   guardandoConfig = false;
   tabActual = 0;
+  dropdownExportAbierto = false;
 
-  constructor(private snackBar: MatSnackBar) {}
+  constructor(
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
+  ) {}
 
   ngOnInit(): void {
     this.cargarConfiguracion();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   cargarConfiguracion(): void {
-    // Simular carga de configuración
     this.configuracionOriginal = JSON.parse(JSON.stringify(this.configuracion));
   }
 
@@ -151,7 +171,6 @@ export class ConfiguracionComponent implements OnInit {
   guardarConfiguracion(): void {
     this.guardandoConfig = true;
 
-    // Simular guardado
     setTimeout(() => {
       this.guardandoConfig = false;
       this.hayCambios = false;
@@ -168,102 +187,147 @@ export class ConfiguracionComponent implements OnInit {
     }, 2000);
   }
 
-  crearRespaldoManual(): void {
-    this.snackBar.open('Creando respaldo manual...', 'Cerrar', {
-      duration: 2000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-    });
-
-    setTimeout(() => {
-      this.snackBar.open('Respaldo creado exitosamente', 'Cerrar', {
-        duration: 3000,
-        horizontalPosition: 'end',
-        verticalPosition: 'top',
-        panelClass: ['snackbar-success'],
-      });
-    }, 2000);
-  }
-
-  verHistorialRespaldos(): void {
-    this.snackBar.open('Abriendo historial de respaldos...', 'Cerrar', {
-      duration: 2000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-    });
-  }
-
   resetearTab(tabIndex: number): void {
     switch (tabIndex) {
-      case 0: // General
+      case 0:
         this.configuracion.empresa = { ...this.configuracionOriginal.empresa };
         this.configuracion.sistema = { ...this.configuracionOriginal.sistema };
         break;
-      case 1: // Inventario
+      case 1:
         this.configuracion.inventario = {
           ...this.configuracionOriginal.inventario,
         };
         break;
-      case 2: // Seguridad
-        this.configuracion.seguridad = {
-          ...this.configuracionOriginal.seguridad,
+      case 2:
+        this.configuracion.usuarios = {
+          ...this.configuracionOriginal.usuarios,
         };
         break;
-      case 3: // Respaldos
-        this.configuracion.respaldos = {
-          ...this.configuracionOriginal.respaldos,
+      case 3:
+        this.configuracion.auditoria = {
+          ...this.configuracionOriginal.auditoria,
         };
         break;
     }
-    this.hayCambios = this.hayCambiosPendientes();
+    this.hayCambios = false;
   }
 
-  exportarConfiguracion(): void {
-    const dataStr = JSON.stringify(this.configuracion, null, 2);
-    const dataUri =
-      'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+  private configurarExportacion(): ConfiguracionExportacion<any> {
+    return {
+      entidades: [this.configuracion],
+      nombreArchivo: 'configuracion-sistema',
+      nombreEntidad: 'Configuración del Sistema',
+      columnas: [
+        { campo: 'empresa.nombre', titulo: 'Empresa', formato: 'texto' },
+        {
+          campo: 'sistema.zona_horaria',
+          titulo: 'Zona Horaria',
+          formato: 'texto',
+        },
+        {
+          campo: 'inventario.metodo_valorizacion',
+          titulo: 'Método Valorización',
+          formato: 'texto',
+        },
+        {
+          campo: 'usuarios.max_intentos_login',
+          titulo: 'Max Intentos Login',
+          formato: 'numero',
+        },
+        { campo: 'auditoria.nivel_log', titulo: 'Nivel Log', formato: 'texto' },
+      ],
+      filtrosActivos: {},
+      metadatos: {
+        cantidadTotal: 1,
+        cantidadFiltrada: 1,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
 
-    const exportFileDefaultName = 'configuracion-texfina.json';
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<any> {
+    return {
+      tipoEntidad: 'configuracion',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Empresa',
+          campoEntidad: 'empresa.nombre',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Zona Horaria',
+          campoEntidad: 'sistema.zona_horaria',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'empresa.nombre',
+          validador: (valor) => valor && valor.length <= 200,
+          mensajeError:
+            'El nombre de la empresa debe tener máximo 200 caracteres',
+        },
+      ],
+    };
+  }
 
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-
-    this.snackBar.open('Configuración exportada exitosamente', 'Cerrar', {
-      duration: 3000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-      panelClass: ['snackbar-success'],
+  cargaMasiva(): void {
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
     });
   }
 
-  importarConfiguracion(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        try {
-          const importedConfig = JSON.parse(e.target.result);
-          this.configuracion = { ...this.configuracion, ...importedConfig };
-          this.hayCambios = true;
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
 
-          this.snackBar.open('Configuración importada exitosamente', 'Cerrar', {
-            duration: 3000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top',
-            panelClass: ['snackbar-success'],
-          });
-        } catch (error) {
-          this.snackBar.open('Error al importar la configuración', 'Cerrar', {
-            duration: 3000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top',
-            panelClass: ['snackbar-error'],
-          });
-        }
-      };
-      reader.readAsText(file);
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
     }
+  }
+
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
+
+  private descargarPlantillaCargaMasiva(): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService.generarPlantilla(config);
+  }
+
+  private procesarArchivoCargaMasiva(archivo: File): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService
+      .procesarArchivo(archivo, config)
+      .then((resultado) => {
+        console.log('Archivo procesado:', resultado);
+        if (resultado.exitosa) {
+          this.cargarConfiguracion();
+        }
+      })
+      .catch((error) => {
+        console.error('Error procesando archivo:', error);
+      });
   }
 }

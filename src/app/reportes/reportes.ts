@@ -9,37 +9,33 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
-import { Subject, takeUntil, debounceTime } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import {
+  ExportacionService,
+  ConfiguracionExportacion,
+} from '../services/exportacion.service';
+import {
+  CargaMasivaService,
+  ConfiguracionCargaMasiva,
+} from '../services/carga-masiva.service';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 
-export interface ReporteInventario {
-  id_insumo: number;
-  codigo_fox: string;
-  nombre: string;
-  almacen: string;
-  clase: string;
-  stock_actual: number;
-  costo_unitario: number;
-  valor_total: number;
-  rotacion: number;
-  dias_inventario: number;
-}
-
-export interface ReporteMovimiento {
-  id_movimiento: number;
-  fecha: string;
-  tipo_movimiento: 'INGRESO' | 'EGRESO' | 'AJUSTE';
-  codigo_fox: string;
-  material: string;
-  cantidad: number;
-  almacen: string;
+export interface Reporte {
+  id_reporte: number;
+  tipo_reporte: string;
+  fecha_generacion: string;
   usuario: string;
-  observaciones: string;
+  parametros: string;
+  estado: 'GENERANDO' | 'COMPLETADO' | 'ERROR';
+  tamano_archivo: number;
+  ruta_archivo?: string;
 }
 
 export interface KPI {
@@ -77,460 +73,439 @@ export interface KPI {
 export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  // Estado del componente
-  filtrosForm: FormGroup;
-  filtrosExpanded = true;
-  cargandoReporte = false;
+  isLoading = false;
   hasError = false;
   errorMessage = '';
+  dropdownExportAbierto = false;
 
-  // Datos
-  reporteInventario: ReporteInventario[] = [];
-  reporteMovimientos: ReporteMovimiento[] = [];
-  reporteInventarioFiltrado: ReporteInventario[] = [];
-  reporteMovimientosFiltrado: ReporteMovimiento[] = [];
+  reportes: Reporte[] = [];
+  dataSource = new MatTableDataSource<Reporte>([]);
+  displayedColumns: string[] = [
+    'tipo',
+    'fecha',
+    'usuario',
+    'parametros',
+    'estado',
+    'tamano',
+    'acciones',
+  ];
+
+  filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosColumnaHabilitados = false;
   kpis: KPI[] = [];
 
-  // Catálogos
-  almacenes = [
-    { id: 1, nombre: 'Almacén Principal' },
-    { id: 2, nombre: 'Almacén Secundario' },
-    { id: 3, nombre: 'Almacén de Tránsito' },
-  ];
+  constructor(
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private exportacionService: ExportacionService,
+    private cargaMasivaService: CargaMasivaService
+  ) {
+    this.filtroGeneralForm = this.fb.group({
+      busquedaGeneral: [''],
+    });
 
-  clases = [
-    { id: 1, nombre: 'Fibras Naturales' },
-    { id: 2, nombre: 'Fibras Sintéticas' },
-    { id: 3, nombre: 'Hilos' },
-    { id: 4, nombre: 'Telas' },
-    { id: 5, nombre: 'Accesorios' },
-  ];
-
-  // Configuración de tablas
-  displayedColumnsInventario: string[] = [
-    'codigo',
-    'material',
-    'almacen',
-    'clase',
-    'stock',
-    'valor',
-    'rotacion',
-    'dias',
-  ];
-
-  displayedColumnsMovimientos: string[] = [
-    'fecha',
-    'tipo',
-    'codigo',
-    'material',
-    'cantidad',
-    'almacen',
-    'usuario',
-  ];
-
-  constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
-    this.filtrosForm = this.fb.group({
-      tipo_reporte_text: [''],
-      fecha_desde_text: [''],
-      fecha_hasta_text: [''],
-      almacen: [''],
-      clase: [''],
+    this.filtrosColumnaForm = this.fb.group({
+      tipo: [''],
+      fecha: [''],
+      usuario: [''],
+      parametros: [''],
+      estado: [''],
+      tamano: [''],
     });
   }
 
   ngOnInit(): void {
+    this.configurarFiltros();
+    this.cargarDatos();
     this.cargarKPIs();
-    this.cargarReporteInventario();
-    this.cargarReporteMovimientos();
-
-    // Escuchar cambios en filtros con debounce
-    this.filtrosForm.valueChanges
-      .pipe(takeUntil(this.destroy$), debounceTime(300))
-      .subscribe(() => {
-        this.aplicarFiltros();
-      });
   }
 
-  ngAfterViewInit(): void {
-    // Inicialización después de la vista
-  }
+  ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  // ===== GESTIÓN DE FILTROS =====
-  toggleFiltros(): void {
-    this.filtrosExpanded = !this.filtrosExpanded;
+  get isEmpty(): boolean {
+    return !this.isLoading && !this.hasError && this.reportes.length === 0;
   }
 
-  limpiarFiltros(): void {
-    this.filtrosForm.patchValue({
-      tipo_reporte_text: '',
-      fecha_desde_text: '',
-      fecha_hasta_text: '',
-      almacen: '',
-      clase: '',
-    });
-    this.aplicarFiltros();
+  get isFilteredEmpty(): boolean {
+    return (
+      !this.isLoading &&
+      !this.hasError &&
+      this.reportes.length > 0 &&
+      this.dataSource.filteredData.length === 0
+    );
   }
 
-  // ===== GESTIÓN DE DATOS =====
-  aplicarFiltros(): void {
-    const filtros = this.filtrosForm.value;
+  private configurarFiltros() {
+    this.filtroGeneralForm.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.aplicarFiltroGeneral();
+      });
+  }
 
-    // Filtrar reporte de inventario
-    this.reporteInventarioFiltrado = this.reporteInventario.filter((item) => {
-      const matchTipo =
-        !filtros.tipo_reporte_text ||
-        'inventario'
-          .toLowerCase()
-          .includes(filtros.tipo_reporte_text.toLowerCase());
-      const matchFechaDesde = !filtros.fecha_desde_text || true; // Por simplicidad
-      const matchFechaHasta = !filtros.fecha_hasta_text || true; // Por simplicidad
-      const matchAlmacen =
-        !filtros.almacen ||
-        item.almacen.toLowerCase().includes(filtros.almacen.toLowerCase());
-      const matchClase =
-        !filtros.clase ||
-        item.clase.toLowerCase().includes(filtros.clase.toLowerCase());
+  private async cargarDatos() {
+    this.isLoading = true;
+    this.hasError = false;
 
-      return (
-        matchTipo &&
-        matchFechaDesde &&
-        matchFechaHasta &&
-        matchAlmacen &&
-        matchClase
-      );
-    });
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      this.cargarDatosMock();
+    } catch (error) {
+      this.hasError = true;
+      this.errorMessage = 'Error al cargar los datos de reportes';
+      console.error('Error cargando reportes:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
 
-    // Filtrar reporte de movimientos
-    this.reporteMovimientosFiltrado = this.reporteMovimientos.filter((item) => {
-      const matchTipo =
-        !filtros.tipo_reporte_text ||
-        'movimientos'
-          .toLowerCase()
-          .includes(filtros.tipo_reporte_text.toLowerCase());
-      const matchFechaDesde =
-        !filtros.fecha_desde_text ||
-        item.fecha.includes(filtros.fecha_desde_text);
-      const matchFechaHasta =
-        !filtros.fecha_hasta_text ||
-        item.fecha.includes(filtros.fecha_hasta_text);
-      const matchAlmacen =
-        !filtros.almacen ||
-        item.almacen.toLowerCase().includes(filtros.almacen.toLowerCase());
-      const matchClase = !filtros.clase || true; // Los movimientos no tienen clase directa
+  private cargarDatosMock() {
+    this.reportes = [
+      {
+        id_reporte: 1,
+        tipo_reporte: 'Inventario General',
+        fecha_generacion: '2024-01-15T10:30:00',
+        usuario: 'Admin User',
+        parametros: 'Todos los almacenes, todas las clases',
+        estado: 'COMPLETADO',
+        tamano_archivo: 2048576,
+        ruta_archivo: '/reportes/inventario_20240115.xlsx',
+      },
+      {
+        id_reporte: 2,
+        tipo_reporte: 'Movimientos Diarios',
+        fecha_generacion: '2024-01-14T15:45:00',
+        usuario: 'Operador 1',
+        parametros: 'Fecha: 2024-01-14, Almacén Principal',
+        estado: 'COMPLETADO',
+        tamano_archivo: 1024000,
+        ruta_archivo: '/reportes/movimientos_20240114.pdf',
+      },
+      {
+        id_reporte: 3,
+        tipo_reporte: 'Stock Crítico',
+        fecha_generacion: '2024-01-13T09:15:00',
+        usuario: 'Supervisor',
+        parametros: 'Items con stock menor al mínimo',
+        estado: 'ERROR',
+        tamano_archivo: 0,
+      },
+      {
+        id_reporte: 4,
+        tipo_reporte: 'Análisis de Rotación',
+        fecha_generacion: '2024-01-12T14:20:00',
+        usuario: 'Analista',
+        parametros: 'Período: Último trimestre',
+        estado: 'GENERANDO',
+        tamano_archivo: 0,
+      },
+    ];
 
-      return (
-        matchTipo &&
-        matchFechaDesde &&
-        matchFechaHasta &&
-        matchAlmacen &&
-        matchClase
-      );
-    });
+    this.dataSource.data = [...this.reportes];
   }
 
   cargarKPIs(): void {
     this.kpis = [
       {
-        nombre: 'Valor Total Inventario',
-        valor: 'S/ 485,240.50',
-        descripcion: 'Valorización total del inventario',
+        nombre: 'Reportes Generados',
+        valor: '245',
+        descripcion: 'Total este mes',
         tendencia: 'up',
-        porcentaje: 12.5,
+        porcentaje: 12,
       },
       {
-        nombre: 'Rotación Promedio',
-        valor: '4.2x',
-        descripcion: 'Rotación promedio anual',
-        tendencia: 'stable',
-        porcentaje: 0.8,
-      },
-      {
-        nombre: 'Días de Inventario',
-        valor: '87 días',
-        descripcion: 'Promedio días de inventario',
+        nombre: 'Tiempo Promedio',
+        valor: '3.2 min',
+        descripcion: 'Generación promedio',
         tendencia: 'down',
-        porcentaje: -5.2,
+        porcentaje: 8,
       },
       {
-        nombre: 'Items Críticos',
-        valor: '23',
-        descripcion: 'Items con stock crítico',
+        nombre: 'Reportes Exitosos',
+        valor: '98.5%',
+        descripcion: 'Tasa de éxito',
+        tendencia: 'stable',
+      },
+      {
+        nombre: 'Almacenamiento',
+        valor: '2.4 GB',
+        descripcion: 'Espacio utilizado',
         tendencia: 'up',
-        porcentaje: 18.5,
+        porcentaje: 15,
       },
     ];
   }
 
-  cargarReporteInventario(): void {
-    this.reporteInventario = [
-      {
-        id_insumo: 1,
-        codigo_fox: 'ALG001',
-        nombre: 'Algodón Pima Blanco',
-        almacen: 'Almacén Principal',
-        clase: 'Fibras Naturales',
-        stock_actual: 450.75,
-        costo_unitario: 8.5,
-        valor_total: 3831.38,
-        rotacion: 6.2,
-        dias_inventario: 59,
-      },
-      {
-        id_insumo: 2,
-        codigo_fox: 'POL002',
-        nombre: 'Poliéster 150D Negro',
-        almacen: 'Almacén Secundario',
-        clase: 'Fibras Sintéticas',
-        stock_actual: 325.2,
-        costo_unitario: 12.75,
-        valor_total: 4146.3,
-        rotacion: 4.8,
-        dias_inventario: 76,
-      },
-      {
-        id_insumo: 3,
-        codigo_fox: 'HIL003',
-        nombre: 'Hilo de Algodón 30/1',
-        almacen: 'Almacén Principal',
-        clase: 'Hilos',
-        stock_actual: 850.0,
-        costo_unitario: 15.25,
-        valor_total: 12962.5,
-        rotacion: 8.1,
-        dias_inventario: 45,
-      },
-      {
-        id_insumo: 4,
-        codigo_fox: 'TEL004',
-        nombre: 'Tela Jersey Algodón',
-        almacen: 'Almacén Principal',
-        clase: 'Telas',
-        stock_actual: 125.5,
-        costo_unitario: 28.9,
-        valor_total: 3626.95,
-        rotacion: 3.2,
-        dias_inventario: 114,
-      },
-      {
-        id_insumo: 5,
-        codigo_fox: 'ACC005',
-        nombre: 'Botones Metálicos',
-        almacen: 'Almacén de Tránsito',
-        clase: 'Accesorios',
-        stock_actual: 2500.0,
-        costo_unitario: 0.85,
-        valor_total: 2125.0,
-        rotacion: 12.5,
-        dias_inventario: 29,
-      },
-    ];
-    this.reporteInventarioFiltrado = [...this.reporteInventario];
+  aplicarFiltroGeneral(): void {
+    const filtro =
+      this.filtroGeneralForm.get('busquedaGeneral')?.value?.toLowerCase() || '';
+
+    if (!filtro.trim()) {
+      this.dataSource.data = [...this.reportes];
+      return;
+    }
+
+    this.dataSource.data = this.reportes.filter(
+      (reporte) =>
+        reporte.tipo_reporte.toLowerCase().includes(filtro) ||
+        reporte.usuario.toLowerCase().includes(filtro) ||
+        reporte.parametros.toLowerCase().includes(filtro) ||
+        this.getEstadoTexto(reporte.estado).toLowerCase().includes(filtro) ||
+        this.formatearFecha(reporte.fecha_generacion)
+          .toLowerCase()
+          .includes(filtro)
+    );
   }
 
-  cargarReporteMovimientos(): void {
-    this.reporteMovimientos = [
-      {
-        id_movimiento: 1,
-        fecha: '2024-01-15',
-        tipo_movimiento: 'INGRESO',
-        codigo_fox: 'ALG001',
-        material: 'Algodón Pima Blanco',
-        cantidad: 250.0,
-        almacen: 'Almacén Principal',
-        usuario: 'Juan Pérez',
-        observaciones: 'Compra directa',
-      },
-      {
-        id_movimiento: 2,
-        fecha: '2024-01-14',
-        tipo_movimiento: 'EGRESO',
-        codigo_fox: 'POL002',
-        material: 'Poliéster 150D Negro',
-        cantidad: -125.5,
-        almacen: 'Almacén Secundario',
-        usuario: 'María García',
-        observaciones: 'Producción lote #1024',
-      },
-      {
-        id_movimiento: 3,
-        fecha: '2024-01-13',
-        tipo_movimiento: 'AJUSTE',
-        codigo_fox: 'HIL003',
-        material: 'Hilo de Algodón 30/1',
-        cantidad: 15.25,
-        almacen: 'Almacén Principal',
-        usuario: 'Carlos López',
-        observaciones: 'Corrección inventario',
-      },
-      {
-        id_movimiento: 4,
-        fecha: '2024-01-12',
-        tipo_movimiento: 'INGRESO',
-        codigo_fox: 'TEL004',
-        material: 'Tela Jersey Algodón',
-        cantidad: 85.0,
-        almacen: 'Almacén Principal',
-        usuario: 'Ana Rodríguez',
-        observaciones: 'Transferencia interna',
-      },
-    ];
-    this.reporteMovimientosFiltrado = [...this.reporteMovimientos];
+  limpiarFiltroGeneral(): void {
+    this.filtroGeneralForm.get('busquedaGeneral')?.setValue('');
   }
 
-  // ===== COMPUTED PROPERTIES =====
-  get isEmpty(): boolean {
-    const tipoFiltro =
-      this.filtrosForm.value.tipo_reporte_text?.toLowerCase() || '';
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset();
+  }
 
-    if (tipoFiltro.includes('movimiento')) {
-      return this.reporteMovimientosFiltrado.length === 0;
-    } else {
-      // Por defecto muestra inventario
-      return this.reporteInventarioFiltrado.length === 0;
+  descargar(reporte: Reporte): void {
+    if (reporte.estado === 'COMPLETADO' && reporte.ruta_archivo) {
+      console.log('Descargando reporte:', reporte.ruta_archivo);
+      this.snackBar.open('Descargando reporte...', 'Cerrar', {
+        duration: 3000,
+      });
     }
   }
 
-  get currentReportType(): 'inventario' | 'movimientos' {
-    const tipoFiltro =
-      this.filtrosForm.value.tipo_reporte_text?.toLowerCase() || '';
-    return tipoFiltro.includes('movimiento') ? 'movimientos' : 'inventario';
-  }
-
-  // ===== ORDENAMIENTO =====
-  sortData(column: string): void {
-    console.log('Ordenando por:', column);
-    // Implementar lógica de ordenamiento
-  }
-
-  // ===== FUNCIONES DE EXPORTACIÓN =====
-  exportarExcel(): void {
-    this.snackBar.open('Exportando a Excel...', 'Cerrar', { duration: 3000 });
-  }
-
-  exportarPDF(): void {
-    this.snackBar.open('Exportando a PDF...', 'Cerrar', { duration: 3000 });
-  }
-
-  programarReporte(): void {
-    this.snackBar.open('Función de programación en desarrollo...', 'Cerrar', {
-      duration: 3000,
-    });
-  }
-
-  // ===== HELPERS DE CLASES CSS =====
-  getCardClass(tendencia: string): string {
-    switch (tendencia) {
-      case 'up':
-        return 'card-success';
-      case 'down':
-        return 'card-warning';
-      default:
-        return 'card-info';
+  eliminar(reporte: Reporte): void {
+    const confirmacion = confirm(
+      `¿Está seguro que desea eliminar el reporte "${reporte.tipo_reporte}"?`
+    );
+    if (confirmacion && reporte.id_reporte) {
+      console.log('Eliminar reporte:', reporte);
+      this.snackBar.open('Reporte eliminado correctamente', 'Cerrar', {
+        duration: 3000,
+      });
+      this.cargarDatos();
     }
   }
 
-  getTrendClass(tendencia: string): string {
-    switch (tendencia) {
-      case 'up':
-        return 'trend-up';
-      case 'down':
-        return 'trend-down';
-      default:
-        return 'trend-stable';
-    }
-  }
-
-  getRotacionClass(rotacion: number): string {
-    if (rotacion >= 8) return 'badge-success';
-    if (rotacion >= 4) return 'badge-warning';
-    return 'badge-danger';
-  }
-
-  getTipoMovimientoClass(tipo: string): string {
-    switch (tipo) {
-      case 'INGRESO':
-        return 'badge-success';
-      case 'EGRESO':
-        return 'badge-danger';
-      case 'AJUSTE':
-        return 'badge-warning';
-      default:
-        return 'badge-neutral';
-    }
-  }
-
-  getCantidadClass(tipo: string): string {
-    switch (tipo) {
-      case 'INGRESO':
-        return 'text-success';
-      case 'EGRESO':
-        return 'text-danger';
-      default:
-        return 'text-neutral';
-    }
-  }
-
-  // ===== FORMATEO =====
-  formatearMoneda(valor: number): string {
-    return new Intl.NumberFormat('es-PE', {
-      style: 'currency',
-      currency: 'PEN',
-    }).format(valor);
-  }
-
-  formatearNumero(valor: number): string {
-    return new Intl.NumberFormat('es-PE', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(valor);
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
   }
 
   formatearFecha(fecha: string): string {
-    return new Date(fecha).toLocaleDateString('es-PE');
+    if (!fecha) return '-';
+    const date = new Date(fecha);
+    return date.toLocaleDateString('es-CO');
   }
 
-  formatearCantidad(cantidad: number): string {
-    const signo = cantidad >= 0 ? '+' : '';
-    return `${signo}${this.formatearNumero(Math.abs(cantidad))}`;
+  formatearHora(fecha: string): string {
+    if (!fecha) return '-';
+    const date = new Date(fecha);
+    return date.toLocaleTimeString('es-CO', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
-  // ===== ICONOS =====
-  getIconoTendencia(tendencia: string): string {
-    switch (tendencia) {
-      case 'up':
-        return 'trending_up';
-      case 'down':
-        return 'trending_down';
-      default:
-        return 'trending_flat';
+  formatearParametros(parametros: string): string {
+    if (!parametros) return '-';
+    return parametros.length > 50
+      ? `${parametros.substring(0, 50)}...`
+      : parametros;
+  }
+
+  formatearTamano(bytes: number): string {
+    if (!bytes || bytes === 0) return '-';
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`;
+  }
+
+  getEstadoTexto(estado: string): string {
+    const estados: { [key: string]: string } = {
+      GENERANDO: 'Generando',
+      COMPLETADO: 'Completado',
+      ERROR: 'Error',
+    };
+    return estados[estado] || estado;
+  }
+
+  getEstadoBadgeClass(estado: string): string {
+    const clases: { [key: string]: string } = {
+      GENERANDO: 'badge-warning',
+      COMPLETADO: 'badge-success',
+      ERROR: 'badge-error',
+    };
+    return clases[estado] || 'badge-neutral';
+  }
+
+  getCardClass(tendencia: string): string {
+    const clases: { [key: string]: string } = {
+      up: 'card-success',
+      down: 'card-warning',
+      stable: 'card-neutral',
+    };
+    return clases[tendencia] || '';
+  }
+
+  getTrendClass(tendencia: string): string {
+    const clases: { [key: string]: string } = {
+      up: 'trend-up',
+      down: 'trend-down',
+      stable: 'trend-stable',
+    };
+    return clases[tendencia] || '';
+  }
+
+  sortData(column: string): void {
+    console.log('Ordenando por:', column);
+  }
+
+  verDetalle(reporte: Reporte): void {
+    console.log('Ver detalle del reporte:', reporte);
+  }
+
+  agregar(): void {
+    console.log('Generar nuevo reporte');
+  }
+
+  private configurarExportacion(): ConfiguracionExportacion<Reporte> {
+    return {
+      entidades: this.dataSource.data,
+      nombreArchivo: 'reportes',
+      nombreEntidad: 'Reportes',
+      columnas: [
+        { campo: 'id_reporte', titulo: 'ID', formato: 'numero' },
+        { campo: 'tipo_reporte', titulo: 'Tipo Reporte', formato: 'texto' },
+        {
+          campo: 'fecha_generacion',
+          titulo: 'Fecha Generación',
+          formato: 'fecha',
+        },
+        { campo: 'usuario', titulo: 'Usuario', formato: 'texto' },
+        { campo: 'parametros', titulo: 'Parámetros', formato: 'texto' },
+        { campo: 'estado', titulo: 'Estado', formato: 'texto' },
+        { campo: 'tamano_archivo', titulo: 'Tamaño', formato: 'numero' },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.reportes.length,
+        cantidadFiltrada: this.dataSource.data.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Reporte> {
+    return {
+      tipoEntidad: 'reportes',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Tipo Reporte',
+          campoEntidad: 'tipo_reporte',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Usuario',
+          campoEntidad: 'usuario',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Parámetros',
+          campoEntidad: 'parametros',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'tipo_reporte',
+          validador: (valor) => valor && valor.length <= 100,
+          mensajeError: 'El tipo de reporte debe tener máximo 100 caracteres',
+        },
+        {
+          campo: 'usuario',
+          validador: (valor) => valor && valor.length <= 50,
+          mensajeError: 'El usuario debe tener máximo 50 caracteres',
+        },
+      ],
+    };
+  }
+
+  cargaMasiva(): void {
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
+    });
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
     }
   }
 
-  // ===== PAGINACIÓN =====
-  getCurrentPageItems(): string {
-    const total =
-      this.currentReportType === 'inventario'
-        ? this.reporteInventarioFiltrado.length
-        : this.reporteMovimientosFiltrado.length;
-    return `1-${total}`;
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
   }
 
-  getTotalItems(): number {
-    return this.currentReportType === 'inventario'
-      ? this.reporteInventarioFiltrado.length
-      : this.reporteMovimientosFiltrado.length;
+  private descargarPlantillaCargaMasiva(): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService.generarPlantilla(config);
   }
 
-  isFirstPage(): boolean {
-    return true; // Por ahora no hay paginación real
+  private procesarArchivoCargaMasiva(archivo: File): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService
+      .procesarArchivo(archivo, config)
+      .then((resultado) => {
+        console.log('Archivo procesado:', resultado);
+        if (resultado.exitosa) {
+          this.cargarDatos();
+        }
+      })
+      .catch((error) => {
+        console.error('Error procesando archivo:', error);
+      });
   }
 
-  isLastPage(): boolean {
-    return true; // Por ahora no hay paginación real
+  private obtenerFiltrosActivos(): any {
+    return {
+      busquedaGeneral:
+        this.filtroGeneralForm.get('busquedaGeneral')?.value || '',
+    };
+  }
+
+  reintentarCarga(): void {
+    this.cargarDatos();
   }
 }

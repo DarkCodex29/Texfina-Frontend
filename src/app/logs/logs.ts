@@ -17,15 +17,25 @@ import {
   CargaMasivaService,
   ConfiguracionCargaMasiva,
 } from '../services/carga-masiva.service';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 
 interface LogSistema {
   id_log: number;
   nivel: 'ERROR' | 'WARNING' | 'INFO' | 'DEBUG';
-  modulo: string;
-  mensaje: string;
+  fecha_hora: string;
   usuario: string;
-  fecha: Date;
+  accion: string;
+  mensaje: string;
+  ip_address: string;
   detalles?: string;
+}
+
+interface Estadistica {
+  nombre: string;
+  valor: string;
+  descripcion: string;
+  tipo: 'error' | 'warning' | 'info' | 'success';
+  porcentaje?: number;
 }
 
 @Component({
@@ -47,12 +57,12 @@ interface LogSistema {
 })
 export class LogsComponent implements OnInit {
   displayedColumns: string[] = [
-    'id_log',
     'nivel',
-    'modulo',
-    'mensaje',
-    'usuario',
     'fecha',
+    'usuario',
+    'accion',
+    'mensaje',
+    'ip',
     'acciones',
   ];
 
@@ -63,6 +73,7 @@ export class LogsComponent implements OnInit {
   dropdownExportAbierto = false;
 
   logs: LogSistema[] = [];
+  estadisticas: Estadistica[] = [];
   cargando = false;
   error: string | null = null;
 
@@ -98,17 +109,18 @@ export class LogsComponent implements OnInit {
     });
 
     this.filtrosColumnaForm = this.fb.group({
-      idLog: [''],
       nivel: [''],
-      modulo: [''],
-      mensaje: [''],
+      fecha: [''],
       usuario: [''],
-      fechaDesde: [''],
+      accion: [''],
+      mensaje: [''],
+      ip: [''],
     });
   }
 
   ngOnInit(): void {
     this.cargarDatos();
+    this.cargarEstadisticas();
     this.configurarFiltros();
   }
 
@@ -118,10 +130,6 @@ export class LogsComponent implements OnInit {
       ?.valueChanges.subscribe(() => {
         this.aplicarFiltroGeneral();
       });
-
-    this.filtrosColumnaForm.valueChanges.subscribe(() => {
-      this.aplicarFiltrosColumna();
-    });
   }
 
   cargarDatos(): void {
@@ -134,48 +142,52 @@ export class LogsComponent implements OnInit {
           {
             id_log: 1,
             nivel: 'ERROR',
-            modulo: 'Autenticación',
-            mensaje:
-              'Intento de acceso fallido para usuario: operador@texfina.com',
-            usuario: 'sistema',
-            fecha: new Date('2024-01-15T10:30:00'),
-            detalles: 'IP: 192.168.1.100, User-Agent: Mozilla/5.0',
+            fecha_hora: '2024-01-15T10:30:00',
+            usuario: 'operador@texfina.com',
+            accion: 'LOGIN_FAILED',
+            mensaje: 'Intento de acceso fallido - credenciales incorrectas',
+            ip_address: '192.168.1.100',
+            detalles: 'User-Agent: Mozilla/5.0',
           },
           {
             id_log: 2,
             nivel: 'INFO',
-            modulo: 'Almacenes',
-            mensaje: 'Nuevo almacén creado exitosamente',
+            fecha_hora: '2024-01-15T11:45:00',
             usuario: 'admin@texfina.com',
-            fecha: new Date('2024-01-15T11:45:00'),
+            accion: 'CREATE_ALMACEN',
+            mensaje: 'Nuevo almacén creado exitosamente',
+            ip_address: '192.168.1.101',
             detalles: 'Almacén ID: 5, Nombre: Almacén Principal',
           },
           {
             id_log: 3,
             nivel: 'WARNING',
-            modulo: 'Stock',
-            mensaje: 'Stock bajo detectado en material',
+            fecha_hora: '2024-01-15T14:20:00',
             usuario: 'sistema',
-            fecha: new Date('2024-01-15T14:20:00'),
-            detalles: 'Material ID: 25, Stock actual: 5, Mínimo: 10',
+            accion: 'STOCK_LOW',
+            mensaje: 'Stock bajo detectado en material MT001',
+            ip_address: '127.0.0.1',
+            detalles: 'Stock actual: 5, Mínimo: 20',
           },
           {
             id_log: 4,
             nivel: 'DEBUG',
-            modulo: 'Base de Datos',
-            mensaje: 'Consulta de optimización ejecutada',
+            fecha_hora: '2024-01-16T09:15:00',
             usuario: 'sistema',
-            fecha: new Date('2024-01-16T09:15:00'),
-            detalles: 'Duración: 1.2s, Registros procesados: 1500',
+            accion: 'DB_OPTIMIZATION',
+            mensaje: 'Consulta de optimización ejecutada',
+            ip_address: '127.0.0.1',
+            detalles: 'Duración: 1.2s, Registros: 1500',
           },
           {
             id_log: 5,
             nivel: 'ERROR',
-            modulo: 'Reportes',
-            mensaje: 'Error al generar reporte mensual',
+            fecha_hora: '2024-01-16T16:30:00',
             usuario: 'supervisor@texfina.com',
-            fecha: new Date('2024-01-16T16:30:00'),
-            detalles: 'Error: TimeoutException, Periodo: Enero 2024',
+            accion: 'GENERATE_REPORT',
+            mensaje: 'Error al generar reporte mensual',
+            ip_address: '192.168.1.102',
+            detalles: 'TimeoutException - Periodo: Enero 2024',
           },
         ];
 
@@ -186,6 +198,38 @@ export class LogsComponent implements OnInit {
         this.cargando = false;
       }
     }, 1000);
+  }
+
+  cargarEstadisticas(): void {
+    this.estadisticas = [
+      {
+        nombre: 'Eventos Hoy',
+        valor: '156',
+        descripcion: 'Total de eventos registrados',
+        tipo: 'info',
+        porcentaje: 8,
+      },
+      {
+        nombre: 'Errores',
+        valor: '12',
+        descripcion: 'Errores en las últimas 24h',
+        tipo: 'error',
+        porcentaje: 15,
+      },
+      {
+        nombre: 'Advertencias',
+        valor: '34',
+        descripcion: 'Advertencias activas',
+        tipo: 'warning',
+        porcentaje: 5,
+      },
+      {
+        nombre: 'Sistema Saludable',
+        valor: '92%',
+        descripcion: 'Uptime del sistema',
+        tipo: 'success',
+      },
+    ];
   }
 
   aplicarFiltroGeneral(): void {
@@ -199,105 +243,56 @@ export class LogsComponent implements OnInit {
 
     this.dataSource.data = this.logs.filter(
       (log) =>
-        log.id_log.toString().includes(filtro) ||
         log.nivel.toLowerCase().includes(filtro) ||
-        log.modulo.toLowerCase().includes(filtro) ||
+        log.usuario.toLowerCase().includes(filtro) ||
+        log.accion.toLowerCase().includes(filtro) ||
         log.mensaje.toLowerCase().includes(filtro) ||
-        log.usuario.toLowerCase().includes(filtro)
+        log.ip_address.toLowerCase().includes(filtro) ||
+        this.formatearFecha(log.fecha_hora).toLowerCase().includes(filtro)
     );
-  }
-
-  aplicarFiltrosColumna(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    let datosFiltrados = [...this.logs];
-
-    if (filtros.idLog) {
-      datosFiltrados = datosFiltrados.filter((log) =>
-        log.id_log.toString().includes(filtros.idLog)
-      );
-    }
-
-    if (filtros.nivel) {
-      datosFiltrados = datosFiltrados.filter(
-        (log) => log.nivel === filtros.nivel
-      );
-    }
-
-    if (filtros.modulo) {
-      datosFiltrados = datosFiltrados.filter((log) =>
-        log.modulo.toLowerCase().includes(filtros.modulo.toLowerCase())
-      );
-    }
-
-    if (filtros.mensaje) {
-      datosFiltrados = datosFiltrados.filter((log) =>
-        log.mensaje.toLowerCase().includes(filtros.mensaje.toLowerCase())
-      );
-    }
-
-    if (filtros.usuario) {
-      datosFiltrados = datosFiltrados.filter((log) =>
-        log.usuario.toLowerCase().includes(filtros.usuario.toLowerCase())
-      );
-    }
-
-    this.dataSource.data = datosFiltrados;
   }
 
   limpiarFiltroGeneral(): void {
     this.filtroGeneralForm.get('busquedaGeneral')?.setValue('');
-    this.dataSource.data = [...this.logs];
   }
 
   limpiarFiltrosColumna(): void {
     this.filtrosColumnaForm.reset();
-    this.aplicarFiltroGeneral();
+  }
+
+  eliminar(log: LogSistema): void {
+    const confirmacion = confirm(
+      `¿Está seguro que desea eliminar este log del ${log.fecha_hora}?`
+    );
+    if (confirmacion && log.id_log) {
+      console.log('Eliminar log:', log);
+      this.cargarDatos();
+    }
   }
 
   sortData(sort: Sort | string): void {
-    const sortField = typeof sort === 'string' ? sort : sort.active;
-    const sortDirection = typeof sort === 'string' ? 'asc' : sort.direction;
-
-    if (!sortDirection) {
-      this.dataSource.data = [...this.logs];
-      return;
-    }
-
-    this.dataSource.data = this.dataSource.data.sort((a, b) => {
-      const isAsc = sortDirection === 'asc';
-
-      switch (sortField) {
-        case 'id_log':
-          return this.compare(a.id_log, b.id_log, isAsc);
-        case 'nivel':
-          return this.compare(a.nivel, b.nivel, isAsc);
-        case 'modulo':
-          return this.compare(a.modulo, b.modulo, isAsc);
-        case 'mensaje':
-          return this.compare(a.mensaje, b.mensaje, isAsc);
-        case 'usuario':
-          return this.compare(a.usuario, b.usuario, isAsc);
-        case 'fecha':
-          return this.compare(a.fecha, b.fecha, isAsc);
-        default:
-          return 0;
-      }
-    });
-  }
-
-  private compare(a: any, b: any, isAsc: boolean): number {
-    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+    console.log('Ordenar por:', sort);
   }
 
   reintentarCarga(): void {
     this.cargarDatos();
   }
 
+  agregar(): void {
+    console.log('Limpiar logs del sistema');
+  }
+
   cargaMasiva(): void {
-    console.log(
-      'Funcionalidad de carga masiva - configuración:',
-      this.configurarCargaMasiva()
-    );
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
+    });
   }
 
   exportarExcel(): void {
@@ -325,19 +320,34 @@ export class LogsComponent implements OnInit {
   }
 
   verDetalle(log: LogSistema): void {
-    console.log('Ver detalle de log:', log);
-  }
-
-  formatearCodigo(id?: number): string {
-    if (!id) return '00001';
-    return id.toString().padStart(5, '0');
+    console.log('Ver detalle del log:', log);
   }
 
   formatearTexto(texto?: string): string {
     return texto && texto.trim() ? texto : '-';
   }
 
-  formatearNivel(nivel: string): string {
+  formatearFecha(fecha: string): string {
+    if (!fecha) return '-';
+    const date = new Date(fecha);
+    return date.toLocaleDateString('es-CO');
+  }
+
+  formatearHora(fecha: string): string {
+    if (!fecha) return '-';
+    const date = new Date(fecha);
+    return date.toLocaleTimeString('es-CO', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  formatearMensaje(mensaje: string): string {
+    if (!mensaje) return '-';
+    return mensaje.length > 60 ? `${mensaje.substring(0, 60)}...` : mensaje;
+  }
+
+  getNivelTexto(nivel: string): string {
     const niveles: { [key: string]: string } = {
       ERROR: 'Error',
       WARNING: 'Advertencia',
@@ -347,9 +357,9 @@ export class LogsComponent implements OnInit {
     return niveles[nivel] || nivel;
   }
 
-  obtenerClaseNivel(nivel: string): string {
+  getNivelBadgeClass(nivel: string): string {
     const clases: { [key: string]: string } = {
-      ERROR: 'badge-danger',
+      ERROR: 'badge-error',
       WARNING: 'badge-warning',
       INFO: 'badge-info',
       DEBUG: 'badge-neutral',
@@ -357,34 +367,39 @@ export class LogsComponent implements OnInit {
     return clases[nivel] || 'badge-neutral';
   }
 
-  formatearMensaje(mensaje: string): string {
-    if (!mensaje) return '-';
-    return mensaje.length > 50 ? mensaje.substring(0, 50) + '...' : mensaje;
+  getCardClass(tipo: string): string {
+    const clases: { [key: string]: string } = {
+      error: 'card-error',
+      warning: 'card-warning',
+      info: 'card-info',
+      success: 'card-success',
+    };
+    return clases[tipo] || '';
   }
 
-  formatearFecha(fecha: Date): string {
-    if (!fecha) return '-';
-    return new Date(fecha).toLocaleString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  getTrendClass(tipo: string): string {
+    const clases: { [key: string]: string } = {
+      error: 'trend-down',
+      warning: 'trend-stable',
+      info: 'trend-up',
+      success: 'trend-up',
+    };
+    return clases[tipo] || '';
   }
 
   private configurarExportacion(): ConfiguracionExportacion<LogSistema> {
     return {
       entidades: this.dataSource.data,
-      nombreArchivo: 'logs-sistema',
+      nombreArchivo: 'logs_sistema',
       nombreEntidad: 'Logs del Sistema',
       columnas: [
         { campo: 'id_log', titulo: 'ID', formato: 'numero' },
         { campo: 'nivel', titulo: 'Nivel', formato: 'texto' },
-        { campo: 'modulo', titulo: 'Módulo', formato: 'texto' },
-        { campo: 'mensaje', titulo: 'Mensaje', formato: 'texto' },
+        { campo: 'fecha_hora', titulo: 'Fecha/Hora', formato: 'fecha' },
         { campo: 'usuario', titulo: 'Usuario', formato: 'texto' },
-        { campo: 'fecha', titulo: 'Fecha', formato: 'fecha' },
+        { campo: 'accion', titulo: 'Acción', formato: 'texto' },
+        { campo: 'mensaje', titulo: 'Mensaje', formato: 'texto' },
+        { campo: 'ip_address', titulo: 'IP', formato: 'texto' },
       ],
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
@@ -407,8 +422,14 @@ export class LogsComponent implements OnInit {
           tipoEsperado: 'texto',
         },
         {
-          columnaArchivo: 'Módulo',
-          campoEntidad: 'modulo',
+          columnaArchivo: 'Usuario',
+          campoEntidad: 'usuario',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Acción',
+          campoEntidad: 'accion',
           obligatorio: true,
           tipoEsperado: 'texto',
         },
@@ -419,13 +440,24 @@ export class LogsComponent implements OnInit {
           tipoEsperado: 'texto',
         },
         {
-          columnaArchivo: 'Usuario',
-          campoEntidad: 'usuario',
+          columnaArchivo: 'IP',
+          campoEntidad: 'ip_address',
           obligatorio: false,
           tipoEsperado: 'texto',
         },
       ],
       validaciones: [
+        {
+          campo: 'nivel',
+          validador: (valor) =>
+            ['ERROR', 'WARNING', 'INFO', 'DEBUG'].includes(valor),
+          mensajeError: 'El nivel debe ser: ERROR, WARNING, INFO o DEBUG',
+        },
+        {
+          campo: 'usuario',
+          validador: (valor) => valor && valor.length <= 100,
+          mensajeError: 'El usuario debe tener máximo 100 caracteres',
+        },
         {
           campo: 'mensaje',
           validador: (valor) => valor && valor.length <= 500,
@@ -435,13 +467,30 @@ export class LogsComponent implements OnInit {
     };
   }
 
-  private obtenerFiltrosActivos(): any {
-    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
-    const filtrosColumna = this.filtrosColumnaForm.value;
+  private descargarPlantillaCargaMasiva(): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService.generarPlantilla(config);
+  }
 
+  private procesarArchivoCargaMasiva(archivo: File): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService
+      .procesarArchivo(archivo, config)
+      .then((resultado) => {
+        console.log('Archivo procesado:', resultado);
+        if (resultado.exitosa) {
+          this.cargarDatos();
+        }
+      })
+      .catch((error) => {
+        console.error('Error procesando archivo:', error);
+      });
+  }
+
+  private obtenerFiltrosActivos(): any {
     return {
-      busquedaGeneral: filtroGeneral || '',
-      ...filtrosColumna,
+      busquedaGeneral:
+        this.filtroGeneralForm.get('busquedaGeneral')?.value || '',
     };
   }
 }

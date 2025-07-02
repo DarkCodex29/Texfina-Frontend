@@ -62,66 +62,180 @@
   }
 }
 
+// ============================================================================
+// STOCK - ESTILOS ESPECÍFICOS ALINEADOS CON ESTÁNDAR TEXFINA
+// ============================================================================
+
+/* Solo estilos muy específicos para las celdas de stock */
 .stock-cell {
   .material-name {
-    margin-bottom: 2px;
+    font-weight: 600;
+    line-height: 1.2;
   }
 
   .material-unidad {
-    font-size: 12px;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin-top: 2px;
   }
 }
 
 .stock-cantidad-cell {
   .cantidad-valor {
-    margin-bottom: 2px;
+    font-weight: 600;
+    line-height: 1.2;
   }
 
   .cantidad-limites {
-    font-size: 11px;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin-top: 2px;
   }
 }
 
 .valor-cell {
   .valor-total {
-    margin-bottom: 2px;
+    font-weight: 600;
+    line-height: 1.2;
   }
 
   .valor-unitario {
-    font-size: 12px;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin-top: 2px;
   }
 }
 
 .btn-action {
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--texfina-border-radius);
+
+  &.btn-view {
+    background-color: var(--texfina-secondary-light);
+    color: var(--texfina-secondary);
+  }
+
+  &.btn-edit {
+    background-color: var(--texfina-success-light);
+    color: var(--texfina-success);
+  }
+
+  &.btn-delete {
+    background-color: var(--texfina-primary-light);
+    color: var(--texfina-primary);
   }
 }
 
 // ============================================================================
-// ALTURA NORMALIZADA PARA FILTROS DE STOCK
+// FILTROS POR COLUMNA
+// ============================================================================
+
+.header-filters {
+  background: var(--texfina-bg-muted);
+  border-top: 1px solid var(--texfina-border);
+  padding: 8px 0;
+}
+
+.column-filter-input {
+  width: 100%;
+  border: 1px solid var(--texfina-border);
+  border-radius: 6px;
+  background: white;
+  padding: 8px 12px;
+  margin: 0 4px;
+  font-size: 0.8rem;
+  color: var(--texfina-text-primary);
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-secondary);
+    box-shadow: 0 0 0 2px var(--texfina-secondary-light);
+  }
+
+  &::placeholder {
+    color: var(--texfina-text-muted);
+    font-size: 0.75rem;
+  }
+}
+
+.btn-clear-column-filters {
+  min-width: 140px !important;
+  height: 48px !important;
+  border-radius: 10px !important;
+  border: 2px solid var(--texfina-primary) !important;
+  background: linear-gradient(135deg, white, #fef7f7) !important;
+  color: var(--texfina-primary) !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 0 20px;
+  white-space: nowrap;
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-primary);
+    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    width: 100% !important;
+    min-width: auto !important;
+  }
+}
+
+// ============================================================================
+// FILTROS DE BÚSQUEDA ESTÁNDAR
 // ============================================================================
 
 .filters-card {
+  background: var(--surface-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+
   .filters-content {
-    padding: var(--spacing-md) var(--spacing-lg) !important;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--background-subtle);
+
+    @media (max-width: 768px) {
+      padding: var(--spacing-md) var(--spacing-lg);
+    }
   }
 
   .simple-input {
     height: 44px !important;
     padding: var(--spacing-sm) var(--spacing-md) !important;
+    padding-right: calc(var(--spacing-md) + 80px) !important;
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    color: var(--text-primary);
+
+    &:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-color-alpha);
+    }
 
     @media (max-width: 768px) {
       height: 40px !important;
+      padding: var(--spacing-xs) var(--spacing-sm) !important;
+      padding-right: calc(var(--spacing-sm) + 70px) !important;
     }
   }
 
   .btn-limpiar {
     height: calc(100% - 8px) !important;
+    padding: var(--spacing-xs) var(--spacing-sm) !important;
 
     @media (max-width: 768px) {
       height: calc(100% - 6px) !important;
+      padding: var(--spacing-xs) !important;
     }
   }
 }

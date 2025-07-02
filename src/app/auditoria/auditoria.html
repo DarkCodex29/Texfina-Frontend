@@ -2,9 +2,12 @@
   <div class="page-content">
     <div class="page-header">
       <div class="header-content">
-        <h1 class="page-title text-texfina text-primary">Auditoría</h1>
+        <h1 class="page-title text-texfina text-primary">
+          Auditoría del Sistema
+        </h1>
         <p class="page-subtitle text-texfina text-muted">
-          Registro de actividades y cambios del sistema
+          Rastrea cambios críticos y mantiene un historial completo de
+          modificaciones
         </p>
       </div>
       <div class="header-actions">
@@ -27,6 +30,9 @@
             </button>
           </div>
         </div>
+        <button class="btn-texfina btn-primary" (click)="agregar()">
+          Generar Auditoría
+        </button>
       </div>
     </div>
 
@@ -39,7 +45,7 @@
                 <input
                   class="simple-input"
                   formControlName="busquedaGeneral"
-                  placeholder="Buscar por usuario, acción, tabla..."
+                  placeholder="Buscar en entidad, acción, usuario, fecha..."
                   type="text"
                 />
                 <button
@@ -61,134 +67,223 @@
       <div class="table-with-headers">
         <div class="column-headers">
           <div class="header-row header-titles">
-            <div class="header-col id-col" (click)="sortData('id_auditoria')">
-              <span>ID</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col usuario-col" (click)="sortData('usuario')">
-              <span>Usuario</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            <div class="header-col entidad-col" (click)="sortData('entidad')">
+              <span>Entidad</span>
             </div>
             <div class="header-col accion-col" (click)="sortData('accion')">
               <span>Acción</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
             </div>
-            <div class="header-col tabla-col" (click)="sortData('tabla')">
-              <span>Tabla</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col registro-col"
-              (click)="sortData('registro_id')"
-            >
-              <span>Registro</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
+            <div class="header-col usuario-col" (click)="sortData('usuario')">
+              <span>Usuario</span>
             </div>
             <div class="header-col fecha-col" (click)="sortData('fecha')">
-              <span>Fecha</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
+              <span>Fecha/Hora</span>
+            </div>
+            <div class="header-col campos-col" (click)="sortData('campos')">
+              <span>Campos Modificados</span>
+            </div>
+            <div class="header-col ip-col" (click)="sortData('ip')">
+              <span>IP</span>
             </div>
             <div class="header-col acciones-col">
               <span>ACCIONES</span>
             </div>
           </div>
+
+          <div
+            class="header-row header-filters"
+            *ngIf="filtrosColumnaHabilitados"
+            [formGroup]="filtrosColumnaForm"
+          >
+            <div class="header-col entidad-col">
+              <input
+                class="column-filter-input"
+                formControlName="entidad"
+                placeholder="Entidad..."
+                type="text"
+              />
+            </div>
+            <div class="header-col accion-col">
+              <input
+                class="column-filter-input"
+                formControlName="accion"
+                placeholder="Acción..."
+                type="text"
+              />
+            </div>
+            <div class="header-col usuario-col">
+              <input
+                class="column-filter-input"
+                formControlName="usuario"
+                placeholder="Usuario..."
+                type="text"
+              />
+            </div>
+            <div class="header-col fecha-col">
+              <input
+                class="column-filter-input"
+                formControlName="fecha"
+                placeholder="Fecha..."
+                type="date"
+              />
+            </div>
+            <div class="header-col campos-col">
+              <input
+                class="column-filter-input"
+                formControlName="campos"
+                placeholder="Campos..."
+                type="text"
+              />
+            </div>
+            <div class="header-col ip-col">
+              <input
+                class="column-filter-input"
+                formControlName="ip"
+                placeholder="IP..."
+                type="text"
+              />
+            </div>
+            <div class="header-col acciones-col">
+              <button
+                class="btn-clear-column-filters"
+                type="button"
+                (click)="limpiarFiltrosColumna()"
+                matTooltip="Limpiar filtros de columna"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="table-container">
-          <div *ngIf="cargando" class="loading-state">
-            <mat-spinner diameter="40"></mat-spinner>
-            <p>Cargando auditoría...</p>
-          </div>
-
-          <div *ngIf="!cargando && error" class="error-state">
-            <mat-icon>error_outline</mat-icon>
-            <h3>Error al cargar los datos</h3>
-            <p>{{ error }}</p>
-            <button class="btn-texfina btn-primary" (click)="cargarDatos()">
+          <div *ngIf="hasError" class="error-state">
+            <h3 class="error-title text-texfina text-primary">
+              Error al cargar datos
+            </h3>
+            <p class="error-subtitle text-texfina text-muted">
+              {{ errorMessage }}
+            </p>
+            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
               Reintentar
             </button>
           </div>
 
-          <div
-            *ngIf="!cargando && !error && dataSource.data.length === 0"
-            class="empty-state"
-          >
-            <mat-icon>assignment</mat-icon>
-            <h3>No hay registros de auditoría</h3>
-            <p>
-              No se encontraron registros que coincidan con los filtros
-              aplicados.
+          <div *ngIf="isEmpty" class="empty-state">
+            <h3 class="empty-title text-texfina text-primary">
+              No hay registros de auditoría
+            </h3>
+            <p class="empty-subtitle text-texfina text-muted">
+              Los registros de auditoría aparecerán aquí automáticamente
             </p>
+            <button class="btn-texfina btn-primary" (click)="agregar()">
+              Generar Primera Auditoría
+            </button>
           </div>
 
-          <table
-            mat-table
-            [dataSource]="dataSource"
-            class="auditoria-table"
-            *ngIf="!cargando && !error && dataSource.data.length > 0"
-          >
-            <ng-container matColumnDef="id_auditoria">
-              <td mat-cell *matCellDef="let registro" class="table-cell">
-                <span class="badge-texfina badge-neutral">
-                  {{ formatearCodigo(registro.id_auditoria) }}
-                </span>
-              </td>
-            </ng-container>
+          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
+            <h3 class="filtered-empty-title text-texfina text-primary">
+              No se encontraron resultados
+            </h3>
+            <p class="filtered-empty-subtitle text-texfina text-muted">
+              Intenta ajustar los filtros o limpiar la búsqueda
+            </p>
+            <button
+              class="btn-texfina btn-secondary"
+              (click)="limpiarFiltroGeneral()"
+            >
+              Limpiar Filtros
+            </button>
+          </div>
 
-            <ng-container matColumnDef="usuario">
-              <td mat-cell *matCellDef="let registro" class="table-cell">
-                <div class="usuario-cell">
-                  <span class="usuario-name">
-                    {{ formatearTexto(registro.usuario) }}
-                  </span>
+          <table mat-table [dataSource]="dataSource" matSort class="data-table">
+            <ng-container matColumnDef="entidad">
+              <td mat-cell *matCellDef="let auditoria" class="table-cell">
+                <div class="entidad-cell">
+                  <div class="entidad-tipo text-texfina font-medium">
+                    {{ formatearTexto(auditoria.tipo_entidad) }}
+                  </div>
+                  <div class="entidad-id text-texfina text-muted">
+                    ID: {{ formatearTexto(auditoria.id_entidad) }}
+                  </div>
                 </div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="accion">
-              <td mat-cell *matCellDef="let registro" class="table-cell">
+              <td mat-cell *matCellDef="let auditoria" class="table-cell">
                 <span
                   class="badge-texfina"
-                  [ngClass]="obtenerClaseAccion(registro.accion)"
+                  [ngClass]="getAccionBadgeClass(auditoria.accion)"
                 >
-                  {{ formatearAccion(registro.accion) }}
+                  {{ formatearTexto(auditoria.accion) }}
                 </span>
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="tabla">
-              <td mat-cell *matCellDef="let registro" class="table-cell">
-                {{ formatearTexto(registro.tabla) }}
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="registro_id">
-              <td mat-cell *matCellDef="let registro" class="table-cell">
-                {{ formatearTexto(registro.registro_id) }}
+            <ng-container matColumnDef="usuario">
+              <td mat-cell *matCellDef="let auditoria" class="table-cell">
+                <span class="usuario-name">
+                  {{ formatearTexto(auditoria.usuario) }}
+                </span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="fecha">
-              <td mat-cell *matCellDef="let registro" class="table-cell">
+              <td mat-cell *matCellDef="let auditoria" class="table-cell">
                 <div class="fecha-cell">
-                  <span class="fecha-text">
-                    {{ formatearFecha(registro.fecha) }}
-                  </span>
+                  <div class="fecha-text text-texfina font-medium">
+                    {{ formatearFecha(auditoria.fecha_hora) }}
+                  </div>
+                  <div class="hora-text text-texfina text-muted">
+                    {{ formatearHora(auditoria.fecha_hora) }}
+                  </div>
                 </div>
               </td>
             </ng-container>
 
+            <ng-container matColumnDef="campos">
+              <td mat-cell *matCellDef="let auditoria" class="table-cell">
+                <span
+                  class="campos-text"
+                  [title]="auditoria.campos_modificados"
+                >
+                  {{ formatearCampos(auditoria.campos_modificados) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="ip">
+              <td mat-cell *matCellDef="let auditoria" class="table-cell">
+                <span class="ip-text">
+                  {{ formatearTexto(auditoria.ip_address) }}
+                </span>
+              </td>
+            </ng-container>
+
             <ng-container matColumnDef="acciones">
-              <td mat-cell *matCellDef="let registro" class="table-cell">
+              <td mat-cell *matCellDef="let auditoria" class="table-cell">
                 <div class="action-buttons">
                   <button
-                    mat-mini-fab
-                    color="accent"
-                    class="btn-action btn-detail"
-                    (click)="verDetalle(registro)"
+                    class="btn-action btn-view"
+                    (click)="verDetalle(auditoria)"
                     matTooltip="Ver detalles"
                   >
-                    <mat-icon>visibility</mat-icon>
+                    👁
+                  </button>
+                  <button
+                    class="btn-action btn-compare"
+                    (click)="compararCambios(auditoria)"
+                    matTooltip="Comparar cambios"
+                  >
+                    ⚖
+                  </button>
+                  <button
+                    class="btn-action btn-delete"
+                    (click)="eliminar(auditoria)"
+                    matTooltip="Eliminar registro"
+                  >
+                    🗑
                   </button>
                 </div>
               </td>
@@ -196,22 +291,6 @@
 
             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
-
-          <div
-            class="pagination-container"
-            *ngIf="!cargando && !error && dataSource.data.length > 0"
-          >
-            <div class="pagination-info">
-              Mostrando {{ dataSource.data.length }} registros
-            </div>
-            <div class="pagination-buttons">
-              <mat-paginator
-                [pageSize]="10"
-                [pageSizeOptions]="[10, 25, 50, 100]"
-                showFirstLastButtons
-              ></mat-paginator>
-            </div>
-          </div>
         </div>
       </div>
     </div>
