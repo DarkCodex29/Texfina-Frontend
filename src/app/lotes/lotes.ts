@@ -49,9 +49,17 @@ import {
 } from '../services/carga-masiva.service';
 import { LotesService } from '../services/lotes.service';
 import { Lote, Insumo } from '../models/insumo.model';
-import { EditarLoteDialogComponent } from './editar-lote-dialog/editar-lote-dialog';
-import { DetalleLoteDialogComponent } from './detalle-lote-dialog/detalle-lote-dialog';
+import { LOTES_CONFIG, LotesConfig } from '../shared/configs/lotes-config';
+import {
+  FormularioDialogComponent,
+  ConfiguracionFormulario,
+} from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import {
+  DetalleDialogComponent,
+  ConfiguracionDetalle,
+} from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
 import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
 
 @Component({
   selector: 'app-lotes',
@@ -156,7 +164,7 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.cargarLotes();
+    this.cargarDatos();
     this.cargarInsumos();
     this.configurarFiltroGeneralEnTiempoReal();
     this.configurarFiltrosColumnaEnTiempoReal();
@@ -190,7 +198,7 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
   // ============================================================================
   // MÉTODOS DE INICIALIZACIÓN
   // ============================================================================
-  cargarLotes(): void {
+  cargarDatos(): void {
     this.isLoading = true;
     this.hasError = false;
     this.errorMessage = '';
@@ -248,7 +256,7 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   reintentarCarga(): void {
-    this.cargarLotes();
+    this.cargarDatos();
     this.cargarInsumos();
   }
 
@@ -405,37 +413,132 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
   // MÉTODOS DE ACCIONES
   // ============================================================================
   abrirNuevoLote(): void {
-    const dialogRef = this.dialog.open(EditarLoteDialogComponent, {
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '700px',
       disableClose: true,
-      data: { esNuevo: true, insumos: this.insumos },
+      data: {
+        esNuevo: true,
+        insumos: this.insumos,
+        titulo: 'Agregar Lote',
+        configuracion: LOTES_CONFIG,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.cargarLotes();
+        this.cargarDatos();
       }
     });
   }
 
   verDetalle(lote: Lote): void {
-    const insumo = this.insumos.find((i) => i.id_insumo === lote.id_insumo);
-    this.dialog.open(DetalleLoteDialogComponent, {
-      width: '600px',
-      data: { lote, insumo },
-    });
-  }
+    const configuracion: ConfiguracionDetalle = {
+      entidad: 'Lote',
+      entidadArticulo: 'el lote',
+      filas: [
+        [
+          {
+            key: 'id_lote',
+            label: 'ID Lote',
+            tipo: 'text',
+            formateo: (id) => this.formatearCodigo(id),
+          },
+          {
+            key: 'lote',
+            label: 'Código',
+            tipo: 'text',
+            formateo: (texto) => this.formatearTexto(texto),
+          },
+        ],
+        [
+          {
+            key: 'id_insumo',
+            label: 'Insumo',
+            tipo: 'text',
+            formateo: (id) => this.getInsumoNombre(id),
+          },
+          {
+            key: 'ubicacion',
+            label: 'Ubicación',
+            tipo: 'text',
+            formateo: (texto) => this.formatearTexto(texto),
+          },
+        ],
+        [
+          {
+            key: 'stock_inicial',
+            label: 'Stock Inicial',
+            tipo: 'number',
+            formateo: (valor) => this.formatearNumero(valor),
+          },
+          {
+            key: 'stock_actual',
+            label: 'Stock Actual',
+            tipo: 'number',
+            formateo: (valor) => this.formatearNumero(valor),
+          },
+        ],
+        [
+          {
+            key: 'fecha_expiracion',
+            label: 'Fecha de Vencimiento',
+            tipo: 'text',
+            formateo: (fecha) => this.formatearFechaDetalle(fecha),
+          },
+          {
+            key: 'precio_total',
+            label: 'Precio Total',
+            tipo: 'number',
+            formateo: (precio) => this.formatearPrecio(precio),
+          },
+        ],
+        [
+          {
+            key: 'estado_lote',
+            label: 'Estado',
+            tipo: 'text',
+            formateo: (estado) => this.formatearEstado(estado),
+          },
+          {
+            key: 'porcentaje_stock',
+            label: 'Porcentaje Stock',
+            tipo: 'text',
+            formateo: () => this.calcularPorcentajeStock(lote),
+          },
+        ],
+      ],
+      datos: lote,
+    };
 
-  editarLote(lote: Lote): void {
-    const dialogRef = this.dialog.open(EditarLoteDialogComponent, {
-      width: '700px',
+    const dialogRef = this.dialog.open(DetalleDialogComponent, {
+      width: '800px',
       disableClose: true,
-      data: { lote, esNuevo: false, insumos: this.insumos },
+      data: configuracion,
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.cargarLotes();
+        this.cargarDatos();
+      }
+    });
+  }
+
+  editarLote(lote: Lote): void {
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '700px',
+      disableClose: true,
+      data: {
+        lote,
+        esNuevo: false,
+        insumos: this.insumos,
+        titulo: 'Editar Lote',
+        configuracion: LOTES_CONFIG,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.cargarDatos();
       }
     });
   }
@@ -512,47 +615,257 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
   // ============================================================================
 
   agregar(): void {
-    const dialogRef = this.dialog.open(EditarLoteDialogComponent, {
+    const configuracion: ConfiguracionFormulario = {
+      titulo: {
+        agregar: 'Agregar Lote',
+        editar: 'Editar Lote',
+      },
+      entidad: 'Lote',
+      entidadArticulo: 'el lote',
+      esEdicion: false,
+      filas: [
+        [
+          {
+            key: 'id_insumo',
+            label: 'Insumo',
+            tipo: 'select',
+            opciones: this.insumos.map((i) => ({
+              value: i.id_insumo!,
+              label: i.nombre,
+            })),
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+        [
+          {
+            key: 'lote',
+            label: 'Código de Lote',
+            tipo: 'text',
+            placeholder: 'Ingrese el código del lote',
+            maxLength: 100,
+            obligatorio: true,
+            ancho: 'normal',
+          },
+          {
+            key: 'ubicacion',
+            label: 'Ubicación',
+            tipo: 'text',
+            placeholder: 'Ubicación del lote',
+            maxLength: 200,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'stock_inicial',
+            label: 'Stock Inicial',
+            tipo: 'number',
+            placeholder: 'Cantidad inicial',
+            obligatorio: true,
+            ancho: 'normal',
+          },
+          {
+            key: 'stock_actual',
+            label: 'Stock Actual',
+            tipo: 'number',
+            placeholder: 'Cantidad actual',
+            obligatorio: true,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'fecha_expiracion',
+            label: 'Fecha de Vencimiento',
+            tipo: 'text',
+            ancho: 'normal',
+          },
+          {
+            key: 'precio_total',
+            label: 'Precio Total',
+            tipo: 'number',
+            placeholder: '0.00',
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'estado_lote',
+            label: 'Estado',
+            tipo: 'select',
+            opciones: LOTES_CONFIG.ESTADOS.map((e) => ({
+              value: e.valor,
+              label: e.nombre,
+            })),
+            obligatorio: true,
+            ancho: 'normal',
+          },
+        ],
+      ],
+    };
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '700px',
       disableClose: true,
-      data: { esNuevo: true, insumos: this.insumos, titulo: 'Agregar Lote' },
+      data: configuracion,
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.cargarLotes();
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado?.accion === 'guardar') {
+        this.materialService.crearLote(resultado.datos).subscribe({
+          next: () => {
+            this.cargarDatos();
+          },
+          error: (error: any) => {
+            console.error('Error al crear lote:', error);
+          },
+        });
       }
     });
   }
 
   editar(lote: Lote): void {
-    const dialogRef = this.dialog.open(EditarLoteDialogComponent, {
+    const configuracion: ConfiguracionFormulario = {
+      titulo: {
+        agregar: 'Agregar Lote',
+        editar: 'Editar Lote',
+      },
+      entidad: 'Lote',
+      entidadArticulo: 'el lote',
+      esEdicion: true,
+      filas: [
+        [
+          {
+            key: 'id_insumo',
+            label: 'Insumo',
+            tipo: 'select',
+            opciones: this.insumos.map((i) => ({
+              value: i.id_insumo!,
+              label: i.nombre,
+            })),
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+        [
+          {
+            key: 'lote',
+            label: 'Código de Lote',
+            tipo: 'text',
+            placeholder: 'Ingrese el código del lote',
+            maxLength: 100,
+            obligatorio: true,
+            ancho: 'normal',
+          },
+          {
+            key: 'ubicacion',
+            label: 'Ubicación',
+            tipo: 'text',
+            placeholder: 'Ubicación del lote',
+            maxLength: 200,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'stock_inicial',
+            label: 'Stock Inicial',
+            tipo: 'number',
+            placeholder: 'Cantidad inicial',
+            obligatorio: true,
+            ancho: 'normal',
+          },
+          {
+            key: 'stock_actual',
+            label: 'Stock Actual',
+            tipo: 'number',
+            placeholder: 'Cantidad actual',
+            obligatorio: true,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'fecha_expiracion',
+            label: 'Fecha de Vencimiento',
+            tipo: 'text',
+            ancho: 'normal',
+          },
+          {
+            key: 'precio_total',
+            label: 'Precio Total',
+            tipo: 'number',
+            placeholder: '0.00',
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'estado_lote',
+            label: 'Estado',
+            tipo: 'select',
+            opciones: LOTES_CONFIG.ESTADOS.map((e) => ({
+              value: e.valor,
+              label: e.nombre,
+            })),
+            obligatorio: true,
+            ancho: 'normal',
+          },
+        ],
+      ],
+      datosIniciales: {
+        id_insumo: lote.id_insumo,
+        lote: lote.lote,
+        ubicacion: lote.ubicacion,
+        stock_inicial: lote.stock_inicial,
+        stock_actual: lote.stock_actual,
+        fecha_expiracion: lote.fecha_expiracion
+          ? new Date(lote.fecha_expiracion)
+          : null,
+        precio_total: lote.precio_total,
+        estado_lote: lote.estado_lote || 'ACTIVO',
+      },
+    };
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '700px',
       disableClose: true,
-      data: {
-        lote,
-        esNuevo: false,
-        insumos: this.insumos,
-        titulo: 'Editar Lote',
-      },
+      data: configuracion,
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.cargarLotes();
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado?.accion === 'guardar' && lote.id_lote) {
+        const loteActualizado = {
+          ...resultado.datos,
+          id_lote: lote.id_lote,
+        };
+
+        this.materialService.actualizarLote(loteActualizado).subscribe({
+          next: () => {
+            this.cargarDatos();
+          },
+          error: (error: any) => {
+            console.error('Error al editar lote:', error);
+          },
+        });
       }
     });
   }
 
   eliminar(lote: Lote): void {
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar el lote ${lote.lote}?`
-    );
-    if (confirmacion && lote.id_lote) {
-      this.lotesService.eliminarLote(lote.id_lote).subscribe(() => {
-        this.cargarLotes();
-      });
-    }
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '400px',
+      disableClose: true,
+      data: LotesConfig.eliminarLote(lote),
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado && lote.id_lote) {
+        console.log('Eliminar lote - Funcionalidad en desarrollo');
+        this.cargarDatos();
+      }
+    });
   }
 
   exportarExcel(): void {
@@ -714,11 +1027,58 @@ export class LotesComponent implements OnInit, AfterViewInit, OnDestroy {
       .procesarArchivo(archivo, this.configurarCargaMasiva())
       .then((resultado: ResultadoCargaMasiva<Lote>) => {
         console.log('Carga masiva completada:', resultado);
-        this.cargarLotes();
+        this.cargarDatos();
       })
       .catch((error: any) => {
         console.error('Error en carga masiva:', error);
       });
+  }
+
+  formatearCodigo(id?: number): string {
+    if (!id) return 'LT-0000';
+    return `LT-${id.toString().padStart(4, '0')}`;
+  }
+
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
+  }
+
+  formatearNumero(valor?: number): string {
+    if (valor === null || valor === undefined) return '-';
+    return valor.toLocaleString('es-ES', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  formatearPrecio(precio?: number): string {
+    if (precio === null || precio === undefined) return '-';
+    return `$${precio.toLocaleString('es-ES', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+
+  formatearFechaDetalle(fecha?: Date | string): string {
+    if (!fecha) return '-';
+    const fechaObj = typeof fecha === 'string' ? new Date(fecha) : fecha;
+    return fechaObj.toLocaleDateString('es-ES');
+  }
+
+  formatearEstado(estado?: string): string {
+    if (!estado) return '-';
+    const estadoConfig = LOTES_CONFIG.ESTADOS.find((e) => e.valor === estado);
+    return estadoConfig ? estadoConfig.nombre : estado;
+  }
+
+  calcularPorcentajeStock(lote: Lote): string {
+    const stockInicial = lote.stock_inicial || 0;
+    const stockActual = lote.stock_actual || 0;
+
+    if (stockInicial === 0) return '0%';
+
+    const porcentaje = Math.round((stockActual / stockInicial) * 100);
+    return `${porcentaje}%`;
   }
 }
 
