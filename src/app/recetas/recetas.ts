@@ -35,6 +35,7 @@ import {
 } from 'rxjs';
 import { MaterialService } from '../services/material.service';
 import { Receta, Insumo } from '../models/insumo.model';
+import { RECETAS_CONFIG } from '../shared/configs/recetas-config';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -44,9 +45,17 @@ import {
   CargaMasivaService,
   ConfiguracionCargaMasiva,
   MapeoColumna,
+  ResultadoCargaMasiva,
 } from '../services/carga-masiva.service';
-import { DetalleRecetaDialogComponent } from './detalle-receta-dialog/detalle-receta-dialog';
-import { EditarRecetaDialogComponent } from './editar-receta-dialog/editar-receta-dialog';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import {
+  FormularioDialogComponent,
+  ConfiguracionFormulario,
+} from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import {
+  DetalleDialogComponent,
+  ConfiguracionDetalle,
+} from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
 
 @Component({
   selector: 'app-recetas',
@@ -445,9 +454,40 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cargaMasiva(): void {
-    console.log('📥 Iniciando carga masiva de recetas');
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarRecetas();
+      }
+    });
+  }
+
+  private descargarPlantillaCargaMasiva(): void {
     const config = this.configurarCargaMasiva();
     this.cargaMasivaService.generarPlantilla(config);
+  }
+
+  private procesarArchivoCargaMasiva(archivo: File): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService
+      .procesarArchivo(archivo, config)
+      .then((resultado: ResultadoCargaMasiva<Receta>) => {
+        console.log('Carga masiva procesada:', resultado);
+        this.cargarRecetas();
+      })
+      .catch((error: any) => {
+        console.error('Error en carga masiva:', error);
+      });
   }
 
   toggleDropdownExport(): void {
@@ -458,36 +498,142 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
   // MÉTODOS DE ACCIONES CRUD
   // ============================================================================
   agregar(): void {
-    const dialogRef = this.dialog.open(EditarRecetaDialogComponent, {
+    const configuracion: ConfiguracionFormulario = {
+      titulo: {
+        agregar: 'Agregar Receta',
+        editar: 'Editar Receta',
+      },
+      entidad: 'Receta',
+      entidadArticulo: 'la receta',
+      esEdicion: false,
+      filas: [
+        [
+          {
+            key: 'nombre',
+            label: 'Nombre',
+            tipo: 'text',
+            placeholder: 'Ingrese el nombre de la receta',
+            maxLength: 200,
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+      ],
+    };
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esNuevo: true },
+      data: configuracion,
     });
+
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarRecetas();
+      if (resultado?.accion === 'guardar') {
+        this.materialService.crearReceta(resultado.datos).subscribe({
+          next: () => {
+            this.cargarRecetas();
+          },
+          error: (error) => {
+            console.error('Error al crear receta:', error);
+          },
+        });
       }
     });
   }
 
   editar(receta: Receta): void {
-    const dialogRef = this.dialog.open(EditarRecetaDialogComponent, {
+    const configuracion: ConfiguracionFormulario = {
+      titulo: {
+        agregar: 'Agregar Receta',
+        editar: 'Editar Receta',
+      },
+      entidad: 'Receta',
+      entidadArticulo: 'la receta',
+      esEdicion: true,
+      filas: [
+        [
+          {
+            key: 'nombre',
+            label: 'Nombre',
+            tipo: 'text',
+            placeholder: 'Ingrese el nombre de la receta',
+            maxLength: 200,
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+      ],
+      datosIniciales: {
+        nombre: receta.nombre,
+      },
+    };
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esNuevo: false, receta: receta },
+      data: configuracion,
     });
+
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarRecetas();
+      if (resultado?.accion === 'guardar' && receta.id_receta) {
+        const recetaActualizada = {
+          ...resultado.datos,
+          id_receta: receta.id_receta,
+        };
+
+        this.materialService.editarReceta(recetaActualizada).subscribe({
+          next: () => {
+            this.cargarRecetas();
+          },
+          error: (error) => {
+            console.error('Error al editar receta:', error);
+          },
+        });
       }
     });
   }
 
   verDetalle(receta: Receta): void {
-    this.dialog.open(DetalleRecetaDialogComponent, {
+    const configuracion: ConfiguracionDetalle = {
+      entidad: 'Receta',
+      entidadArticulo: 'la receta',
+      filas: [
+        [
+          {
+            key: 'id_receta',
+            label: 'ID Receta',
+            tipo: 'text',
+            formateo: (id) => this.formatearCodigo(id),
+          },
+          {
+            key: 'nombre',
+            label: 'Nombre',
+            tipo: 'text',
+            formateo: (texto) => this.formatearTexto(texto),
+          },
+        ],
+        [
+          {
+            key: 'estado',
+            label: 'Estado',
+            tipo: 'text',
+            formateo: () => this.getEstadoReceta(receta),
+          },
+          {
+            key: 'ingredientes',
+            label: 'Cantidad Ingredientes',
+            tipo: 'number',
+            formateo: () => this.getIngredientesCount(receta).toString(),
+          },
+        ],
+      ],
+      datos: receta,
+    };
+
+    this.dialog.open(DetalleDialogComponent, {
       width: '800px',
       disableClose: true,
-      data: { receta: receta },
+      data: configuracion,
     });
   }
 
@@ -508,6 +654,10 @@ export class RecetasComponent implements OnInit, AfterViewInit, OnDestroy {
   formatearCodigo(id?: number): string {
     if (!id) return 'REC-0000';
     return `REC-${id.toString().padStart(4, '0')}`;
+  }
+
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
   }
 
   getIngredientesCount(receta: Receta): number {
