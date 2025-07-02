@@ -5,14 +5,14 @@
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: clamp(10px, 1.5vw, 16px) !important; // Gap autoajustable entre cards
+  margin-bottom: clamp(16px, 2.5vw, 20px) !important; // Margin autoajustable
 
   .card-texfina {
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
-    padding: 12px;
+    padding: clamp(12px, 2vw, 18px) !important; // Padding autoajustable interno
     transition: all 0.2s ease;
 
     &:hover {
@@ -32,7 +32,11 @@
       text-align: center;
 
       .summary-value {
-        font-size: 20px;
+        font-size: clamp(
+          18px,
+          3.5vw,
+          22px
+        ) !important; // Valor principal autoajustable
         font-weight: 700;
         margin-bottom: 4px;
         display: block;
@@ -40,25 +44,35 @@
       }
 
       .summary-label {
-        font-size: 13px;
+        font-size: clamp(11px, 2vw, 13px) !important; // Texto autoajustable
         font-weight: 500;
         opacity: 0.8;
         line-height: 1.3;
       }
+    }
+
+    h3 {
+      font-size: clamp(14px, 2.5vw, 16px) !important; // Título autoajustable
+      margin-bottom: clamp(6px, 1vw, 8px) !important;
+    }
+
+    p {
+      font-size: clamp(11px, 2vw, 13px) !important; // Texto autoajustable
+      margin-bottom: clamp(4px, 0.6vw, 6px) !important;
     }
   }
 
   // Responsive para tablets
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: clamp(6px, 1vw, 10px);
   }
 
   // Responsive para móvil
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: clamp(6px, 1vw, 10px) !important;
+    margin-bottom: clamp(12px, 2vw, 16px) !important;
   }
 }
 
@@ -66,43 +80,348 @@
 // STOCK - ESTILOS ESPECÍFICOS ALINEADOS CON ESTÁNDAR TEXFINA
 // ============================================================================
 
+/* Mejoras de espaciado para la tabla de Stock */
+.table-cell {
+  vertical-align: top !important;
+  display: flex;
+  align-items: flex-start;
+  padding: clamp(8px, 1.2vw, 12px) clamp(12px, 1.8vw, 16px) !important;
+
+  @media (max-width: 768px) {
+    padding: clamp(6px, 1vw, 8px) clamp(8px, 1.2vw, 12px) !important;
+  }
+
+  &:nth-child(1) {
+    // CÓDIGO
+    text-align: left;
+  }
+
+  &:nth-child(2) {
+    // MATERIAL
+    text-align: left;
+  }
+
+  &:nth-child(3) {
+    // ALMACÉN - AJUSTE ESPECÍFICO
+    text-align: left;
+
+    .almacen-name {
+      display: block;
+      padding-left: 0 !important; // Asegurar que no tenga padding extra
+      margin-left: 0 !important; // Asegurar que no tenga margin extra
+      text-align: left !important; // Forzar alineación izquierda
+    }
+  }
+
+  &:nth-child(4) {
+    // CLASE
+    text-align: left;
+  }
+
+  &:nth-child(5) {
+    // STOCK ACTUAL
+    text-align: right;
+  }
+
+  &:nth-child(6) {
+    // ESTADO
+    text-align: center;
+  }
+
+  &:nth-child(7) {
+    // VALOR TOTAL
+    text-align: right;
+  }
+
+  &:nth-child(8) {
+    // ACCIONES
+    text-align: center;
+  }
+}
+
 /* Solo estilos muy específicos para las celdas de stock */
 .stock-cell {
   .material-name {
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.3;
+    font-size: clamp(13px, 2.5vw, 14px); // Tamaño autoajustable
+    margin-bottom: clamp(2px, 0.3vw, 3px); // Margin autoajustable
   }
 
   .material-unidad {
-    font-size: 0.75rem;
+    font-size: clamp(10px, 2vw, 12px); // Tamaño autoajustable
     line-height: 1.2;
-    margin-top: 2px;
+    margin-top: clamp(1px, 0.2vw, 2px); // Margin autoajustable
+    opacity: 0.8;
   }
 }
 
+/* ===== CELDA DE ALMACÉN ESPECÍFICA ===== */
+.almacen-cell {
+  padding-top: clamp(4px, 0.7vw, 8px);
+}
+
+.almacen-name {
+  font-weight: 500;
+  font-size: clamp(13px, 2.5vw, 14px);
+  color: var(--texfina-text-primary);
+  padding: 0;
+  margin: 0;
+  line-height: 1.4;
+}
+
 .stock-cantidad-cell {
+  text-align: right;
+
   .cantidad-valor {
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.3;
+    font-size: clamp(13px, 2.5vw, 14px); // Tamaño autoajustable
+    margin-bottom: clamp(2px, 0.3vw, 3px); // Margin autoajustable
   }
 
   .cantidad-limites {
-    font-size: 0.75rem;
+    font-size: clamp(9px, 1.8vw, 11px); // Tamaño autoajustable
     line-height: 1.2;
-    margin-top: 2px;
+    margin-top: clamp(1px, 0.2vw, 2px); // Margin autoajustable
+    opacity: 0.7;
   }
 }
 
 .valor-cell {
+  text-align: right;
+
   .valor-total {
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.3;
+    font-size: clamp(13px, 2.5vw, 14px); // Tamaño autoajustable
+    margin-bottom: clamp(2px, 0.3vw, 3px); // Margin autoajustable
   }
 
   .valor-unitario {
-    font-size: 0.75rem;
+    font-size: clamp(9px, 1.8vw, 11px); // Tamaño autoajustable
     line-height: 1.2;
-    margin-top: 2px;
+    margin-top: clamp(1px, 0.2vw, 2px); // Margin autoajustable
+    opacity: 0.7;
+  }
+}
+
+/* Mejoras para badges y estados */
+.badge-texfina {
+  padding: clamp(4px, 0.6vw, 6px) clamp(8px, 1.2vw, 12px) !important; // Padding autoajustable
+  font-size: clamp(10px, 1.8vw, 12px) !important; // Tamaño autoajustable
+  border-radius: clamp(4px, 0.6vw, 6px) !important;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-top: clamp(4px, 0.7vw, 8px);
+}
+
+/* Columnas específicas con mejor espaciado */
+.codigo-col {
+  min-width: clamp(80px, 10vw, 100px); // Ancho autoajustable
+}
+
+.material-col {
+  min-width: clamp(180px, 25vw, 220px); // Ancho autoajustable
+}
+
+.almacen-col {
+  min-width: clamp(120px, 15vw, 140px); // Ancho autoajustable
+}
+
+.clase-col {
+  min-width: clamp(100px, 12vw, 120px); // Ancho autoajustable
+}
+
+.stock-col {
+  min-width: clamp(130px, 16vw, 150px); // Ancho autoajustable
+}
+
+.estado-col {
+  min-width: clamp(90px, 11vw, 110px); // Ancho autoajustable
+}
+
+.valor-col {
+  min-width: clamp(120px, 15vw, 140px); // Ancho autoajustable
+}
+
+.acciones-col {
+  min-width: clamp(100px, 12vw, 120px); // Ancho autoajustable
+}
+
+/* Mejor espaciado para header de tabla - ALINEADO CON CELDAS */
+.header-row {
+  .header-col {
+    padding: clamp(10px, 1.5vw, 14px) clamp(12px, 1.8vw, 16px) !important; // MISMO PADDING HORIZONTAL QUE CELDAS
+    font-weight: 600;
+    font-size: clamp(11px, 2vw, 13px) !important; // Tamaño autoajustable
+
+    span {
+      line-height: 1.3;
+    }
+  }
+
+  // Alineación específica por columna para coincidir con contenido
+  .stock-col {
+    text-align: right; // Alinear header de stock a la derecha como las celdas
+  }
+
+  .valor-col {
+    text-align: right; // Alinear header de valor a la derecha como las celdas
+  }
+
+  .estado-col {
+    text-align: center; // Centrar header de estado
+  }
+
+  .acciones-col {
+    text-align: center; // Centrar header de acciones
+  }
+
+  // Alineación específica para headers de títulos
+  &.header-titles {
+    .header-col {
+      &:nth-child(1) {
+        text-align: left;
+      } // CÓDIGO
+      &:nth-child(2) {
+        text-align: left;
+      } // MATERIAL
+      &:nth-child(3) {
+        // ALMACÉN - AJUSTE ESPECÍFICO
+        text-align: left;
+
+        span {
+          display: block;
+          padding-left: 0 !important; // Sin padding extra en el header
+          margin-left: 0 !important; // Sin margin extra en el header
+        }
+      }
+      &:nth-child(4) {
+        text-align: left;
+      } // CLASE
+      &:nth-child(5) {
+        text-align: right;
+      } // STOCK ACTUAL
+      &:nth-child(6) {
+        text-align: center;
+      } // ESTADO
+      &:nth-child(7) {
+        text-align: right;
+      } // VALOR TOTAL
+      &:nth-child(8) {
+        text-align: center;
+      } // ACCIONES
+    }
+  }
+
+  // Alineación específica para headers de filtros
+  &.header-filters {
+    .header-col {
+      &:nth-child(1) {
+        text-align: left;
+      } // CÓDIGO
+      &:nth-child(2) {
+        text-align: left;
+      } // MATERIAL
+      &:nth-child(3) {
+        // ALMACÉN - AJUSTE ESPECÍFICO
+        text-align: left;
+
+        .column-filter-input {
+          text-align: left !important; // Forzar input de filtro alineado
+          padding-left: clamp(
+            8px,
+            1.2vw,
+            10px
+          ) !important; // Padding específico
+        }
+      }
+      &:nth-child(4) {
+        text-align: left;
+      } // CLASE
+      &:nth-child(5) {
+        text-align: right;
+      } // STOCK ACTUAL
+      &:nth-child(6) {
+        text-align: center;
+      } // ESTADO
+      &:nth-child(7) {
+        text-align: right;
+      } // VALOR TOTAL
+      &:nth-child(8) {
+        text-align: center;
+      } // ACCIONES
+    }
+  }
+}
+
+/* Mejorar espaciado de botones de acciones */
+.action-buttons {
+  display: flex;
+  gap: clamp(4px, 0.6vw, 6px) !important; // Gap autoajustable
+  justify-content: center;
+  align-items: center;
+  padding: clamp(2px, 0.3vw, 4px); // Padding autoajustable
+}
+
+/* ===== FILTROS DE COLUMNA ALINEADOS ===== */
+.header-filters {
+  background: var(--texfina-bg-muted);
+  border-top: 1px solid var(--texfina-border);
+  padding: clamp(4px, 1vw, 8px) 0; // Padding autoajustable
+}
+
+.column-filter-input {
+  width: 100%;
+  border: 1px solid var(--texfina-border);
+  border-radius: 6px;
+  background: white;
+  padding: clamp(6px, 1.2vw, 8px) clamp(8px, 1.5vw, 12px); // Padding autoajustable
+  margin: 0 clamp(2px, 0.5vw, 4px); // Margin autoajustable
+  font-size: clamp(11px, 2vw, 13px); // Tamaño autoajustable
+  color: var(--texfina-text-primary);
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-secondary);
+    box-shadow: 0 0 0 2px var(--texfina-secondary-light);
+  }
+
+  &::placeholder {
+    color: var(--texfina-text-muted);
+    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
+  }
+}
+
+.btn-clear-column-filters {
+  min-width: 140px !important;
+  height: clamp(40px, 6vw, 48px) !important; // Altura autoajustable
+  border-radius: 10px !important;
+  border: 2px solid var(--texfina-primary) !important;
+  background: linear-gradient(135deg, white, #fef7f7) !important;
+  color: var(--texfina-primary) !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  font-size: clamp(12px, 2.2vw, 14px); // Tamaño autoajustable
+  padding: 0 clamp(12px, 2.5vw, 20px); // Padding autoajustable
+  white-space: nowrap;
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-primary);
+    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    width: 100% !important;
+    min-width: auto !important;
   }
 }
 
@@ -220,7 +539,7 @@
 .header-filters {
   background: var(--texfina-bg-muted);
   border-top: 1px solid var(--texfina-border);
-  padding: 8px 0;
+  padding: clamp(4px, 1vw, 8px) 0; // Padding autoajustable
 }
 
 .column-filter-input {
@@ -228,9 +547,9 @@
   border: 1px solid var(--texfina-border);
   border-radius: 6px;
   background: white;
-  padding: 8px 12px;
-  margin: 0 4px;
-  font-size: 0.8rem;
+  padding: clamp(6px, 1.2vw, 8px) clamp(8px, 1.5vw, 12px); // Padding autoajustable
+  margin: 0 clamp(2px, 0.5vw, 4px); // Margin autoajustable
+  font-size: clamp(11px, 2vw, 13px); // Tamaño autoajustable
   color: var(--texfina-text-primary);
 
   &:focus {
@@ -241,13 +560,13 @@
 
   &::placeholder {
     color: var(--texfina-text-muted);
-    font-size: 0.75rem;
+    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
   }
 }
 
 .btn-clear-column-filters {
   min-width: 140px !important;
-  height: 48px !important;
+  height: clamp(40px, 6vw, 48px) !important; // Altura autoajustable
   border-radius: 10px !important;
   border: 2px solid var(--texfina-primary) !important;
   background: linear-gradient(135deg, white, #fef7f7) !important;
@@ -260,8 +579,8 @@
   position: relative;
   overflow: hidden;
   font-weight: 500;
-  font-size: 14px;
-  padding: 0 20px;
+  font-size: clamp(12px, 2.2vw, 14px); // Tamaño autoajustable
+  padding: 0 clamp(12px, 2.5vw, 20px); // Padding autoajustable
   white-space: nowrap;
 
   &:focus {
@@ -285,23 +604,31 @@
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
+  padding: clamp(
+    12px,
+    2vw,
+    18px
+  ) !important; // Padding autoajustable para filtros
 
   .filters-content {
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: clamp(12px, 2vw, 16px) clamp(16px, 2.5vw, 20px); // Padding autoajustable
     background: var(--background-subtle);
 
     @media (max-width: 768px) {
-      padding: var(--spacing-md) var(--spacing-lg);
+      padding: clamp(8px, 1.5vw, 12px) clamp(12px, 2vw, 16px);
     }
   }
 
   .simple-input {
-    height: 44px !important;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    padding-right: calc(var(--spacing-md) + 80px) !important;
+    height: clamp(36px, 5.5vw, 44px) !important; // Altura autoajustable
+    padding: clamp(10px, 1.5vw, 12px) clamp(14px, 2vw, 16px) !important; // Padding autoajustable
+    padding-right: calc(
+      clamp(10px, 1.5vw, 12px) + clamp(60px, 10vw, 80px)
+    ) !important;
     border: 1px solid var(--border-color);
     background: var(--surface-color);
     color: var(--text-primary);
+    font-size: clamp(13px, 2.2vw, 14px) !important; // Tamaño autoajustable
 
     &:focus {
       border-color: var(--primary-color);
@@ -309,19 +636,154 @@
     }
 
     @media (max-width: 768px) {
-      height: 40px !important;
-      padding: var(--spacing-xs) var(--spacing-sm) !important;
-      padding-right: calc(var(--spacing-sm) + 70px) !important;
+      height: clamp(32px, 5vw, 40px) !important;
+      padding: clamp(8px, 1.2vw, 10px) clamp(12px, 1.8vw, 14px) !important;
+      padding-right: calc(
+        clamp(8px, 1.2vw, 10px) + clamp(50px, 8vw, 70px)
+      ) !important;
     }
   }
 
   .btn-limpiar {
-    height: calc(100% - 8px) !important;
-    padding: var(--spacing-xs) var(--spacing-sm) !important;
+    height: calc(
+      100% - clamp(6px, 1vw, 8px)
+    ) !important; // Altura autoajustable
+    padding: clamp(4px, 0.8vw, 6px) clamp(6px, 1vw, 8px) !important; // Padding autoajustable
+    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
 
     @media (max-width: 768px) {
-      height: calc(100% - 6px) !important;
-      padding: var(--spacing-xs) !important;
+      height: calc(100% - clamp(4px, 0.8vw, 6px)) !important;
+      padding: clamp(2px, 0.5vw, 4px) !important;
+    }
+  }
+}
+
+// ============================================================================
+// TABLA RESPONSIVE ESPECÍFICA PARA STOCK
+// ============================================================================
+
+// Mejoras específicas para la tabla de stock en móvil
+@media (max-width: 768px) {
+  .table-with-headers {
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--texfina-primary);
+        border-radius: 10px;
+      }
+    }
+
+    .column-headers,
+    .data-table {
+      min-width: 900px; // Forzar ancho mínimo para scroll horizontal
+    }
+  }
+}
+
+// Reducir tamaño de botones de acciones en móvil
+@media (max-width: 480px) {
+  .btn-action {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    padding: 0 !important;
+
+    mat-icon {
+      font-size: 16px !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
+
+  .action-buttons {
+    gap: 4px !important;
+  }
+}
+
+/* ===== MEJORAS GENERALES DEL LAYOUT ===== */
+
+/* Contenedor principal más organizado */
+.page-container {
+  padding: clamp(12px, 2vw, 20px) !important; // Padding autoajustable general
+  gap: clamp(12px, 2vw, 20px) !important; // Gap autoajustable entre elementos
+
+  @media (max-width: 768px) {
+    padding: clamp(8px, 1.5vw, 12px) !important;
+    gap: clamp(8px, 1.5vw, 12px) !important;
+  }
+}
+
+/* Header mejor organizado */
+.page-header {
+  padding: clamp(16px, 2.5vw, 24px) !important; // Padding autoajustable
+
+  .page-title {
+    font-size: clamp(
+      22px,
+      4vw,
+      28px
+    ) !important; // Título más pequeño y autoajustable
+    margin-bottom: clamp(4px, 0.6vw, 6px) !important;
+  }
+
+  .page-subtitle {
+    font-size: clamp(13px, 2.2vw, 15px) !important; // Subtítulo autoajustable
+  }
+
+  @media (max-width: 768px) {
+    padding: clamp(12px, 2vw, 16px) !important;
+  }
+}
+
+/* Header actions mejor espaciado */
+.header-actions {
+  gap: clamp(8px, 1.2vw, 12px) !important; // Gap autoajustable entre botones
+
+  .btn-texfina {
+    padding: clamp(10px, 1.5vw, 12px) clamp(16px, 2.5vw, 20px) !important; // Padding autoajustable
+    font-size: clamp(13px, 2.2vw, 14px) !important; // Tamaño autoajustable
+  }
+
+  @media (max-width: 768px) {
+    gap: clamp(6px, 1vw, 8px) !important;
+
+    .btn-texfina {
+      padding: clamp(8px, 1.2vw, 10px) clamp(12px, 2vw, 16px) !important;
+      font-size: clamp(12px, 2vw, 13px) !important;
+    }
+  }
+}
+
+/* Tabla principal mejor organizada */
+.table-with-headers {
+  border-radius: clamp(
+    8px,
+    1.2vw,
+    12px
+  ) !important; // Border radius autoajustable
+  overflow: hidden !important;
+
+  .table-container {
+    max-height: calc(
+      100vh - 350px
+    ) !important; // Altura automática basada en viewport
+
+    @media (max-width: 768px) {
+      max-height: calc(
+        100vh - 400px
+      ) !important; // Más espacio en móvil para otros elementos
     }
   }
 }

@@ -127,30 +127,30 @@ export class RolesComponent implements OnInit, OnDestroy {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       this.roles = [
-        {
-          id_rol: 'ADMIN',
+    {
+      id_rol: 'ADMIN',
           nombre: 'Administrador',
-          descripcion: 'Administrador del sistema con acceso completo',
-          activo: true,
-        },
-        {
-          id_rol: 'SUPERVISOR',
+      descripcion: 'Administrador del sistema con acceso completo',
+      activo: true,
+    },
+    {
+      id_rol: 'SUPERVISOR',
           nombre: 'Supervisor',
-          descripcion: 'Supervisor de operaciones con permisos avanzados',
-          activo: true,
-        },
-        {
-          id_rol: 'OPERARIO',
+      descripcion: 'Supervisor de operaciones con permisos avanzados',
+      activo: true,
+    },
+    {
+      id_rol: 'OPERARIO',
           nombre: 'Operario',
-          descripcion: 'Operario con permisos básicos de gestión',
-          activo: true,
-        },
-        {
-          id_rol: 'CONSULTOR',
+      descripcion: 'Operario con permisos básicos de gestión',
+      activo: true,
+    },
+    {
+      id_rol: 'CONSULTOR',
           nombre: 'Consultor',
-          descripcion: 'Consultor con permisos de solo lectura',
-          activo: false,
-        },
+      descripcion: 'Consultor con permisos de solo lectura',
+      activo: false,
+    },
         {
           id_rol: 'INVITADO',
           nombre: 'Invitado',

@@ -4,10 +4,11 @@
   .entidad-tipo {
     font-weight: 500;
     color: var(--texfina-text-primary);
+    font-size: clamp(12px, 2.2vw, 14px); // Tamaño autoajustable
   }
 
   .entidad-id {
-    font-size: 12px;
+    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
     color: var(--texfina-text-muted);
   }
 }
@@ -16,19 +17,20 @@
   .fecha-text {
     font-weight: 500;
     color: var(--texfina-text-primary);
+    font-size: clamp(12px, 2.2vw, 14px); // Tamaño autoajustable
   }
 
   .hora-text {
-    font-size: 12px;
+    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
     color: var(--texfina-text-muted);
   }
 }
 
 .campos-text {
-  font-size: 13px;
+  font-size: clamp(11px, 2vw, 13px); // Tamaño autoajustable
   color: var(--texfina-text-primary);
   display: inline-block;
-  max-width: 200px;
+  max-width: clamp(150px, 25vw, 200px); // Ancho autoajustable
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -40,10 +42,10 @@
 
 .ip-text {
   font-family: "Courier New", monospace;
-  font-size: 12px;
+  font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
   color: var(--texfina-text-muted);
   background: var(--texfina-neutral-bg);
-  padding: 2px 6px;
+  padding: clamp(1px, 0.3vw, 2px) clamp(4px, 0.8vw, 6px); // Padding autoajustable
   border-radius: 4px;
 }
 
@@ -82,23 +84,78 @@
 }
 
 .entidad-col {
-  min-width: 140px;
+  min-width: clamp(120px, 18vw, 140px); // Ancho autoajustable
 }
 .accion-col {
-  min-width: 90px;
+  min-width: clamp(80px, 12vw, 90px); // Ancho autoajustable
 }
 .usuario-col {
-  min-width: 120px;
+  min-width: clamp(100px, 15vw, 120px); // Ancho autoajustable
 }
 .fecha-col {
-  min-width: 140px;
+  min-width: clamp(120px, 18vw, 140px); // Ancho autoajustable
 }
 .campos-col {
-  min-width: 180px;
+  min-width: clamp(150px, 22vw, 180px); // Ancho autoajustable
 }
 .ip-col {
-  min-width: 120px;
+  min-width: clamp(100px, 15vw, 120px); // Ancho autoajustable
 }
 .acciones-col {
-  min-width: 140px;
+  min-width: clamp(120px, 18vw, 140px); // Ancho autoajustable
+}
+
+// ============================================================================
+// TABLA RESPONSIVE ESPECÍFICA PARA AUDITORÍA
+// ============================================================================
+
+// Mejoras específicas para la tabla de auditoría en móvil
+@media (max-width: 768px) {
+  .table-with-headers {
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--texfina-primary);
+        border-radius: 10px;
+      }
+    }
+
+    .column-headers,
+    .data-table {
+      min-width: 1000px; // Forzar ancho mínimo para scroll horizontal (más ancho por más columnas)
+    }
+  }
+}
+
+// Reducir tamaño de botones de acciones en móvil
+@media (max-width: 480px) {
+  .btn-action,
+  .btn-compare {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    padding: 0 !important;
+
+    mat-icon {
+      font-size: 16px !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
+
+  .action-buttons {
+    gap: 4px !important;
+  }
 }

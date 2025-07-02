@@ -1,13 +1,13 @@
 /* Contenedor principal */
 .reportes-container {
-  padding: 1.5rem;
+  padding: clamp(12px, 2vw, 24px);
   background-color: #f5f7fa;
   height: 100%;
   width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  overflow: hidden; // Importante para contener el scroll
+  overflow: hidden;
 }
 
 /* Header de la página */
@@ -15,28 +15,29 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
+  margin-bottom: clamp(16px, 2.5vw, 24px);
   background: white;
-  padding: 24px;
+  padding: clamp(16px, 2.5vw, 24px);
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
 
   .page-title {
     margin: 0;
-    font-size: 28px;
+    font-size: clamp(20px, 3.5vw, 28px);
     font-weight: 600;
     color: #1f2937;
   }
 
   .action-buttons {
     display: flex;
-    gap: 12px;
+    gap: clamp(8px, 1.5vw, 12px);
 
     .btn-exportar {
       font-weight: 500;
-      padding: 8px 20px;
+      padding: clamp(6px, 1vw, 8px) clamp(16px, 2.5vw, 20px);
       border-radius: 8px;
+      font-size: clamp(12px, 2.2vw, 14px);
 
       &[color="primary"] {
         background: #7c3aed;
@@ -61,31 +62,56 @@
       color: #7c3aed;
       border-color: #7c3aed;
       font-weight: 500;
-      padding: 8px 20px;
+      padding: clamp(6px, 1vw, 8px) clamp(16px, 2.5vw, 20px);
       border-radius: 8px;
+      font-size: clamp(12px, 2.2vw, 14px);
 
       &:hover {
         background: rgba(124, 58, 237, 0.1);
       }
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+
+      .btn-exportar,
+      .btn-programar {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: clamp(12px, 2vw, 16px);
+    align-items: stretch;
+
+    .page-title {
+      text-align: center;
     }
   }
 }
 
 /* Sección KPIs */
 .kpis-section {
-  margin-bottom: 24px;
+  margin-bottom: clamp(16px, 2.5vw, 24px);
 
   .section-title {
-    font-size: 20px;
+    font-size: clamp(16px, 2.8vw, 20px);
     font-weight: 600;
     color: #1f2937;
-    margin: 0 0 16px 0;
+    margin: 0 0 clamp(12px, 2vw, 16px) 0;
   }
 
   .kpis-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(clamp(250px, 35vw, 280px), 1fr)
+    );
+    gap: clamp(12px, 2vw, 16px);
 
     .kpi-card {
       background: white;
@@ -111,14 +137,16 @@
       }
 
       .kpi-content {
+        padding: clamp(12px, 2vw, 16px);
+
         .kpi-header {
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          margin-bottom: 8px;
+          margin-bottom: clamp(6px, 1vw, 8px);
 
           .kpi-value {
-            font-size: 32px;
+            font-size: clamp(24px, 4vw, 32px);
             font-weight: 700;
             color: #1f2937;
             line-height: 1;
@@ -127,16 +155,16 @@
           .kpi-tendencia {
             display: flex;
             align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
+            gap: clamp(2px, 0.5vw, 4px);
+            padding: clamp(3px, 0.5vw, 4px) clamp(6px, 1vw, 8px);
             border-radius: 6px;
-            font-size: 12px;
+            font-size: clamp(10px, 1.8vw, 12px);
             font-weight: 600;
 
             mat-icon {
-              font-size: 18px;
-              height: 18px;
-              width: 18px;
+              font-size: clamp(14px, 2.5vw, 18px);
+              height: clamp(14px, 2.5vw, 18px);
+              width: clamp(14px, 2.5vw, 18px);
             }
 
             &.success {
@@ -157,14 +185,14 @@
         }
 
         .kpi-label {
-          font-size: 16px;
+          font-size: clamp(14px, 2.5vw, 16px);
           font-weight: 600;
           color: #374151;
-          margin-bottom: 4px;
+          margin-bottom: clamp(3px, 0.5vw, 4px);
         }
 
         .kpi-descripcion {
-          font-size: 14px;
+          font-size: clamp(12px, 2.2vw, 14px);
           color: #6b7280;
         }
       }
@@ -174,26 +202,26 @@
 
 /* Tarjeta de filtros */
 .filters-card {
-  margin-bottom: 24px;
+  margin-bottom: clamp(16px, 2.5vw, 24px);
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
 
   mat-card-header {
     background: #f9fafb;
-    padding: 16px 24px;
+    padding: clamp(12px, 2vw, 16px) clamp(18px, 2.5vw, 24px);
     border-radius: 12px 12px 0 0;
 
     mat-card-title {
       color: #1f2937;
       font-weight: 600;
-      font-size: 18px;
+      font-size: clamp(16px, 2.8vw, 18px);
       margin: 0;
     }
   }
 
   mat-card-content {
-    padding: 24px;
+    padding: clamp(18px, 2.5vw, 24px);
   }
 
   .filters-form {
@@ -547,13 +575,13 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 0; // Importante para que flex funcione correctamente
+  min-height: 0;
 }
 
 .table-container {
   flex: 1;
   overflow: auto;
-  min-height: 0; // Importante para que flex funcione correctamente
+  min-height: 0;
 }
 
 // ===== ESTILOS ESPECÍFICOS DE REPORTES =====
@@ -963,5 +991,59 @@
       height: calc(100% - 6px) !important;
       padding: var(--spacing-xs) !important;
     }
+  }
+}
+
+// ===== RESPONSIVE PARA REPORTES =====
+
+// Mejoras específicas para la tabla de reportes en móvil
+@media (max-width: 768px) {
+  .reportes-container {
+    .table-with-headers {
+      .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+          height: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: var(--texfina-primary);
+          border-radius: 10px;
+        }
+      }
+
+      .column-headers,
+      .data-table {
+        min-width: 900px; // Forzar ancho mínimo para scroll horizontal
+      }
+    }
+  }
+}
+
+// Reducir tamaño de botones de acciones en móvil
+@media (max-width: 480px) {
+  .btn-action {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    padding: 0 !important;
+
+    mat-icon {
+      font-size: 16px !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
+
+  .action-buttons {
+    gap: 4px !important;
   }
 }

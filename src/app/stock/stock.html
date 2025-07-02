@@ -232,9 +232,11 @@
 
             <ng-container matColumnDef="almacen">
               <td mat-cell *matCellDef="let stock" class="table-cell">
-                <span class="almacen-name">
-                  {{ formatearTexto(stock.nombre_almacen) }}
-                </span>
+                <div class="almacen-cell">
+                  <span class="almacen-name">
+                    {{ formatearTexto(stock.nombre_almacen) }}
+                  </span>
+                </div>
               </td>
             </ng-container>
 

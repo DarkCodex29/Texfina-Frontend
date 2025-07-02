@@ -61,7 +61,7 @@
 .header-filters {
   background: var(--texfina-bg-muted);
   border-top: 1px solid var(--texfina-border);
-  padding: 8px 0;
+  padding: clamp(4px, 1vw, 8px) 0; // Padding autoajustable
 }
 
 .column-filter-input {
@@ -69,9 +69,9 @@
   border: 1px solid var(--texfina-border);
   border-radius: 6px;
   background: white;
-  padding: 8px 12px;
-  margin: 0 4px;
-  font-size: 0.8rem;
+  padding: clamp(6px, 1.2vw, 8px) clamp(8px, 1.5vw, 12px); // Padding autoajustable
+  margin: 0 clamp(2px, 0.5vw, 4px); // Margin autoajustable
+  font-size: clamp(11px, 2vw, 13px); // Tamaño autoajustable
   color: var(--texfina-text-primary);
 
   &:focus {
@@ -82,13 +82,13 @@
 
   &::placeholder {
     color: var(--texfina-text-muted);
-    font-size: 0.75rem;
+    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
   }
 }
 
 .btn-clear-column-filters {
   min-width: 140px !important;
-  height: 48px !important;
+  height: clamp(40px, 6vw, 48px) !important; // Altura autoajustable
   border-radius: 10px !important;
   border: 2px solid var(--texfina-primary) !important;
   background: linear-gradient(135deg, white, #fef7f7) !important;
@@ -101,8 +101,8 @@
   position: relative;
   overflow: hidden;
   font-weight: 500;
-  font-size: 14px;
-  padding: 0 20px;
+  font-size: clamp(12px, 2.2vw, 14px); // Tamaño autoajustable
+  padding: 0 clamp(12px, 2.5vw, 20px); // Padding autoajustable
   white-space: nowrap;
 
   &:focus {
@@ -164,5 +164,59 @@
       height: calc(100% - 6px) !important;
       padding: var(--spacing-xs) !important;
     }
+  }
+}
+
+// ============================================================================
+// TABLA RESPONSIVE ESPECÍFICA PARA LOGS
+// ============================================================================
+
+// Mejoras específicas para la tabla de logs en móvil
+@media (max-width: 768px) {
+  .table-with-headers {
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--texfina-primary);
+        border-radius: 10px;
+      }
+    }
+
+    .column-headers,
+    .data-table {
+      min-width: 800px; // Forzar ancho mínimo para scroll horizontal
+    }
+  }
+}
+
+// Reducir tamaño de botones de acciones en móvil
+@media (max-width: 480px) {
+  .btn-action {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    padding: 0 !important;
+
+    mat-icon {
+      font-size: 16px !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
+
+  .action-buttons {
+    gap: 4px !important;
   }
 }
