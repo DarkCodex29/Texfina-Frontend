@@ -1,462 +1,62 @@
 .main-toolbar {
+  background: white;
+  color: #212529;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e9ecef;
+  height: 64px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  min-height: 64px;
-  height: 64px;
-  padding: 0 20px;
-  background: #fff;
-  color: #222;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  position: relative;
+  gap: 16px;
+  position: sticky;
+  top: 0;
   z-index: 1000;
-  border-bottom: 1px solid #e9ecef;
-  flex-shrink: 0;
-  overflow: visible;
+}
+
+.menu-toggle {
+  display: none !important;
+  color: var(--texfina-text-primary) !important;
+
+  @media (max-width: 800px) {
+    display: flex !important;
+  }
 }
 
 .toolbar-logos {
-  display: none;
+  display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
 .toolbar-logo {
-  height: 32px;
-  max-width: 100px;
-  object-fit: contain;
-}
-
-.toolbar-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-right: 24px;
+  height: 36px;
+  width: auto;
+  margin: 0;
+  padding: 0;
 }
 
 .spacer {
-  flex: 1 1 auto;
-  min-width: 20px;
-}
-
-.toolbar-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-  min-width: 250px;
-  max-width: 300px;
-  flex-shrink: 0;
-  overflow: visible;
-
-  &:hover {
-    background-color: #f8f9fa;
-  }
-}
-
-.user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-right: 8px;
-  min-width: 0;
   flex: 1;
-  overflow: visible;
 }
 
-.user-name {
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: #2c3e50;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  text-align: right;
-  min-width: 120px;
-  max-width: 180px;
-}
-
-.user-email {
-  font-size: 0.75rem;
-  color: #6c757d;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  text-align: right;
-  min-width: 140px;
-  max-width: 200px;
-}
-
-mat-icon {
-  flex-shrink: 0;
-  color: #6c757d;
-  font-size: 24px;
-  width: 24px;
-  height: 24px;
-}
-
-// Responsive para tablets
-@media (max-width: 1200px) {
-  .main-toolbar {
-    padding: 0 16px;
-  }
-
-  .toolbar-user {
-    min-width: 220px;
-    max-width: 280px;
-  }
-
-  .user-name {
-    font-size: 0.85rem;
-  }
-
-  .user-email {
-    font-size: 0.7rem;
-  }
-}
-
-// Responsive para móviles
 @media (max-width: 800px) {
   .main-toolbar {
     padding: 0 12px;
-    min-height: 56px;
-    height: 56px;
-    justify-content: space-between;
+    gap: 12px;
   }
 
-  .toolbar-logos {
-    display: flex;
-    flex-shrink: 0;
+  .toolbar-logo {
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-toolbar {
+    padding: 0 8px;
+    gap: 8px;
   }
 
   .toolbar-logo {
     height: 28px;
-    max-width: 80px;
-  }
-
-  .spacer {
-    flex: 1;
-    min-width: 10px;
-  }
-
-  .toolbar-user {
-    padding: 4px 8px;
-    gap: 8px;
-    min-width: 180px;
-    max-width: 220px;
-    flex-shrink: 0;
-  }
-
-  .user-info {
-    margin-right: 4px;
-  }
-
-  .user-name {
-    font-size: 0.8rem;
-    min-width: 60px;
-  }
-
-  .user-email {
-    font-size: 0.65rem;
-    min-width: 80px;
-  }
-
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
-}
-
-// Responsive para móviles pequeños
-@media (max-width: 480px) {
-  .main-toolbar {
-    padding: 0 8px;
-  }
-
-  .toolbar-logo {
-    height: 24px;
-    max-width: 70px;
-  }
-
-  .toolbar-user {
-    min-width: 120px;
-    padding: 4px 6px;
-  }
-
-  .user-name {
-    font-size: 0.75rem;
-    min-width: 50px;
-  }
-
-  .user-email {
-    display: none;
-  }
-}
-
-// Responsive para pantallas muy pequeñas
-@media (max-width: 360px) {
-  .toolbar-user {
-    min-width: 100px;
-  }
-
-  .user-name {
-    font-size: 0.7rem;
-    min-width: 40px;
-  }
-}
-
-// ============================================================================
-// BOTÓN DE USUARIO Y MENÚ DESPLEGABLE
-// ============================================================================
-
-.user-button {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  padding: 6px 12px !important;
-  border-radius: 8px !important;
-  transition: background-color 0.2s ease !important;
-  min-width: 250px !important;
-  max-width: 300px !important;
-  flex-shrink: 0 !important;
-  height: auto !important;
-  min-height: 48px !important;
-  background: transparent !important;
-  border: none !important;
-  cursor: pointer !important;
-
-  // Eliminar tooltips y popups
-  &::before,
-  &::after {
-    display: none !important;
-  }
-
-  &:hover {
-    background-color: #f8f9fa !important;
-  }
-
-  .user-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    min-width: 0;
-    flex: 1;
-    margin-right: 8px;
-  }
-
-  .dropdown-arrow {
-    font-size: 18px !important;
-    width: 18px !important;
-    height: 18px !important;
-    color: #6c757d !important;
-    transition: transform 0.2s ease !important;
-    flex-shrink: 0 !important;
-    order: 2 !important;
-  }
-
-  &[aria-expanded="true"] .dropdown-arrow {
-    transform: rotate(180deg) !important;
-  }
-}
-
-// Estilos para el menú desplegable
-::ng-deep .user-menu {
-  margin-top: 8px !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  border: 1px solid #e9ecef !important;
-  min-width: 250px !important;
-
-  .mat-mdc-menu-content {
-    padding: 0 !important;
-  }
-
-  .user-menu-header {
-    padding: 16px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-
-    .user-menu-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-
-      .menu-user-name {
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: #2c3e50;
-        line-height: 1.2;
-      }
-
-      .menu-user-email {
-        font-size: 0.8rem;
-        color: #6c757d;
-        line-height: 1.2;
-        margin-top: 2px;
-      }
-    }
-  }
-
-  .mat-mdc-menu-item {
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    padding: 12px 16px !important;
-    min-height: 48px !important;
-    font-size: 0.9rem !important;
-    color: #2c3e50 !important;
-    transition: all 0.2s ease !important;
-
-    &:hover {
-      background-color: #f8f9fa !important;
-      color: #bd2126 !important;
-
-      mat-icon {
-        color: #bd2126 !important;
-      }
-    }
-
-    mat-icon {
-      color: #6c757d !important;
-      font-size: 20px !important;
-      width: 20px !important;
-      height: 20px !important;
-      margin: 0 !important;
-    }
-
-    span {
-      font-weight: 500;
-    }
-
-    // Eliminar tooltips del botón de logout
-    &::before,
-    &::after {
-      display: none !important;
-    }
-  }
-
-  .mat-mdc-menu-item:focus {
-    background-color: #f8f9fa !important;
-    outline: none !important;
-  }
-}
-
-// Responsive para el menú de usuario
-@media (max-width: 800px) {
-  .user-button {
-    min-width: 180px !important;
-    max-width: 220px !important;
-    padding: 4px 8px !important;
-    gap: 8px !important;
-
-    .dropdown-arrow {
-      font-size: 16px !important;
-      width: 16px !important;
-      height: 16px !important;
-    }
-  }
-
-  ::ng-deep .user-menu {
-    min-width: 200px !important;
-
-    .user-menu-header {
-      padding: 12px;
-
-      .menu-user-name {
-        font-size: 0.9rem;
-      }
-
-      .menu-user-email {
-        font-size: 0.75rem;
-      }
-    }
-
-    .mat-mdc-menu-item {
-      padding: 10px 12px !important;
-      min-height: 44px !important;
-      font-size: 0.85rem !important;
-
-      mat-icon {
-        font-size: 18px !important;
-        width: 18px !important;
-        height: 18px !important;
-      }
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .user-button {
-    min-width: 120px !important;
-
-    .user-email {
-      display: none;
-    }
-  }
-
-  ::ng-deep .user-menu {
-    min-width: 180px !important;
-
-    .user-menu-header .menu-user-email {
-      display: none;
-    }
-  }
-}
-
-// ============================================================================
-// BOTÓN HAMBURGUESA - SOLO MÓVIL
-// ============================================================================
-
-.menu-toggle {
-  display: none !important;
-  color: var(--texfina-text-primary) !important;
-  background: transparent !important;
-  border: none !important;
-  padding: 8px !important;
-  margin-right: 8px !important;
-  border-radius: var(--texfina-radius-sm) !important;
-  transition: background-color 0.2s ease !important;
-
-  &:hover {
-    background: var(--texfina-secondary-bg) !important;
-    color: var(--texfina-secondary) !important;
-  }
-
-  mat-icon {
-    font-size: 24px !important;
-    width: 24px !important;
-    height: 24px !important;
-    color: inherit !important;
-  }
-}
-
-// Mostrar botón hamburguesa solo en móvil
-@media (max-width: 800px) {
-  .menu-toggle {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .menu-toggle {
-    padding: 6px !important;
-    margin-right: 6px !important;
-
-    mat-icon {
-      font-size: 22px !important;
-      width: 22px !important;
-      height: 22px !important;
-    }
   }
 }

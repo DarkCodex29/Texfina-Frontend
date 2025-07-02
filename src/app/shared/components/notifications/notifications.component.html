@@ -1,0 +1,54 @@
+<div class="notifications-container">
+  <button
+    mat-icon-button
+    [matMenuTriggerFor]="notificationsMenu"
+    class="notifications-button"
+    matBadge="{{ alertasCount }}"
+    [matBadgeHidden]="alertasCount === 0"
+    matBadgeColor="warn"
+    matBadgeSize="small"
+    matBadgePosition="after"
+  >
+    <mat-icon>notifications</mat-icon>
+  </button>
+
+  <mat-menu
+    #notificationsMenu="matMenu"
+    class="notifications-menu"
+    xPosition="before"
+  >
+    <div class="notifications-header">
+      <div class="header-content">
+        <h3 class="notifications-title">Notificaciones</h3>
+        <p class="notifications-subtitle">
+          {{ alertasCount }}
+          {{ alertasCount === 1 ? "alerta activa" : "alertas activas" }}
+        </p>
+      </div>
+    </div>
+
+    <div class="notifications-content">
+      <div
+        class="notifications-list"
+        *ngIf="alertas && alertas.length > 0; else noNotifications"
+      >
+        <app-notification-item
+          *ngFor="let alerta of alertas"
+          [alerta]="alerta"
+          (resolver)="onResolverAlerta($event)"
+        ></app-notification-item>
+      </div>
+
+      <ng-template #noNotifications>
+        <div class="no-notifications">
+          <div class="empty-state">
+            <span class="empty-message">No hay alertas activas</span>
+            <span class="empty-submessage"
+              >Todas las notificaciones están al día</span
+            >
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </mat-menu>
+</div>

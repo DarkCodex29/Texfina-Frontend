@@ -19,13 +19,15 @@
 
 .content {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   background-color: #ffffff;
 }
 
 .content-wrapper {
-  height: 100%;
-  overflow: auto;
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
 }
 
 // Responsive para tablets grandes

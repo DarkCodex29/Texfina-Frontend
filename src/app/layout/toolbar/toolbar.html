@@ -1,64 +1,22 @@
 <mat-toolbar class="main-toolbar">
-  <!-- Botón hamburguesa para móvil -->
-  <button
-    mat-icon-button
-    class="menu-toggle"
-    (click)="toggleSidenav()"
-    [attr.aria-label]="null"
-    [title]="null"
-  >
+  <button mat-icon-button class="menu-toggle" (click)="toggleSidenav()">
     <mat-icon>menu</mat-icon>
   </button>
 
-  <!-- Logo -->
   <div class="toolbar-logos">
     <img src="assets/logo.svg" alt="Texfina" class="toolbar-logo" />
   </div>
 
   <span class="spacer"></span>
 
-  <!-- Usuario con menú desplegable -->
-  <div class="toolbar-user">
-    <button
-      mat-button
-      [matMenuTriggerFor]="userMenu"
-      class="user-button"
-      [attr.aria-label]="null"
-      [title]="null"
-    >
-      <div class="user-info">
-        <span class="user-name">{{ currentUser?.username || 'Usuario' }}</span>
-        <span class="user-email"
-          >{{ currentUser?.username || 'usuario' }}&#64;texfina.com</span
-        >
-      </div>
-      <mat-icon class="dropdown-arrow">keyboard_arrow_down</mat-icon>
-    </button>
+  <app-notifications
+    [alertas]="alertas"
+    [alertasCount]="alertasCount"
+    (resolver)="resolverAlerta($event)"
+  ></app-notifications>
 
-    <!-- Menú desplegable del usuario -->
-    <mat-menu #userMenu="matMenu" class="user-menu">
-      <div class="user-menu-header">
-        <div class="user-menu-info">
-          <span class="menu-user-name"
-            >{{ currentUser?.username || 'Usuario' }}</span
-          >
-          <span class="menu-user-email"
-            >{{ currentUser?.username || 'usuario' }}&#64;texfina.com</span
-          >
-        </div>
-      </div>
-
-      <mat-divider></mat-divider>
-
-      <button
-        mat-menu-item
-        (click)="logout()"
-        [attr.aria-label]="null"
-        [title]="null"
-      >
-        <mat-icon>logout</mat-icon>
-        <span>Cerrar Sesión</span>
-      </button>
-    </mat-menu>
-  </div>
+  <app-user-menu
+    [currentUser]="currentUser"
+    (logout)="logout()"
+  ></app-user-menu>
 </mat-toolbar>

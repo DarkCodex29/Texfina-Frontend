@@ -1,0 +1,31 @@
+<div class="user-menu-container">
+  <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+    <div class="user-info">
+      <span class="user-name">{{ currentUser?.username || "Usuario" }}</span>
+      <span class="user-email"
+        >{{ currentUser?.username || "usuario" }}&#64;texfina.com</span
+      >
+    </div>
+    <mat-icon class="dropdown-arrow">keyboard_arrow_down</mat-icon>
+  </button>
+
+  <mat-menu #userMenu="matMenu" class="user-menu">
+    <div class="user-menu-header">
+      <div class="user-menu-info">
+        <span class="menu-user-name">{{
+          currentUser?.username || "Usuario"
+        }}</span>
+        <span class="menu-user-email"
+          >{{ currentUser?.username || "usuario" }}&#64;texfina.com</span
+        >
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <button mat-menu-item (click)="onLogout()">
+      <mat-icon>logout</mat-icon>
+      <span>Cerrar Sesión</span>
+    </button>
+  </mat-menu>
+</div>

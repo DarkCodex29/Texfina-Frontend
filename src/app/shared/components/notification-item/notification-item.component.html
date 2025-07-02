@@ -1,0 +1,21 @@
+<div class="notification-item" [ngClass]="'alert-' + alerta.nivel">
+  <div class="notification-content">
+    <div class="notification-title">{{ alerta.titulo }}</div>
+    <div class="notification-description">{{ alerta.descripcion }}</div>
+    <div class="notification-meta">
+      <span class="notification-source">{{ alerta.almacen }}</span>
+      <span class="notification-time">{{
+        formatearTiempoRelativo(alerta.fechaCreacion)
+      }}</span>
+    </div>
+  </div>
+  <div class="notification-actions">
+    <button
+      mat-icon-button
+      class="notification-action"
+      (click)="onResolver(); $event.stopPropagation()"
+    >
+      <mat-icon>check</mat-icon>
+    </button>
+  </div>
+</div>

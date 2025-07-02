@@ -1,0 +1,246 @@
+<div class="page-container">
+  <div class="page-content">
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">
+          Panel de control ejecutivo - Vista general del sistema
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          class="btn-texfina btn-secondary"
+          (click)="actualizarDashboard()"
+          [disabled]="isLoading"
+        >
+          Actualizar
+        </button>
+        <button
+          class="btn-texfina btn-primary"
+          routerLink="/dashboard/reportes"
+        >
+          Ver Reportes
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando métricas del dashboard...</p>
+    </div>
+
+    <div *ngIf="hasError && !isLoading" class="error-container">
+      <p>{{ errorMessage }}</p>
+      <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
+        Reintentar
+      </button>
+    </div>
+
+    <div *ngIf="!isLoading && !hasError" class="dashboard-content">
+      <div class="kpis-section">
+        <h2 class="section-title">Indicadores Clave</h2>
+        <div class="kpis-grid">
+          <div class="kpi-card primary">
+            <div class="kpi-content">
+              <div class="kpi-value">{{resumen?.totalInsumos || 0}}</div>
+              <div class="kpi-label">Total Insumos</div>
+              <div class="kpi-trend positive">+3.2% vs mes anterior</div>
+            </div>
+          </div>
+
+          <div class="kpi-card secondary">
+            <div class="kpi-content">
+              <div class="kpi-value">
+                {{resumen?.valorInventario | currency:'PEN':'symbol':'1.2-2'}}
+              </div>
+              <div class="kpi-label">Valor Inventario</div>
+              <div class="kpi-trend positive">+1.8% vs mes anterior</div>
+            </div>
+          </div>
+
+          <div class="kpi-card warning">
+            <div class="kpi-content">
+              <div class="kpi-value">{{resumen?.stockCritico || 0}}</div>
+              <div class="kpi-label">Stock Crítico</div>
+              <div class="kpi-trend negative">+5 items esta semana</div>
+            </div>
+          </div>
+
+          <div class="kpi-card success">
+            <div class="kpi-content">
+              <div class="kpi-value">95%</div>
+              <div class="kpi-label">Eficiencia Global</div>
+              <div class="kpi-trend positive">+2.1% vs mes anterior</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="section-title">Estadísticas Detalladas</h2>
+      <div class="stats-grid">
+        <div class="stats-card">
+          <div class="stats-header">
+            <h3>Estado de Almacenes</h3>
+          </div>
+          <div class="stats-content">
+            <div
+              class="almacen-item"
+              *ngFor="let almacen of estadisticasAlmacenes"
+            >
+              <div class="almacen-info">
+                <div class="almacen-nombre">{{almacen.nombre}}</div>
+                <div class="almacen-ubicacion">{{almacen.ubicacion}}</div>
+              </div>
+              <div class="almacen-metrics">
+                <div class="metric-value">{{almacen.cantidadInsumos}}</div>
+                <div class="metric-label">INSUMOS</div>
+              </div>
+              <div class="almacen-status">
+                <div
+                  class="status-indicator"
+                  [ngClass]="'estado-' + almacen.estado.toLowerCase()"
+                ></div>
+                <div
+                  class="status-badge"
+                  [ngClass]="'badge-' + almacen.estado.toLowerCase()"
+                >
+                  {{almacen.estado}}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="stats-footer">
+            <button class="btn-link">
+              <span>Ver todos los almacenes</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-card">
+          <div class="stats-header">
+            <h3>Top Insumos por Valor</h3>
+          </div>
+          <div class="stats-content">
+            <div
+              class="insumo-item"
+              *ngFor="let insumo of topInsumos; let i = index"
+              [ngClass]="'rank-' + (i + 1)"
+            >
+              <div class="rank-number">{{i + 1}}</div>
+              <div class="insumo-info">
+                <div class="insumo-nombre">{{insumo.nombre}}</div>
+                <div class="insumo-codigo">{{insumo.codigo}}</div>
+              </div>
+              <div class="insumo-metrics">
+                <div class="metric-value">
+                  {{insumo.valorTotal | currency:'PEN':'symbol':'1.0-0'}}
+                </div>
+                <div class="metric-label">VALOR</div>
+              </div>
+              <div class="insumo-status">
+                <div class="status-badge badge-activo">ACTIVO</div>
+              </div>
+            </div>
+          </div>
+          <div class="stats-footer">
+            <button class="btn-link">
+              <span>Ver todos los insumos</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-card">
+          <div class="stats-header">
+            <h3>Consumo por Áreas</h3>
+          </div>
+          <div class="stats-content">
+            <div class="consumo-item" *ngFor="let consumo of metricasConsumo">
+              <div class="consumo-info">
+                <div class="area-nombre">{{consumo.area}}</div>
+                <div class="consumo-valor">
+                  {{consumo.consumoMensual | currency:'PEN':'symbol':'1.0-0'}}
+                </div>
+              </div>
+              <div class="consumo-trend">
+                <div
+                  class="trend-indicator"
+                  [ngClass]="'trend-' + consumo.tendencia.toLowerCase()"
+                >
+                  {{formatearPorcentaje(consumo.porcentajeDiferencia)}}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="stats-footer">
+            <button class="btn-link">
+              <span>Ver análisis completo</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-card critical">
+          <div class="stats-header">
+            <h3>Stock Crítico</h3>
+          </div>
+          <div class="stats-content">
+            <div class="stock-item" *ngFor="let stock of insumosStockBajo">
+              <div class="stock-info">
+                <div class="stock-nombre">{{stock.nombre}}</div>
+                <div class="stock-codigo">{{stock.codigo}}</div>
+              </div>
+              <div class="stock-metrics">
+                <div class="metric-value critical">{{stock.stockActual}}</div>
+                <div class="metric-label">UNIDADES</div>
+              </div>
+              <div class="status-badge badge-critico">CRÍTICO</div>
+            </div>
+          </div>
+          <div class="stats-footer">
+            <button class="btn-link critical">
+              <span>Ver gestión de stock</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-actions-section">
+        <h2 class="section-title">Acciones Rápidas</h2>
+        <div class="quick-actions-grid">
+          <div class="action-card" routerLink="/dashboard/insumos">
+            <div class="action-content">
+              <div class="action-title">Agregar Insumo</div>
+              <div class="action-description">
+                Registrar nuevo insumo en el inventario
+              </div>
+            </div>
+          </div>
+
+          <div class="action-card" routerLink="/dashboard/ingresos">
+            <div class="action-content">
+              <div class="action-title">Registrar Ingreso</div>
+              <div class="action-description">
+                Documentar entrada de mercancía
+              </div>
+            </div>
+          </div>
+
+          <div class="action-card" routerLink="/dashboard/consumos">
+            <div class="action-content">
+              <div class="action-title">Registrar Consumo</div>
+              <div class="action-description">
+                Documentar salida de materiales
+              </div>
+            </div>
+          </div>
+
+          <div class="action-card" routerLink="/dashboard/reportes">
+            <div class="action-content">
+              <div class="action-title">Generar Reporte</div>
+              <div class="action-description">Crear análisis detallado</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
