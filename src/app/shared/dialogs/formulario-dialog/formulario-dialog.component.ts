@@ -17,7 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
 export interface CampoFormulario {
   key: string;
   label: string;
-  tipo: 'text' | 'number' | 'select';
+  tipo: 'text' | 'number' | 'select' | 'textarea' | 'date';
   placeholder?: string;
   maxLength?: number;
   step?: number;

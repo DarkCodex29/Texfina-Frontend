@@ -39,6 +39,24 @@
             [min]="campo.min || null"
           />
 
+          <!-- Input de fecha -->
+          <input
+            *ngIf="campo.tipo === 'date'"
+            class="form-input"
+            type="date"
+            [formControlName]="campo.key"
+          />
+
+          <!-- Textarea -->
+          <textarea
+            *ngIf="campo.tipo === 'textarea'"
+            class="form-textarea"
+            [formControlName]="campo.key"
+            [placeholder]="campo.placeholder || ''"
+            [maxlength]="campo.maxLength || null"
+            rows="4"
+          ></textarea>
+
           <!-- Select -->
           <select
             *ngIf="campo.tipo === 'select'"

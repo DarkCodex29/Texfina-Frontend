@@ -106,27 +106,6 @@
   }
 }
 
-.btn-action {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--texfina-border-radius);
-
-  &.btn-view {
-    background-color: var(--texfina-secondary-light);
-    color: var(--texfina-secondary);
-  }
-
-  &.btn-edit {
-    background-color: var(--texfina-success-light);
-    color: var(--texfina-success);
-  }
-
-  &.btn-delete {
-    background-color: var(--texfina-primary-light);
-    color: var(--texfina-primary);
-  }
-}
-
 // ============================================================================
 // DROPDOWN DE EXPORTAR
 // ============================================================================

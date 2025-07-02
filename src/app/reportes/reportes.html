@@ -261,9 +261,9 @@
                   <button
                     class="btn-action btn-view"
                     (click)="verDetalle(reporte)"
-                    matTooltip="Ver detalles"
+                    matTooltip="Ver detalle"
                   >
-                    👁
+                    <mat-icon>visibility</mat-icon>
                   </button>
                   <button
                     class="btn-action btn-download"
@@ -271,14 +271,14 @@
                     matTooltip="Descargar reporte"
                     [disabled]="reporte.estado !== 'COMPLETADO'"
                   >
-                    ⬇
+                    <mat-icon>download</mat-icon>
                   </button>
                   <button
                     class="btn-action btn-delete"
                     (click)="eliminar(reporte)"
                     matTooltip="Eliminar reporte"
                   >
-                    🗑
+                    <mat-icon>delete</mat-icon>
                   </button>
                 </div>
               </td>

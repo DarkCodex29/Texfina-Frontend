@@ -136,6 +136,20 @@
     @include hover-lift(-2px, rgba(220, 38, 38, 0.3));
   }
 
+  &.btn-download {
+    @include gradient-bg(var(--texfina-neutral), #7d7b7a);
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(152, 149, 148, 0.2);
+    @include hover-lift(-2px, rgba(152, 149, 148, 0.3));
+  }
+
+  &.btn-compare {
+    @include gradient-bg(#6366f1, #4f46e5);
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+    @include hover-lift(-2px, rgba(99, 102, 241, 0.3));
+  }
+
   .mat-icon,
   mat-icon {
     font-size: 20px !important;

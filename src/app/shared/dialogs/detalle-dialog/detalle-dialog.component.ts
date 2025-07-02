@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 export interface CampoDetalle {
   key: string;
   label: string;
-  tipo: 'text' | 'number' | 'select';
+  tipo: 'text' | 'number' | 'select' | 'textarea' | 'date';
   ancho?: 'normal' | 'completo';
   opciones?: { value: any; label: string }[];
   formateo?: (valor: any) => string;

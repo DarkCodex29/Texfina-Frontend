@@ -35,6 +35,24 @@
             readonly
           />
 
+          <!-- Input de fecha de solo lectura -->
+          <input
+            *ngIf="campo.tipo === 'date'"
+            class="form-input"
+            type="date"
+            [value]="obtenerValorCampo(campo.key)"
+            readonly
+          />
+
+          <!-- Textarea de solo lectura -->
+          <textarea
+            *ngIf="campo.tipo === 'textarea'"
+            class="form-textarea"
+            [value]="obtenerValorCampo(campo.key)"
+            readonly
+            rows="4"
+          ></textarea>
+
           <!-- Select deshabilitado -->
           <select
             *ngIf="campo.tipo === 'select'"

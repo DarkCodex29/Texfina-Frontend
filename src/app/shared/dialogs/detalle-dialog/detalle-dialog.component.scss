@@ -89,7 +89,8 @@
 }
 
 .form-input,
-.form-select {
+.form-select,
+.form-textarea {
   width: 100%;
   padding: 12px 16px;
   border: 2px solid var(--texfina-border-light);
@@ -112,6 +113,12 @@
     cursor: not-allowed;
     border-color: var(--texfina-border-medium);
   }
+}
+
+.form-textarea {
+  min-height: 80px;
+  resize: vertical;
+  font-family: inherit;
 }
 
 .form-select {

@@ -45,6 +45,10 @@ import {
   MapeoColumna,
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import { StockConfig } from '../shared/configs/stock-config';
 
 export interface Stock {
   id_insumo: number;
@@ -521,25 +525,64 @@ export class StockComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   verDetalle(stock: Stock): void {
-    console.log('Ver detalle stock:', stock);
+    const configuracion = StockConfig.getConfiguracionDetalle(stock);
+
+    this.dialog.open(DetalleDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: configuracion,
+    });
   }
 
   editar(stock: Stock): void {
-    console.log('Editar stock:', stock);
+    const configuracion = StockConfig.getConfiguracionFormulario(true, stock);
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: configuracion,
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado && resultado.accion === 'guardar') {
+        this.actualizarStock(stock.id_insumo!, resultado.datos).then(() => {
+          this.cargarDatos();
+        });
+      }
+    });
   }
 
   eliminar(stock: Stock): void {
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar el registro de stock para ${stock.nombre_material}?`
-    );
-    if (confirmacion && stock.id_insumo) {
-      console.log('Eliminar stock:', stock);
-      this.cargarDatos();
-    }
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '400px',
+      disableClose: true,
+      data: StockConfig.eliminarStock(stock),
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado && stock.id_insumo) {
+        console.log('Eliminar stock - Funcionalidad en desarrollo');
+        this.cargarDatos();
+      }
+    });
   }
 
   agregar(): void {
-    console.log('Agregar nuevo stock');
+    const configuracion = StockConfig.getConfiguracionFormulario(false);
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: configuracion,
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado && resultado.accion === 'guardar') {
+        this.guardarStock(resultado.datos).then(() => {
+          this.cargarDatos();
+        });
+      }
+    });
   }
 
   reintentarCarga(): void {
@@ -726,6 +769,122 @@ export class StockComponent implements OnInit, AfterViewInit, OnDestroy {
       .catch((error: any) => {
         console.error('Error procesando archivo:', error);
       });
+  }
+
+  async guardarStock(datos: any): Promise<any> {
+    try {
+      const nuevoStock: Stock = {
+        id_insumo: 0, // Se asignará automáticamente
+        codigo_fox: datos.codigo_fox,
+        nombre: datos.nombre_material,
+        nombre_material: datos.nombre_material,
+        id_almacen: this.obtenerIdAlmacen(datos.nombre_almacen),
+        almacen: datos.nombre_almacen,
+        nombre_almacen: datos.nombre_almacen,
+        id_clase: this.obtenerIdClase(datos.clase),
+        clase: datos.clase,
+        id_unidad: this.obtenerIdUnidad(datos.unidad),
+        unidad: datos.unidad,
+        stock_actual: datos.cantidad_actual,
+        cantidad_actual: datos.cantidad_actual,
+        stock_minimo: datos.stock_minimo || 0,
+        stock_maximo: datos.stock_maximo || 0,
+        costo_unitario: datos.precio_unitario || 0,
+        precio_unitario: datos.precio_unitario || 0,
+        valor_total:
+          (datos.cantidad_actual || 0) * (datos.precio_unitario || 0),
+        fecha_ultimo_movimiento: new Date().toISOString().split('T')[0],
+        estado_stock: this.calcularEstadoStock(
+          datos.cantidad_actual,
+          datos.stock_minimo,
+          datos.stock_maximo
+        ),
+        estado: this.calcularEstadoStock(
+          datos.cantidad_actual,
+          datos.stock_minimo,
+          datos.stock_maximo
+        ),
+      };
+
+      console.log('Stock a crear:', nuevoStock);
+      return Promise.resolve(nuevoStock);
+    } catch (error) {
+      console.error('Error al crear stock:', error);
+      throw error;
+    }
+  }
+
+  async actualizarStock(id: number, datos: any): Promise<any> {
+    try {
+      const stockActualizado: Partial<Stock> = {
+        id_insumo: id,
+        codigo_fox: datos.codigo_fox,
+        nombre: datos.nombre_material,
+        nombre_material: datos.nombre_material,
+        nombre_almacen: datos.nombre_almacen,
+        clase: datos.clase,
+        unidad: datos.unidad,
+        cantidad_actual: datos.cantidad_actual,
+        stock_minimo: datos.stock_minimo || 0,
+        stock_maximo: datos.stock_maximo || 0,
+        precio_unitario: datos.precio_unitario || 0,
+        valor_total:
+          (datos.cantidad_actual || 0) * (datos.precio_unitario || 0),
+        estado: this.calcularEstadoStock(
+          datos.cantidad_actual,
+          datos.stock_minimo,
+          datos.stock_maximo
+        ),
+      };
+
+      console.log('Stock a actualizar:', stockActualizado);
+      return Promise.resolve(stockActualizado);
+    } catch (error) {
+      console.error('Error al actualizar stock:', error);
+      throw error;
+    }
+  }
+
+  private obtenerIdAlmacen(nombreAlmacen: string): number {
+    const almacenes: Record<string, number> = {
+      'Almacén Principal': 1,
+      'Cámara Fría': 2,
+      'Almacén Especiales': 3,
+    };
+    return almacenes[nombreAlmacen] || 1;
+  }
+
+  private obtenerIdClase(nombreClase: string): number {
+    const clases: Record<string, number> = {
+      'Materia Prima': 1,
+      Lácteos: 2,
+      Aditivos: 3,
+      Chocolatería: 4,
+      Condimentos: 5,
+    };
+    return clases[nombreClase] || 1;
+  }
+
+  private obtenerIdUnidad(nombreUnidad: string): number {
+    const unidades: Record<string, number> = {
+      KG: 1,
+      GR: 2,
+      LT: 3,
+      UN: 4,
+    };
+    return unidades[nombreUnidad] || 1;
+  }
+
+  private calcularEstadoStock(
+    actual: number,
+    minimo: number,
+    maximo: number
+  ): 'CRITICO' | 'BAJO' | 'NORMAL' | 'ALTO' {
+    if (!actual || actual === 0) return 'CRITICO';
+    if (actual < minimo) return 'CRITICO';
+    if (actual <= minimo * 1.2) return 'BAJO';
+    if (actual >= maximo * 0.9) return 'ALTO';
+    return 'NORMAL';
   }
 
   private obtenerFiltrosActivos(): any {
