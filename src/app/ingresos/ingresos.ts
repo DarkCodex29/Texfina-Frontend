@@ -46,9 +46,22 @@ import {
   MapeoColumna,
 } from '../services/carga-masiva.service';
 import { Ingreso, Insumo, Unidad, Lote } from '../models/insumo.model';
-import { IngresoMaterialDialogComponent } from './ingreso-material-dialog/ingreso-material-dialog.component';
+import {
+  FormularioDialogComponent,
+  ConfiguracionFormulario,
+  CampoFormulario,
+} from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import {
+  DetalleDialogComponent,
+  ConfiguracionDetalle,
+  CampoDetalle,
+} from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
 import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
-import { DetalleIngresoDialogComponent } from './detalle-ingreso-dialog/detalle-ingreso-dialog.component';
+import {
+  INGRESOS_CONFIG,
+  IngresosConfig,
+} from '../shared/configs/ingresos-config';
 
 @Component({
   selector: 'app-ingresos',
@@ -421,54 +434,6 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
   // ============================================================================
   // MÉTODOS DE ACCIONES
   // ============================================================================
-  abrirRegistroIngreso(): void {
-    const dialogRef = this.dialog.open(IngresoMaterialDialogComponent, {
-      width: '800px',
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        // Actualizar la lista de ingresos después de crear uno nuevo
-        this.cargarDatos();
-        console.log('✅ Ingreso registrado exitosamente:', result);
-      }
-    });
-  }
-
-  abrirIngresoMasivo(): void {
-    console.log('Abrir ingreso masivo');
-    // TODO: Implementar modal de ingreso masivo
-  }
-
-  verDetalle(ingreso: Ingreso): void {
-    console.log('Ver detalle de ingreso:', ingreso);
-    this.dialog.open(DetalleIngresoDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: { ingreso: ingreso },
-    });
-  }
-
-  editar(ingreso: Ingreso): void {
-    console.log('Editar ingreso:', ingreso);
-    const dialogRef = this.dialog.open(IngresoMaterialDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: {
-        esEdicion: true,
-        ingreso: ingreso,
-        titulo: 'Editar Ingreso',
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.cargarDatos();
-        console.log('✅ Ingreso editado exitosamente:', result);
-      }
-    });
-  }
 
   // ============================================================================
   // MÉTODOS UTILITARIOS
@@ -609,18 +574,26 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
       validaciones: [
         {
           campo: 'presentacion',
-          validador: (valor) => !valor || valor.length <= 100,
-          mensajeError: 'La presentación debe tener máximo 100 caracteres',
+          validador: (valor) =>
+            !valor ||
+            valor.length <=
+              INGRESOS_CONFIG.VALIDACIONES.PRESENTACION_MAX_LENGTH,
+          mensajeError: `La presentación debe tener máximo ${INGRESOS_CONFIG.VALIDACIONES.PRESENTACION_MAX_LENGTH} caracteres`,
         },
         {
           campo: 'numero_remision',
-          validador: (valor) => !valor || valor.length <= 50,
-          mensajeError: 'El número de remisión debe tener máximo 50 caracteres',
+          validador: (valor) =>
+            !valor ||
+            valor.length <=
+              INGRESOS_CONFIG.VALIDACIONES.NUMERO_REMISION_MAX_LENGTH,
+          mensajeError: `El número de remisión debe tener máximo ${INGRESOS_CONFIG.VALIDACIONES.NUMERO_REMISION_MAX_LENGTH} caracteres`,
         },
         {
           campo: 'estado',
-          validador: (valor) => !valor || valor.length <= 50,
-          mensajeError: 'El estado debe tener máximo 50 caracteres',
+          validador: (valor) =>
+            !valor ||
+            valor.length <= INGRESOS_CONFIG.VALIDACIONES.ESTADO_MAX_LENGTH,
+          mensajeError: `El estado debe tener máximo ${INGRESOS_CONFIG.VALIDACIONES.ESTADO_MAX_LENGTH} caracteres`,
         },
       ],
     };
@@ -700,23 +673,416 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
   // CRUD COMPLETO
   // ============================================================================
 
-  agregar(): void {
-    this.abrirRegistroIngreso();
+  guardarIngreso(ingreso: Ingreso): void {
+    this.cargarDatos();
+    console.log('✅ Ingreso guardado exitosamente:', ingreso);
   }
 
   eliminar(ingreso: Ingreso): void {
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar el ingreso del ${this.formatearFecha(
-        ingreso.fecha
-      )}?`
-    );
-    if (confirmacion && ingreso.id_ingreso) {
-      console.log('Eliminar ingreso - Funcionalidad en desarrollo');
-    }
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '400px',
+      disableClose: true,
+      data: IngresosConfig.eliminarIngreso(ingreso),
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado && ingreso.id_ingreso) {
+        console.log('Eliminar ingreso - Funcionalidad en desarrollo');
+        this.cargarDatos();
+      }
+    });
   }
 
   toggleDropdownExport(): void {
     this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  agregar(): void {
+    const configuracion: ConfiguracionFormulario = {
+      titulo: {
+        agregar: 'Agregar Ingreso',
+        editar: 'Editar Ingreso',
+      },
+      entidad: 'Ingreso',
+      entidadArticulo: 'el ingreso',
+      esEdicion: false,
+      filas: [
+        [
+          {
+            key: 'id_insumo',
+            label: 'Insumo',
+            tipo: 'select',
+            opciones: this.insumos.map((i) => ({
+              value: i.id_insumo!,
+              label: i.nombre,
+            })),
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+        [
+          {
+            key: 'fecha',
+            label: 'Fecha',
+            tipo: 'text',
+            placeholder: 'dd/mm/aaaa',
+            obligatorio: true,
+            ancho: 'normal',
+          },
+          {
+            key: 'cantidad',
+            label: 'Cantidad',
+            tipo: 'number',
+            placeholder: 'Cantidad recibida',
+            obligatorio: true,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'presentacion',
+            label: 'Presentación',
+            tipo: 'text',
+            placeholder: 'Descripción de presentación',
+            maxLength: 100,
+            ancho: 'normal',
+          },
+          {
+            key: 'id_unidad',
+            label: 'Unidad',
+            tipo: 'select',
+            opciones: this.unidades.map((u) => ({
+              value: u.id_unidad,
+              label: u.nombre,
+            })),
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'id_lote',
+            label: 'Lote',
+            tipo: 'select',
+            opciones: this.lotes.map((l) => ({
+              value: l.id_lote!,
+              label: l.lote || '',
+            })),
+            ancho: 'normal',
+          },
+          {
+            key: 'precio_unitario_historico',
+            label: 'Precio Unitario',
+            tipo: 'number',
+            placeholder: '0.00',
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'numero_remision',
+            label: 'N° Remisión',
+            tipo: 'text',
+            placeholder: 'Número de remisión',
+            maxLength: 50,
+            ancho: 'normal',
+          },
+          {
+            key: 'orden_compra',
+            label: 'Orden de Compra',
+            tipo: 'text',
+            placeholder: 'Número de orden',
+            maxLength: 50,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'estado',
+            label: 'Estado',
+            tipo: 'select',
+            opciones: Object.entries(INGRESOS_CONFIG.ESTADOS).map(
+              ([key, value]) => ({
+                value: key,
+                label: value.texto,
+              })
+            ),
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+      ],
+    };
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: configuracion,
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado && resultado.datos) {
+        this.materialService.crearIngreso(resultado.datos).subscribe({
+          next: () => {
+            this.cargarDatos();
+          },
+          error: (error: any) => {
+            console.error('Error al crear ingreso:', error);
+          },
+        });
+      }
+    });
+  }
+
+  editar(ingreso: Ingreso): void {
+    const configuracion: ConfiguracionFormulario = {
+      titulo: {
+        agregar: 'Agregar Ingreso',
+        editar: 'Editar Ingreso',
+      },
+      entidad: 'Ingreso',
+      entidadArticulo: 'el ingreso',
+      esEdicion: true,
+      datosIniciales: ingreso,
+      filas: [
+        [
+          {
+            key: 'id_insumo',
+            label: 'Insumo',
+            tipo: 'select',
+            opciones: this.insumos.map((i) => ({
+              value: i.id_insumo!,
+              label: i.nombre,
+            })),
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+        [
+          {
+            key: 'fecha',
+            label: 'Fecha',
+            tipo: 'text',
+            placeholder: 'dd/mm/aaaa',
+            obligatorio: true,
+            ancho: 'normal',
+          },
+          {
+            key: 'cantidad',
+            label: 'Cantidad',
+            tipo: 'number',
+            placeholder: 'Cantidad recibida',
+            obligatorio: true,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'presentacion',
+            label: 'Presentación',
+            tipo: 'text',
+            placeholder: 'Descripción de presentación',
+            maxLength: 100,
+            ancho: 'normal',
+          },
+          {
+            key: 'id_unidad',
+            label: 'Unidad',
+            tipo: 'select',
+            opciones: this.unidades.map((u) => ({
+              value: u.id_unidad,
+              label: u.nombre,
+            })),
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'id_lote',
+            label: 'Lote',
+            tipo: 'select',
+            opciones: this.lotes.map((l) => ({
+              value: l.id_lote!,
+              label: l.lote || '',
+            })),
+            ancho: 'normal',
+          },
+          {
+            key: 'precio_unitario_historico',
+            label: 'Precio Unitario',
+            tipo: 'number',
+            placeholder: '0.00',
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'numero_remision',
+            label: 'N° Remisión',
+            tipo: 'text',
+            placeholder: 'Número de remisión',
+            maxLength: 50,
+            ancho: 'normal',
+          },
+          {
+            key: 'orden_compra',
+            label: 'Orden de Compra',
+            tipo: 'text',
+            placeholder: 'Número de orden',
+            maxLength: 50,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'estado',
+            label: 'Estado',
+            tipo: 'select',
+            opciones: Object.entries(INGRESOS_CONFIG.ESTADOS).map(
+              ([key, value]) => ({
+                value: key,
+                label: value.texto,
+              })
+            ),
+            obligatorio: true,
+            ancho: 'completo',
+          },
+        ],
+      ],
+    };
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: configuracion,
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado && resultado.datos) {
+        this.materialService.actualizarIngreso(resultado.datos).subscribe({
+          next: () => {
+            this.cargarDatos();
+          },
+          error: (error: any) => {
+            console.error('Error al editar ingreso:', error);
+          },
+        });
+      }
+    });
+  }
+
+  verDetalle(ingreso: Ingreso): void {
+    const configuracion: ConfiguracionDetalle = {
+      entidad: 'Ingreso',
+      entidadArticulo: 'el ingreso',
+      datos: ingreso,
+      filas: [
+        [
+          {
+            key: 'id_ingreso',
+            label: 'Código',
+            tipo: 'text',
+            formateo: (valor) => IngresosConfig.formatearCodigo(valor),
+            ancho: 'normal',
+          },
+          {
+            key: 'fecha',
+            label: 'Fecha',
+            tipo: 'text',
+            formateo: (valor) => IngresosConfig.formatearFecha(valor),
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'id_insumo',
+            label: 'Insumo',
+            tipo: 'text',
+            formateo: (valor) =>
+              IngresosConfig.formatearTexto(this.getInsumoNombre(valor)),
+            ancho: 'normal',
+          },
+          {
+            key: 'cantidad',
+            label: 'Cantidad',
+            tipo: 'number',
+            formateo: (valor) => IngresosConfig.formatearCantidad(valor),
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'presentacion',
+            label: 'Presentación',
+            tipo: 'text',
+            formateo: (valor) => IngresosConfig.formatearTexto(valor),
+            ancho: 'normal',
+          },
+          {
+            key: 'id_unidad',
+            label: 'Unidad',
+            tipo: 'text',
+            formateo: (valor) =>
+              IngresosConfig.formatearTexto(this.getUnidadNombre(valor)),
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'id_lote',
+            label: 'Lote',
+            tipo: 'text',
+            formateo: (valor) =>
+              IngresosConfig.formatearTexto(this.getLoteNombre(valor)),
+            ancho: 'normal',
+          },
+          {
+            key: 'precio_unitario_historico',
+            label: 'Precio Unitario',
+            tipo: 'number',
+            formateo: (valor) => IngresosConfig.formatearPrecio(valor),
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'precio_total_formula',
+            label: 'Precio Total',
+            tipo: 'number',
+            formateo: (valor) => IngresosConfig.formatearPrecio(valor),
+            ancho: 'normal',
+          },
+          {
+            key: 'estado',
+            label: 'Estado',
+            tipo: 'text',
+            formateo: (valor) => IngresosConfig.formatearEstado(valor).texto,
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'numero_remision',
+            label: 'N° Remisión',
+            tipo: 'text',
+            formateo: (valor) => IngresosConfig.formatearTexto(valor),
+            ancho: 'normal',
+          },
+          {
+            key: 'orden_compra',
+            label: 'Orden de Compra',
+            tipo: 'text',
+            formateo: (valor) => IngresosConfig.formatearTexto(valor),
+            ancho: 'normal',
+          },
+        ],
+      ],
+    };
+
+    this.dialog.open(DetalleDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: configuracion,
+    });
   }
 }
 
