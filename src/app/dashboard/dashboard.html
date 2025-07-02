@@ -8,19 +8,20 @@
         </p>
       </div>
       <div class="header-actions">
-        <button
-          class="btn-texfina btn-secondary"
-          (click)="actualizarDashboard()"
-          [disabled]="isLoading"
-        >
-          Actualizar
-        </button>
-        <button
-          class="btn-texfina btn-primary"
-          routerLink="/dashboard/reportes"
-        >
-          Ver Reportes
-        </button>
+        <div class="quick-actions-inline">
+          <button class="action-btn" routerLink="/dashboard/insumos">
+            Agregar Insumo
+          </button>
+          <button class="action-btn" routerLink="/dashboard/ingresos">
+            Registrar Ingreso
+          </button>
+          <button class="action-btn" routerLink="/dashboard/consumos">
+            Registrar Consumo
+          </button>
+          <button class="action-btn primary" routerLink="/dashboard/reportes">
+            Ver Reportes
+          </button>
+        </div>
       </div>
     </div>
 
@@ -199,45 +200,6 @@
             <button class="btn-link critical">
               <span>Ver gestión de stock</span>
             </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="quick-actions-section">
-        <h2 class="section-title">Acciones Rápidas</h2>
-        <div class="quick-actions-grid">
-          <div class="action-card" routerLink="/dashboard/insumos">
-            <div class="action-content">
-              <div class="action-title">Agregar Insumo</div>
-              <div class="action-description">
-                Registrar nuevo insumo en el inventario
-              </div>
-            </div>
-          </div>
-
-          <div class="action-card" routerLink="/dashboard/ingresos">
-            <div class="action-content">
-              <div class="action-title">Registrar Ingreso</div>
-              <div class="action-description">
-                Documentar entrada de mercancía
-              </div>
-            </div>
-          </div>
-
-          <div class="action-card" routerLink="/dashboard/consumos">
-            <div class="action-content">
-              <div class="action-title">Registrar Consumo</div>
-              <div class="action-description">
-                Documentar salida de materiales
-              </div>
-            </div>
-          </div>
-
-          <div class="action-card" routerLink="/dashboard/reportes">
-            <div class="action-content">
-              <div class="action-title">Generar Reporte</div>
-              <div class="action-description">Crear análisis detallado</div>
-            </div>
           </div>
         </div>
       </div>

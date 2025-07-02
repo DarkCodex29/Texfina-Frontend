@@ -26,60 +26,102 @@
       position: absolute;
       top: 4px;
       right: 4px;
-      background-color: var(--texfina-primary);
+      background: linear-gradient(135deg, var(--texfina-primary), #a01e23);
       color: white;
-      font-size: 9px;
-      font-weight: 600;
+      font-size: 10px;
+      font-weight: 700;
       min-width: 20px;
       height: 20px;
-      padding: 0 4px;
+      padding: 0 6px;
       border-radius: 10px;
       border: 2px solid white;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 8px rgba(189, 33, 38, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 10;
       white-space: nowrap;
       overflow: hidden;
+      letter-spacing: 0.5px;
     }
   }
 }
 
 ::ng-deep .notifications-menu {
-  margin-top: 6px !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid var(--texfina-border-light) !important;
-  min-width: 280px !important;
-  max-width: 300px !important;
+  margin-top: 8px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  min-width: 320px !important;
+  max-width: 340px !important;
   overflow: hidden !important;
+  backdrop-filter: blur(10px);
 
   .notifications-header {
-    padding: 12px 16px;
-    background: linear-gradient(135deg, var(--texfina-secondary), #0d1752);
+    padding: var(--texfina-spacing-lg) var(--texfina-spacing-xl);
+    background: linear-gradient(
+      135deg,
+      var(--texfina-secondary),
+      #0f1854,
+      var(--texfina-secondary)
+    );
     color: white;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
 
-    .header-content {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1),
+        transparent,
+        rgba(255, 255, 255, 0.05)
+      );
+      pointer-events: none;
     }
 
-    .notifications-title {
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        var(--texfina-primary),
+        #f59e0b,
+        var(--texfina-primary)
+      );
+    }
+
+    h3 {
       margin: 0;
-      font-size: 14px;
+      font-size: 18px;
+      font-weight: 900;
+      color: white;
+      letter-spacing: -0.3px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .notifications-count {
+      display: block;
+      font-size: 12px;
       font-weight: 600;
-      color: white !important;
-      line-height: 1.2;
-    }
-
-    .notifications-subtitle {
-      margin: 0;
-      font-size: 11px;
-      opacity: 0.8;
-      font-weight: 400;
-      color: white !important;
+      opacity: 0.9;
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
     }
   }
 
@@ -88,12 +130,12 @@
   }
 
   .notifications-list {
-    max-height: 260px;
+    max-height: 300px;
     overflow-y: auto;
     overflow-x: hidden;
 
     &::-webkit-scrollbar {
-      width: 3px;
+      width: 4px;
     }
 
     &::-webkit-scrollbar-track {
@@ -101,11 +143,11 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #d1d5db;
+      background: linear-gradient(180deg, #cbd5e1, #94a3b8);
       border-radius: 2px;
 
       &:hover {
-        background: #9ca3af;
+        background: linear-gradient(180deg, #94a3b8, #64748b);
       }
     }
   }
@@ -115,27 +157,27 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px 16px;
-    background: white;
+    padding: 32px 20px;
+    background: linear-gradient(135deg, #fafbfc, #f1f5f9);
 
     .empty-state {
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      gap: 4px;
+      gap: 6px;
     }
 
     .empty-message {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--texfina-text-primary);
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .empty-submessage {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--texfina-text-muted);
-      opacity: 0.7;
+      opacity: 0.8;
     }
   }
 }
@@ -146,8 +188,8 @@
   }
 
   ::ng-deep .notifications-menu {
-    min-width: 260px !important;
-    max-width: 280px !important;
+    min-width: 300px !important;
+    max-width: 320px !important;
   }
 }
 
@@ -164,45 +206,45 @@
     .notifications-button .custom-badge {
       top: 2px;
       right: 2px;
-      font-size: 8px;
-      font-weight: 600;
+      font-size: 9px;
+      font-weight: 700;
       min-width: 18px;
       height: 18px;
-      padding: 0 3px;
+      padding: 0 4px;
       border-radius: 9px;
       border: 1px solid white;
     }
   }
 
   ::ng-deep .notifications-menu {
-    min-width: 240px !important;
-    max-width: 260px !important;
+    min-width: 280px !important;
+    max-width: 300px !important;
 
     .notifications-header {
-      padding: 10px 14px;
+      padding: 14px 16px;
 
       .notifications-title {
-        font-size: 13px;
+        font-size: 15px;
       }
 
       .notifications-subtitle {
-        font-size: 10px;
+        font-size: 11px;
       }
     }
 
     .notifications-list {
-      max-height: 220px;
+      max-height: 260px;
     }
 
     .no-notifications {
-      padding: 16px 14px;
+      padding: 24px 16px;
 
       .empty-message {
-        font-size: 12px;
+        font-size: 13px;
       }
 
       .empty-submessage {
-        font-size: 10px;
+        font-size: 11px;
       }
     }
   }

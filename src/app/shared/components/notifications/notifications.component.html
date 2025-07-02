@@ -14,13 +14,11 @@
     xPosition="before"
   >
     <div class="notifications-header">
-      <div class="header-content">
-        <h3 class="notifications-title">Notificaciones</h3>
-        <p class="notifications-subtitle">
-          {{ alertasCount }}
-          {{ alertasCount === 1 ? "alerta activa" : "alertas activas" }}
-        </p>
-      </div>
+      <h3>Notificaciones</h3>
+      <span class="notifications-count">
+        {{ alertasCount }}
+        {{ alertasCount === 1 ? "alerta activa" : "alertas activas" }}
+      </span>
     </div>
 
     <div class="notifications-content">
