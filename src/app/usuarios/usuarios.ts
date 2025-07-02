@@ -24,9 +24,11 @@ import {
   MapeoColumna,
 } from '../services/carga-masiva.service';
 import { Usuario, Rol, TipoUsuario } from '../models/insumo.model';
-import { DetalleUsuarioDialogComponent } from './detalle-usuario-dialog/detalle-usuario-dialog';
-import { EditarUsuarioDialogComponent } from './editar-usuario-dialog/editar-usuario-dialog';
+import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
 import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import { UsuariosConfig } from '../shared/configs/usuarios-config';
 
 @Component({
   selector: 'app-usuarios',
@@ -392,70 +394,114 @@ export class UsuariosComponent implements OnInit {
   }
 
   agregar(): void {
-    const dialogRef = this.dialog.open(EditarUsuarioDialogComponent, {
+    const configuracion = UsuariosConfig.getConfiguracionFormulario(false);
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: {
-        esEdicion: false,
-        titulo: 'Agregar Usuario',
-        roles: this.roles,
-        tiposUsuario: this.tiposUsuario,
-      },
+      data: configuracion,
     });
 
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarDatos();
+      if (resultado && resultado.accion === 'guardar') {
+        this.guardarUsuario(resultado.datos).then(() => {
+          this.cargarDatos();
+        });
       }
     });
   }
 
   editar(usuario: Usuario): void {
-    const dialogRef = this.dialog.open(EditarUsuarioDialogComponent, {
+    const configuracion = UsuariosConfig.getConfiguracionFormulario(
+      true,
+      usuario
+    );
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: {
-        esEdicion: true,
-        usuario: usuario,
-        titulo: 'Editar Usuario',
-        roles: this.roles,
-        tiposUsuario: this.tiposUsuario,
-      },
+      data: configuracion,
     });
 
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarDatos();
+      if (resultado && resultado.accion === 'guardar') {
+        this.actualizarUsuario(usuario.id_usuario!, resultado.datos).then(
+          () => {
+            this.cargarDatos();
+          }
+        );
       }
     });
   }
 
   verDetalle(usuario: Usuario): void {
-    this.dialog.open(DetalleUsuarioDialogComponent, {
+    const configuracion = UsuariosConfig.getConfiguracionDetalle(usuario);
+
+    this.dialog.open(DetalleDialogComponent, {
       width: '800px',
       disableClose: true,
-      data: {
-        usuario: usuario,
-        roles: this.roles,
-        tiposUsuario: this.tiposUsuario,
-      },
+      data: configuracion,
     });
   }
 
   eliminar(usuario: Usuario): void {
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar el usuario ${usuario.username}?`
-    );
-    if (confirmacion && usuario.id_usuario) {
-      // this.materialService.eliminarUsuario(usuario.id_usuario).subscribe({
-      //   next: () => {
-      //     this.cargarDatos();
-      //   },
-      //   error: (error: any) => {
-      //     console.error('Error al eliminar usuario:', error);
-      //   }
-      // });
-      console.log('Eliminar usuario - Funcionalidad en desarrollo');
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '400px',
+      disableClose: true,
+      data: UsuariosConfig.eliminarUsuario(usuario),
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado && usuario.id_usuario) {
+        // this.materialService.eliminarUsuario(usuario.id_usuario).subscribe({
+        //   next: () => {
+        //     this.cargarDatos();
+        //   },
+        //   error: (error: any) => {
+        //     console.error('Error al eliminar usuario:', error);
+        //   }
+        // });
+        console.log('Eliminar usuario - Funcionalidad en desarrollo');
+        this.cargarDatos();
+      }
+    });
+  }
+
+  async guardarUsuario(datos: any): Promise<any> {
+    try {
+      const nuevoUsuario: Usuario = {
+        username: datos.username,
+        email: datos.email,
+        password_hash: datos.password,
+        id_rol: datos.id_rol,
+        id_tipo_usuario: parseInt(datos.id_tipo_usuario),
+        activo: datos.activo ?? true,
+      };
+
+      console.log('Usuario a crear:', nuevoUsuario);
+      return Promise.resolve(nuevoUsuario);
+    } catch (error) {
+      console.error('Error al crear usuario:', error);
+      throw error;
+    }
+  }
+
+  async actualizarUsuario(id: number, datos: any): Promise<any> {
+    try {
+      const usuarioActualizado: Usuario = {
+        id_usuario: id,
+        username: datos.username,
+        email: datos.email,
+        id_rol: datos.id_rol,
+        id_tipo_usuario: parseInt(datos.id_tipo_usuario),
+        activo: datos.activo,
+      };
+
+      console.log('Usuario a actualizar:', usuarioActualizado);
+      return Promise.resolve(usuarioActualizado);
+    } catch (error) {
+      console.error('Error al actualizar usuario:', error);
+      throw error;
     }
   }
 
