@@ -13,6 +13,10 @@ export class UnidadesConfig {
     datosIniciales?: any
   ): ConfiguracionFormulario {
     return {
+      titulo: {
+        agregar: 'Registrar Unidad',
+        editar: 'Editar Unidad',
+      },
       entidad: 'Unidad',
       entidadArticulo: 'una unidad',
       esEdicion: esEdicion,

@@ -14,6 +14,10 @@ export class ClasesConfig {
     datosIniciales?: any
   ): ConfiguracionFormulario {
     return {
+      titulo: {
+        agregar: 'Registrar Clase',
+        editar: 'Editar Clase',
+      },
       entidad: 'Clase',
       entidadArticulo: 'una clase',
       esEdicion: esEdicion,

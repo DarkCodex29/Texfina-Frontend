@@ -33,8 +33,10 @@ import {
 } from 'rxjs';
 import { MaterialService } from '../services/material.service';
 import { Proveedor } from '../models/insumo.model';
-import { DetalleProveedorDialogComponent } from './detalle-proveedor-dialog/detalle-proveedor-dialog';
-import { EditarProveedorDialogComponent } from './editar-proveedor-dialog/editar-proveedor-dialog';
+import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import { ProveedoresConfig } from '../shared/configs/proveedores-config';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -327,15 +329,15 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   abrirNuevoProveedor(): void {
-    const dialogRef = this.dialog.open(EditarProveedorDialogComponent, {
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esNuevo: true },
+      data: ProveedoresConfig.formulario(false),
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.cargarProveedores();
+      if (result?.accion === 'guardar') {
+        this.guardarProveedor(result.datos);
       }
     });
   }
@@ -508,60 +510,93 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dropdownExportAbierto = !this.dropdownExportAbierto;
   }
 
+  async guardarProveedor(datos: any): Promise<any> {
+    try {
+      const resultado = await this.materialService
+        .crearProveedor(datos)
+        .toPromise();
+      this.cargarProveedores();
+      return resultado;
+    } catch (error) {
+      console.error('Error al guardar proveedor:', error);
+      throw error;
+    }
+  }
+
+  async actualizarProveedor(id: number, datos: any): Promise<any> {
+    try {
+      const proveedorActualizado = { ...datos, id_proveedor: id };
+      const resultado = await this.materialService
+        .actualizarProveedor(proveedorActualizado)
+        .toPromise();
+      this.cargarProveedores();
+      return resultado;
+    } catch (error) {
+      console.error('Error al actualizar proveedor:', error);
+      throw error;
+    }
+  }
+
   agregar(): void {
-    const dialogRef = this.dialog.open(EditarProveedorDialogComponent, {
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: { esNuevo: true },
+      data: ProveedoresConfig.formulario(false),
     });
+
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarProveedores();
+      if (resultado?.accion === 'guardar') {
+        this.guardarProveedor(resultado.datos);
       }
     });
   }
 
   editar(proveedor: Proveedor): void {
-    const dialogRef = this.dialog.open(EditarProveedorDialogComponent, {
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
       disableClose: true,
-      data: {
-        esNuevo: false,
-        proveedor: proveedor,
-      },
+      data: ProveedoresConfig.formulario(true, proveedor),
     });
+
     dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarProveedores();
+      if (resultado?.accion === 'guardar' && proveedor.id_proveedor) {
+        this.actualizarProveedor(proveedor.id_proveedor, resultado.datos);
       }
     });
   }
 
   verDetalle(proveedor: Proveedor): void {
-    this.dialog.open(DetalleProveedorDialogComponent, {
+    this.dialog.open(DetalleDialogComponent, {
       width: '800px',
       disableClose: true,
-      data: { proveedor: proveedor },
+      data: ProveedoresConfig.detalle(proveedor),
     });
   }
 
   eliminar(proveedor: Proveedor): void {
-    const empresaTexto =
-      proveedor.empresa || `el proveedor con ID ${proveedor.id_proveedor}`;
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar ${empresaTexto}?`
-    );
+    const empresa = proveedor.empresa || `Proveedor ${proveedor.id_proveedor}`;
+    const config = ProveedoresConfig.eliminarProveedor(empresa);
 
-    if (confirmacion && proveedor.id_proveedor) {
-      this.materialService.eliminarProveedor(proveedor.id_proveedor).subscribe({
-        next: () => {
-          console.log('✅ Proveedor eliminado exitosamente');
-          this.cargarProveedores();
-        },
-        error: (error: any) => {
-          console.error('❌ Error al eliminar proveedor:', error);
-        },
-      });
-    }
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '400px',
+      disableClose: true,
+      data: { config },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado && proveedor.id_proveedor) {
+        this.materialService
+          .eliminarProveedor(proveedor.id_proveedor)
+          .subscribe({
+            next: () => {
+              console.log('✅ Proveedor eliminado exitosamente');
+              this.cargarProveedores();
+            },
+            error: (error: any) => {
+              console.error('❌ Error al eliminar proveedor:', error);
+            },
+          });
+      }
+    });
   }
 }

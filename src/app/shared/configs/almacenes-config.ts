@@ -13,6 +13,10 @@ export class AlmacenesConfig {
     datosIniciales?: any
   ): ConfiguracionFormulario {
     return {
+      titulo: {
+        agregar: 'Registrar Almacén',
+        editar: 'Editar Almacén',
+      },
       entidad: 'Almacén',
       entidadArticulo: 'un almacén',
       esEdicion: esEdicion,

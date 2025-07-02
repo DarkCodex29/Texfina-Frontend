@@ -28,6 +28,10 @@ export interface CampoFormulario {
 }
 
 export interface ConfiguracionFormulario {
+  titulo: {
+    agregar: string;
+    editar: string;
+  };
   entidad: string;
   entidadArticulo: string;
   esEdicion: boolean;
