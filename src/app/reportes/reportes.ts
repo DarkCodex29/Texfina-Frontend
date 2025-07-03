@@ -368,11 +368,47 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   verDetalle(reporte: Reporte): void {
-    console.log('Ver detalle del reporte:', reporte);
+    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
+      ({ DetalleDialogComponent }) => {
+        import('../shared/configs/reportes-config').then(
+          ({ ReportesConfig }) => {
+            const dialogRef = this.dialog.open(DetalleDialogComponent, {
+              width: '800px',
+              disableClose: true,
+              data: {
+                configuracion: ReportesConfig.getConfiguracionDetalle(reporte),
+              },
+            });
+          }
+        );
+      }
+    );
   }
 
   agregar(): void {
-    console.log('Generar nuevo reporte');
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      import('../shared/configs/reportes-config').then(({ ReportesConfig }) => {
+        const dialogRef = this.dialog.open(FormularioDialogComponent, {
+          width: '600px',
+          disableClose: true,
+          data: {
+            configuracion: ReportesConfig.getConfiguracionFormulario(false),
+          },
+        });
+
+        dialogRef.afterClosed().subscribe((resultado) => {
+          if (resultado) {
+            console.log('Generando reporte con configuración:', resultado);
+            this.snackBar.open('Reporte programado para generación', 'Cerrar', {
+              duration: 3000,
+            });
+            this.cargarDatos();
+          }
+        });
+      });
+    });
   }
 
   private configurarExportacion(): ConfiguracionExportacion<Reporte> {

@@ -218,11 +218,11 @@
 
 /* Columnas específicas con mejor espaciado */
 .codigo-col {
-  min-width: clamp(80px, 10vw, 100px); // Ancho autoajustable
+  min-width: clamp(60px, 6vw, 80px); // Reducido
 }
 
 .material-col {
-  min-width: clamp(180px, 25vw, 220px); // Ancho autoajustable
+  min-width: clamp(120px, 15vw, 160px); // Reducido
 }
 
 .almacen-col {
@@ -384,8 +384,8 @@
 
   &:focus {
     outline: none;
-    border-color: var(--texfina-secondary);
-    box-shadow: 0 0 0 2px var(--texfina-secondary-light);
+    border-color: var(--texfina-primary);
+    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
   }
 
   &::placeholder {
@@ -482,24 +482,6 @@
       &:first-child {
         border-top-left-radius: var(--texfina-radius-md);
         border-top-right-radius: var(--texfina-radius-md);
-      }
-
-      &:last-child {
-        border-bottom-left-radius: var(--texfina-radius-md);
-        border-bottom-right-radius: var(--texfina-radius-md);
-      }
-
-      &:not(:last-child) {
-        border-bottom: 1px solid var(--texfina-border-light);
-      }
-
-      &:hover {
-        background: var(--texfina-secondary-bg);
-        color: var(--texfina-secondary);
-      }
-
-      // Estilos específicos por tipo de exportación
-      &:first-child {
         // Excel - Verde
         &:hover {
           background: linear-gradient(135deg, #dcfce7, #bbf7d0);
@@ -508,6 +490,8 @@
       }
 
       &:last-child {
+        border-bottom-left-radius: var(--texfina-radius-md);
+        border-bottom-right-radius: var(--texfina-radius-md);
         // PDF - Rojo
         &:hover {
           background: linear-gradient(
@@ -517,6 +501,15 @@
           );
           color: var(--texfina-primary);
         }
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px solid var(--texfina-border-light);
+      }
+
+      &:hover {
+        background: var(--texfina-secondary-bg);
+        color: var(--texfina-secondary);
       }
     }
   }
@@ -533,182 +526,75 @@
 }
 
 // ============================================================================
-// FILTROS POR COLUMNA
-// ============================================================================
-
-.header-filters {
-  background: var(--texfina-bg-muted);
-  border-top: 1px solid var(--texfina-border);
-  padding: clamp(4px, 1vw, 8px) 0; // Padding autoajustable
-}
-
-.column-filter-input {
-  width: 100%;
-  border: 1px solid var(--texfina-border);
-  border-radius: 6px;
-  background: white;
-  padding: clamp(6px, 1.2vw, 8px) clamp(8px, 1.5vw, 12px); // Padding autoajustable
-  margin: 0 clamp(2px, 0.5vw, 4px); // Margin autoajustable
-  font-size: clamp(11px, 2vw, 13px); // Tamaño autoajustable
-  color: var(--texfina-text-primary);
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-secondary);
-    box-shadow: 0 0 0 2px var(--texfina-secondary-light);
-  }
-
-  &::placeholder {
-    color: var(--texfina-text-muted);
-    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
-  }
-}
-
-.btn-clear-column-filters {
-  min-width: 140px !important;
-  height: clamp(40px, 6vw, 48px) !important; // Altura autoajustable
-  border-radius: 10px !important;
-  border: 2px solid var(--texfina-primary) !important;
-  background: linear-gradient(135deg, white, #fef7f7) !important;
-  color: var(--texfina-primary) !important;
-  cursor: pointer;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
-  position: relative;
-  overflow: hidden;
-  font-weight: 500;
-  font-size: clamp(12px, 2.2vw, 14px); // Tamaño autoajustable
-  padding: 0 clamp(12px, 2.5vw, 20px); // Padding autoajustable
-  white-space: nowrap;
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-primary);
-    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
-  }
-
-  @media (max-width: 768px) {
-    width: 100% !important;
-    min-width: auto !important;
-  }
-}
-
-// ============================================================================
-// FILTROS DE BÚSQUEDA ESTÁNDAR
-// ============================================================================
-
-.filters-card {
-  background: var(--surface-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-  padding: clamp(
-    12px,
-    2vw,
-    18px
-  ) !important; // Padding autoajustable para filtros
-
-  .filters-content {
-    padding: clamp(12px, 2vw, 16px) clamp(16px, 2.5vw, 20px); // Padding autoajustable
-    background: var(--background-subtle);
-
-    @media (max-width: 768px) {
-      padding: clamp(8px, 1.5vw, 12px) clamp(12px, 2vw, 16px);
-    }
-  }
-
-  .simple-input {
-    height: clamp(36px, 5.5vw, 44px) !important; // Altura autoajustable
-    padding: clamp(10px, 1.5vw, 12px) clamp(14px, 2vw, 16px) !important; // Padding autoajustable
-    padding-right: calc(
-      clamp(10px, 1.5vw, 12px) + clamp(60px, 10vw, 80px)
-    ) !important;
-    border: 1px solid var(--border-color);
-    background: var(--surface-color);
-    color: var(--text-primary);
-    font-size: clamp(13px, 2.2vw, 14px) !important; // Tamaño autoajustable
-
-    &:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px var(--primary-color-alpha);
-    }
-
-    @media (max-width: 768px) {
-      height: clamp(32px, 5vw, 40px) !important;
-      padding: clamp(8px, 1.2vw, 10px) clamp(12px, 1.8vw, 14px) !important;
-      padding-right: calc(
-        clamp(8px, 1.2vw, 10px) + clamp(50px, 8vw, 70px)
-      ) !important;
-    }
-  }
-
-  .btn-limpiar {
-    height: calc(
-      100% - clamp(6px, 1vw, 8px)
-    ) !important; // Altura autoajustable
-    padding: clamp(4px, 0.8vw, 6px) clamp(6px, 1vw, 8px) !important; // Padding autoajustable
-    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
-
-    @media (max-width: 768px) {
-      height: calc(100% - clamp(4px, 0.8vw, 6px)) !important;
-      padding: clamp(2px, 0.5vw, 4px) !important;
-    }
-  }
-}
-
-// ============================================================================
 // TABLA RESPONSIVE ESPECÍFICA PARA STOCK
 // ============================================================================
 
-// Mejoras específicas para la tabla de stock en móvil
-@media (max-width: 768px) {
-  .table-with-headers {
-    .table-container {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-
-      &::-webkit-scrollbar {
-        height: 6px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--texfina-primary);
-        border-radius: 10px;
-      }
-    }
-
-    .column-headers,
-    .data-table {
-      min-width: 900px; // Forzar ancho mínimo para scroll horizontal
+.table-with-headers {
+  overflow-x: auto;
+  width: 100%;
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .column-headers,
+  .data-table {
+    min-width: 1000px;
+    @media (max-width: 600px) {
+      min-width: 700px;
     }
   }
 }
 
-// Reducir tamaño de botones de acciones en móvil
-@media (max-width: 480px) {
-  .btn-action {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    padding: 0 !important;
+// Ajustar padding y tamaño de fuente en celdas y headers para móvil
+@media (max-width: 600px) {
+  .table-cell,
+  .header-row .header-col {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    font-size: 11px !important;
+  }
+  .badge-texfina {
+    font-size: 10px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
 
+  .acciones-col {
+    min-width: 60px !important;
+  }
+  .action-buttons {
+    gap: 2px !important;
+    flex-wrap: wrap !important;
+    justify-content: center;
+  }
+  .btn-action {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    padding: 0 !important;
     mat-icon {
-      font-size: 16px !important;
-      width: 16px !important;
-      height: 16px !important;
+      font-size: 13px !important;
+      width: 13px !important;
+      height: 13px !important;
     }
   }
 
-  .action-buttons {
-    gap: 4px !important;
+  .codigo-col {
+    min-width: 40px !important;
+  }
+  .material-col {
+    min-width: 80px !important;
+  }
+  .table-cell.codigo-col,
+  .header-row .codigo-col {
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+  .table-cell.material-col,
+  .header-row .material-col {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
   }
 }
 
@@ -766,24 +652,72 @@
   }
 }
 
-/* Tabla principal mejor organizada */
+// Mejorar responsividad tabla stock para pantallas pequeñas
 .table-with-headers {
-  border-radius: clamp(
-    8px,
-    1.2vw,
-    12px
-  ) !important; // Border radius autoajustable
-  overflow: hidden !important;
-
+  overflow-x: auto;
+  width: 100%;
   .table-container {
-    max-height: calc(
-      100vh - 350px
-    ) !important; // Altura automática basada en viewport
-
-    @media (max-width: 768px) {
-      max-height: calc(
-        100vh - 400px
-      ) !important; // Más espacio en móvil para otros elementos
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .column-headers,
+  .data-table {
+    min-width: 1000px;
+    @media (max-width: 600px) {
+      min-width: 700px;
     }
+  }
+}
+
+// Ajustar padding y tamaño de fuente en celdas y headers para móvil
+@media (max-width: 600px) {
+  .table-cell,
+  .header-row .header-col {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    font-size: 11px !important;
+  }
+  .badge-texfina {
+    font-size: 10px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  .acciones-col {
+    min-width: 60px !important;
+  }
+  .action-buttons {
+    gap: 2px !important;
+    flex-wrap: wrap !important;
+    justify-content: center;
+  }
+  .btn-action {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    padding: 0 !important;
+    mat-icon {
+      font-size: 13px !important;
+      width: 13px !important;
+      height: 13px !important;
+    }
+  }
+
+  .codigo-col {
+    min-width: 40px !important;
+  }
+  .material-col {
+    min-width: 80px !important;
+  }
+  .table-cell.codigo-col,
+  .header-row .codigo-col {
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+  .table-cell.material-col,
+  .header-row .material-col {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
   }
 }

@@ -586,9 +586,10 @@
 
 // ===== ESTILOS ESPECÍFICOS DE REPORTES =====
 
-.reportes-container {
-  // Utiliza las clases globales del patrón Texfina
-}
+// Eliminar reglas duplicadas y vacías
+// .reportes-container {
+//   // Utiliza las clases globales del patrón Texfina
+// }
 
 // ===== SUMMARY CARDS PARA REPORTES =====
 .summary-cards {
@@ -647,12 +648,6 @@
 // ===== COLUMNAS ESPECÍFICAS PARA REPORTES =====
 
 // Para reporte de inventario
-.reportes-container .table-with-headers .column-headers .header-row {
-  &:has(.codigo-col) {
-    grid-template-columns: 80px 240px 140px 120px 130px 140px 100px 120px;
-  }
-}
-
 .reportes-container .table-container .data-table {
   &:has(td .badge-texfina) {
     grid-template-columns: 80px 240px 140px 120px 130px 140px 100px 120px;
@@ -666,300 +661,197 @@
   }
 }
 
-// ===== ALINEACIONES ESPECÍFICAS =====
-.reportes-container .table-container .data-table {
-  .table-cell {
-    // Código
-    &:nth-child(1) {
-      text-align: center;
-    }
+// =============================
+// TABLA DE REPORTES RESPONSIVE
+// =============================
 
-    // Material
+.table-with-headers {
+  overflow-x: auto;
+  width: 100%;
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .column-headers,
+  .data-table {
+    min-width: 1000px;
+    @media (max-width: 600px) {
+      min-width: 700px;
+    }
+  }
+}
+
+// Ajustar padding y tamaño de fuente en celdas y headers para móvil
+@media (max-width: 600px) {
+  .table-cell,
+  .header-row .header-col {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    font-size: 11px !important;
+  }
+  .badge-texfina {
+    font-size: 10px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+  .acciones-col {
+    min-width: 60px !important;
+  }
+  .action-buttons {
+    gap: 2px !important;
+    flex-wrap: wrap !important;
+    justify-content: center;
+  }
+  .btn-action {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    padding: 0 !important;
+    mat-icon {
+      font-size: 13px !important;
+      width: 13px !important;
+      height: 13px !important;
+    }
+  }
+  .tipo-col {
+    min-width: 40px !important;
+  }
+  .usuario-col {
+    min-width: 60px !important;
+  }
+  .parametros-col {
+    min-width: 60px !important;
+  }
+  .table-cell.tipo-col,
+  .header-row .tipo-col {
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+  .table-cell.usuario-col,
+  .header-row .usuario-col {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+}
+
+// Mejorar espaciado de botones de acciones
+.action-buttons {
+  display: flex;
+  gap: clamp(4px, 0.6vw, 6px) !important;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(2px, 0.3vw, 4px);
+}
+
+// Columnas específicas con mejor espaciado
+.tipo-col {
+  min-width: clamp(60px, 6vw, 80px);
+}
+.usuario-col {
+  min-width: clamp(100px, 12vw, 120px);
+}
+.parametros-col {
+  min-width: clamp(120px, 15vw, 160px);
+}
+.estado-col {
+  min-width: clamp(90px, 11vw, 110px);
+}
+.tamano-col {
+  min-width: clamp(80px, 10vw, 100px);
+}
+.acciones-col {
+  min-width: clamp(100px, 12vw, 120px);
+}
+
+// Mejor espaciado para header de tabla - ALINEADO CON CELDAS
+.header-row {
+  .header-col {
+    padding: clamp(10px, 1.5vw, 14px) clamp(12px, 1.8vw, 16px) !important;
+    font-weight: 600;
+    font-size: clamp(11px, 2vw, 13px) !important;
+    span {
+      line-height: 1.3;
+    }
+  }
+  .estado-col,
+  .acciones-col {
+    text-align: center;
+  }
+}
+
+// Alineación específica para headers de títulos y filtros
+.header-row.header-titles {
+  .header-col {
+    &:nth-child(1) {
+      text-align: left;
+    } // Tipo
+    &:nth-child(2) {
+      text-align: left;
+    } // Fecha
+    &:nth-child(3) {
+      text-align: left;
+    } // Usuario
+    &:nth-child(4) {
+      text-align: left;
+    } // Parámetros
+    &:nth-child(5) {
+      text-align: center;
+    } // Estado
+    &:nth-child(6) {
+      text-align: right;
+    } // Tamaño
+    &:nth-child(7) {
+      text-align: center;
+    } // Acciones
+  }
+}
+.header-row.header-filters {
+  .header-col {
+    &:nth-child(1) {
+      text-align: left;
+    }
     &:nth-child(2) {
       text-align: left;
     }
-
-    // Almacén/Tipo
     &:nth-child(3) {
-      text-align: center;
+      text-align: left;
     }
-
-    // Clase/Código (movimientos)
     &:nth-child(4) {
+      text-align: left;
+    }
+    &:nth-child(5) {
       text-align: center;
     }
-
-    // Stock/Cantidad
-    &:nth-child(5) {
-      text-align: right;
-    }
-
-    // Valor/Almacén (movimientos)
     &:nth-child(6) {
       text-align: right;
     }
-
-    // Rotación/Usuario
     &:nth-child(7) {
       text-align: center;
     }
-
-    // Días
-    &:nth-child(8) {
-      text-align: center;
-    }
-  }
-}
-
-// ===== INFORMACIÓN DETALLADA EN CELDAS =====
-.material-info {
-  .material-name {
-    font-weight: 500;
-    color: #1f2937;
-    margin-bottom: 2px;
-  }
-
-  .material-detail {
-    font-size: 0.75rem;
-    color: #6b7280;
-  }
-}
-
-.stock-info,
-.valor-info {
-  text-align: right;
-
-  .stock-value,
-  .valor-total {
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 2px;
-  }
-
-  .stock-unit,
-  .valor-unit {
-    font-size: 0.75rem;
-    color: #6b7280;
-  }
-}
-
-// ===== BADGES ESPECÍFICOS PARA REPORTES =====
-.badge-texfina {
-  &.badge-success {
-    background-color: #d1fae5;
-    color: #065f46;
-    border-color: #10b981;
-  }
-
-  &.badge-danger {
-    background-color: #fee2e2;
-    color: #991b1b;
-    border-color: #ef4444;
-  }
-
-  &.badge-warning {
-    background-color: #fef3c7;
-    color: #92400e;
-    border-color: #f59e0b;
-  }
-
-  &.badge-neutral {
-    background-color: #f3f4f6;
-    color: #374151;
-    border-color: #d1d5db;
-  }
-}
-
-// ===== CLASES DE TEXTO =====
-.text-success {
-  color: #10b981 !important;
-  font-weight: 600;
-}
-
-.text-danger {
-  color: #ef4444 !important;
-  font-weight: 600;
-}
-
-.text-neutral {
-  color: #6b7280 !important;
-}
-
-// ===== RESPONSIVE PARA REPORTES =====
-@media (max-width: 1200px) {
-  .summary-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .reportes-container .table-with-headers .column-headers .header-row {
-    &:has(.codigo-col) {
-      grid-template-columns: 70px 200px 120px 100px 110px 120px 90px 100px;
-    }
-
-    &:has(.fecha-col) {
-      grid-template-columns: 90px 80px 70px 180px 90px 120px 100px;
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .summary-cards {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .reportes-container .table-with-headers .column-headers .header-row {
-    &:has(.codigo-col) {
-      grid-template-columns: 60px 160px 100px 80px 90px 100px 70px 80px;
-    }
-
-    &:has(.fecha-col) {
-      grid-template-columns: 80px 70px 60px 140px 80px 100px 80px;
+    .column-filter-input {
+      text-align: left !important;
+      padding-left: clamp(8px, 1.2vw, 10px) !important;
     }
   }
 }
 
 // ============================================================================
-// REPORTES - ESTILOS ESPECÍFICOS ALINEADOS CON ESTÁNDAR TEXFINA
+// REPORTES - ESTILOS ESPECÍFICOS ALINEADOS CON REGLA DE ORO TEXFINA
 // ============================================================================
 
-/* Solo estilos muy específicos para las celdas de reportes */
-.fecha-cell {
-  .fecha-text {
-    font-weight: 600;
-    line-height: 1.2;
-  }
-
-  .hora-text {
-    font-size: 0.75rem;
-    line-height: 1.2;
-    margin-top: 2px;
-  }
-}
-
-.usuario-name {
-  font-weight: 500;
-}
-
-.parametros-text {
-  font-size: 0.9rem;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tamano-text {
-  font-weight: 500;
-  color: var(--texfina-text-primary);
-}
-
-.btn-action {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--texfina-border-radius);
-
-  &.btn-view {
-    background-color: var(--texfina-secondary-light);
-    color: var(--texfina-secondary);
-  }
-
-  &.btn-download {
-    background-color: var(--texfina-success-light);
-    color: var(--texfina-success);
-
-    &:disabled {
-      background-color: var(--texfina-neutral-light);
-      color: var(--texfina-neutral);
-      cursor: not-allowed;
-    }
-  }
-
-  &.btn-delete {
-    background-color: var(--texfina-primary-light);
-    color: var(--texfina-primary);
-  }
-}
+// Usar clases globales de Texfina - sin estilos locales que interfieran
 
 // ============================================================================
-// FILTROS POR COLUMNA
-// ============================================================================
-
-.header-filters {
-  background: var(--texfina-bg-muted);
-  border-top: 1px solid var(--texfina-border);
-  padding: 8px 0;
-}
-
-.column-filter-input {
-  width: 100%;
-  border: 1px solid var(--texfina-border);
-  border-radius: 6px;
-  background: white;
-  padding: 8px 12px;
-  margin: 0 4px;
-  font-size: 0.8rem;
-  color: var(--texfina-text-primary);
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-secondary);
-    box-shadow: 0 0 0 2px var(--texfina-secondary-light);
-  }
-
-  &::placeholder {
-    color: var(--texfina-text-muted);
-    font-size: 0.75rem;
-  }
-}
-
-.btn-clear-column-filters {
-  min-width: 140px !important;
-  height: 48px !important;
-  border-radius: 10px !important;
-  border: 2px solid var(--texfina-primary) !important;
-  background: linear-gradient(135deg, white, #fef7f7) !important;
-  color: var(--texfina-primary) !important;
-  cursor: pointer;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
-  position: relative;
-  overflow: hidden;
-  font-weight: 500;
-  font-size: 14px;
-  padding: 0 20px;
-  white-space: nowrap;
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-primary);
-    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
-  }
-
-  @media (max-width: 768px) {
-    width: 100% !important;
-    min-width: auto !important;
-  }
-}
-
-// ============================================================================
-// FILTROS DE BÚSQUEDA ESTÁNDAR
+// FILTROS - ALTURA NORMALIZADA
 // ============================================================================
 
 .filters-card {
-  background: var(--surface-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-
   .filters-content {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: var(--background-subtle);
+    padding: var(--spacing-md) var(--spacing-lg) !important;
 
     @media (max-width: 768px) {
-      padding: var(--spacing-md) var(--spacing-lg);
+      padding: var(--spacing-sm) var(--spacing-md) !important;
     }
   }
 
@@ -967,14 +859,6 @@
     height: 44px !important;
     padding: var(--spacing-sm) var(--spacing-md) !important;
     padding-right: calc(var(--spacing-md) + 80px) !important;
-    border: 1px solid var(--border-color);
-    background: var(--surface-color);
-    color: var(--text-primary);
-
-    &:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px var(--primary-color-alpha);
-    }
 
     @media (max-width: 768px) {
       height: 40px !important;
@@ -991,6 +875,324 @@
       height: calc(100% - 6px) !important;
       padding: var(--spacing-xs) !important;
     }
+  }
+}
+
+// ============================================================================
+// HEADER DE TABLA - CORREGIR ALINEAMIENTO
+// ============================================================================
+
+.table-with-headers {
+  .column-headers {
+    .header-row {
+      display: grid;
+      grid-template-columns:
+        minmax(120px, 1.2fr) /* tipo */
+        minmax(140px, 1.3fr) /* fecha */
+        minmax(100px, 1fr) /* usuario */
+        minmax(150px, 2fr) /* parametros */
+        minmax(100px, 1fr) /* estado */
+        minmax(80px, 0.8fr) /* tamano */
+        minmax(120px, 1fr); /* acciones */
+      gap: 8px;
+      align-items: center;
+
+      @media (max-width: 1200px) {
+        grid-template-columns: 1.2fr 1.3fr 1fr 1.8fr 1fr 0.8fr 1fr;
+      }
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr 1fr 0.8fr 1.5fr 0.8fr 0.6fr 1fr;
+        gap: 4px;
+      }
+    }
+  }
+}
+
+.data-table {
+  .mat-mdc-row {
+    display: grid !important;
+    grid-template-columns:
+      minmax(120px, 1.2fr) /* tipo */
+      minmax(140px, 1.3fr) /* fecha */
+      minmax(100px, 1fr) /* usuario */
+      minmax(150px, 2fr) /* parametros */
+      minmax(100px, 1fr) /* estado */
+      minmax(80px, 0.8fr) /* tamano */
+      minmax(120px, 1fr); /* acciones */
+    gap: 8px;
+    align-items: center;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 1.2fr 1.3fr 1fr 1.8fr 1fr 0.8fr 1fr;
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr 1fr 0.8fr 1.5fr 0.8fr 0.6fr 1fr;
+      gap: 4px;
+    }
+  }
+
+  .mat-mdc-cell {
+    border: none !important;
+    padding: var(--spacing-sm) var(--spacing-xs) !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @media (max-width: 768px) {
+      font-size: 13px;
+      padding: var(--spacing-xs) 2px !important;
+    }
+  }
+}
+
+// ============================================================================
+// CELDAS ESPECÍFICAS DE REPORTES
+// ============================================================================
+
+.fecha-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .fecha-text {
+    font-weight: 500;
+    color: var(--texfina-text-primary);
+    font-size: 14px;
+  }
+
+  .hora-text {
+    font-size: 12px;
+    color: var(--texfina-text-muted);
+  }
+
+  @media (max-width: 768px) {
+    .fecha-text {
+      font-size: 12px;
+    }
+    .hora-text {
+      font-size: 10px;
+    }
+  }
+}
+
+.usuario-name {
+  font-weight: 500;
+  color: var(--texfina-text-primary);
+}
+
+.parametros-text {
+  color: var(--texfina-text-muted);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    font-size: 11px;
+  }
+}
+
+.tamano-text {
+  font-weight: 500;
+  color: var(--texfina-text-primary);
+  font-size: 13px;
+  text-align: right;
+
+  @media (max-width: 768px) {
+    font-size: 11px;
+  }
+}
+
+// ============================================================================
+// BADGES DE ESTADO
+// ============================================================================
+
+.badge-texfina {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+
+  &.badge-primary {
+    background: var(--texfina-primary-bg);
+    color: var(--texfina-primary);
+  }
+
+  &.badge-success {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &.badge-error {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.badge-neutral {
+    background: var(--texfina-neutral-bg);
+    color: var(--texfina-neutral);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+
+// ============================================================================
+// BOTONES DE ACCIÓN
+// ============================================================================
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    gap: 2px;
+  }
+}
+
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &.btn-view {
+    background-color: var(--texfina-secondary-bg);
+    color: var(--texfina-secondary);
+
+    &:hover {
+      background-color: var(--texfina-secondary);
+      color: white;
+    }
+  }
+
+  &.btn-download {
+    background-color: var(--texfina-success-bg, #d1fae5);
+    color: var(--texfina-success);
+
+    &:hover:not(:disabled) {
+      background-color: var(--texfina-success);
+      color: white;
+    }
+
+    &:disabled {
+      background-color: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+  }
+
+  &.btn-delete {
+    background-color: #fee2e2;
+    color: #dc2626;
+
+    &:hover {
+      background-color: #dc2626;
+      color: white;
+    }
+  }
+
+  @media (max-width: 768px) {
+    width: 28px;
+    height: 28px;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+// ============================================================================
+// FILTROS POR COLUMNA
+// ============================================================================
+
+.header-filters {
+  background: var(--texfina-bg-muted, #f8fafc);
+  border-top: 1px solid var(--texfina-border, #e5e7eb);
+  padding: 8px 0;
+}
+
+.column-filter-input {
+  width: 100%;
+  border: 1px solid var(--texfina-border, #e5e7eb);
+  border-radius: 6px;
+  background: white;
+  padding: 6px 8px;
+  margin: 0 4px;
+  font-size: 12px;
+  color: var(--texfina-text-primary);
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-secondary);
+    box-shadow: 0 0 0 2px rgba(18, 30, 102, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--texfina-text-muted);
+    font-size: 11px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 4px 6px;
+    font-size: 11px;
+    margin: 0 2px;
+  }
+}
+
+.btn-clear-column-filters {
+  min-width: 120px !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  border: 2px solid var(--texfina-primary) !important;
+  background: linear-gradient(135deg, white, #fef7f7) !important;
+  color: var(--texfina-primary) !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
+  font-weight: 500;
+  font-size: 12px;
+  padding: 0 16px;
+  white-space: nowrap;
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-primary);
+    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    width: 100% !important;
+    min-width: auto !important;
+    font-size: 11px;
+    height: 36px !important;
   }
 }
 
