@@ -1,138 +1,19 @@
 // ============================================================================
-// LOGS - ESTILOS ESPECÍFICOS ALINEADOS CON ESTÁNDAR TEXFINA
+// LOGS - ESTILOS ESPECÍFICOS ALINEADOS CON REGLA DE ORO TEXFINA
 // ============================================================================
 
-/* Solo estilos muy específicos para las celdas de logs */
-.fecha-cell {
-  .fecha-text {
-    font-weight: 600;
-    line-height: 1.2;
-  }
-
-  .hora-text {
-    font-size: 0.75rem;
-    line-height: 1.2;
-    margin-top: 2px;
-  }
-}
-
-.usuario-name {
-  font-weight: 500;
-}
-
-.accion-text {
-  font-weight: 500;
-}
-
-.mensaje-text {
-  font-size: 0.9rem;
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ip-text {
-  font-family: monospace;
-  font-size: 0.9rem;
-  color: var(--texfina-text-primary);
-}
-
-.btn-action {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--texfina-border-radius);
-
-  &.btn-view {
-    background-color: var(--texfina-secondary-light);
-    color: var(--texfina-secondary);
-  }
-
-  &.btn-delete {
-    background-color: var(--texfina-primary-light);
-    color: var(--texfina-primary);
-  }
-}
+// Usar clases globales de Texfina - sin estilos locales que interfieran
 
 // ============================================================================
-// FILTROS POR COLUMNA
-// ============================================================================
-
-.header-filters {
-  background: var(--texfina-bg-muted);
-  border-top: 1px solid var(--texfina-border);
-  padding: clamp(4px, 1vw, 8px) 0; // Padding autoajustable
-}
-
-.column-filter-input {
-  width: 100%;
-  border: 1px solid var(--texfina-border);
-  border-radius: 6px;
-  background: white;
-  padding: clamp(6px, 1.2vw, 8px) clamp(8px, 1.5vw, 12px); // Padding autoajustable
-  margin: 0 clamp(2px, 0.5vw, 4px); // Margin autoajustable
-  font-size: clamp(11px, 2vw, 13px); // Tamaño autoajustable
-  color: var(--texfina-text-primary);
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-secondary);
-    box-shadow: 0 0 0 2px var(--texfina-secondary-light);
-  }
-
-  &::placeholder {
-    color: var(--texfina-text-muted);
-    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
-  }
-}
-
-.btn-clear-column-filters {
-  min-width: 140px !important;
-  height: clamp(40px, 6vw, 48px) !important; // Altura autoajustable
-  border-radius: 10px !important;
-  border: 2px solid var(--texfina-primary) !important;
-  background: linear-gradient(135deg, white, #fef7f7) !important;
-  color: var(--texfina-primary) !important;
-  cursor: pointer;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
-  position: relative;
-  overflow: hidden;
-  font-weight: 500;
-  font-size: clamp(12px, 2.2vw, 14px); // Tamaño autoajustable
-  padding: 0 clamp(12px, 2.5vw, 20px); // Padding autoajustable
-  white-space: nowrap;
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-primary);
-    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
-  }
-
-  @media (max-width: 768px) {
-    width: 100% !important;
-    min-width: auto !important;
-  }
-}
-
-// ============================================================================
-// FILTROS DE BÚSQUEDA ESTÁNDAR
+// FILTROS - ALTURA NORMALIZADA
 // ============================================================================
 
 .filters-card {
-  background: var(--surface-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-
   .filters-content {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: var(--background-subtle);
+    padding: var(--spacing-md) var(--spacing-lg) !important;
 
     @media (max-width: 768px) {
-      padding: var(--spacing-md) var(--spacing-lg);
+      padding: var(--spacing-sm) var(--spacing-md) !important;
     }
   }
 
@@ -168,10 +49,241 @@
 }
 
 // ============================================================================
+// GRID LAYOUT PARA TABLA DE LOGS - 7 COLUMNAS OPTIMIZADAS
+// ============================================================================
+
+.table-with-headers {
+  .column-headers,
+  .data-table {
+    display: grid;
+    grid-template-columns: 80px // ID - estrecho
+      140px // Timestamp - mediano
+      120px // Usuario - mediano
+      140px // Acción - mediano
+      120px // Módulo - mediano
+      120px // IP - mediano
+      100px; // Acciones - estrecho
+    gap: 0;
+    width: 100%;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 70px // ID
+        130px // Timestamp
+        110px // Usuario
+        130px // Acción
+        110px // Módulo
+        110px // IP
+        90px; // Acciones
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 60px // ID
+        120px // Timestamp
+        100px // Usuario
+        120px // Acción
+        100px // Módulo
+        100px // IP
+        80px; // Acciones
+      min-width: 680px; // Forzar scroll horizontal
+    }
+  }
+
+  .header-row,
+  .mat-mdc-row {
+    display: contents;
+  }
+
+  .header-col,
+  .mat-mdc-cell {
+    display: flex;
+    align-items: center;
+    padding: var(--texfina-spacing-sm) var(--texfina-spacing-xs);
+    border-right: 1px solid var(--texfina-border-light);
+    min-height: 48px;
+
+    &:last-child {
+      border-right: none;
+    }
+
+    @media (max-width: 768px) {
+      padding: var(--texfina-spacing-xs);
+      min-height: 44px;
+      font-size: 13px;
+    }
+  }
+}
+
+// ============================================================================
+// FILTROS POR COLUMNA
+// ============================================================================
+
+.header-filters {
+  background: var(--texfina-bg-muted);
+  border-top: 1px solid var(--texfina-border);
+  padding: var(--texfina-spacing-xs) 0;
+
+  .column-filter-input {
+    width: 100%;
+    border: 1px solid var(--texfina-border);
+    border-radius: 6px;
+    background: white;
+    padding: var(--texfina-spacing-xs) var(--texfina-spacing-sm);
+    margin: 0 var(--texfina-spacing-xs);
+    font-size: 12px;
+    color: var(--texfina-text-primary);
+
+    &:focus {
+      outline: none;
+      border-color: var(--texfina-secondary);
+      box-shadow: 0 0 0 2px var(--texfina-secondary-bg);
+    }
+
+    &::placeholder {
+      color: var(--texfina-text-muted);
+      font-size: 11px;
+    }
+
+    @media (max-width: 768px) {
+      padding: var(--texfina-spacing-xs);
+      font-size: 11px;
+    }
+  }
+
+  .btn-clear-column-filters {
+    min-width: 120px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+    border: 2px solid var(--texfina-primary) !important;
+    background: linear-gradient(135deg, white, #fef7f7) !important;
+    color: var(--texfina-primary) !important;
+    cursor: pointer;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 500;
+    font-size: 12px;
+    padding: 0 var(--texfina-spacing-sm);
+    white-space: nowrap;
+
+    &:focus {
+      outline: none;
+      border-color: var(--texfina-primary);
+      box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      width: 100% !important;
+      min-width: auto !important;
+      font-size: 11px;
+    }
+  }
+}
+
+// ============================================================================
+// CELDAS ESPECÍFICAS PARA LOGS
+// ============================================================================
+
+.codigo-cell {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--texfina-secondary);
+  font-size: 13px;
+}
+
+.timestamp-cell {
+  .fecha-text {
+    font-weight: 600;
+    line-height: 1.2;
+    font-size: 13px;
+  }
+
+  .hora-text {
+    font-size: 11px;
+    line-height: 1.2;
+    margin-top: 2px;
+    color: var(--texfina-text-muted);
+  }
+}
+
+.usuario-name {
+  font-weight: 500;
+  color: var(--texfina-text-primary);
+}
+
+.accion-text {
+  font-weight: 500;
+  color: var(--texfina-primary);
+  font-size: 13px;
+}
+
+.modulo-text {
+  font-weight: 500;
+  color: var(--texfina-secondary);
+  font-size: 13px;
+}
+
+.ip-text {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--texfina-text-primary);
+  background: var(--texfina-neutral-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+// ============================================================================
+// ACCIONES DE TABLA
+// ============================================================================
+
+.actions-container {
+  display: flex;
+  gap: var(--texfina-spacing-xs);
+  justify-content: center;
+  width: 100%;
+}
+
+.btn-action {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  &.btn-view {
+    background-color: var(--texfina-secondary-bg) !important;
+    color: var(--texfina-secondary) !important;
+  }
+
+  &.btn-delete {
+    background-color: var(--texfina-primary-bg) !important;
+    color: var(--texfina-primary) !important;
+  }
+
+  .mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  @media (max-width: 768px) {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+
+    .mat-icon {
+      font-size: 16px !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
+}
+
+// ============================================================================
 // TABLA RESPONSIVE ESPECÍFICA PARA LOGS
 // ============================================================================
 
-// Mejoras específicas para la tabla de logs en móvil
 @media (max-width: 768px) {
   .table-with-headers {
     .table-container {
@@ -196,27 +308,7 @@
 
     .column-headers,
     .data-table {
-      min-width: 800px; // Forzar ancho mínimo para scroll horizontal
+      min-width: 680px;
     }
-  }
-}
-
-// Reducir tamaño de botones de acciones en móvil
-@media (max-width: 480px) {
-  .btn-action {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    padding: 0 !important;
-
-    mat-icon {
-      font-size: 16px !important;
-      width: 16px !important;
-      height: 16px !important;
-    }
-  }
-
-  .action-buttons {
-    gap: 4px !important;
   }
 }

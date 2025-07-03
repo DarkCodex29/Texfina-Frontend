@@ -19,6 +19,7 @@ import {
   CargaMasivaService,
   ConfiguracionCargaMasiva,
 } from '../services/carga-masiva.service';
+import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 
 interface Auditoria {
   id_auditoria?: number;
@@ -54,12 +55,12 @@ interface Auditoria {
 })
 export class AuditoriaComponent implements OnInit {
   displayedColumns: string[] = [
+    'id_auditoria',
     'entidad',
     'accion',
     'usuario',
     'fecha',
     'campos',
-    'ip',
     'acciones',
   ];
   dataSource = new MatTableDataSource<Auditoria>();
@@ -70,6 +71,7 @@ export class AuditoriaComponent implements OnInit {
   dropdownExportAbierto = false;
   hasError = false;
   errorMessage = '';
+  cargando = false;
 
   constructor(
     private fb: FormBuilder,
@@ -82,12 +84,12 @@ export class AuditoriaComponent implements OnInit {
     });
 
     this.filtrosColumnaForm = this.fb.group({
+      id: [''],
       entidad: [''],
       accion: [''],
       usuario: [''],
       fecha: [''],
       campos: [''],
-      ip: [''],
     });
   }
 
@@ -97,186 +99,182 @@ export class AuditoriaComponent implements OnInit {
   }
 
   private cargarDatos(): void {
-    this.auditorias = [
-      {
-        id_auditoria: 1,
-        tipo_entidad: 'Materiales',
-        id_entidad: 'MAT001',
-        accion: 'CREATE',
-        usuario: 'admin@texfina.com',
-        fecha_hora: new Date('2024-01-15T10:30:00'),
-        campos_modificados: 'nombre, precio, categoria, stock_minimo',
-        ip_address: '192.168.1.100',
-        datos_anteriores: '{}',
-        datos_nuevos:
-          '{"nombre":"Tela Cotton","precio":25.50,"categoria":"Textiles","stock_minimo":10}',
-      },
-      {
-        id_auditoria: 2,
-        tipo_entidad: 'Almacenes',
-        id_entidad: 'ALM003',
-        accion: 'UPDATE',
-        usuario: 'supervisor@texfina.com',
-        fecha_hora: new Date('2024-01-15T14:45:00'),
-        campos_modificados: 'ubicacion, capacidad_maxima',
-        ip_address: '192.168.1.105',
-        datos_anteriores: '{"ubicacion":"Bodega A","capacidad_maxima":1000}',
-        datos_nuevos:
-          '{"ubicacion":"Bodega Principal","capacidad_maxima":1500}',
-      },
-      {
-        id_auditoria: 3,
-        tipo_entidad: 'Usuarios',
-        id_entidad: 'USR012',
-        accion: 'DELETE',
-        usuario: 'admin@texfina.com',
-        fecha_hora: new Date('2024-01-16T09:15:00'),
-        campos_modificados: 'estado, fecha_eliminacion',
-        ip_address: '192.168.1.100',
-        datos_anteriores: '{"email":"temp@texfina.com","estado":"ACTIVO"}',
-        datos_nuevos:
-          '{"estado":"ELIMINADO","fecha_eliminacion":"2024-01-16T09:15:00"}',
-      },
-      {
-        id_auditoria: 4,
-        tipo_entidad: 'Proveedores',
-        id_entidad: 'PRV007',
-        accion: 'UPDATE',
-        usuario: 'compras@texfina.com',
-        fecha_hora: new Date('2024-01-16T11:20:00'),
-        campos_modificados: 'telefono, direccion',
-        ip_address: '192.168.1.110',
-        datos_anteriores:
-          '{"telefono":"555-1234","direccion":"Calle Antigua 123"}',
-        datos_nuevos: '{"telefono":"555-9876","direccion":"Avenida Nueva 456"}',
-      },
-      {
-        id_auditoria: 5,
-        tipo_entidad: 'Ingresos',
-        id_entidad: 'ING089',
-        accion: 'CREATE',
-        usuario: 'operario@texfina.com',
-        fecha_hora: new Date('2024-01-16T16:30:00'),
-        campos_modificados:
-          'material_id, cantidad, precio_unitario, proveedor_id',
-        ip_address: '192.168.1.115',
-        datos_anteriores: '{}',
-        datos_nuevos:
-          '{"material_id":"MAT001","cantidad":500,"precio_unitario":24.75,"proveedor_id":"PRV007"}',
-      },
-      {
-        id_auditoria: 6,
-        tipo_entidad: 'Sistema',
-        id_entidad: 'SYS001',
-        accion: 'LOGIN',
-        usuario: 'admin@texfina.com',
-        fecha_hora: new Date('2024-01-17T08:00:00'),
-        campos_modificados: 'ultimo_acceso, ip_ultimo_acceso',
-        ip_address: '192.168.1.100',
-        datos_anteriores:
-          '{"ultimo_acceso":"2024-01-16T18:00:00","ip_ultimo_acceso":"192.168.1.100"}',
-        datos_nuevos:
-          '{"ultimo_acceso":"2024-01-17T08:00:00","ip_ultimo_acceso":"192.168.1.100"}',
-      },
-      {
-        id_auditoria: 7,
-        tipo_entidad: 'Consumos',
-        id_entidad: 'CON045',
-        accion: 'UPDATE',
-        usuario: 'produccion@texfina.com',
-        fecha_hora: new Date('2024-01-17T13:45:00'),
-        campos_modificados: 'cantidad_consumida, observaciones',
-        ip_address: '192.168.1.120',
-        datos_anteriores:
-          '{"cantidad_consumida":100,"observaciones":"Consumo normal"}',
-        datos_nuevos:
-          '{"cantidad_consumida":125,"observaciones":"Consumo aumentado por producción extra"}',
-      },
-      {
-        id_auditoria: 8,
-        tipo_entidad: 'Sistema',
-        id_entidad: 'SYS002',
-        accion: 'LOGOUT',
-        usuario: 'supervisor@texfina.com',
-        fecha_hora: new Date('2024-01-17T17:30:00'),
-        campos_modificados: 'sesion_finalizada, duracion_sesion',
-        ip_address: '192.168.1.105',
-        datos_anteriores:
-          '{"sesion_activa":true,"inicio_sesion":"2024-01-17T08:30:00"}',
-        datos_nuevos: '{"sesion_activa":false,"duracion_sesion":"9h 0m"}',
-      },
-    ];
+    this.cargando = true;
+    this.hasError = false;
 
-    this.dataSource.data = this.auditorias;
+    setTimeout(() => {
+      try {
+        this.auditorias = [
+          {
+            id_auditoria: 1,
+            tipo_entidad: 'Material',
+            id_entidad: 'MAT-001',
+            accion: 'CREATE',
+            usuario: 'admin@texfina.com',
+            fecha_hora: new Date('2024-01-20T10:30:25'),
+            campos_modificados: 'nombre, codigo, precio_unitario, id_clase',
+            ip_address: '192.168.1.100',
+            datos_anteriores: '{}',
+            datos_nuevos:
+              '{"nombre":"Tela Cotton Premium","codigo":"MAT-001","precio_unitario":45.50,"id_clase":"TEX-001"}',
+          },
+          {
+            id_auditoria: 2,
+            tipo_entidad: 'Almacén',
+            id_entidad: 'ALM-003',
+            accion: 'UPDATE',
+            usuario: 'supervisor@texfina.com',
+            fecha_hora: new Date('2024-01-20T14:45:12'),
+            campos_modificados: 'nombre, ubicacion',
+            ip_address: '192.168.1.105',
+            datos_anteriores: '{"nombre":"Bodega A","ubicacion":"Sector 1"}',
+            datos_nuevos:
+              '{"nombre":"Almacén Principal","ubicacion":"Sector Central"}',
+          },
+          {
+            id_auditoria: 3,
+            tipo_entidad: 'Usuario',
+            id_entidad: 'USR-012',
+            accion: 'DELETE',
+            usuario: 'admin@texfina.com',
+            fecha_hora: new Date('2024-01-20T16:15:40'),
+            campos_modificados: 'activo, fecha_eliminacion',
+            ip_address: '192.168.1.100',
+            datos_anteriores: '{"email":"temp@texfina.com","activo":true}',
+            datos_nuevos:
+              '{"activo":false,"fecha_eliminacion":"2024-01-20T16:15:40"}',
+          },
+          {
+            id_auditoria: 4,
+            tipo_entidad: 'Proveedor',
+            id_entidad: 'PRV-007',
+            accion: 'UPDATE',
+            usuario: 'compras@texfina.com',
+            fecha_hora: new Date('2024-01-20T18:20:15'),
+            campos_modificados: 'contacto, direccion',
+            ip_address: '192.168.1.110',
+            datos_anteriores:
+              '{"contacto":"Juan Pérez","direccion":"Calle Antigua 123"}',
+            datos_nuevos:
+              '{"contacto":"María González","direccion":"Avenida Nueva 456"}',
+          },
+          {
+            id_auditoria: 5,
+            tipo_entidad: 'Ingreso',
+            id_entidad: 'ING-089',
+            accion: 'CREATE',
+            usuario: 'operario@texfina.com',
+            fecha_hora: new Date('2024-01-20T19:30:55'),
+            campos_modificados:
+              'id_insumo, cantidad, precio_unitario_historico, numero_remision',
+            ip_address: '192.168.1.115',
+            datos_anteriores: '{}',
+            datos_nuevos:
+              '{"id_insumo":15,"cantidad":500,"precio_unitario_historico":44.75,"numero_remision":"REM-2024-089"}',
+          },
+          {
+            id_auditoria: 6,
+            tipo_entidad: 'Sistema',
+            id_entidad: 'SYS-001',
+            accion: 'LOGIN',
+            usuario: 'admin@texfina.com',
+            fecha_hora: new Date('2024-01-21T08:00:00'),
+            campos_modificados: 'last_login, ip_ultimo_acceso',
+            ip_address: '192.168.1.100',
+            datos_anteriores:
+              '{"last_login":"2024-01-20T18:00:00","ip_ultimo_acceso":"192.168.1.100"}',
+            datos_nuevos:
+              '{"last_login":"2024-01-21T08:00:00","ip_ultimo_acceso":"192.168.1.100"}',
+          },
+          {
+            id_auditoria: 7,
+            tipo_entidad: 'Consumo',
+            id_entidad: 'CON-045',
+            accion: 'UPDATE',
+            usuario: 'produccion@texfina.com',
+            fecha_hora: new Date('2024-01-21T13:45:30'),
+            campos_modificados: 'cantidad, estado',
+            ip_address: '192.168.1.120',
+            datos_anteriores: '{"cantidad":100,"estado":"PENDIENTE"}',
+            datos_nuevos: '{"cantidad":125,"estado":"COMPLETADO"}',
+          },
+          {
+            id_auditoria: 8,
+            tipo_entidad: 'Lote',
+            id_entidad: 'LOT-234',
+            accion: 'CREATE',
+            usuario: 'jefe.almacen@texfina.com',
+            fecha_hora: new Date('2024-01-21T15:30:18'),
+            campos_modificados:
+              'lote, stock_inicial, fecha_expiracion, precio_total',
+            ip_address: '192.168.1.103',
+            datos_anteriores: '{}',
+            datos_nuevos:
+              '{"lote":"L-2024-002","stock_inicial":1000,"fecha_expiracion":"2025-01-21","precio_total":22750.00}',
+          },
+          {
+            id_auditoria: 9,
+            tipo_entidad: 'Receta',
+            id_entidad: 'REC-015',
+            accion: 'UPDATE',
+            usuario: 'chef.produccion@texfina.com',
+            fecha_hora: new Date('2024-01-21T17:20:45'),
+            campos_modificados: 'nombre, proporcion_ingredientes',
+            ip_address: '192.168.1.125',
+            datos_anteriores:
+              '{"nombre":"Mezcla Estándar","proporcion_ingredientes":"50:30:20"}',
+            datos_nuevos:
+              '{"nombre":"Mezcla Premium","proporcion_ingredientes":"55:25:20"}',
+          },
+          {
+            id_auditoria: 10,
+            tipo_entidad: 'Stock',
+            id_entidad: 'STK-078',
+            accion: 'UPDATE',
+            usuario: 'sistema',
+            fecha_hora: new Date('2024-01-21T20:00:00'),
+            campos_modificados: 'cantidad, fecha_ultima_actualizacion',
+            ip_address: '127.0.0.1',
+            datos_anteriores:
+              '{"cantidad":250,"fecha_ultima_actualizacion":"2024-01-20T20:00:00"}',
+            datos_nuevos:
+              '{"cantidad":175,"fecha_ultima_actualizacion":"2024-01-21T20:00:00"}',
+          },
+        ];
+
+        this.dataSource.data = [...this.auditorias];
+        this.cargando = false;
+      } catch (error) {
+        this.hasError = true;
+        this.errorMessage = 'Error al cargar los registros de auditoría';
+        this.cargando = false;
+      }
+    }, 1000);
   }
 
   private configurarFiltros(): void {
     this.filtroGeneralForm
       .get('busquedaGeneral')
       ?.valueChanges.subscribe((valor) => {
-        this.aplicarFiltroGeneral(valor);
+        this.aplicarFiltroGeneral(valor || '');
       });
-
-    this.filtrosColumnaForm.valueChanges.subscribe(() => {
-      this.aplicarFiltrosColumna();
-    });
   }
 
   private aplicarFiltroGeneral(valor: string): void {
-    if (!valor || valor.trim() === '') {
-      this.dataSource.data = this.auditorias;
+    if (!valor.trim()) {
+      this.dataSource.data = [...this.auditorias];
       return;
     }
 
-    const filtro = valor.toLowerCase().trim();
+    const filtro = valor.toLowerCase();
     this.dataSource.data = this.auditorias.filter(
       (auditoria) =>
         auditoria.tipo_entidad.toLowerCase().includes(filtro) ||
         auditoria.id_entidad.toLowerCase().includes(filtro) ||
         auditoria.accion.toLowerCase().includes(filtro) ||
         auditoria.usuario.toLowerCase().includes(filtro) ||
-        auditoria.campos_modificados.toLowerCase().includes(filtro) ||
-        auditoria.ip_address.toLowerCase().includes(filtro)
+        auditoria.campos_modificados.toLowerCase().includes(filtro)
     );
-  }
-
-  private aplicarFiltrosColumna(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    let datosFiltrados = this.auditorias;
-
-    Object.keys(filtros).forEach((key) => {
-      const valor = filtros[key];
-      if (valor && valor.trim() !== '') {
-        const filtroLower = valor.toLowerCase().trim();
-        datosFiltrados = datosFiltrados.filter((auditoria) => {
-          switch (key) {
-            case 'entidad':
-              return (
-                auditoria.tipo_entidad.toLowerCase().includes(filtroLower) ||
-                auditoria.id_entidad.toLowerCase().includes(filtroLower)
-              );
-            case 'accion':
-              return auditoria.accion.toLowerCase().includes(filtroLower);
-            case 'usuario':
-              return auditoria.usuario.toLowerCase().includes(filtroLower);
-            case 'fecha':
-              return this.formatearFecha(auditoria.fecha_hora).includes(
-                filtroLower
-              );
-            case 'campos':
-              return auditoria.campos_modificados
-                .toLowerCase()
-                .includes(filtroLower);
-            case 'ip':
-              return auditoria.ip_address.toLowerCase().includes(filtroLower);
-            default:
-              return true;
-          }
-        });
-      }
-    });
-
-    this.dataSource.data = datosFiltrados;
   }
 
   limpiarFiltroGeneral(): void {
@@ -288,131 +286,189 @@ export class AuditoriaComponent implements OnInit {
   }
 
   get isEmpty(): boolean {
-    return this.auditorias.length === 0;
+    return !this.cargando && !this.hasError && this.auditorias.length === 0;
   }
 
   get isFilteredEmpty(): boolean {
-    return this.auditorias.length > 0 && this.dataSource.data.length === 0;
+    return (
+      !this.cargando &&
+      !this.hasError &&
+      this.auditorias.length > 0 &&
+      this.dataSource.data.length === 0
+    );
   }
 
   sortData(column: string): void {
-    const data = this.dataSource.data.slice();
-    const isAsc = this.dataSource.sort?.direction === 'asc';
-
-    this.dataSource.data = data.sort((a, b) => {
-      switch (column) {
-        case 'entidad':
-          return this.compare(a.tipo_entidad, b.tipo_entidad, isAsc);
-        case 'accion':
-          return this.compare(a.accion, b.accion, isAsc);
-        case 'usuario':
-          return this.compare(a.usuario, b.usuario, isAsc);
-        case 'fecha':
-          return this.compare(
-            a.fecha_hora.getTime(),
-            b.fecha_hora.getTime(),
-            isAsc
-          );
-        case 'campos':
-          return this.compare(
-            a.campos_modificados,
-            b.campos_modificados,
-            isAsc
-          );
-        case 'ip':
-          return this.compare(a.ip_address, b.ip_address, isAsc);
-        default:
-          return 0;
-      }
-    });
-  }
-
-  private compare(
-    a: string | number,
-    b: string | number,
-    isAsc: boolean
-  ): number {
-    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+    console.log('Ordenar por:', column);
   }
 
   reintentarCarga(): void {
-    this.hasError = false;
     this.cargarDatos();
+  }
+
+  formatearCodigo(id?: number): string {
+    if (!id) return '000001';
+    return id.toString().padStart(6, '0');
   }
 
   formatearTexto(texto?: string): string {
     return texto && texto.trim() ? texto : '-';
   }
 
+  formatearAccion(accion: string): string {
+    const acciones: { [key: string]: string } = {
+      CREATE: 'Crear',
+      INSERT: 'Insertar',
+      UPDATE: 'Actualizar',
+      DELETE: 'Eliminar',
+      LOGIN: 'Acceso',
+      LOGOUT: 'Salida',
+    };
+    return acciones[accion] || accion;
+  }
+
   formatearFecha(fecha?: Date): string {
     if (!fecha) return '-';
-    return fecha.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
+    try {
+      return new Date(fecha).toLocaleDateString('es-ES');
+    } catch {
+      return '-';
+    }
   }
 
   formatearHora(fecha?: Date): string {
     if (!fecha) return '-';
-    return fecha.toLocaleTimeString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
+    try {
+      return new Date(fecha).toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return '-';
+    }
   }
 
   formatearCampos(campos?: string): string {
-    if (!campos || campos.trim() === '') return '-';
-
-    const camposArray = campos.split(',').map((c) => c.trim());
-    if (camposArray.length <= 3) {
-      return campos;
-    }
-
-    return `${camposArray.slice(0, 3).join(', ')} (+${
-      camposArray.length - 3
-    } más)`;
+    if (!campos) return '-';
+    return campos.length > 30 ? `${campos.substring(0, 30)}...` : campos;
   }
 
   getAccionBadgeClass(accion: string): string {
-    switch (accion.toUpperCase()) {
-      case 'CREATE':
-        return 'badge-create';
-      case 'UPDATE':
-        return 'badge-update';
-      case 'DELETE':
-        return 'badge-delete';
-      case 'LOGIN':
-        return 'badge-login';
-      case 'LOGOUT':
-        return 'badge-logout';
-      default:
-        return 'badge-texfina badge-neutral';
+    const clases: { [key: string]: string } = {
+      CREATE: 'badge-create',
+      INSERT: 'badge-insert',
+      UPDATE: 'badge-update',
+      DELETE: 'badge-delete',
+      LOGIN: 'badge-login',
+      LOGOUT: 'badge-logout',
+    };
+    return clases[accion] || 'badge-neutral';
+  }
+
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
     }
   }
 
-  private obtenerFiltrosActivos(): any {
-    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
-    const filtrosColumna = this.filtrosColumnaForm.value;
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
 
-    return {
-      busquedaGeneral: filtroGeneral || '',
-      filtrosColumna: Object.keys(filtrosColumna)
-        .filter(
-          (key) => filtrosColumna[key] && filtrosColumna[key].trim() !== ''
-        )
-        .reduce((obj, key) => {
-          obj[key] = filtrosColumna[key];
-          return obj;
-        }, {} as any),
-    };
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  cargaMasiva(): void {
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        configuracion: this.configurarCargaMasiva(),
+        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
+        onProcesarArchivo: (archivo: File) =>
+          this.procesarArchivoCargaMasiva(archivo),
+      },
+    });
+  }
+
+  agregar(): void {
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      import('../shared/configs/auditoria-config').then(
+        ({ AuditoriaConfig }) => {
+          const dialogRef = this.dialog.open(FormularioDialogComponent, {
+            width: '600px',
+            disableClose: true,
+            data: {
+              configuracion: AuditoriaConfig.getConfiguracionFormulario(false),
+            },
+          });
+
+          dialogRef.afterClosed().subscribe((resultado) => {
+            if (resultado) {
+              console.log('Generando registro de auditoría:', resultado);
+              this.cargarDatos();
+            }
+          });
+        }
+      );
+    });
+  }
+
+  verDetalle(auditoria: Auditoria): void {
+    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
+      ({ DetalleDialogComponent }) => {
+        import('../shared/configs/auditoria-config').then(
+          ({ AuditoriaConfig }) => {
+            const dialogRef = this.dialog.open(DetalleDialogComponent, {
+              width: '800px',
+              disableClose: true,
+              data: {
+                configuracion:
+                  AuditoriaConfig.getConfiguracionDetalle(auditoria),
+              },
+            });
+          }
+        );
+      }
+    );
+  }
+
+  compararCambios(auditoria: Auditoria): void {
+    console.log('Comparar cambios para:', auditoria);
+    alert(
+      `Comparando cambios para ${auditoria.tipo_entidad} ${auditoria.id_entidad}:\n\nAntes: ${auditoria.datos_anteriores}\n\nDespués: ${auditoria.datos_nuevos}`
+    );
+  }
+
+  eliminar(auditoria: Auditoria): void {
+    const confirmacion = confirm(
+      `¿Está seguro que desea eliminar el registro de auditoría #${this.formatearCodigo(
+        auditoria.id_auditoria
+      )}?`
+    );
+    if (confirmacion) {
+      console.log('Eliminar auditoría:', auditoria);
+      this.cargarDatos();
+    }
   }
 
   private configurarExportacion(): ConfiguracionExportacion<Auditoria> {
     return {
       entidades: this.dataSource.data,
-      nombreArchivo: 'auditoria-sistema',
+      nombreArchivo: 'auditoria_sistema',
       nombreEntidad: 'Auditoría del Sistema',
       columnas: [
         { campo: 'id_auditoria', titulo: 'ID', formato: 'numero' },
@@ -426,7 +482,7 @@ export class AuditoriaComponent implements OnInit {
           titulo: 'Campos Modificados',
           formato: 'texto',
         },
-        { campo: 'ip_address', titulo: 'Dirección IP', formato: 'texto' },
+        { campo: 'ip_address', titulo: 'IP Address', formato: 'texto' },
       ],
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
@@ -440,7 +496,7 @@ export class AuditoriaComponent implements OnInit {
 
   private configurarCargaMasiva(): ConfiguracionCargaMasiva<Auditoria> {
     return {
-      tipoEntidad: 'auditoria',
+      tipoEntidad: 'auditoria_sistema',
       mapeoColumnas: [
         {
           columnaArchivo: 'Tipo Entidad',
@@ -481,92 +537,53 @@ export class AuditoriaComponent implements OnInit {
       ],
       validaciones: [
         {
-          campo: 'tipo_entidad',
-          validador: (valor) => valor && valor.length <= 100,
-          mensajeError: 'El tipo de entidad debe tener máximo 100 caracteres',
-        },
-        {
           campo: 'accion',
           validador: (valor) =>
-            ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT'].includes(
-              valor?.toUpperCase()
-            ),
+            ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT'].includes(valor),
           mensajeError:
             'La acción debe ser: CREATE, UPDATE, DELETE, LOGIN o LOGOUT',
+        },
+        {
+          campo: 'usuario',
+          validador: (valor) => valor && valor.length <= 100,
+          mensajeError: 'El usuario debe tener máximo 100 caracteres',
         },
       ],
     };
   }
 
-  exportarExcel(): void {
-    try {
-      const config = this.configurarExportacion();
-      this.exportacionService.exportarExcel(config);
-      this.dropdownExportAbierto = false;
-    } catch (error) {
-      console.error('Error al exportar Excel:', error);
-    }
+  private descargarPlantillaCargaMasiva(): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService.generarPlantilla(config);
   }
 
-  exportarPDF(): void {
-    try {
-      const config = this.configurarExportacion();
-      this.exportacionService.exportarPDF(config);
-      this.dropdownExportAbierto = false;
-    } catch (error) {
-      console.error('Error al exportar PDF:', error);
-    }
+  private procesarArchivoCargaMasiva(archivo: File): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService
+      .procesarArchivo(archivo, config)
+      .then((resultado) => {
+        console.log('Archivo procesado:', resultado);
+        if (resultado.exitosa) {
+          this.cargarDatos();
+        }
+      })
+      .catch((error) => {
+        console.error('Error al procesar archivo:', error);
+      });
   }
 
-  toggleDropdownExport(): void {
-    this.dropdownExportAbierto = !this.dropdownExportAbierto;
-  }
+  private obtenerFiltrosActivos(): any {
+    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
+    const filtrosColumna = this.filtrosColumnaForm.value;
 
-  cargaMasiva(): void {
-    console.log('Abriendo diálogo de carga masiva para auditoría');
-  }
-
-  agregar(): void {
-    console.log('Generando nueva auditoría automática del sistema');
-    const nuevaAuditoria: Auditoria = {
-      id_auditoria: this.auditorias.length + 1,
-      tipo_entidad: 'Sistema',
-      id_entidad: `SYS${String(this.auditorias.length + 1).padStart(3, '0')}`,
-      accion: 'CREATE',
-      usuario: 'sistema@texfina.com',
-      fecha_hora: new Date(),
-      campos_modificados: 'auditoria_generada, tipo_evento',
-      ip_address: '127.0.0.1',
-      datos_anteriores: '{}',
-      datos_nuevos:
-        '{"evento":"Auditoría generada manualmente","timestamp":"' +
-        new Date().toISOString() +
-        '"}',
+    return {
+      busquedaGeneral: filtroGeneral || null,
+      filtrosColumna: Object.keys(filtrosColumna).reduce((acc, key) => {
+        if (filtrosColumna[key]) {
+          acc[key] = filtrosColumna[key];
+        }
+        return acc;
+      }, {} as any),
     };
-
-    this.auditorias.unshift(nuevaAuditoria);
-    this.dataSource.data = this.auditorias;
-  }
-
-  verDetalle(auditoria: Auditoria): void {
-    console.log('Ver detalle de auditoría:', auditoria);
-  }
-
-  compararCambios(auditoria: Auditoria): void {
-    console.log('Comparar cambios de auditoría:', auditoria);
-    console.log('Datos anteriores:', auditoria.datos_anteriores);
-    console.log('Datos nuevos:', auditoria.datos_nuevos);
-  }
-
-  eliminar(auditoria: Auditoria): void {
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar el registro de auditoría ${auditoria.id_auditoria}?`
-    );
-    if (confirmacion && auditoria.id_auditoria) {
-      this.auditorias = this.auditorias.filter(
-        (a) => a.id_auditoria !== auditoria.id_auditoria
-      );
-      this.dataSource.data = this.auditorias;
-    }
   }
 }

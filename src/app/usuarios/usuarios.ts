@@ -73,7 +73,6 @@ export class UsuariosComponent implements OnInit {
     'id_rol',
     'id_tipo_usuario',
     'activo',
-    'last_login',
     'acciones',
   ];
 
@@ -152,7 +151,10 @@ export class UsuariosComponent implements OnInit {
       (usuario) =>
         usuario.id_usuario?.toString().includes(busqueda.toLowerCase()) ||
         usuario.username?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        usuario.email?.toLowerCase().includes(busqueda.toLowerCase())
+        usuario.email?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        this.obtenerNombreRol(usuario.id_rol)
+          .toLowerCase()
+          .includes(busqueda.toLowerCase())
     );
 
     this.dataSource.data = filtrados;
@@ -385,12 +387,22 @@ export class UsuariosComponent implements OnInit {
 
   private descargarPlantillaCargaMasiva(): void {
     const config = this.configurarCargaMasiva();
-    console.log('Descargar plantilla - Funcionalidad en desarrollo');
+    this.cargaMasivaService.generarPlantilla(config);
   }
 
   private procesarArchivoCargaMasiva(archivo: File): void {
     const config = this.configurarCargaMasiva();
-    console.log('Procesar archivo - Funcionalidad en desarrollo');
+    this.cargaMasivaService
+      .procesarArchivo(archivo, config)
+      .then((resultado) => {
+        console.log('Archivo procesado:', resultado);
+        if (resultado.exitosa) {
+          this.cargarDatos();
+        }
+      })
+      .catch((error) => {
+        console.error('Error procesando archivo:', error);
+      });
   }
 
   agregar(): void {
@@ -453,15 +465,7 @@ export class UsuariosComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((confirmado) => {
       if (confirmado && usuario.id_usuario) {
-        // this.materialService.eliminarUsuario(usuario.id_usuario).subscribe({
-        //   next: () => {
-        //     this.cargarDatos();
-        //   },
-        //   error: (error: any) => {
-        //     console.error('Error al eliminar usuario:', error);
-        //   }
-        // });
-        console.log('Eliminar usuario - Funcionalidad en desarrollo');
+        console.log('Eliminar usuario:', usuario);
         this.cargarDatos();
       }
     });

@@ -45,7 +45,7 @@
                 <input
                   class="simple-input"
                   formControlName="busquedaGeneral"
-                  placeholder="Buscar en entidad, acción, usuario, fecha..."
+                  placeholder="Buscar en entidad, acción, usuario, campos..."
                   type="text"
                 />
                 <button
@@ -67,7 +67,13 @@
       <div class="table-with-headers">
         <div class="column-headers">
           <div class="header-row header-titles">
-            <div class="header-col entidad-col" (click)="sortData('entidad')">
+            <div class="header-col id-col" (click)="sortData('id_auditoria')">
+              <span>ID</span>
+            </div>
+            <div
+              class="header-col entidad-col"
+              (click)="sortData('tipo_entidad')"
+            >
               <span>Entidad</span>
             </div>
             <div class="header-col accion-col" (click)="sortData('accion')">
@@ -76,14 +82,14 @@
             <div class="header-col usuario-col" (click)="sortData('usuario')">
               <span>Usuario</span>
             </div>
-            <div class="header-col fecha-col" (click)="sortData('fecha')">
+            <div class="header-col fecha-col" (click)="sortData('fecha_hora')">
               <span>Fecha/Hora</span>
             </div>
-            <div class="header-col campos-col" (click)="sortData('campos')">
+            <div
+              class="header-col campos-col"
+              (click)="sortData('campos_modificados')"
+            >
               <span>Campos Modificados</span>
-            </div>
-            <div class="header-col ip-col" (click)="sortData('ip')">
-              <span>IP</span>
             </div>
             <div class="header-col acciones-col">
               <span>ACCIONES</span>
@@ -95,6 +101,14 @@
             *ngIf="filtrosColumnaHabilitados"
             [formGroup]="filtrosColumnaForm"
           >
+            <div class="header-col id-col">
+              <input
+                class="column-filter-input"
+                formControlName="id"
+                placeholder="ID..."
+                type="text"
+              />
+            </div>
             <div class="header-col entidad-col">
               <input
                 class="column-filter-input"
@@ -132,14 +146,6 @@
                 class="column-filter-input"
                 formControlName="campos"
                 placeholder="Campos..."
-                type="text"
-              />
-            </div>
-            <div class="header-col ip-col">
-              <input
-                class="column-filter-input"
-                formControlName="ip"
-                placeholder="IP..."
                 type="text"
               />
             </div>
@@ -197,13 +203,21 @@
           </div>
 
           <table mat-table [dataSource]="dataSource" matSort class="data-table">
+            <ng-container matColumnDef="id_auditoria">
+              <td mat-cell *matCellDef="let auditoria" class="table-cell">
+                <span class="codigo-cell"
+                  >{{ formatearCodigo(auditoria.id_auditoria) }}</span
+                >
+              </td>
+            </ng-container>
+
             <ng-container matColumnDef="entidad">
               <td mat-cell *matCellDef="let auditoria" class="table-cell">
                 <div class="entidad-cell">
-                  <div class="entidad-tipo text-texfina font-medium">
+                  <div class="entidad-tipo">
                     {{ formatearTexto(auditoria.tipo_entidad) }}
                   </div>
-                  <div class="entidad-id text-texfina text-muted">
+                  <div class="entidad-id">
                     ID: {{ formatearTexto(auditoria.id_entidad) }}
                   </div>
                 </div>
@@ -216,26 +230,26 @@
                   class="badge-texfina"
                   [ngClass]="getAccionBadgeClass(auditoria.accion)"
                 >
-                  {{ formatearTexto(auditoria.accion) }}
+                  {{ formatearAccion(auditoria.accion) }}
                 </span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="usuario">
               <td mat-cell *matCellDef="let auditoria" class="table-cell">
-                <span class="usuario-name">
-                  {{ formatearTexto(auditoria.usuario) }}
-                </span>
+                <span class="usuario-name"
+                  >{{ formatearTexto(auditoria.usuario) }}</span
+                >
               </td>
             </ng-container>
 
             <ng-container matColumnDef="fecha">
               <td mat-cell *matCellDef="let auditoria" class="table-cell">
                 <div class="fecha-cell">
-                  <div class="fecha-text text-texfina font-medium">
+                  <div class="fecha-text">
                     {{ formatearFecha(auditoria.fecha_hora) }}
                   </div>
-                  <div class="hora-text text-texfina text-muted">
+                  <div class="hora-text">
                     {{ formatearHora(auditoria.fecha_hora) }}
                   </div>
                 </div>
@@ -253,18 +267,15 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="ip">
-              <td mat-cell *matCellDef="let auditoria" class="table-cell">
-                <span class="ip-text">
-                  {{ formatearTexto(auditoria.ip_address) }}
-                </span>
-              </td>
-            </ng-container>
-
             <ng-container matColumnDef="acciones">
-              <td mat-cell *matCellDef="let auditoria" class="table-cell">
-                <div class="action-buttons">
+              <td
+                mat-cell
+                *matCellDef="let auditoria"
+                class="table-cell table-actions"
+              >
+                <div class="actions-container">
                   <button
+                    mat-icon-button
                     class="btn-action btn-view"
                     (click)="verDetalle(auditoria)"
                     matTooltip="Ver detalle"
@@ -272,6 +283,7 @@
                     <mat-icon>visibility</mat-icon>
                   </button>
                   <button
+                    mat-icon-button
                     class="btn-action btn-compare"
                     (click)="compararCambios(auditoria)"
                     matTooltip="Comparar cambios"
@@ -279,6 +291,7 @@
                     <mat-icon>compare_arrows</mat-icon>
                   </button>
                   <button
+                    mat-icon-button
                     class="btn-action btn-delete"
                     (click)="eliminar(auditoria)"
                     matTooltip="Eliminar registro"

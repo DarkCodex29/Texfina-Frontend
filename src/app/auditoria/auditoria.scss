@@ -1,53 +1,252 @@
-// Estilos específicos para Auditoría
+// ============================================================================
+// AUDITORÍA - ESTILOS ESPECÍFICOS ALINEADOS CON REGLA DE ORO TEXFINA
+// ============================================================================
+
+// Usar clases globales de Texfina - sin estilos locales que interfieran
+
+// ============================================================================
+// FILTROS - ALTURA NORMALIZADA
+// ============================================================================
+
+.filters-card {
+  .filters-content {
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+
+    @media (max-width: 768px) {
+      padding: var(--spacing-sm) var(--spacing-md) !important;
+    }
+  }
+
+  .simple-input {
+    height: 44px !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    padding-right: calc(var(--spacing-md) + 80px) !important;
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    color: var(--text-primary);
+
+    &:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-color-alpha);
+    }
+
+    @media (max-width: 768px) {
+      height: 40px !important;
+      padding: var(--spacing-xs) var(--spacing-sm) !important;
+      padding-right: calc(var(--spacing-sm) + 70px) !important;
+    }
+  }
+
+  .btn-limpiar {
+    height: calc(100% - 8px) !important;
+    padding: var(--spacing-xs) var(--spacing-sm) !important;
+
+    @media (max-width: 768px) {
+      height: calc(100% - 6px) !important;
+      padding: var(--spacing-xs) !important;
+    }
+  }
+}
+
+// ============================================================================
+// GRID LAYOUT PARA TABLA DE AUDITORÍA - 7 COLUMNAS OPTIMIZADAS
+// ============================================================================
+
+.table-with-headers {
+  .column-headers,
+  .data-table {
+    display: grid;
+    grid-template-columns: 80px // ID - estrecho
+      140px // Entidad - mediano
+      100px // Acción - pequeño
+      140px // Usuario - mediano
+      140px // Fecha - mediano
+      180px // Campos - ancho
+      120px; // Acciones - mediano
+    gap: 0;
+    width: 100%;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 70px // ID
+        130px // Entidad
+        90px // Acción
+        130px // Usuario
+        130px // Fecha
+        160px // Campos
+        110px; // Acciones
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 60px // ID
+        120px // Entidad
+        80px // Acción
+        120px // Usuario
+        120px // Fecha
+        150px // Campos
+        100px; // Acciones
+      min-width: 750px; // Forzar scroll horizontal
+    }
+  }
+
+  .header-row,
+  .mat-mdc-row {
+    display: contents;
+  }
+
+  .header-col,
+  .mat-mdc-cell {
+    display: flex;
+    align-items: center;
+    padding: var(--texfina-spacing-sm) var(--texfina-spacing-xs);
+    border-right: 1px solid var(--texfina-border-light);
+    min-height: 48px;
+
+    &:last-child {
+      border-right: none;
+    }
+
+    @media (max-width: 768px) {
+      padding: var(--texfina-spacing-xs);
+      min-height: 44px;
+      font-size: 13px;
+    }
+  }
+}
+
+// ============================================================================
+// FILTROS POR COLUMNA
+// ============================================================================
+
+.header-filters {
+  background: var(--texfina-bg-muted);
+  border-top: 1px solid var(--texfina-border);
+  padding: var(--texfina-spacing-xs) 0;
+
+  .column-filter-input {
+    width: 100%;
+    border: 1px solid var(--texfina-border);
+    border-radius: 6px;
+    background: white;
+    padding: var(--texfina-spacing-xs) var(--texfina-spacing-sm);
+    margin: 0 var(--texfina-spacing-xs);
+    font-size: 12px;
+    color: var(--texfina-text-primary);
+
+    &:focus {
+      outline: none;
+      border-color: var(--texfina-secondary);
+      box-shadow: 0 0 0 2px var(--texfina-secondary-bg);
+    }
+
+    &::placeholder {
+      color: var(--texfina-text-muted);
+      font-size: 11px;
+    }
+
+    @media (max-width: 768px) {
+      padding: var(--texfina-spacing-xs);
+      font-size: 11px;
+    }
+  }
+
+  .btn-clear-column-filters {
+    min-width: 120px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+    border: 2px solid var(--texfina-primary) !important;
+    background: linear-gradient(135deg, white, #fef7f7) !important;
+    color: var(--texfina-primary) !important;
+    cursor: pointer;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 500;
+    font-size: 12px;
+    padding: 0 var(--texfina-spacing-sm);
+    white-space: nowrap;
+
+    &:focus {
+      outline: none;
+      border-color: var(--texfina-primary);
+      box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      width: 100% !important;
+      min-width: auto !important;
+      font-size: 11px;
+    }
+  }
+}
+
+// ============================================================================
+// CELDAS ESPECÍFICAS PARA AUDITORÍA
+// ============================================================================
+
+.codigo-cell {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--texfina-secondary);
+  font-size: 13px;
+}
 
 .entidad-cell {
   .entidad-tipo {
-    font-weight: 500;
+    font-weight: 600;
     color: var(--texfina-text-primary);
-    font-size: clamp(12px, 2.2vw, 14px); // Tamaño autoajustable
+    font-size: 13px;
+    line-height: 1.2;
   }
 
   .entidad-id {
-    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
+    font-size: 11px;
     color: var(--texfina-text-muted);
+    margin-top: 2px;
+    font-family: monospace;
   }
 }
 
 .fecha-cell {
   .fecha-text {
-    font-weight: 500;
+    font-weight: 600;
+    line-height: 1.2;
+    font-size: 13px;
     color: var(--texfina-text-primary);
-    font-size: clamp(12px, 2.2vw, 14px); // Tamaño autoajustable
   }
 
   .hora-text {
-    font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
+    font-size: 11px;
+    line-height: 1.2;
+    margin-top: 2px;
     color: var(--texfina-text-muted);
   }
 }
 
+.usuario-name {
+  font-weight: 500;
+  color: var(--texfina-text-primary);
+  font-size: 13px;
+}
+
 .campos-text {
-  font-size: clamp(11px, 2vw, 13px); // Tamaño autoajustable
+  font-size: 12px;
   color: var(--texfina-text-primary);
   display: inline-block;
-  max-width: clamp(150px, 25vw, 200px); // Ancho autoajustable
+  max-width: 160px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: help;
 
-  &:hover {
-    cursor: help;
+  @media (max-width: 768px) {
+    max-width: 140px;
+    font-size: 11px;
   }
 }
 
-.ip-text {
-  font-family: "Courier New", monospace;
-  font-size: clamp(10px, 1.8vw, 12px); // Tamaño autoajustable
-  color: var(--texfina-text-muted);
-  background: var(--texfina-neutral-bg);
-  padding: clamp(1px, 0.3vw, 2px) clamp(4px, 0.8vw, 6px); // Padding autoajustable
-  border-radius: 4px;
-}
+// ============================================================================
+// BADGES DE ACCIÓN
+// ============================================================================
 
 .badge-create {
   background-color: var(--texfina-success) !important;
@@ -64,6 +263,11 @@
   color: white !important;
 }
 
+.badge-insert {
+  background-color: var(--texfina-success) !important;
+  color: white !important;
+}
+
 .badge-login {
   background-color: var(--texfina-secondary) !important;
   color: white !important;
@@ -74,42 +278,64 @@
   color: white !important;
 }
 
-.btn-compare {
-  background-color: #8b5cf6 !important;
-  color: white !important;
+// ============================================================================
+// ACCIONES DE TABLA
+// ============================================================================
 
-  &:hover {
-    background-color: #7c3aed !important;
+.actions-container {
+  display: flex;
+  gap: var(--texfina-spacing-xs);
+  justify-content: center;
+  width: 100%;
+}
+
+.btn-action {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  &.btn-view {
+    background-color: var(--texfina-secondary-bg) !important;
+    color: var(--texfina-secondary) !important;
   }
-}
 
-.entidad-col {
-  min-width: clamp(120px, 18vw, 140px); // Ancho autoajustable
-}
-.accion-col {
-  min-width: clamp(80px, 12vw, 90px); // Ancho autoajustable
-}
-.usuario-col {
-  min-width: clamp(100px, 15vw, 120px); // Ancho autoajustable
-}
-.fecha-col {
-  min-width: clamp(120px, 18vw, 140px); // Ancho autoajustable
-}
-.campos-col {
-  min-width: clamp(150px, 22vw, 180px); // Ancho autoajustable
-}
-.ip-col {
-  min-width: clamp(100px, 15vw, 120px); // Ancho autoajustable
-}
-.acciones-col {
-  min-width: clamp(120px, 18vw, 140px); // Ancho autoajustable
+  &.btn-compare {
+    background-color: #f3e8ff !important;
+    color: #8b5cf6 !important;
+  }
+
+  &.btn-delete {
+    background-color: var(--texfina-primary-bg) !important;
+    color: var(--texfina-primary) !important;
+  }
+
+  .mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  @media (max-width: 768px) {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+
+    .mat-icon {
+      font-size: 16px !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
 }
 
 // ============================================================================
 // TABLA RESPONSIVE ESPECÍFICA PARA AUDITORÍA
 // ============================================================================
 
-// Mejoras específicas para la tabla de auditoría en móvil
 @media (max-width: 768px) {
   .table-with-headers {
     .table-container {
@@ -134,28 +360,7 @@
 
     .column-headers,
     .data-table {
-      min-width: 1000px; // Forzar ancho mínimo para scroll horizontal (más ancho por más columnas)
+      min-width: 750px;
     }
-  }
-}
-
-// Reducir tamaño de botones de acciones en móvil
-@media (max-width: 480px) {
-  .btn-action,
-  .btn-compare {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    padding: 0 !important;
-
-    mat-icon {
-      font-size: 16px !important;
-      width: 16px !important;
-      height: 16px !important;
-    }
-  }
-
-  .action-buttons {
-    gap: 4px !important;
   }
 }

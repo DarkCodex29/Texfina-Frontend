@@ -19,23 +19,16 @@ import {
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
 
-interface LogSistema {
-  id_log: number;
-  nivel: 'ERROR' | 'WARNING' | 'INFO' | 'DEBUG';
-  fecha_hora: string;
-  usuario: string;
+interface LogEvento {
+  id: number;
+  id_usuario: number;
+  usuario?: string;
   accion: string;
-  mensaje: string;
-  ip_address: string;
-  detalles?: string;
-}
-
-interface Estadistica {
-  nombre: string;
-  valor: string;
   descripcion: string;
-  tipo: 'error' | 'warning' | 'info' | 'success';
-  porcentaje?: number;
+  ip_origen: string;
+  modulo: string;
+  tabla_afectada: string;
+  timestamp: string;
 }
 
 @Component({
@@ -57,23 +50,22 @@ interface Estadistica {
 })
 export class LogsComponent implements OnInit {
   displayedColumns: string[] = [
-    'nivel',
-    'fecha',
+    'id',
+    'timestamp',
     'usuario',
     'accion',
-    'mensaje',
-    'ip',
+    'modulo',
+    'ip_origen',
     'acciones',
   ];
 
-  dataSource = new MatTableDataSource<LogSistema>([]);
+  dataSource = new MatTableDataSource<LogEvento>([]);
   filtroGeneralForm: FormGroup;
   filtrosColumnaForm: FormGroup;
   filtrosColumnaHabilitados = false;
   dropdownExportAbierto = false;
 
-  logs: LogSistema[] = [];
-  estadisticas: Estadistica[] = [];
+  logs: LogEvento[] = [];
   cargando = false;
   error: string | null = null;
 
@@ -109,18 +101,17 @@ export class LogsComponent implements OnInit {
     });
 
     this.filtrosColumnaForm = this.fb.group({
-      nivel: [''],
-      fecha: [''],
+      id: [''],
+      timestamp: [''],
       usuario: [''],
       accion: [''],
-      mensaje: [''],
-      ip: [''],
+      modulo: [''],
+      ip_origen: [''],
     });
   }
 
   ngOnInit(): void {
     this.cargarDatos();
-    this.cargarEstadisticas();
     this.configurarFiltros();
   }
 
@@ -140,54 +131,114 @@ export class LogsComponent implements OnInit {
       try {
         this.logs = [
           {
-            id_log: 1,
-            nivel: 'ERROR',
-            fecha_hora: '2024-01-15T10:30:00',
-            usuario: 'operador@texfina.com',
-            accion: 'LOGIN_FAILED',
-            mensaje: 'Intento de acceso fallido - credenciales incorrectas',
-            ip_address: '192.168.1.100',
-            detalles: 'User-Agent: Mozilla/5.0',
-          },
-          {
-            id_log: 2,
-            nivel: 'INFO',
-            fecha_hora: '2024-01-15T11:45:00',
+            id: 1,
+            id_usuario: 1,
             usuario: 'admin@texfina.com',
+            accion: 'LOGIN_SUCCESS',
+            descripcion: 'Usuario autenticado exitosamente',
+            ip_origen: '192.168.1.100',
+            modulo: 'AUTENTICACIÓN',
+            tabla_afectada: 'USUARIO',
+            timestamp: '2024-01-20T10:30:25',
+          },
+          {
+            id: 2,
+            id_usuario: 2,
+            usuario: 'operador@texfina.com',
             accion: 'CREATE_ALMACEN',
-            mensaje: 'Nuevo almacén creado exitosamente',
-            ip_address: '192.168.1.101',
-            detalles: 'Almacén ID: 5, Nombre: Almacén Principal',
+            descripcion: 'Almacén Principal creado exitosamente',
+            ip_origen: '192.168.1.101',
+            modulo: 'ALMACENES',
+            tabla_afectada: 'ALMACEN',
+            timestamp: '2024-01-20T11:45:10',
           },
           {
-            id_log: 3,
-            nivel: 'WARNING',
-            fecha_hora: '2024-01-15T14:20:00',
-            usuario: 'sistema',
-            accion: 'STOCK_LOW',
-            mensaje: 'Stock bajo detectado en material MT001',
-            ip_address: '127.0.0.1',
-            detalles: 'Stock actual: 5, Mínimo: 20',
+            id: 3,
+            id_usuario: 1,
+            usuario: 'admin@texfina.com',
+            accion: 'UPDATE_STOCK',
+            descripcion: 'Stock actualizado: Material MT-001 (+50 unidades)',
+            ip_origen: '192.168.1.100',
+            modulo: 'MATERIALES',
+            tabla_afectada: 'STOCK',
+            timestamp: '2024-01-20T14:20:33',
           },
           {
-            id_log: 4,
-            nivel: 'DEBUG',
-            fecha_hora: '2024-01-16T09:15:00',
-            usuario: 'sistema',
-            accion: 'DB_OPTIMIZATION',
-            mensaje: 'Consulta de optimización ejecutada',
-            ip_address: '127.0.0.1',
-            detalles: 'Duración: 1.2s, Registros: 1500',
-          },
-          {
-            id_log: 5,
-            nivel: 'ERROR',
-            fecha_hora: '2024-01-16T16:30:00',
+            id: 4,
+            id_usuario: 3,
             usuario: 'supervisor@texfina.com',
+            accion: 'DELETE_PROVIDER',
+            descripcion: 'Proveedor ACME Corp eliminado del sistema',
+            ip_origen: '192.168.1.102',
+            modulo: 'PROVEEDORES',
+            tabla_afectada: 'PROVEEDOR',
+            timestamp: '2024-01-20T15:15:42',
+          },
+          {
+            id: 5,
+            id_usuario: 2,
+            usuario: 'operador@texfina.com',
             accion: 'GENERATE_REPORT',
-            mensaje: 'Error al generar reporte mensual',
-            ip_address: '192.168.1.102',
-            detalles: 'TimeoutException - Periodo: Enero 2024',
+            descripcion: 'Reporte mensual de inventario generado',
+            ip_origen: '192.168.1.101',
+            modulo: 'REPORTES',
+            tabla_afectada: 'REPORTE',
+            timestamp: '2024-01-20T16:30:15',
+          },
+          {
+            id: 6,
+            id_usuario: 4,
+            usuario: 'jefe.almacen@texfina.com',
+            accion: 'CREATE_LOTE',
+            descripcion: 'Nuevo lote L-2024-001 registrado',
+            ip_origen: '192.168.1.103',
+            modulo: 'LOTES',
+            tabla_afectada: 'LOTE',
+            timestamp: '2024-01-20T17:45:20',
+          },
+          {
+            id: 7,
+            id_usuario: 1,
+            usuario: 'admin@texfina.com',
+            accion: 'UPDATE_USER',
+            descripcion: 'Permisos de usuario operador actualizados',
+            ip_origen: '192.168.1.100',
+            modulo: 'USUARIOS',
+            tabla_afectada: 'USUARIO',
+            timestamp: '2024-01-20T18:00:05',
+          },
+          {
+            id: 8,
+            id_usuario: 2,
+            usuario: 'operador@texfina.com',
+            accion: 'CONSUMO_MATERIAL',
+            descripcion: 'Consumo registrado: 25kg Material MT-002',
+            ip_origen: '192.168.1.101',
+            modulo: 'CONSUMOS',
+            tabla_afectada: 'CONSUMO',
+            timestamp: '2024-01-20T19:12:40',
+          },
+          {
+            id: 9,
+            id_usuario: 5,
+            usuario: 'calidad@texfina.com',
+            accion: 'APPROVE_INGRESO',
+            descripcion: 'Ingreso aprobado: Orden compra OC-2024-015',
+            ip_origen: '192.168.1.104',
+            modulo: 'INGRESOS',
+            tabla_afectada: 'INGRESO',
+            timestamp: '2024-01-20T20:30:18',
+          },
+          {
+            id: 10,
+            id_usuario: 3,
+            usuario: 'supervisor@texfina.com',
+            accion: 'BACKUP_DATABASE',
+            descripcion: 'Respaldo automático de base de datos completado',
+            ip_origen: '127.0.0.1',
+            modulo: 'SISTEMA',
+            tabla_afectada: 'SISTEMA',
+            timestamp: '2024-01-20T22:00:00',
           },
         ];
 
@@ -200,71 +251,39 @@ export class LogsComponent implements OnInit {
     }, 1000);
   }
 
-  cargarEstadisticas(): void {
-    this.estadisticas = [
-      {
-        nombre: 'Eventos Hoy',
-        valor: '156',
-        descripcion: 'Total de eventos registrados',
-        tipo: 'info',
-        porcentaje: 8,
-      },
-      {
-        nombre: 'Errores',
-        valor: '12',
-        descripcion: 'Errores en las últimas 24h',
-        tipo: 'error',
-        porcentaje: 15,
-      },
-      {
-        nombre: 'Advertencias',
-        valor: '34',
-        descripcion: 'Advertencias activas',
-        tipo: 'warning',
-        porcentaje: 5,
-      },
-      {
-        nombre: 'Sistema Saludable',
-        valor: '92%',
-        descripcion: 'Uptime del sistema',
-        tipo: 'success',
-      },
-    ];
-  }
-
   aplicarFiltroGeneral(): void {
-    const filtro =
-      this.filtroGeneralForm.get('busquedaGeneral')?.value?.toLowerCase() || '';
+    const busqueda = this.filtroGeneralForm.get('busquedaGeneral')?.value || '';
 
-    if (!filtro.trim()) {
-      this.dataSource.data = [...this.logs];
+    if (!busqueda) {
+      this.dataSource.data = this.logs;
       return;
     }
 
-    this.dataSource.data = this.logs.filter(
+    const filtrados = this.logs.filter(
       (log) =>
-        log.nivel.toLowerCase().includes(filtro) ||
-        log.usuario.toLowerCase().includes(filtro) ||
-        log.accion.toLowerCase().includes(filtro) ||
-        log.mensaje.toLowerCase().includes(filtro) ||
-        log.ip_address.toLowerCase().includes(filtro) ||
-        this.formatearFecha(log.fecha_hora).toLowerCase().includes(filtro)
+        log.accion?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        log.descripcion?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        log.modulo?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        log.ip_origen?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        log.usuario?.toLowerCase().includes(busqueda.toLowerCase())
     );
+
+    this.dataSource.data = filtrados;
   }
 
   limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.get('busquedaGeneral')?.setValue('');
+    this.filtroGeneralForm.patchValue({ busquedaGeneral: '' });
   }
 
   limpiarFiltrosColumna(): void {
     this.filtrosColumnaForm.reset();
   }
 
-  eliminar(log: LogSistema): void {
+  eliminar(log: LogEvento): void {
     const confirmacion = confirm(
-      `¿Está seguro que desea eliminar este log del ${log.fecha_hora}?`
+      `¿Está seguro que desea eliminar el log #${this.formatearCodigo(log.id)}?`
     );
-    if (confirmacion && log.id_log) {
+    if (confirmacion) {
       console.log('Eliminar log:', log);
       this.cargarDatos();
     }
@@ -279,7 +298,26 @@ export class LogsComponent implements OnInit {
   }
 
   agregar(): void {
-    console.log('Limpiar logs del sistema');
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      import('../shared/configs/logs-config').then(({ LogsConfig }) => {
+        const dialogRef = this.dialog.open(FormularioDialogComponent, {
+          width: '600px',
+          disableClose: true,
+          data: {
+            configuracion: LogsConfig.getConfiguracionFormulario(false),
+          },
+        });
+
+        dialogRef.afterClosed().subscribe((resultado) => {
+          if (resultado) {
+            console.log('Creando log manual:', resultado);
+            this.cargarDatos();
+          }
+        });
+      });
+    });
   }
 
   cargaMasiva(): void {
@@ -319,8 +357,25 @@ export class LogsComponent implements OnInit {
     this.dropdownExportAbierto = !this.dropdownExportAbierto;
   }
 
-  verDetalle(log: LogSistema): void {
-    console.log('Ver detalle del log:', log);
+  verDetalle(log: LogEvento): void {
+    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
+      ({ DetalleDialogComponent }) => {
+        import('../shared/configs/logs-config').then(({ LogsConfig }) => {
+          const dialogRef = this.dialog.open(DetalleDialogComponent, {
+            width: '800px',
+            disableClose: true,
+            data: {
+              configuracion: LogsConfig.getConfiguracionDetalle(log),
+            },
+          });
+        });
+      }
+    );
+  }
+
+  formatearCodigo(id?: number): string {
+    if (!id) return '000001';
+    return id.toString().padStart(6, '0');
   }
 
   formatearTexto(texto?: string): string {
@@ -329,77 +384,39 @@ export class LogsComponent implements OnInit {
 
   formatearFecha(fecha: string): string {
     if (!fecha) return '-';
-    const date = new Date(fecha);
-    return date.toLocaleDateString('es-CO');
+    try {
+      return new Date(fecha).toLocaleDateString('es-ES');
+    } catch {
+      return '-';
+    }
   }
 
   formatearHora(fecha: string): string {
     if (!fecha) return '-';
-    const date = new Date(fecha);
-    return date.toLocaleTimeString('es-CO', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    try {
+      return new Date(fecha).toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return '-';
+    }
   }
 
-  formatearMensaje(mensaje: string): string {
-    if (!mensaje) return '-';
-    return mensaje.length > 60 ? `${mensaje.substring(0, 60)}...` : mensaje;
-  }
-
-  getNivelTexto(nivel: string): string {
-    const niveles: { [key: string]: string } = {
-      ERROR: 'Error',
-      WARNING: 'Advertencia',
-      INFO: 'Información',
-      DEBUG: 'Debug',
-    };
-    return niveles[nivel] || nivel;
-  }
-
-  getNivelBadgeClass(nivel: string): string {
-    const clases: { [key: string]: string } = {
-      ERROR: 'badge-error',
-      WARNING: 'badge-warning',
-      INFO: 'badge-info',
-      DEBUG: 'badge-neutral',
-    };
-    return clases[nivel] || 'badge-neutral';
-  }
-
-  getCardClass(tipo: string): string {
-    const clases: { [key: string]: string } = {
-      error: 'card-error',
-      warning: 'card-warning',
-      info: 'card-info',
-      success: 'card-success',
-    };
-    return clases[tipo] || '';
-  }
-
-  getTrendClass(tipo: string): string {
-    const clases: { [key: string]: string } = {
-      error: 'trend-down',
-      warning: 'trend-stable',
-      info: 'trend-up',
-      success: 'trend-up',
-    };
-    return clases[tipo] || '';
-  }
-
-  private configurarExportacion(): ConfiguracionExportacion<LogSistema> {
+  private configurarExportacion(): ConfiguracionExportacion<LogEvento> {
     return {
       entidades: this.dataSource.data,
       nombreArchivo: 'logs_sistema',
       nombreEntidad: 'Logs del Sistema',
       columnas: [
-        { campo: 'id_log', titulo: 'ID', formato: 'numero' },
-        { campo: 'nivel', titulo: 'Nivel', formato: 'texto' },
-        { campo: 'fecha_hora', titulo: 'Fecha/Hora', formato: 'fecha' },
+        { campo: 'id', titulo: 'ID', formato: 'numero' },
+        { campo: 'timestamp', titulo: 'Fecha/Hora', formato: 'fecha' },
         { campo: 'usuario', titulo: 'Usuario', formato: 'texto' },
         { campo: 'accion', titulo: 'Acción', formato: 'texto' },
-        { campo: 'mensaje', titulo: 'Mensaje', formato: 'texto' },
-        { campo: 'ip_address', titulo: 'IP', formato: 'texto' },
+        { campo: 'modulo', titulo: 'Módulo', formato: 'texto' },
+        { campo: 'descripcion', titulo: 'Descripción', formato: 'texto' },
+        { campo: 'ip_origen', titulo: 'IP Origen', formato: 'texto' },
+        { campo: 'tabla_afectada', titulo: 'Tabla Afectada', formato: 'texto' },
       ],
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
@@ -411,21 +428,15 @@ export class LogsComponent implements OnInit {
     };
   }
 
-  private configurarCargaMasiva(): ConfiguracionCargaMasiva<LogSistema> {
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<LogEvento> {
     return {
-      tipoEntidad: 'logs',
+      tipoEntidad: 'logs_sistema',
       mapeoColumnas: [
         {
-          columnaArchivo: 'Nivel',
-          campoEntidad: 'nivel',
+          columnaArchivo: 'ID Usuario',
+          campoEntidad: 'id_usuario',
           obligatorio: true,
-          tipoEsperado: 'texto',
-        },
-        {
-          columnaArchivo: 'Usuario',
-          campoEntidad: 'usuario',
-          obligatorio: true,
-          tipoEsperado: 'texto',
+          tipoEsperado: 'numero',
         },
         {
           columnaArchivo: 'Acción',
@@ -434,34 +445,40 @@ export class LogsComponent implements OnInit {
           tipoEsperado: 'texto',
         },
         {
-          columnaArchivo: 'Mensaje',
-          campoEntidad: 'mensaje',
+          columnaArchivo: 'Descripción',
+          campoEntidad: 'descripcion',
           obligatorio: true,
           tipoEsperado: 'texto',
         },
         {
-          columnaArchivo: 'IP',
-          campoEntidad: 'ip_address',
+          columnaArchivo: 'IP Origen',
+          campoEntidad: 'ip_origen',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Módulo',
+          campoEntidad: 'modulo',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Tabla Afectada',
+          campoEntidad: 'tabla_afectada',
           obligatorio: false,
           tipoEsperado: 'texto',
         },
       ],
       validaciones: [
         {
-          campo: 'nivel',
-          validador: (valor) =>
-            ['ERROR', 'WARNING', 'INFO', 'DEBUG'].includes(valor),
-          mensajeError: 'El nivel debe ser: ERROR, WARNING, INFO o DEBUG',
-        },
-        {
-          campo: 'usuario',
+          campo: 'accion',
           validador: (valor) => valor && valor.length <= 100,
-          mensajeError: 'El usuario debe tener máximo 100 caracteres',
+          mensajeError: 'La acción debe tener máximo 100 caracteres',
         },
         {
-          campo: 'mensaje',
+          campo: 'descripcion',
           validador: (valor) => valor && valor.length <= 500,
-          mensajeError: 'El mensaje debe tener máximo 500 caracteres',
+          mensajeError: 'La descripción debe tener máximo 500 caracteres',
         },
       ],
     };
@@ -483,14 +500,22 @@ export class LogsComponent implements OnInit {
         }
       })
       .catch((error) => {
-        console.error('Error procesando archivo:', error);
+        console.error('Error al procesar archivo:', error);
       });
   }
 
   private obtenerFiltrosActivos(): any {
+    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
+    const filtrosColumna = this.filtrosColumnaForm.value;
+
     return {
-      busquedaGeneral:
-        this.filtroGeneralForm.get('busquedaGeneral')?.value || '',
+      busquedaGeneral: filtroGeneral || null,
+      filtrosColumna: Object.keys(filtrosColumna).reduce((acc, key) => {
+        if (filtrosColumna[key]) {
+          acc[key] = filtrosColumna[key];
+        }
+        return acc;
+      }, {} as any),
     };
   }
 }
