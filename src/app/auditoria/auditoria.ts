@@ -11,6 +11,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { PrimeDataTableComponent, TableColumn, TableAction, TableState } from '../shared/components/prime-data-table/prime-data-table.component';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -49,11 +50,98 @@ interface Auditoria {
     MatPaginatorModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './auditoria.html',
   styleUrl: './auditoria.scss',
 })
 export class AuditoriaComponent implements OnInit {
+  // Configuración del DataTable
+  tableColumns: TableColumn[] = [
+    {
+      key: 'id_auditoria',
+      title: 'ID',
+      type: 'badge',
+      sortable: true,
+      filterable: true,
+      width: '90px',
+      icon: 'pi pi-hashtag'
+    },
+    {
+      key: 'entidad',
+      title: 'Entidad',
+      type: 'text',
+      sortable: true,
+      filterable: true,
+      width: '180px',
+      icon: 'pi pi-database'
+    },
+    {
+      key: 'accion',
+      title: 'Acción',
+      type: 'badge',
+      sortable: true,
+      filterable: true,
+      width: '140px',
+      icon: 'pi pi-bolt'
+    },
+    {
+      key: 'usuario',
+      title: 'Usuario',
+      type: 'user',
+      sortable: true,
+      filterable: true,
+      width: '220px',
+      icon: 'pi pi-user'
+    },
+    {
+      key: 'fecha_hora',
+      title: 'Fecha/Hora',
+      type: 'date',
+      sortable: true,
+      filterable: true,
+      width: '160px',
+      icon: 'pi pi-calendar-clock'
+    },
+    {
+      key: 'campos_modificados',
+      title: 'Campos Modificados',
+      type: 'description',
+      sortable: false,
+      filterable: true,
+      width: '300px',
+      icon: 'pi pi-info-circle'
+    }
+  ];
+
+  tableActions: TableAction[] = [
+    {
+      icon: 'pi pi-eye',
+      tooltip: 'Ver detalle de la auditoría',
+      action: 'view',
+      color: 'primary'
+    },
+    {
+      icon: 'pi pi-compare',
+      tooltip: 'Comparar cambios',
+      action: 'compare',
+      color: 'secondary'
+    },
+    {
+      icon: 'pi pi-trash',
+      tooltip: 'Eliminar registro',
+      action: 'delete',
+      color: 'danger'
+    }
+  ];
+
+  tableState: TableState = {
+    loading: false,
+    error: false,
+    empty: false,
+    filteredEmpty: false
+  };
+
   displayedColumns: string[] = [
     'id_auditoria',
     'entidad',
@@ -99,6 +187,7 @@ export class AuditoriaComponent implements OnInit {
   }
 
   private cargarDatos(): void {
+    this.tableState = { ...this.tableState, loading: true, error: false };
     this.cargando = true;
     this.hasError = false;
 
@@ -249,10 +338,17 @@ export class AuditoriaComponent implements OnInit {
           campos: a.campos_modificados,
         }));
         this.dataSource.data = [...this.auditorias];
+        this.tableState = { 
+          ...this.tableState, 
+          loading: false, 
+          empty: this.auditorias.length === 0,
+          filteredEmpty: false
+        };
         this.cargando = false;
       } catch (error) {
         this.hasError = true;
         this.errorMessage = 'Error al cargar los registros de auditoría';
+        this.tableState = { ...this.tableState, loading: false, error: true };
         this.cargando = false;
       }
     }, 1000);
@@ -590,6 +686,35 @@ export class AuditoriaComponent implements OnInit {
         }
         return acc;
       }, {} as any),
+    };
+  }
+
+  // Métodos para el DataTable
+  handleAction(event: {action: string, item: any}) {
+    switch (event.action) {
+      case 'view':
+        this.verDetalle(event.item);
+        break;
+      case 'compare':
+        this.compararCambios(event.item);
+        break;
+      case 'delete':
+        this.eliminar(event.item);
+        break;
+    }
+  }
+
+  handleSort(event: {column: string, direction: 'asc' | 'desc'}) {
+    console.log('Ordenar:', event);
+    this.sortData(event.column);
+  }
+
+  handleFilters(filters: any) {
+    console.log('Filtros aplicados:', filters);
+    // Los filtros ya se aplican automáticamente en el DataTable
+    this.tableState = {
+      ...this.tableState,
+      filteredEmpty: this.dataSource.data.length === 0 && this.auditorias.length > 0
     };
   }
 }

@@ -63,217 +63,25 @@
       </div>
     </div>
 
-    <div class="filters-card">
-      <div class="filters-header">
-        <div class="filters-title">Búsqueda General</div>
-      </div>
-
-      <div class="filters-content">
-        <form [formGroup]="filtroGeneralForm" class="filters-form">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <input
-                  class="simple-input"
-                  formControlName="busquedaGeneral"
-                  placeholder="Buscar por nombre de rol, descripción, estado..."
-                  type="text"
-                />
-                <button
-                  *ngIf="filtroGeneralForm.get('busquedaGeneral')?.value"
-                  class="btn-limpiar"
-                  type="button"
-                  (click)="limpiarFiltroGeneral()"
-                >
-                  Limpiar
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div class="table-card table-with-headers">
-      <div class="column-headers">
-        <div class="header-row">
-          <div class="header-col codigo-col" (click)="sortData('id_rol')">
-            <span>Código</span>
-          </div>
-          <div class="header-col rol-col" (click)="sortData('nombre')">
-            <span>Rol</span>
-          </div>
-          <div class="header-col usuarios-col" (click)="sortData('usuarios')">
-            <span>Usuarios</span>
-          </div>
-          <div class="header-col permisos-col" (click)="sortData('permisos')">
-            <span>Permisos</span>
-          </div>
-          <div class="header-col estado-col" (click)="sortData('activo')">
-            <span>Estado</span>
-          </div>
-          <div class="header-col acciones-col">
-            <span>Acciones</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="table-container">
-        <div *ngIf="hasError" class="error-state">
-          <h3 class="error-title text-texfina text-primary">
-            Error al cargar datos
-          </h3>
-          <p class="error-subtitle text-texfina text-muted">
-            {{ errorMessage }}
-          </p>
-          <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
-            Reintentar
-          </button>
-        </div>
-
-        <div *ngIf="isEmpty" class="empty-state">
-          <h3 class="empty-title text-texfina text-primary">
-            No hay roles registrados
-          </h3>
-          <p class="empty-subtitle text-texfina text-muted">
-            No se encontraron roles en el sistema
-          </p>
-          <button class="btn-texfina btn-primary" (click)="agregar()">
-            Agregar Primer Rol
-          </button>
-        </div>
-
-        <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
-          <h3 class="filtered-empty-title text-texfina text-primary">
-            No se encontraron resultados
-          </h3>
-          <p class="filtered-empty-subtitle text-texfina text-muted">
-            Intenta ajustar los filtros o limpiar la búsqueda
-          </p>
-          <button
-            class="btn-texfina btn-secondary"
-            (click)="limpiarFiltroGeneral()"
-          >
-            Limpiar Filtros
-          </button>
-        </div>
-
-        <table
-          mat-table
-          [dataSource]="dataSource"
-          matSort
-          class="data-table"
-          *ngIf="!isEmpty && !isFilteredEmpty && !hasError"
-        >
-          <ng-container matColumnDef="codigo">
-            <th mat-header-cell *matHeaderCellDef>Código</th>
-            <td mat-cell *matCellDef="let rol" class="table-cell">
-              <span class="badge-texfina badge-neutral">
-                {{ formatearCodigo(rol.id_rol) }}
-              </span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="rol">
-            <th mat-header-cell *matHeaderCellDef>Rol</th>
-            <td mat-cell *matCellDef="let rol" class="table-cell">
-              <div class="rol-info">
-                <div class="rol-nombre">{{ formatearTexto(rol.nombre) }}</div>
-                <div class="rol-descripcion text-texfina text-muted">
-                  {{ formatearTexto(rol.descripcion) }}
-                </div>
-              </div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="usuarios">
-            <th mat-header-cell *matHeaderCellDef>Usuarios</th>
-            <td mat-cell *matCellDef="let rol" class="table-cell">
-              <span class="badge-texfina badge-info">
-                {{ contarUsuarios(rol.id_rol) }}
-              </span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="permisos">
-            <th mat-header-cell *matHeaderCellDef>Permisos</th>
-            <td mat-cell *matCellDef="let rol" class="table-cell">
-              <span class="badge-texfina badge-secondary">
-                {{ contarPermisos(rol.id_rol) }}
-              </span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="estado">
-            <th mat-header-cell *matHeaderCellDef>Estado</th>
-            <td mat-cell *matCellDef="let rol" class="table-cell">
-              <span
-                class="badge-texfina"
-                [ngClass]="getEstadoBadgeClass(rol.activo)"
-              >
-                {{ getEstadoTexto(rol.activo) }}
-              </span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let rol" class="table-cell">
-              <div class="action-buttons">
-                <button
-                  mat-mini-fab
-                  class="btn-action btn-view"
-                  (click)="verDetalle(rol)"
-                  matTooltip="Ver detalle"
-                >
-                  V
-                </button>
-                <button
-                  mat-mini-fab
-                  class="btn-action btn-edit"
-                  (click)="editar(rol)"
-                  matTooltip="Editar rol"
-                >
-                  E
-                </button>
-                <button
-                  mat-mini-fab
-                  class="btn-action btn-permisos"
-                  (click)="gestionarPermisos(rol)"
-                  matTooltip="Gestionar permisos"
-                >
-                  P
-                </button>
-              </div>
-            </td>
-          </ng-container>
-
-          <tr
-            mat-header-row
-            *matHeaderRowDef="displayedColumns; sticky: true"
-          ></tr>
-          <tr
-            mat-row
-            *matRowDef="let row; columns: displayedColumns;"
-            class="data-row"
-          ></tr>
-        </table>
-        </div>
-      </div>
-
-      <!-- Paginación -->
-      <div class="table-footer">
-        <div class="pagination-info">
-          <span class="text-texfina text-muted">Página 1 de 10</span>
-        </div>
-        <div class="pagination-controls">
-          <button class="pagination-button" disabled>
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button class="pagination-button">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- PrimeNG Data Table -->
+    <app-prime-data-table
+      [columns]="tableColumns"
+      [data]="roles"
+      [actions]="tableActions"
+      [state]="tableState"
+      [showGlobalFilter]="true"
+      [showColumnFilters]="true"
+      [showPagination]="true"
+      [pageSize]="10"
+      [actionsPinned]="true"
+      emptyIcon="group"
+      emptyTitle="No hay roles registrados"
+      emptySubtitle="Los roles de usuario aparecerán aquí una vez que sean creados"
+      emptyActionText="Agregar Primer Rol"
+      (actionClicked)="handleAction($event)"
+      (sortChanged)="handleSort($event)"
+      (filtersChanged)="handleFilters($event)"
+      (retryClicked)="reintentarCarga()"
+      (addNewClicked)="agregar()"
+    ></app-prime-data-table>
   </div>

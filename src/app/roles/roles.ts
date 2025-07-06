@@ -12,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSortModule } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { PrimeDataTableComponent, TableColumn, TableAction, TableState } from '../shared/components/prime-data-table/prime-data-table.component';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -27,6 +28,8 @@ interface Rol {
   nombre: string;
   descripcion: string;
   activo: boolean;
+  usuarios_count?: number;
+  permisos_count?: number;
 }
 
 interface Estadistica {
@@ -52,12 +55,99 @@ interface Estadistica {
     MatInputModule,
     MatTooltipModule,
     MatSortModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './roles.html',
   styleUrls: ['./roles.scss'],
 })
 export class RolesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+
+  // Configuración del DataTable
+  tableColumns: TableColumn[] = [
+    {
+      key: 'id_rol',
+      title: 'Código',
+      type: 'badge',
+      sortable: true,
+      filterable: true,
+      width: '120px',
+      icon: 'pi pi-hashtag'
+    },
+    {
+      key: 'nombre',
+      title: 'Rol',
+      type: 'text',
+      sortable: true,
+      filterable: true,
+      width: '200px',
+      icon: 'pi pi-user'
+    },
+    {
+      key: 'descripcion',
+      title: 'Descripción',
+      type: 'description',
+      sortable: false,
+      filterable: true,
+      width: '300px',
+      icon: 'pi pi-info-circle'
+    },
+    {
+      key: 'usuarios_count',
+      title: 'Usuarios',
+      type: 'badge',
+      sortable: true,
+      filterable: false,
+      width: '100px',
+      icon: 'pi pi-users'
+    },
+    {
+      key: 'permisos_count',
+      title: 'Permisos',
+      type: 'badge',
+      sortable: true,
+      filterable: false,
+      width: '100px',
+      icon: 'pi pi-shield'
+    },
+    {
+      key: 'activo',
+      title: 'Estado',
+      type: 'badge',
+      sortable: true,
+      filterable: true,
+      width: '100px',
+      icon: 'pi pi-circle'
+    }
+  ];
+
+  tableActions: TableAction[] = [
+    {
+      icon: 'pi pi-eye',
+      tooltip: 'Ver detalle del rol',
+      action: 'view',
+      color: 'primary'
+    },
+    {
+      icon: 'pi pi-pencil',
+      tooltip: 'Editar rol',
+      action: 'edit',
+      color: 'secondary'
+    },
+    {
+      icon: 'pi pi-shield',
+      tooltip: 'Gestionar permisos',
+      action: 'permissions',
+      color: 'warn'
+    }
+  ];
+
+  tableState: TableState = {
+    loading: false,
+    error: false,
+    empty: false,
+    filteredEmpty: false
+  };
 
   displayedColumns: string[] = [
     'codigo',
@@ -131,6 +221,7 @@ export class RolesComponent implements OnInit, OnDestroy {
   }
 
   private async cargarDatos(): Promise<void> {
+    this.tableState = { ...this.tableState, loading: true, error: false };
     this.isLoading = true;
     this.hasError = false;
 
@@ -172,12 +263,21 @@ export class RolesComponent implements OnInit, OnDestroy {
         nombre: r.nombre || '',
         descripcion: r.descripcion || '',
         activo: r.activo ?? false,
+        usuarios_count: this.contarUsuarios(r.id_rol),
+        permisos_count: this.contarPermisos(r.id_rol),
       }));
       this.dataSource.data = [...this.roles];
+      this.tableState = { 
+        ...this.tableState, 
+        loading: false, 
+        empty: this.roles.length === 0,
+        filteredEmpty: false
+      };
       this.isLoading = false;
     } catch (error) {
       this.hasError = true;
       this.errorMessage = 'Error al cargar los roles del sistema';
+      this.tableState = { ...this.tableState, loading: false, error: true };
       this.isLoading = false;
     }
   }
@@ -456,6 +556,35 @@ export class RolesComponent implements OnInit, OnDestroy {
     return {
       busquedaGeneral:
         this.filtroGeneralForm.get('busquedaGeneral')?.value || '',
+    };
+  }
+
+  // Métodos para el DataTable
+  handleAction(event: {action: string, item: any}) {
+    switch (event.action) {
+      case 'view':
+        this.verDetalle(event.item);
+        break;
+      case 'edit':
+        this.editar(event.item);
+        break;
+      case 'permissions':
+        this.gestionarPermisos(event.item);
+        break;
+    }
+  }
+
+  handleSort(event: {column: string, direction: 'asc' | 'desc'}) {
+    console.log('Ordenar:', event);
+    this.sortData(event.column);
+  }
+
+  handleFilters(filters: any) {
+    console.log('Filtros aplicados:', filters);
+    // Los filtros ya se aplican automáticamente en el DataTable
+    this.tableState = {
+      ...this.tableState,
+      filteredEmpty: this.dataSource.data.length === 0 && this.roles.length > 0
     };
   }
 }
