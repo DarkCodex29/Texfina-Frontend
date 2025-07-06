@@ -8,13 +8,14 @@ import {
   OnChanges,
   SimpleChanges,
   HostListener,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 
 // PrimeNG imports
-import { TableModule } from 'primeng/table';
+import { TableModule, Table } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
@@ -108,8 +109,8 @@ export interface TableState {
       <!-- Tabla principal -->
       <p-table
         #dt
-        [value]="data"
-        [loading]="state.loading"
+        [value]="state.loading ? skeletonData : data"
+        [loading]="false"
         [paginator]="showPagination"
         [rows]="currentRows"
         [rowsPerPageOptions]="[5, 10, 25, 50]"
@@ -118,7 +119,7 @@ export interface TableState {
         [scrollable]="true"
         scrollHeight="600px"
         [resizableColumns]="true"
-        [sortMode]="'multiple'"
+        [sortMode]="'single'"
         [globalFilterFields]="globalFilterFields"
         styleClass="p-datatable-striped p-datatable-gridlines"
         responsiveLayout="scroll"
@@ -134,20 +135,23 @@ export interface TableState {
               [pSortableColumn]="column.sortable ? column.key : undefined"
             >
               <div class="column-header">
-                <div class="column-title-wrapper">
+                <div 
+                  class="column-title-wrapper sortable-area"
+                  [class.sortable]="column.sortable"
+                >
                   <i *ngIf="column.icon" [class]="column.icon" class="column-icon"></i>
                   <span class="column-title">{{ column.title }}</span>
+                  <p-sortIcon *ngIf="column.sortable" [field]="column.key"></p-sortIcon>
                 </div>
                 <button
                   class="pin-button"
                   [class.pinned]="column.pinned"
-                  (click)="togglePin(column)"
+                  (click)="togglePin(column); $event.stopPropagation()"
                   [matTooltip]="column.pinned ? 'Desanclar columna' : 'Anclar columna'"
                 >
                   <i [class]="column.pinned ? 'pi pi-lock' : 'pi pi-unlock'" class="pin-icon"></i>
                 </button>
               </div>
-              <p-sortIcon *ngIf="column.sortable" [field]="column.key"></p-sortIcon>
             </th>
             <th *ngIf="hasActions" [class.frozen-column]="actionsPinned" style="width: 120px">
               <div class="actions-header">
@@ -186,67 +190,103 @@ export interface TableState {
               *ngFor="let column of visibleColumns; let i = index"
               [class.frozen-column]="column.pinned"
             >
-              <ng-container [ngSwitch]="column.type">
-                <!-- Tipo badge -->
-                <span *ngSwitchCase="'badge'" class="badge-texfina badge-primary">
-                  <i class="pi pi-hashtag"></i>
-                  {{ formatCellValue(item, column) }}
-                </span>
-
-                <!-- Tipo date -->
-                <div *ngSwitchCase="'date'" class="timestamp-cell">
-                  <div class="fecha-text">
-                    <i class="pi pi-calendar"></i>
-                    {{ formatearFecha(getNestedValue(item, column.key)) }}
+              <!-- Mostrar skeleton si está cargando -->
+              <ng-container *ngIf="item._skeleton; else normalContent">
+                <ng-container [ngSwitch]="column.type">
+                  <!-- Skeleton para badge -->
+                  <p-skeleton *ngSwitchCase="'badge'" width="80px" height="24px" borderRadius="12px"></p-skeleton>
+                  
+                  <!-- Skeleton para date -->
+                  <div *ngSwitchCase="'date'" class="skeleton-date-container">
+                    <p-skeleton width="90px" height="16px" class="mb-2"></p-skeleton>
+                    <p-skeleton width="70px" height="14px"></p-skeleton>
                   </div>
-                  <div class="hora-text">
-                    <i class="pi pi-clock"></i>
-                    {{ formatearHora(getNestedValue(item, column.key)) }}
+                  
+                  <!-- Skeleton para user -->
+                  <div *ngSwitchCase="'user'" class="skeleton-user-container">
+                    <p-skeleton width="180px" height="18px"></p-skeleton>
                   </div>
-                </div>
+                  
+                  <!-- Skeleton para description -->
+                  <div *ngSwitchCase="'description'" class="skeleton-description-container">
+                    <p-skeleton width="100%" height="16px" class="mb-1"></p-skeleton>
+                    <p-skeleton width="70%" height="14px"></p-skeleton>
+                  </div>
+                  
+                  <!-- Skeleton para text/default -->
+                  <p-skeleton *ngSwitchDefault width="120px" height="18px"></p-skeleton>
+                </ng-container>
+              </ng-container>
 
-                <!-- Tipo user -->
-                <div *ngSwitchCase="'user'" class="user-cell">
-                  <i class="pi pi-user"></i>
-                  <span class="user-email">{{ formatCellValue(item, column) }}</span>
-                </div>
-
-                <!-- Tipo action -->
-                <span *ngSwitchCase="'action'" class="action-cell">
-                  <i [class]="getActionIcon(getNestedValue(item, column.key))"></i>
-                  <span [class]="getActionClass(getNestedValue(item, column.key))">
+              <!-- Contenido normal -->
+              <ng-template #normalContent>
+                <ng-container [ngSwitch]="column.type">
+                  <!-- Tipo badge -->
+                  <span *ngSwitchCase="'badge'" class="badge-texfina badge-primary">
+                    <i class="pi pi-hashtag"></i>
                     {{ formatCellValue(item, column) }}
                   </span>
-                </span>
 
-                <!-- Tipo module -->
-                <span *ngSwitchCase="'module'" class="module-cell">
-                  <i [class]="getModuleIcon(getNestedValue(item, column.key))"></i>
-                  {{ formatCellValue(item, column) }}
-                </span>
+                  <!-- Tipo date -->
+                  <div *ngSwitchCase="'date'" class="timestamp-cell">
+                    <div class="fecha-text">
+                      <i class="pi pi-calendar"></i>
+                      {{ formatearFecha(getNestedValue(item, column.key)) }}
+                    </div>
+                    <div class="hora-text">
+                      <i class="pi pi-clock"></i>
+                      {{ formatearHora(getNestedValue(item, column.key)) }}
+                    </div>
+                  </div>
 
-                <!-- Tipo IP -->
-                <span *ngSwitchCase="'ip'" class="ip-cell">
-                  <i class="pi pi-server"></i>
-                  {{ formatCellValue(item, column) }}
-                </span>
+                  <!-- Tipo user -->
+                  <div *ngSwitchCase="'user'" class="user-cell">
+                    <i class="pi pi-user"></i>
+                    <span class="user-email">{{ formatCellValue(item, column) }}</span>
+                  </div>
 
-                <!-- Tipo description -->
-                <div *ngSwitchCase="'description'" class="description-cell">
-                  <i class="pi pi-info-circle"></i>
-                  <span class="description-text">{{ formatCellValue(item, column) }}</span>
-                </div>
+                  <!-- Tipo action -->
+                  <span *ngSwitchCase="'action'" class="action-cell">
+                    <i [class]="getActionIcon(getNestedValue(item, column.key))"></i>
+                    <span [class]="getActionClass(getNestedValue(item, column.key))">
+                      {{ formatCellValue(item, column) }}
+                    </span>
+                  </span>
 
-                <!-- Tipo text, number o default -->
-                <span *ngSwitchDefault class="text-texfina text-secondary">
-                  {{ formatCellValue(item, column) }}
-                </span>
-              </ng-container>
+                  <!-- Tipo module -->
+                  <span *ngSwitchCase="'module'" class="module-cell">
+                    <i [class]="getModuleIcon(getNestedValue(item, column.key))"></i>
+                    {{ formatCellValue(item, column) }}
+                  </span>
+
+                  <!-- Tipo IP -->
+                  <span *ngSwitchCase="'ip'" class="ip-cell">
+                    <i class="pi pi-server"></i>
+                    {{ formatCellValue(item, column) }}
+                  </span>
+
+                  <!-- Tipo description -->
+                  <div *ngSwitchCase="'description'" class="description-cell">
+                    <i class="pi pi-info-circle"></i>
+                    <span class="description-text">{{ formatCellValue(item, column) }}</span>
+                  </div>
+
+                  <!-- Tipo text, number o default -->
+                  <span *ngSwitchDefault class="text-texfina text-secondary">
+                    {{ formatCellValue(item, column) }}
+                  </span>
+                </ng-container>
+              </ng-template>
             </td>
             
             <!-- Columna de acciones -->
             <td *ngIf="hasActions" [class.frozen-column]="actionsPinned">
-              <div class="action-buttons">
+              <!-- Skeleton para acciones -->
+              <div *ngIf="item._skeleton" class="skeleton-actions-container">
+                <p-skeleton *ngFor="let action of actions" width="32px" height="32px" borderRadius="50%" class="mr-1"></p-skeleton>
+              </div>
+              <!-- Acciones normales -->
+              <div *ngIf="!item._skeleton" class="action-buttons">
                 <p-button
                   *ngFor="let action of getVisibleActions(item)"
                   [icon]="action.icon"
@@ -287,44 +327,6 @@ export interface TableState {
           </tr>
         </ng-template>
 
-        <!-- Loading template con skeleton -->
-        <ng-template pTemplate="loadingbody">
-          <tr *ngFor="let i of skeletonRows">
-            <td *ngFor="let column of visibleColumns" [class.frozen-column]="column.pinned">
-              <ng-container [ngSwitch]="column.type">
-                <!-- Skeleton para badge -->
-                <p-skeleton *ngSwitchCase="'badge'" width="80px" height="24px" borderRadius="12px"></p-skeleton>
-                
-                <!-- Skeleton para date -->
-                <div *ngSwitchCase="'date'" class="skeleton-date-container">
-                  <p-skeleton width="90px" height="16px" class="mb-2"></p-skeleton>
-                  <p-skeleton width="70px" height="14px"></p-skeleton>
-                </div>
-                
-                <!-- Skeleton para user -->
-                <div *ngSwitchCase="'user'" class="skeleton-user-container">
-                  <p-skeleton width="180px" height="18px"></p-skeleton>
-                </div>
-                
-                <!-- Skeleton para description -->
-                <div *ngSwitchCase="'description'" class="skeleton-description-container">
-                  <p-skeleton width="100%" height="16px" class="mb-1"></p-skeleton>
-                  <p-skeleton width="70%" height="14px"></p-skeleton>
-                </div>
-                
-                <!-- Skeleton para text/default -->
-                <p-skeleton *ngSwitchDefault width="120px" height="18px"></p-skeleton>
-              </ng-container>
-            </td>
-            
-            <!-- Skeleton para acciones -->
-            <td *ngIf="hasActions" [class.frozen-column]="actionsPinned">
-              <div class="skeleton-actions-container">
-                <p-skeleton *ngFor="let action of actions" width="32px" height="32px" borderRadius="50%" class="mr-1"></p-skeleton>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
       </p-table>
 
       <!-- Error state -->
@@ -344,6 +346,8 @@ export interface TableState {
   styleUrl: './prime-data-table.component.scss',
 })
 export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
+  @ViewChild('dt') table!: Table;
+  
   @Input() columns: TableColumn[] = [];
   @Input() data: any[] = [];
   @Input() actions: TableAction[] = [];
@@ -387,6 +391,7 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
 
   // Skeleton loading
   skeletonRows: number[] = [];
+  skeletonData: any[] = [];
 
   private destroy$ = new Subject<void>();
 
@@ -419,6 +424,14 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
     this.currentRows = this.pageSize;
     // Inicializar skeleton rows (mostrar entre 5-8 filas skeleton)
     this.skeletonRows = Array.from({ length: Math.min(this.pageSize, 8) }, (_, i) => i);
+    // Crear datos dummy para skeleton
+    this.skeletonData = this.skeletonRows.map(i => {
+      const obj: any = { _skeleton: true };
+      this.visibleColumns.forEach(col => {
+        obj[col.key] = ''; // Valores vacíos para skeleton
+      });
+      return obj;
+    });
   }
 
   togglePin(column: TableColumn) {
@@ -445,6 +458,7 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
     // Implementar limpieza de filtros
     this.globalFilterValue = '';
   }
+
 
   handleAction(action: string, item: any) {
     this.actionClicked.emit({ action, item });

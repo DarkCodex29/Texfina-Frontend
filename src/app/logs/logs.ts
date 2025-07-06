@@ -228,7 +228,10 @@ export class LogsComponent implements OnInit {
     this.tableState = { ...this.tableState, loading: true, error: false };
     this.cargando = true;
     this.error = null;
-    this.logs = [
+    
+    // Simular carga con setTimeout para mostrar skeleton
+    setTimeout(() => {
+      this.logs = [
       {
         id: 1,
         id_usuario: 1,
@@ -307,14 +310,15 @@ export class LogsComponent implements OnInit {
         timestamp: '2024-01-20T18:00:00',
       },
     ];
-    this.dataSource.data = [...this.logs];
-    this.tableState = { 
-      ...this.tableState, 
-      loading: false, 
-      empty: this.logs.length === 0,
-      filteredEmpty: false
-    };
-    this.cargando = false;
+      this.dataSource.data = [...this.logs];
+      this.tableState = { 
+        ...this.tableState, 
+        loading: false, 
+        empty: this.logs.length === 0,
+        filteredEmpty: false
+      };
+      this.cargando = false;
+    }, 1500); // 1.5 segundos para ver el skeleton
   }
 
   aplicarFiltroGeneral(): void {
