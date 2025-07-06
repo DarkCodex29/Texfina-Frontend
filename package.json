@@ -4,10 +4,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --configuration production",
+    "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "serve:prod": "ng serve --configuration production",
+    "analyze": "ng build --configuration production --stats-json && npx webpack-bundle-analyzer dist/texfina-web/browser/stats.json"
   },
   "private": true,
   "dependencies": {
