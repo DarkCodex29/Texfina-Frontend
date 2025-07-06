@@ -1,328 +1,162 @@
-<p-drawer #drawerRef [(visible)]="visible">
-  <ng-template #headless>
-    <div class="flex flex-col h-full">
-      <!-- Header del Drawer -->
-      <div class="flex items-center justify-between px-6 pt-4 shrink-0">
-        <span class="inline-flex items-center gap-2">
-          <img src="assets/logo.svg" alt="Texfina Logo" class="drawer-logo" />
-          <span class="font-semibold text-2xl text-texfina-secondary"
-            >Texfina</span
-          >
-        </span>
-        <span>
-          <p-button
-            type="button"
-            (click)="closeCallback($event)"
-            icon="pi pi-times"
-            [rounded]="true"
-            [outlined]="true"
-            styleClass="h-8 w-8 close-button-custom"
-          >
-          </p-button>
-        </span>
-      </div>
+<nav class="sidebar-container">
+  <!-- Header del Sidebar -->
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <img src="assets/logo.svg" alt="Texfina Logo" class="sidebar-logo" />
+      <span class="brand-text">Texfina</span>
+    </div>
+  </div>
 
-      <!-- Contenido del menú -->
-      <div class="overflow-y-auto flex-1">
-        <ul class="list-none p-4 m-0">
-          <!-- Inicio -->
+  <!-- Contenido del menú -->
+  <div class="sidebar-content">
+    <ul class="menu-list">
+      <!-- Inicio -->
+      <li class="menu-item">
+        <a routerLink="/dashboard" routerLinkActive="active-link" class="menu-link">
+          <mat-icon class="menu-icon">home</mat-icon>
+          <span class="menu-text">Inicio</span>
+        </a>
+      </li>
+
+      <!-- Maestros -->
+      <li class="menu-item">
+        <div class="menu-section" (click)="toggleSection('maestros')">
+          <div class="section-header">
+            <mat-icon class="menu-icon">inventory</mat-icon>
+            <span class="menu-text">Maestros</span>
+          </div>
+          <mat-icon class="expand-icon" [class.expanded]="openSection === 'maestros'">
+            expand_more
+          </mat-icon>
+        </div>
+        <ul class="submenu" [class.hidden]="openSection !== 'maestros'">
           <li>
-            <a
-              pRipple
-              routerLink="/dashboard"
-              routerLinkActive="active-link"
-              class="flex items-center cursor-pointer p-4 rounded-border text-texfina-text-primary hover:bg-texfina-secondary-bg transition-colors duration-200 p-ripple"
-            >
-              <mat-icon class="mr-3 text-texfina-secondary">home</mat-icon>
-              <span class="font-medium">Inicio</span>
+            <a routerLink="/dashboard/insumos" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Insumos</span>
             </a>
           </li>
-
-          <!-- Maestros -->
           <li>
-            <div
-              pRipple
-              pStyleClass="@next"
-              enterFromClass="hidden"
-              enterActiveClass="animate-slidedown"
-              leaveToClass="hidden"
-              leaveActiveClass="animate-slideup"
-              class="p-4 flex items-center justify-between text-texfina-text-primary cursor-pointer p-ripple hover:bg-texfina-primary-bg transition-colors duration-200"
-              (click)="toggleSection('maestro')"
-            >
-              <div class="flex items-center">
-                <mat-icon class="mr-3 text-texfina-primary">inventory</mat-icon>
-                <span class="font-medium">Maestros</span>
-              </div>
-              <mat-icon
-                class="text-texfina-text-muted transition-transform duration-200"
-                [class.rotate-180]="openSection === 'maestro'"
-              >
-                expand_more
-              </mat-icon>
-            </div>
-            <ul
-              class="list-none p-0 m-0 overflow-hidden"
-              [class.hidden]="openSection !== 'maestro'"
-            >
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/insumos"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Insumos</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/proveedores"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Proveedores</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/almacenes"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Almacenes</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/clases"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Clases</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/unidades"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Unidades</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/lotes"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Lotes</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/recetas"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Recetas</span>
-                </a>
-              </li>
-            </ul>
+            <a routerLink="/dashboard/proveedores" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Proveedores</span>
+            </a>
           </li>
-
-          <!-- Movimientos -->
           <li>
-            <div
-              pRipple
-              pStyleClass="@next"
-              enterFromClass="hidden"
-              enterActiveClass="animate-slidedown"
-              leaveToClass="hidden"
-              leaveActiveClass="animate-slideup"
-              class="p-4 flex items-center justify-between text-texfina-text-primary cursor-pointer p-ripple hover:bg-texfina-primary-bg transition-colors duration-200"
-              (click)="toggleSection('movimientos')"
-            >
-              <div class="flex items-center">
-                <mat-icon class="mr-3 text-texfina-primary"
-                  >assignment</mat-icon
-                >
-                <span class="font-medium">Movimientos</span>
-              </div>
-              <mat-icon
-                class="text-texfina-text-muted transition-transform duration-200"
-                [class.rotate-180]="openSection === 'movimientos'"
-              >
-                expand_more
-              </mat-icon>
-            </div>
-            <ul
-              class="list-none p-0 m-0 overflow-hidden"
-              [class.hidden]="openSection !== 'movimientos'"
-            >
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/ingresos"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Ingresos</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/consumos"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Consumos</span>
-                </a>
-              </li>
-            </ul>
+            <a routerLink="/dashboard/almacenes" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Almacenes</span>
+            </a>
           </li>
-
-          <!-- Consultas -->
           <li>
-            <div
-              pRipple
-              pStyleClass="@next"
-              enterFromClass="hidden"
-              enterActiveClass="animate-slidedown"
-              leaveToClass="hidden"
-              leaveActiveClass="animate-slideup"
-              class="p-4 flex items-center justify-between text-texfina-text-primary cursor-pointer p-ripple hover:bg-texfina-primary-bg transition-colors duration-200"
-              (click)="toggleSection('consultas')"
-            >
-              <div class="flex items-center">
-                <mat-icon class="mr-3 text-texfina-primary"
-                  >description</mat-icon
-                >
-                <span class="font-medium">Consultas</span>
-              </div>
-              <mat-icon
-                class="text-texfina-text-muted transition-transform duration-200"
-                [class.rotate-180]="openSection === 'consultas'"
-              >
-                expand_more
-              </mat-icon>
-            </div>
-            <ul
-              class="list-none p-0 m-0 overflow-hidden"
-              [class.hidden]="openSection !== 'consultas'"
-            >
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/stock"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Stock</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/reportes"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Reportes</span>
-                </a>
-              </li>
-            </ul>
+            <a routerLink="/dashboard/clases" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Clases</span>
+            </a>
           </li>
-
-          <!-- Administración -->
           <li>
-            <div
-              pRipple
-              pStyleClass="@next"
-              enterFromClass="hidden"
-              enterActiveClass="animate-slidedown"
-              leaveToClass="hidden"
-              leaveActiveClass="animate-slideup"
-              class="p-4 flex items-center justify-between text-texfina-text-primary cursor-pointer p-ripple hover:bg-texfina-primary-bg transition-colors duration-200"
-              (click)="toggleSection('administracion')"
-            >
-              <div class="flex items-center">
-                <mat-icon class="mr-3 text-texfina-primary">settings</mat-icon>
-                <span class="font-medium">Administración</span>
-              </div>
-              <mat-icon
-                class="text-texfina-text-muted transition-transform duration-200"
-                [class.rotate-180]="openSection === 'administracion'"
-              >
-                expand_more
-              </mat-icon>
-            </div>
-            <ul
-              class="list-none p-0 m-0 overflow-hidden"
-              [class.hidden]="openSection !== 'administracion'"
-            >
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/usuarios"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Usuarios</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/logs"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Logs</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/auditoria"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Auditoría</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/roles"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Roles y Permisos</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  pRipple
-                  routerLink="/dashboard/configuracion"
-                  routerLinkActive="active-sublink"
-                  class="flex items-center cursor-pointer p-3 pl-12 rounded-border text-texfina-text-secondary hover:bg-texfina-secondary-bg hover:text-texfina-secondary transition-colors duration-200 p-ripple"
-                >
-                  <span class="font-medium">Configuración</span>
-                </a>
-              </li>
-            </ul>
+            <a routerLink="/dashboard/unidades" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Unidades</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/dashboard/lotes" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Lotes</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/dashboard/recetas" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Recetas</span>
+            </a>
           </li>
         </ul>
-      </div>
-    </div>
-  </ng-template>
-</p-drawer>
+      </li>
+
+      <!-- Movimientos -->
+      <li class="menu-item">
+        <div class="menu-section" (click)="toggleSection('movimientos')">
+          <div class="section-header">
+            <mat-icon class="menu-icon">assignment</mat-icon>
+            <span class="menu-text">Movimientos</span>
+          </div>
+          <mat-icon class="expand-icon" [class.expanded]="openSection === 'movimientos'">
+            expand_more
+          </mat-icon>
+        </div>
+        <ul class="submenu" [class.hidden]="openSection !== 'movimientos'">
+          <li>
+            <a routerLink="/dashboard/ingresos" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Ingresos</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/dashboard/consumos" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Consumos</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <!-- Consultas -->
+      <li class="menu-item">
+        <div class="menu-section" (click)="toggleSection('consultas')">
+          <div class="section-header">
+            <mat-icon class="menu-icon">description</mat-icon>
+            <span class="menu-text">Consultas</span>
+          </div>
+          <mat-icon class="expand-icon" [class.expanded]="openSection === 'consultas'">
+            expand_more
+          </mat-icon>
+        </div>
+        <ul class="submenu" [class.hidden]="openSection !== 'consultas'">
+          <li>
+            <a routerLink="/dashboard/stock" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Stock</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/dashboard/reportes" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Reportes</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <!-- Administración -->
+      <li class="menu-item">
+        <div class="menu-section" (click)="toggleSection('administracion')">
+          <div class="section-header">
+            <mat-icon class="menu-icon">settings</mat-icon>
+            <span class="menu-text">Administración</span>
+          </div>
+          <mat-icon class="expand-icon" [class.expanded]="openSection === 'administracion'">
+            expand_more
+          </mat-icon>
+        </div>
+        <ul class="submenu" [class.hidden]="openSection !== 'administracion'">
+          <li>
+            <a routerLink="/dashboard/usuarios" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Usuarios</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/dashboard/logs" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Logs</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/dashboard/auditoria" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Auditoría</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/dashboard/roles" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Roles y Permisos</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/dashboard/configuracion" routerLinkActive="active-sublink" class="submenu-link">
+              <span class="submenu-text">Configuración</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>

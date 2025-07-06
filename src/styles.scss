@@ -1,3 +1,21 @@
+// Imports modulares de Texfina
+@use "styles/base/variables";
+@use "styles/base/reset";
+@use "styles/base/mixins";
+@use "styles/base/typography";
+@use "styles/components/buttons";
+@use "styles/components/badges";
+@use "styles/components/cards";
+@use "styles/components/dropdowns";
+@use "styles/components/forms";
+@use "styles/components/modals";
+@use "styles/components/tables";
+@use "styles/components/states";
+@use "styles/layouts/page-layout";
+@use "styles/pages/table-grids";
+@use "styles/utilities/helpers";
+@use "styles/vendors/material-overrides";
+
 // Angular Material Imports
 @import "@angular/material/prebuilt-themes/indigo-pink.css";
 
@@ -102,3 +120,114 @@ html {
   scrollbar-width: thin;
   scrollbar-color: var(--texfina-border-medium) var(--texfina-bg-secondary);
 }
+
+/* =================================================================== */
+/* FIX GLOBAL PARA DROPDOWN EN TABLAS - EVITAR RECORTE */
+/* =================================================================== */
+
+// Override global para asegurar que los overlays no se recorten
+body {
+  // Contenedores principales que podrían estar recortando
+  .main-layout,
+  .content-container,
+  .content,
+  .content-wrapper,
+  .page-container,
+  .page-content,
+  .table-card,
+  .prime-table-card,
+  .mat-sidenav-content,
+  .mat-drawer-content {
+    overflow: visible !important;
+  }
+}
+
+// Global z-index supremo para overlays
+.p-component-overlay,
+.p-overlay,
+.p-menu-overlay,
+.p-select-overlay,
+.p-dropdown-overlay,
+.p-tieredmenu-overlay,
+.p-contextmenu-overlay,
+.action-dropdown .dropdown-menu {
+  z-index: 999999 !important;
+}
+
+.p-overlay-mask {
+  z-index: 999998 !important;
+}
+
+/* =================================================================== */
+/* ESTILOS PARA PRIMENG SELECTS (CONFIGURACIÓN) */
+/* =================================================================== */
+
+// Estilos para p-select específicos con diseño Texfina
+.p-select {
+  .p-select-dropdown {
+    background: white !important;
+    border: 1px solid var(--texfina-border-light) !important;
+    border-radius: var(--texfina-radius-md) !important;
+    transition: all 0.2s ease !important;
+
+    &:hover {
+      border-color: var(--texfina-secondary) !important;
+    }
+
+    &.p-focus {
+      border-color: var(--texfina-secondary) !important;
+      box-shadow: 0 0 0 2px rgba(18, 30, 102, 0.1) !important;
+    }
+  }
+
+  .p-select-label {
+    color: var(--texfina-text-primary) !important;
+    font-size: 14px !important;
+  }
+
+  .p-select-dropdown-icon {
+    color: var(--texfina-secondary) !important;
+  }
+}
+
+// Panel desplegable del p-select con diseño simple y azul
+.p-select-overlay {
+  border: 1px solid var(--texfina-border-light) !important;
+  border-radius: 8px !important;
+  background: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  z-index: 999999 !important;
+  padding: 4px !important;
+  
+  .p-select-list {
+    padding: 0 !important;
+    
+    .p-select-option {
+      padding: 10px 12px !important;
+      color: var(--texfina-text-primary) !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      transition: all 0.2s ease !important;
+      margin: 0 !important;
+      border-radius: 6px !important;
+      
+      &:hover {
+        background: var(--texfina-secondary-bg) !important;
+        color: var(--texfina-secondary) !important;
+      }
+      
+      &.p-select-option-selected {
+        background: var(--texfina-secondary) !important;
+        color: white !important;
+        font-weight: 500 !important;
+      }
+      
+      &.p-focus {
+        background: var(--texfina-secondary-bg) !important;
+        color: var(--texfina-secondary) !important;
+      }
+    }
+  }
+}
+
+

@@ -1,9 +1,7 @@
 .main-layout {
   display: flex;
-  flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  background-color: #ffffff;
 }
 
 .sidebar {
@@ -17,7 +15,6 @@
   flex-direction: column;
   flex: 1;
   overflow: hidden;
-  margin-top: 0;
 }
 
 .content {
@@ -25,14 +22,12 @@
   overflow-y: auto;
   overflow-x: hidden;
   background-color: #ffffff;
-  padding-top: 0;
 }
 
 .content-wrapper {
   height: auto;
   min-height: 100%;
   overflow: visible;
-  padding: 0;
 }
 
 // Responsive para tablets grandes

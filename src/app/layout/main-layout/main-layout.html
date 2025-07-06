@@ -1,18 +1,22 @@
 <!-- Layout principal responsive -->
-<div class="main-layout">
-  <app-toolbar (menuToggle)="toggleSidebar()"></app-toolbar>
-
-  <app-sidebar
-    [(visible)]="sidebarVisible"
-    (visibleChange)="onSidebarVisibleChange($event)"
+<mat-sidenav-container class="main-layout">
+  <!-- Sidenav responsive -->
+  <mat-sidenav
+    #sidenav
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+    class="sidebar"
   >
-  </app-sidebar>
+    <app-sidebar></app-sidebar>
+  </mat-sidenav>
 
-  <div class="content-container">
+  <!-- Contenido principal -->
+  <mat-sidenav-content class="content-container">
+    <app-toolbar (menuToggle)="sidenav.toggle()"></app-toolbar>
     <div class="content">
       <div class="content-wrapper">
         <router-outlet></router-outlet>
       </div>
     </div>
-  </div>
-</div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
