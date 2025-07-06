@@ -820,3 +820,78 @@
   }
   
 }
+
+/* Skeleton Loading Styles */
+.skeleton-date-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+.skeleton-user-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.skeleton-description-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+.skeleton-actions-container {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 0;
+}
+
+/* Override PrimeNG skeleton styles for better appearance */
+::ng-deep {
+  .p-skeleton {
+    background: linear-gradient(90deg, 
+      rgba(240, 240, 240, 0.8) 25%, 
+      rgba(245, 245, 245, 0.9) 50%, 
+      rgba(240, 240, 240, 0.8) 75%
+    ) !important;
+    background-size: 200% 100% !important;
+    animation: skeleton-loading 1.5s infinite !important;
+    border-radius: 4px !important;
+    
+    &.mb-1 {
+      margin-bottom: 2px !important;
+    }
+    
+    &.mb-2 {
+      margin-bottom: 4px !important;
+    }
+    
+    &.mr-1 {
+      margin-right: 4px !important;
+    }
+  }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Accessibility for skeleton */
+.skeleton-date-container,
+.skeleton-user-container,
+.skeleton-description-container,
+.skeleton-actions-container {
+  [aria-hidden="true"] {
+    pointer-events: none;
+  }
+}

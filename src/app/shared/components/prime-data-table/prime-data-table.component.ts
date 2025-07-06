@@ -21,6 +21,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PaginatorModule } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
+import { SkeletonModule } from 'primeng/skeleton';
 
 // Material icons for consistency
 import { MatIconModule } from '@angular/material/icon';
@@ -68,6 +69,7 @@ export interface TableState {
     ProgressSpinnerModule,
     PaginatorModule,
     SelectModule,
+    SkeletonModule,
     MatIconModule,
     MatTooltipModule,
   ],
@@ -285,13 +287,40 @@ export interface TableState {
           </tr>
         </ng-template>
 
-        <!-- Loading template -->
+        <!-- Loading template con skeleton -->
         <ng-template pTemplate="loadingbody">
-          <tr>
-            <td [attr.colspan]="displayedColumnsCount">
-              <div class="loading-state">
-                <p-progressSpinner [style]="{ width: '30px', height: '30px' }"></p-progressSpinner>
-                <span>Cargando datos...</span>
+          <tr *ngFor="let i of skeletonRows">
+            <td *ngFor="let column of visibleColumns" [class.frozen-column]="column.pinned">
+              <ng-container [ngSwitch]="column.type">
+                <!-- Skeleton para badge -->
+                <p-skeleton *ngSwitchCase="'badge'" width="80px" height="24px" borderRadius="12px"></p-skeleton>
+                
+                <!-- Skeleton para date -->
+                <div *ngSwitchCase="'date'" class="skeleton-date-container">
+                  <p-skeleton width="90px" height="16px" class="mb-2"></p-skeleton>
+                  <p-skeleton width="70px" height="14px"></p-skeleton>
+                </div>
+                
+                <!-- Skeleton para user -->
+                <div *ngSwitchCase="'user'" class="skeleton-user-container">
+                  <p-skeleton width="180px" height="18px"></p-skeleton>
+                </div>
+                
+                <!-- Skeleton para description -->
+                <div *ngSwitchCase="'description'" class="skeleton-description-container">
+                  <p-skeleton width="100%" height="16px" class="mb-1"></p-skeleton>
+                  <p-skeleton width="70%" height="14px"></p-skeleton>
+                </div>
+                
+                <!-- Skeleton para text/default -->
+                <p-skeleton *ngSwitchDefault width="120px" height="18px"></p-skeleton>
+              </ng-container>
+            </td>
+            
+            <!-- Skeleton para acciones -->
+            <td *ngIf="hasActions" [class.frozen-column]="actionsPinned">
+              <div class="skeleton-actions-container">
+                <p-skeleton *ngFor="let action of actions" width="32px" height="32px" borderRadius="50%" class="mr-1"></p-skeleton>
               </div>
             </td>
           </tr>
@@ -356,6 +385,9 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
   // Propiedades de paginación
   currentRows: number = 10;
 
+  // Skeleton loading
+  skeletonRows: number[] = [];
+
   private destroy$ = new Subject<void>();
 
   constructor() {}
@@ -385,6 +417,8 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
     this.globalFilterFields = this.visibleColumns.map(col => col.key);
     this.displayedColumnsCount = this.visibleColumns.length + (this.hasActions ? 1 : 0);
     this.currentRows = this.pageSize;
+    // Inicializar skeleton rows (mostrar entre 5-8 filas skeleton)
+    this.skeletonRows = Array.from({ length: Math.min(this.pageSize, 8) }, (_, i) => i);
   }
 
   togglePin(column: TableColumn) {
