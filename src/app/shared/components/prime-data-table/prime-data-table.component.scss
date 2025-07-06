@@ -3,20 +3,20 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  
+  overflow: visible !important;
+
   /* Override PrimeNG styles to match Texfina design */
   ::ng-deep {
     .p-datatable {
       border: none;
       border-radius: 0;
-      
+
       // Personalizar comportamiento de ordenamiento para triple click
       .p-sortable-column {
         position: relative;
-        
+
         &:after {
-          content: '';
+          content: "";
           position: absolute;
           top: 0;
           left: 0;
@@ -25,14 +25,14 @@
           cursor: pointer;
         }
       }
-      
+
       .p-datatable-header {
         background: #fafafa;
         border: none;
         padding: 16px;
         border-bottom: 2px solid #e0e0e0;
       }
-      
+
       .p-datatable-thead > tr > th {
         background: #fafafa;
         border: none;
@@ -43,16 +43,16 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
         color: #424242;
-        
+
         &.frozen-column {
           position: sticky !important;
           left: 0 !important;
           background: #f5f5f5 !important;
           z-index: 3 !important;
           box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
-          
+
           &:after {
-            content: '';
+            content: "";
             position: absolute;
             top: 0;
             right: 0;
@@ -62,7 +62,7 @@
           }
         }
       }
-      
+
       .p-datatable-tbody > tr > td {
         border: none;
         border-bottom: 1px solid #e0e0e0;
@@ -70,16 +70,16 @@
         font-size: 12px;
         line-height: 1.4;
         color: #424242;
-        
+
         &.frozen-column {
           position: sticky !important;
           left: 0 !important;
           background: white !important;
           z-index: 2 !important;
           box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
-          
+
           &:after {
-            content: '';
+            content: "";
             position: absolute;
             top: 0;
             right: 0;
@@ -89,31 +89,31 @@
           }
         }
       }
-      
+
       .p-datatable-tbody > tr:hover > td {
         background: rgba(0, 0, 0, 0.02);
-        
+
         &.frozen-column {
           background: rgba(0, 0, 0, 0.02) !important;
         }
       }
-      
+
       .p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
         background: rgba(0, 0, 0, 0.01);
       }
-      
+
       .p-datatable-loading-overlay {
         background: rgba(255, 255, 255, 0.8);
       }
     }
-    
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .p-datatable-thead > tr > th {
         padding: 8px 12px;
         font-size: 11px;
       }
-      
+
       .p-datatable-tbody > tr > td {
         padding: 8px 12px;
         font-size: 11px;
@@ -130,27 +130,27 @@
   padding: 16px 20px;
   background: #fafafa;
   border-bottom: 1px solid #e0e0e0;
-  
+
   .global-filter {
     flex: 1;
     max-width: 400px;
-    
+
     .global-filter-input {
       width: 100%;
       padding: 8px 12px 8px 36px;
       border: 1px solid #ddd;
       border-radius: 6px;
       font-size: 13px;
-      
+
       &:focus {
         border-color: #1976d2;
         box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
       }
     }
-    
+
     .p-input-icon-left {
       position: relative;
-      
+
       i {
         position: absolute;
         left: 12px;
@@ -161,7 +161,7 @@
       }
     }
   }
-  
+
   .filter-controls {
     display: flex;
     gap: 8px;
@@ -175,46 +175,46 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  
+
   .column-title-wrapper {
     display: flex;
     align-items: center;
     gap: 6px;
     flex: 1;
-    
+
     &.sortable {
       cursor: pointer;
-      
+
       &:hover {
         color: var(--texfina-secondary);
       }
     }
-    
+
     .column-icon {
       font-size: 12px;
       color: var(--texfina-secondary);
       opacity: 0.8;
     }
-    
+
     .column-title {
       font-weight: 600;
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    
+
     // Hacer el icono de ordenar más pequeño
     ::ng-deep .p-sortable-column-icon {
       font-size: 10px !important;
       margin-left: 4px !important;
       color: #757575 !important;
-      
+
       &:hover {
         color: var(--texfina-secondary) !important;
       }
     }
   }
-  
+
   .pin-button {
     display: flex;
     align-items: center;
@@ -228,25 +228,25 @@
     transition: all 0.2s ease;
     padding: 0;
     margin-left: 8px;
-    
+
     &:hover {
       background: rgba(0, 0, 0, 0.08);
     }
-    
+
     &.pinned {
       background: var(--texfina-primary-bg);
       color: var(--texfina-primary);
-      
+
       &:hover {
         background: rgba(189, 33, 38, 0.2);
       }
     }
-    
+
     .pin-icon {
       font-size: 10px;
       color: #757575;
       transition: all 0.2s ease;
-      
+
       &.pi-lock {
         color: var(--texfina-primary);
       }
@@ -270,7 +270,7 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 11px;
-  
+
   &:focus {
     border-color: #1976d2;
     box-shadow: 0 0 0 1px rgba(25, 118, 210, 0.2);
@@ -283,36 +283,36 @@
   gap: 4px;
   justify-content: center;
   align-items: center;
-  
+
   ::ng-deep {
     .p-button {
       width: 28px;
       height: 28px;
       border-radius: 6px;
-      
+
       .p-button-icon {
         font-size: 14px;
       }
-      
+
       &.p-button-text.p-button-secondary {
         color: #757575;
-        
+
         &:hover {
           background: transparent !important;
         }
       }
-      
+
       &.p-button-text.p-button-primary {
         color: #1976d2;
-        
+
         &:hover {
           background: transparent !important;
         }
       }
-      
+
       &.p-button-text.p-button-warn {
         color: #d32f2f;
-        
+
         &:hover {
           background: transparent !important;
         }
@@ -331,36 +331,36 @@
   font-size: 11px;
   font-weight: 600;
   text-align: center;
-  
+
   i {
     font-size: 10px;
   }
-  
+
   &.badge-neutral {
     background: var(--texfina-neutral-bg);
     color: var(--texfina-neutral-dark);
   }
-  
+
   &.badge-primary {
     background: var(--texfina-secondary-bg);
     color: var(--texfina-secondary);
   }
-  
+
   &.badge-secondary {
     background: rgba(117, 117, 117, 0.1);
     color: #757575;
   }
-  
+
   &.badge-success {
     background: rgba(22, 163, 74, 0.1);
     color: var(--texfina-success);
   }
-  
+
   &.badge-warning {
     background: rgba(217, 119, 6, 0.1);
     color: var(--texfina-warning);
   }
-  
+
   &.badge-error {
     background: var(--texfina-primary-bg);
     color: var(--texfina-primary);
@@ -374,7 +374,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  
+
   .fecha-text {
     display: flex;
     align-items: center;
@@ -382,13 +382,13 @@
     font-size: 11px;
     font-weight: 500;
     color: var(--texfina-text-primary);
-    
+
     i {
       font-size: 10px;
       color: var(--texfina-secondary);
     }
   }
-  
+
   .hora-text {
     display: flex;
     align-items: center;
@@ -396,7 +396,7 @@
     font-size: 10px;
     color: var(--texfina-text-secondary);
     margin-left: 14px;
-    
+
     i {
       font-size: 9px;
       color: var(--texfina-neutral);
@@ -409,7 +409,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  
+
   i {
     font-size: 12px;
     color: var(--texfina-secondary);
@@ -422,7 +422,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .user-email {
     font-size: 11px;
     font-weight: 500;
@@ -435,32 +435,32 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  
+
   i {
     font-size: 12px;
     padding: 2px;
   }
-  
+
   .success-action {
     color: var(--texfina-success);
     font-weight: 500;
   }
-  
+
   .error-action {
     color: var(--texfina-primary);
     font-weight: 500;
   }
-  
+
   .warning-action {
     color: var(--texfina-warning);
     font-weight: 500;
   }
-  
+
   .info-action {
     color: var(--texfina-secondary);
     font-weight: 500;
   }
-  
+
   .neutral-action {
     color: var(--texfina-neutral-dark);
     font-weight: 500;
@@ -472,7 +472,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  
+
   i {
     font-size: 11px;
     color: var(--texfina-secondary);
@@ -485,7 +485,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   font-size: 11px;
   font-weight: 500;
   color: var(--texfina-text-primary);
@@ -496,13 +496,13 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Courier New', monospace;
-  
+  font-family: "Courier New", monospace;
+
   i {
     font-size: 11px;
     color: var(--texfina-neutral-dark);
   }
-  
+
   font-size: 11px;
   color: var(--texfina-text-secondary);
   background: var(--texfina-bg-tertiary);
@@ -517,14 +517,14 @@
   align-items: flex-start;
   gap: 6px;
   max-width: 280px;
-  
+
   i {
     font-size: 11px;
     color: var(--texfina-secondary);
     margin-top: 2px;
     flex-shrink: 0;
   }
-  
+
   .description-text {
     font-size: 11px;
     line-height: 1.4;
@@ -539,24 +539,24 @@
 
 /* Text Utilities */
 .text-texfina {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
   &.text-primary {
     color: #1976d2;
   }
-  
+
   &.text-secondary {
     color: #424242;
   }
-  
+
   &.text-muted {
     color: #757575;
   }
-  
+
   &.font-medium {
     font-weight: 500;
   }
-  
+
   &.font-semibold {
     font-weight: 600;
   }
@@ -573,7 +573,7 @@
   justify-content: center;
   padding: 48px 32px;
   text-align: center;
-  
+
   .empty-icon,
   .error-icon {
     font-size: 48px;
@@ -581,7 +581,7 @@
     opacity: 0.5;
     color: #757575;
   }
-  
+
   .empty-title,
   .error-title {
     font-size: 18px;
@@ -589,7 +589,7 @@
     margin: 0 0 8px 0;
     color: #424242;
   }
-  
+
   .empty-subtitle,
   .error-subtitle {
     font-size: 14px;
@@ -603,7 +603,7 @@
   flex-direction: row;
   gap: 12px;
   padding: 24px;
-  
+
   span {
     font-size: 14px;
     color: #757575;
@@ -623,7 +623,7 @@
       align-items: center;
       justify-content: flex-end;
       gap: 0.5rem;
-      
+
       .p-paginator-current {
         background: transparent;
         border: none;
@@ -634,11 +634,11 @@
         padding: 0;
         min-height: auto;
       }
-      
+
       .p-paginator-pages {
         display: flex;
         gap: 0.125rem;
-        
+
         .p-paginator-page {
           background: #ffffff;
           border: 1px solid #d1d5db;
@@ -653,17 +653,17 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          
+
           &:hover {
             background: #f9fafb;
             border-color: #9ca3af;
           }
-          
+
           &.p-highlight {
             background: #3b82f6;
             border-color: #3b82f6;
             color: white;
-            
+
             &:hover {
               background: #2563eb;
               border-color: #2563eb;
@@ -671,7 +671,7 @@
           }
         }
       }
-      
+
       .p-paginator-first,
       .p-paginator-prev,
       .p-paginator-next,
@@ -687,23 +687,23 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        
+
         &:not(.p-disabled):hover {
           background: #f9fafb;
           border-color: #9ca3af;
           color: #374151;
         }
-        
+
         &.p-disabled {
           opacity: 0.5;
           cursor: not-allowed;
         }
-        
+
         .p-paginator-icon {
           font-size: 0.75rem;
         }
       }
-      
+
       // p-select del paginador - aplicar solo estilos visuales de Texfina
       .p-select {
         border: 1px solid var(--texfina-border-light) !important;
@@ -713,29 +713,30 @@
         height: 36px !important;
         min-width: 80px !important;
         transition: all 0.2s ease !important;
-        
+
         &:hover:not(.p-disabled) {
           border-color: var(--texfina-secondary) !important;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
         }
-        
-        &:focus, &.p-focus {
+
+        &:focus,
+        &.p-focus {
           border-color: var(--texfina-secondary) !important;
           box-shadow: 0 0 0 2px var(--texfina-secondary-alpha) !important;
           outline: none !important;
         }
-        
+
         .p-select-label {
           color: var(--texfina-text-primary) !important;
           font-size: 14px !important;
           font-weight: 500 !important;
           padding: 8px 12px !important;
         }
-        
+
         .p-select-dropdown {
           color: var(--texfina-text-secondary) !important;
           width: 32px !important;
-          
+
           .p-select-dropdown-icon {
             font-size: 12px !important;
           }
@@ -745,15 +746,13 @@
   }
 }
 
-
-
 /* Responsive Design */
 @media (max-width: 768px) {
   .prime-table-card {
     border-radius: 8px;
     margin: 0 -4px;
   }
-  
+
   .prime-table-card {
     ::ng-deep {
       .p-paginator {
@@ -761,50 +760,50 @@
         flex-direction: column;
         gap: 0.5rem;
         justify-content: center;
-        
+
         .p-paginator-current {
           font-size: 0.75rem;
           text-align: center;
           margin: 0 0 0.25rem 0;
           order: 2;
         }
-        
+
         .p-paginator-pages {
           order: 1;
-          
+
           .p-paginator-page {
             min-width: 1.75rem;
             height: 1.75rem;
             font-size: 0.75rem;
           }
         }
-        
+
         .p-paginator-first,
         .p-paginator-prev,
         .p-paginator-next,
         .p-paginator-last {
           min-width: 1.75rem;
           height: 1.75rem;
-          
+
           .p-paginator-icon {
             font-size: 0.625rem;
           }
         }
-        
+
         .p-dropdown {
           min-height: 1.75rem;
           min-width: 3.5rem;
           order: 0;
           margin-bottom: 0.25rem;
-          
+
           .p-dropdown-label {
             padding: 0.25rem 0.375rem;
             font-size: 0.75rem;
           }
-          
+
           .p-dropdown-trigger {
             width: 1.5rem;
-            
+
             .p-dropdown-trigger-icon {
               font-size: 0.625rem;
             }
@@ -813,46 +812,45 @@
       }
     }
   }
-  
+
   .table-header {
     flex-direction: column;
     gap: 12px;
     padding: 12px 16px;
-    
+
     .global-filter {
       max-width: none;
     }
   }
-  
+
   .action-buttons {
     gap: 2px;
-    
+
     ::ng-deep .p-button {
       width: 24px;
       height: 24px;
-      
+
       .p-button-icon {
         font-size: 12px;
       }
     }
   }
-  
+
   .badge-texfina {
     padding: 2px 6px;
     font-size: 9px;
     border-radius: 8px;
   }
-  
+
   .timestamp-cell {
     .fecha-text {
       font-size: 10px;
     }
-    
+
     .hora-text {
       font-size: 9px;
     }
   }
-  
 }
 
 /* Skeleton Loading Styles */
@@ -888,23 +886,24 @@
 /* Override PrimeNG skeleton styles for better appearance */
 ::ng-deep {
   .p-skeleton {
-    background: linear-gradient(90deg, 
-      rgba(240, 240, 240, 0.8) 25%, 
-      rgba(245, 245, 245, 0.9) 50%, 
+    background: linear-gradient(
+      90deg,
+      rgba(240, 240, 240, 0.8) 25%,
+      rgba(245, 245, 245, 0.9) 50%,
       rgba(240, 240, 240, 0.8) 75%
     ) !important;
     background-size: 200% 100% !important;
     animation: skeleton-loading 1.5s infinite !important;
     border-radius: 4px !important;
-    
+
     &.mb-1 {
       margin-bottom: 2px !important;
     }
-    
+
     &.mb-2 {
       margin-bottom: 4px !important;
     }
-    
+
     &.mr-1 {
       margin-right: 4px !important;
     }
@@ -927,5 +926,95 @@
 .skeleton-actions-container {
   [aria-hidden="true"] {
     pointer-events: none;
+  }
+}
+
+/* =================================================================== */
+/* FIX DROPDOWN DE ACCIONES EN TABLA - OVERFLOW GLOBAL */
+/* =================================================================== */
+
+// Fix global para todos los overlays de PrimeNG en tablas
+:host {
+  overflow: visible !important;
+}
+
+.prime-table-card {
+  overflow: visible !important;
+
+  ::ng-deep {
+    .p-datatable {
+      overflow: visible !important;
+
+      .p-datatable-wrapper {
+        overflow: visible !important;
+      }
+
+      .p-datatable-tbody {
+        overflow: visible !important;
+      }
+
+      .p-datatable-tbody > tr {
+        overflow: visible !important;
+      }
+
+      .p-datatable-tbody > tr > td {
+        overflow: visible !important;
+      }
+    }
+  }
+}
+
+// Global PrimeNG overlay z-index fix
+::ng-deep {
+  .p-component-overlay,
+  .p-overlay,
+  .p-menu-overlay,
+  .p-select-overlay,
+  .p-dropdown-overlay {
+    z-index: 99999 !important;
+  }
+
+  .p-overlay-mask {
+    z-index: 99998 !important;
+  }
+
+  // Button overlay dropdown fix
+  .p-button-overlay {
+    z-index: 99999 !important;
+  }
+}
+
+// Menu overlay specific fixes
+.p-menu {
+  z-index: 99999 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+  border: 2px solid var(--texfina-primary) !important;
+  border-radius: 12px !important;
+
+  .p-menu-list {
+    padding: 8px !important;
+
+    .p-menuitem {
+      margin: 2px 0 !important;
+
+      .p-menuitem-link {
+        padding: 12px 16px !important;
+        border-radius: 8px !important;
+        color: #374151 !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
+
+        &:hover {
+          background: rgba(var(--texfina-primary-rgb), 0.12) !important;
+          color: var(--texfina-primary) !important;
+          transform: translateX(4px) !important;
+        }
+
+        .p-menuitem-icon {
+          margin-right: 8px !important;
+          color: inherit !important;
+        }
+      }
+    }
   }
 }
