@@ -3,7 +3,7 @@
   "name": "texfina-web",
   "public": false,
   "buildCommand": "chmod +x build.sh && ./build.sh",
-  "outputDirectory": "dist/texfina-web",
+  "outputDirectory": "dist/texfina-web/browser",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": null,
   "rewrites": [

@@ -67,7 +67,7 @@ npm run test
 ### vercel.json
 - Framework: null (custom build)
 - Build Command: `chmod +x build.sh && ./build.sh`
-- Output Directory: `dist/texfina-web`
+- Output Directory: `dist/texfina-web/browser`
 - Install Command: `npm install --legacy-peer-deps`
 
 ### angular.json
