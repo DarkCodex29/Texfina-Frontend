@@ -72,6 +72,8 @@ export class RolesComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Rol>([]);
   estadisticas: Estadistica[] = [];
   filtroGeneralForm: FormGroup;
+  filtrosColumnaForm: FormGroup;
+  filtrosColumnaHabilitados = false;
   dropdownExportAbierto = false;
   isLoading = false;
   hasError = false;
@@ -85,6 +87,14 @@ export class RolesComponent implements OnInit, OnDestroy {
   ) {
     this.filtroGeneralForm = this.fb.group({
       busquedaGeneral: [''],
+    });
+
+    this.filtrosColumnaForm = this.fb.group({
+      codigo: [''],
+      rol: [''],
+      usuarios: [''],
+      permisos: [''],
+      estado: [''],
     });
   }
 
@@ -127,38 +137,42 @@ export class RolesComponent implements OnInit, OnDestroy {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       this.roles = [
-    {
-      id_rol: 'ADMIN',
+        {
+          id_rol: 'ADMIN',
           nombre: 'Administrador',
-      descripcion: 'Administrador del sistema con acceso completo',
-      activo: true,
-    },
-    {
-      id_rol: 'SUPERVISOR',
+          descripcion: 'Administrador del sistema con acceso completo',
+          activo: true,
+        },
+        {
+          id_rol: 'SUPERVISOR',
           nombre: 'Supervisor',
-      descripcion: 'Supervisor de operaciones con permisos avanzados',
-      activo: true,
-    },
-    {
-      id_rol: 'OPERARIO',
+          descripcion: 'Supervisor de operaciones con permisos avanzados',
+          activo: true,
+        },
+        {
+          id_rol: 'OPERARIO',
           nombre: 'Operario',
-      descripcion: 'Operario con permisos básicos de gestión',
-      activo: true,
-    },
-    {
-      id_rol: 'CONSULTOR',
+          descripcion: 'Operario con permisos básicos de gestión',
+          activo: true,
+        },
+        {
+          id_rol: 'CONSULTOR',
           nombre: 'Consultor',
-      descripcion: 'Consultor con permisos de solo lectura',
-      activo: false,
-    },
+          descripcion: 'Consultor con permisos de solo lectura',
+          activo: false,
+        },
         {
           id_rol: 'INVITADO',
           nombre: 'Invitado',
           descripcion: 'Usuario con acceso limitado temporal',
           activo: false,
         },
-      ];
-
+      ].map((r) => ({
+        id_rol: r.id_rol || '',
+        nombre: r.nombre || '',
+        descripcion: r.descripcion || '',
+        activo: r.activo ?? false,
+      }));
       this.dataSource.data = [...this.roles];
       this.isLoading = false;
     } catch (error) {
@@ -220,6 +234,17 @@ export class RolesComponent implements OnInit, OnDestroy {
 
   limpiarFiltroGeneral(): void {
     this.filtroGeneralForm.get('busquedaGeneral')?.setValue('');
+  }
+
+  limpiarFiltrosColumna(): void {
+    this.filtrosColumnaForm.reset({
+      codigo: '',
+      rol: '',
+      usuarios: '',
+      permisos: '',
+      estado: '',
+    });
+    this.dataSource.data = [...this.roles];
   }
 
   formatearTexto(texto?: string): string {

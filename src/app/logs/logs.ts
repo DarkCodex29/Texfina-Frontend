@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
+import { PrimeDataTableComponent, TableColumn, TableAction, TableState } from '../shared/components/prime-data-table/prime-data-table.component';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -18,6 +19,8 @@ import {
   ConfiguracionCargaMasiva,
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
 
 interface LogEvento {
   id: number;
@@ -29,6 +32,7 @@ interface LogEvento {
   modulo: string;
   tabla_afectada: string;
   timestamp: string;
+  [key: string]: string | number | undefined;
 }
 
 @Component({
@@ -44,11 +48,108 @@ interface LogEvento {
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatPaginatorModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './logs.html',
   styleUrl: './logs.scss',
 })
 export class LogsComponent implements OnInit {
+  // Configuración del DataTable
+  tableColumns: TableColumn[] = [
+    {
+      key: 'id',
+      title: 'ID',
+      type: 'badge',
+      sortable: true,
+      filterable: true,
+      width: '90px',
+      icon: 'pi pi-hashtag'
+    },
+    {
+      key: 'timestamp',
+      title: 'Fecha/Hora',
+      type: 'date',
+      sortable: true,
+      filterable: true,
+      width: '160px',
+      icon: 'pi pi-calendar-clock'
+    },
+    {
+      key: 'usuario',
+      title: 'Usuario',
+      type: 'user',
+      sortable: true,
+      filterable: true,
+      width: '220px',
+      icon: 'pi pi-user'
+    },
+    {
+      key: 'accion',
+      title: 'Acción',
+      type: 'action',
+      sortable: true,
+      filterable: true,
+      width: '180px',
+      icon: 'pi pi-bolt'
+    },
+    {
+      key: 'modulo',
+      title: 'Módulo',
+      type: 'module',
+      sortable: true,
+      filterable: true,
+      width: '140px',
+      icon: 'pi pi-building'
+    },
+    {
+      key: 'ip_origen',
+      title: 'IP Origen',
+      type: 'ip',
+      sortable: true,
+      filterable: true,
+      width: '130px',
+      icon: 'pi pi-server'
+    },
+    {
+      key: 'descripcion',
+      title: 'Descripción',
+      type: 'description',
+      sortable: false,
+      filterable: true,
+      width: '300px',
+      icon: 'pi pi-info-circle'
+    }
+  ];
+
+  tableActions: TableAction[] = [
+    {
+      icon: 'pi pi-eye',
+      tooltip: 'Ver detalle del log',
+      action: 'view',
+      color: 'primary'
+    },
+    {
+      icon: 'pi pi-file-export',
+      tooltip: 'Exportar log',
+      action: 'export',
+      color: 'secondary'
+    },
+    {
+      icon: 'pi pi-trash',
+      tooltip: 'Eliminar log',
+      action: 'delete',
+      color: 'danger'
+    }
+  ];
+
+  tableState: TableState = {
+    loading: false,
+    error: false,
+    empty: false,
+    filteredEmpty: false
+  };
+
+  // Propiedades existentes
   displayedColumns: string[] = [
     'id',
     'timestamp',
@@ -124,173 +225,163 @@ export class LogsComponent implements OnInit {
   }
 
   cargarDatos(): void {
+    this.tableState = { ...this.tableState, loading: true, error: false };
     this.cargando = true;
     this.error = null;
-
-    setTimeout(() => {
-      try {
-        this.logs = [
-          {
-            id: 1,
-            id_usuario: 1,
-            usuario: 'admin@texfina.com',
-            accion: 'LOGIN_SUCCESS',
-            descripcion: 'Usuario autenticado exitosamente',
-            ip_origen: '192.168.1.100',
-            modulo: 'AUTENTICACIÓN',
-            tabla_afectada: 'USUARIO',
-            timestamp: '2024-01-20T10:30:25',
-          },
-          {
-            id: 2,
-            id_usuario: 2,
-            usuario: 'operador@texfina.com',
-            accion: 'CREATE_ALMACEN',
-            descripcion: 'Almacén Principal creado exitosamente',
-            ip_origen: '192.168.1.101',
-            modulo: 'ALMACENES',
-            tabla_afectada: 'ALMACEN',
-            timestamp: '2024-01-20T11:45:10',
-          },
-          {
-            id: 3,
-            id_usuario: 1,
-            usuario: 'admin@texfina.com',
-            accion: 'UPDATE_STOCK',
-            descripcion: 'Stock actualizado: Material MT-001 (+50 unidades)',
-            ip_origen: '192.168.1.100',
-            modulo: 'MATERIALES',
-            tabla_afectada: 'STOCK',
-            timestamp: '2024-01-20T14:20:33',
-          },
-          {
-            id: 4,
-            id_usuario: 3,
-            usuario: 'supervisor@texfina.com',
-            accion: 'DELETE_PROVIDER',
-            descripcion: 'Proveedor ACME Corp eliminado del sistema',
-            ip_origen: '192.168.1.102',
-            modulo: 'PROVEEDORES',
-            tabla_afectada: 'PROVEEDOR',
-            timestamp: '2024-01-20T15:15:42',
-          },
-          {
-            id: 5,
-            id_usuario: 2,
-            usuario: 'operador@texfina.com',
-            accion: 'GENERATE_REPORT',
-            descripcion: 'Reporte mensual de inventario generado',
-            ip_origen: '192.168.1.101',
-            modulo: 'REPORTES',
-            tabla_afectada: 'REPORTE',
-            timestamp: '2024-01-20T16:30:15',
-          },
-          {
-            id: 6,
-            id_usuario: 4,
-            usuario: 'jefe.almacen@texfina.com',
-            accion: 'CREATE_LOTE',
-            descripcion: 'Nuevo lote L-2024-001 registrado',
-            ip_origen: '192.168.1.103',
-            modulo: 'LOTES',
-            tabla_afectada: 'LOTE',
-            timestamp: '2024-01-20T17:45:20',
-          },
-          {
-            id: 7,
-            id_usuario: 1,
-            usuario: 'admin@texfina.com',
-            accion: 'UPDATE_USER',
-            descripcion: 'Permisos de usuario operador actualizados',
-            ip_origen: '192.168.1.100',
-            modulo: 'USUARIOS',
-            tabla_afectada: 'USUARIO',
-            timestamp: '2024-01-20T18:00:05',
-          },
-          {
-            id: 8,
-            id_usuario: 2,
-            usuario: 'operador@texfina.com',
-            accion: 'CONSUMO_MATERIAL',
-            descripcion: 'Consumo registrado: 25kg Material MT-002',
-            ip_origen: '192.168.1.101',
-            modulo: 'CONSUMOS',
-            tabla_afectada: 'CONSUMO',
-            timestamp: '2024-01-20T19:12:40',
-          },
-          {
-            id: 9,
-            id_usuario: 5,
-            usuario: 'calidad@texfina.com',
-            accion: 'APPROVE_INGRESO',
-            descripcion: 'Ingreso aprobado: Orden compra OC-2024-015',
-            ip_origen: '192.168.1.104',
-            modulo: 'INGRESOS',
-            tabla_afectada: 'INGRESO',
-            timestamp: '2024-01-20T20:30:18',
-          },
-          {
-            id: 10,
-            id_usuario: 3,
-            usuario: 'supervisor@texfina.com',
-            accion: 'BACKUP_DATABASE',
-            descripcion: 'Respaldo automático de base de datos completado',
-            ip_origen: '127.0.0.1',
-            modulo: 'SISTEMA',
-            tabla_afectada: 'SISTEMA',
-            timestamp: '2024-01-20T22:00:00',
-          },
-        ];
-
-        this.dataSource.data = [...this.logs];
-        this.cargando = false;
-      } catch (error) {
-        this.error = 'Error al cargar los logs del sistema';
-        this.cargando = false;
-      }
-    }, 1000);
+    this.logs = [
+      {
+        id: 1,
+        id_usuario: 1,
+        usuario: 'admin@texfina.com',
+        accion: 'LOGIN_SUCCESS',
+        descripcion: 'Usuario autenticado exitosamente',
+        ip_origen: '192.168.1.100',
+        modulo: 'AUTENTICACIÓN',
+        tabla_afectada: 'USUARIO',
+        timestamp: '2024-01-20T10:30:25',
+      },
+      {
+        id: 2,
+        id_usuario: 2,
+        usuario: 'operador@texfina.com',
+        accion: 'CREATE_ALMACEN',
+        descripcion: 'Almacén Principal creado exitosamente',
+        ip_origen: '192.168.1.101',
+        modulo: 'ALMACENES',
+        tabla_afectada: 'ALMACEN',
+        timestamp: '2024-01-20T11:45:10',
+      },
+      {
+        id: 3,
+        id_usuario: 1,
+        usuario: 'admin@texfina.com',
+        accion: 'UPDATE_STOCK',
+        descripcion: 'Stock actualizado: Material MT-001 (+50 unidades)',
+        ip_origen: '192.168.1.100',
+        modulo: 'MATERIALES',
+        tabla_afectada: 'STOCK',
+        timestamp: '2024-01-20T14:20:33',
+      },
+      {
+        id: 4,
+        id_usuario: 3,
+        usuario: 'supervisor@texfina.com',
+        accion: 'DELETE_PROVIDER',
+        descripcion: 'Proveedor ACME Corp eliminado del sistema',
+        ip_origen: '192.168.1.102',
+        modulo: 'PROVEEDORES',
+        tabla_afectada: 'PROVEEDOR',
+        timestamp: '2024-01-20T15:15:42',
+      },
+      {
+        id: 5,
+        id_usuario: 2,
+        usuario: 'operador@texfina.com',
+        accion: 'GENERATE_REPORT',
+        descripcion: 'Reporte mensual de inventario generado',
+        ip_origen: '192.168.1.101',
+        modulo: 'REPORTES',
+        tabla_afectada: 'REPORTE',
+        timestamp: '2024-01-20T16:30:15',
+      },
+      {
+        id: 6,
+        id_usuario: 4,
+        usuario: 'jefe.almacen@texfina.com',
+        accion: 'CREATE_LOTE',
+        descripcion: 'Nuevo lote L-2024-001 registrado',
+        ip_origen: '192.168.1.103',
+        modulo: 'LOTES',
+        tabla_afectada: 'LOTE',
+        timestamp: '2024-01-20T17:45:20',
+      },
+      {
+        id: 7,
+        id_usuario: 1,
+        usuario: 'admin@texfina.com',
+        accion: 'LOGOUT',
+        descripcion: 'Usuario cerró sesión',
+        ip_origen: '192.168.1.100',
+        modulo: 'AUTENTICACIÓN',
+        tabla_afectada: 'USUARIO',
+        timestamp: '2024-01-20T18:00:00',
+      },
+    ];
+    this.dataSource.data = [...this.logs];
+    this.tableState = { 
+      ...this.tableState, 
+      loading: false, 
+      empty: this.logs.length === 0,
+      filteredEmpty: false
+    };
+    this.cargando = false;
   }
 
   aplicarFiltroGeneral(): void {
-    const busqueda = this.filtroGeneralForm.get('busquedaGeneral')?.value || '';
-
-    if (!busqueda) {
-      this.dataSource.data = this.logs;
-      return;
-    }
-
-    const filtrados = this.logs.filter(
-      (log) =>
-        log.accion?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        log.descripcion?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        log.modulo?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        log.ip_origen?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        log.usuario?.toLowerCase().includes(busqueda.toLowerCase())
-    );
-
-    this.dataSource.data = filtrados;
+    const valor =
+      this.filtroGeneralForm.get('busquedaGeneral')?.value?.toLowerCase() || '';
+    this.dataSource.data = this.logs.filter((log) => {
+      return (
+        log.usuario?.toLowerCase().includes(valor) ||
+        log.accion?.toLowerCase().includes(valor) ||
+        log.descripcion?.toLowerCase().includes(valor) ||
+        log.modulo?.toLowerCase().includes(valor) ||
+        log.ip_origen?.toLowerCase().includes(valor)
+      );
+    });
   }
 
   limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.patchValue({ busquedaGeneral: '' });
+    this.filtroGeneralForm.reset({ busquedaGeneral: '' });
+    this.aplicarFiltroGeneral();
   }
 
   limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
+    this.filtrosColumnaForm.reset({
+      id: '',
+      timestamp: '',
+      usuario: '',
+      accion: '',
+      modulo: '',
+      ip_origen: '',
+    });
+    this.dataSource.data = [...this.logs];
   }
 
   eliminar(log: LogEvento): void {
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar el log #${this.formatearCodigo(log.id)}?`
-    );
-    if (confirmacion) {
-      console.log('Eliminar log:', log);
-      this.cargarDatos();
-    }
+    // Conectar con modal de confirmación existente
+    this.dialog.open(ConfirmacionDialogComponent, {
+      width: '400px',
+      data: {
+        titulo: 'Confirmar Eliminación',
+        mensaje: `¿Estás seguro de que deseas eliminar el log #${log.id}?`,
+        textoBotonConfirmar: 'Eliminar',
+        textoBotonCancelar: 'Cancelar'
+      }
+    }).afterClosed().subscribe(confirmado => {
+      if (confirmado) {
+        this.logs = this.logs.filter((l) => l.id !== log.id);
+        this.dataSource.data = [...this.logs];
+        // Actualizar estado de la tabla
+        this.tableState = {
+          ...this.tableState,
+          empty: this.logs.length === 0
+        };
+      }
+    });
   }
 
   sortData(sort: Sort | string): void {
-    console.log('Ordenar por:', sort);
+    if (typeof sort === 'string') {
+      this.dataSource.data = [...this.dataSource.data].sort((a, b) => {
+        const aValue = a[sort];
+        const bValue = b[sort];
+        if (aValue === undefined || bValue === undefined) return 0;
+        if (aValue < bValue) return -1;
+        if (aValue > bValue) return 1;
+        return 0;
+      });
+    }
   }
 
   reintentarCarga(): void {
@@ -298,30 +389,11 @@ export class LogsComponent implements OnInit {
   }
 
   agregar(): void {
-    import(
-      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
-    ).then(({ FormularioDialogComponent }) => {
-      import('../shared/configs/logs-config').then(({ LogsConfig }) => {
-        const dialogRef = this.dialog.open(FormularioDialogComponent, {
-          width: '600px',
-          disableClose: true,
-          data: {
-            configuracion: LogsConfig.getConfiguracionFormulario(false),
-          },
-        });
-
-        dialogRef.afterClosed().subscribe((resultado) => {
-          if (resultado) {
-            console.log('Creando log manual:', resultado);
-            this.cargarDatos();
-          }
-        });
-      });
-    });
+    // Aquí iría la lógica para agregar un nuevo log
   }
 
   cargaMasiva(): void {
-    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
+    this.dialog.open(CargaMasivaDialogComponent, {
       width: '600px',
       disableClose: true,
       data: {
@@ -334,23 +406,15 @@ export class LogsComponent implements OnInit {
   }
 
   exportarExcel(): void {
-    try {
-      const config = this.configurarExportacion();
-      this.exportacionService.exportarExcel(config);
-      this.dropdownExportAbierto = false;
-    } catch (error) {
-      console.error('Error al exportar Excel:', error);
-    }
+    const config = this.configurarExportacion();
+    this.exportacionService.exportarExcel(config);
+    this.dropdownExportAbierto = false;
   }
 
   exportarPDF(): void {
-    try {
-      const config = this.configurarExportacion();
-      this.exportacionService.exportarPDF(config);
-      this.dropdownExportAbierto = false;
-    } catch (error) {
-      console.error('Error al exportar PDF:', error);
-    }
+    const config = this.configurarExportacion();
+    this.exportacionService.exportarPDF(config);
+    this.dropdownExportAbierto = false;
   }
 
   toggleDropdownExport(): void {
@@ -358,65 +422,73 @@ export class LogsComponent implements OnInit {
   }
 
   verDetalle(log: LogEvento): void {
-    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
-      ({ DetalleDialogComponent }) => {
-        import('../shared/configs/logs-config').then(({ LogsConfig }) => {
-          const dialogRef = this.dialog.open(DetalleDialogComponent, {
-            width: '800px',
-            disableClose: true,
-            data: {
-              configuracion: LogsConfig.getConfiguracionDetalle(log),
-            },
-          });
-        });
+    // Conectar con modal de detalle existente
+    this.dialog.open(DetalleDialogComponent, {
+      width: '800px',
+      data: {
+        entidad: log,
+        titulo: 'Detalle del Log',
+        campos: [
+          { label: 'ID', valor: log.id },
+          { label: 'Usuario', valor: log.usuario },
+          { label: 'Acción', valor: log.accion },
+          { label: 'Descripción', valor: log.descripcion },
+          { label: 'Módulo', valor: log.modulo },
+          { label: 'IP Origen', valor: log.ip_origen },
+          { label: 'Tabla Afectada', valor: log.tabla_afectada },
+          { label: 'Fecha/Hora', valor: log.timestamp }
+        ]
       }
-    );
+    });
   }
 
+
   formatearCodigo(id?: number): string {
-    if (!id) return '000001';
-    return id.toString().padStart(6, '0');
+    if (!id) return '00001';
+    return id.toString().padStart(5, '0');
   }
 
   formatearTexto(texto?: string): string {
-    return texto && texto.trim() ? texto : '-';
+    if (typeof texto === 'string' && texto.trim().length > 0) {
+      return texto;
+    }
+    return '—';
   }
 
   formatearFecha(fecha: string): string {
-    if (!fecha) return '-';
-    try {
-      return new Date(fecha).toLocaleDateString('es-ES');
-    } catch {
-      return '-';
-    }
+    if (!fecha) return '—';
+    const d = new Date(fecha);
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('es-PE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
   }
 
   formatearHora(fecha: string): string {
-    if (!fecha) return '-';
-    try {
-      return new Date(fecha).toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch {
-      return '-';
-    }
+    if (!fecha) return '—';
+    const d = new Date(fecha);
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleTimeString('es-PE', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
   }
 
   private configurarExportacion(): ConfiguracionExportacion<LogEvento> {
     return {
       entidades: this.dataSource.data,
-      nombreArchivo: 'logs_sistema',
-      nombreEntidad: 'Logs del Sistema',
+      nombreArchivo: 'logs',
+      nombreEntidad: 'Logs',
       columnas: [
         { campo: 'id', titulo: 'ID', formato: 'numero' },
         { campo: 'timestamp', titulo: 'Fecha/Hora', formato: 'fecha' },
         { campo: 'usuario', titulo: 'Usuario', formato: 'texto' },
         { campo: 'accion', titulo: 'Acción', formato: 'texto' },
         { campo: 'modulo', titulo: 'Módulo', formato: 'texto' },
-        { campo: 'descripcion', titulo: 'Descripción', formato: 'texto' },
         { campo: 'ip_origen', titulo: 'IP Origen', formato: 'texto' },
-        { campo: 'tabla_afectada', titulo: 'Tabla Afectada', formato: 'texto' },
       ],
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
@@ -430,13 +502,19 @@ export class LogsComponent implements OnInit {
 
   private configurarCargaMasiva(): ConfiguracionCargaMasiva<LogEvento> {
     return {
-      tipoEntidad: 'logs_sistema',
+      tipoEntidad: 'logs',
       mapeoColumnas: [
         {
-          columnaArchivo: 'ID Usuario',
-          campoEntidad: 'id_usuario',
+          columnaArchivo: 'ID',
+          campoEntidad: 'id',
           obligatorio: true,
           tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Usuario',
+          campoEntidad: 'usuario',
+          obligatorio: true,
+          tipoEsperado: 'texto',
         },
         {
           columnaArchivo: 'Acción',
@@ -445,8 +523,8 @@ export class LogsComponent implements OnInit {
           tipoEsperado: 'texto',
         },
         {
-          columnaArchivo: 'Descripción',
-          campoEntidad: 'descripcion',
+          columnaArchivo: 'Módulo',
+          campoEntidad: 'modulo',
           obligatorio: true,
           tipoEsperado: 'texto',
         },
@@ -457,65 +535,61 @@ export class LogsComponent implements OnInit {
           tipoEsperado: 'texto',
         },
         {
-          columnaArchivo: 'Módulo',
-          campoEntidad: 'modulo',
+          columnaArchivo: 'Fecha/Hora',
+          campoEntidad: 'timestamp',
           obligatorio: true,
-          tipoEsperado: 'texto',
-        },
-        {
-          columnaArchivo: 'Tabla Afectada',
-          campoEntidad: 'tabla_afectada',
-          obligatorio: false,
-          tipoEsperado: 'texto',
+          tipoEsperado: 'fecha',
         },
       ],
       validaciones: [
         {
-          campo: 'accion',
+          campo: 'usuario',
           validador: (valor) => valor && valor.length <= 100,
-          mensajeError: 'La acción debe tener máximo 100 caracteres',
-        },
-        {
-          campo: 'descripcion',
-          validador: (valor) => valor && valor.length <= 500,
-          mensajeError: 'La descripción debe tener máximo 500 caracteres',
+          mensajeError: 'El usuario debe tener máximo 100 caracteres',
         },
       ],
     };
   }
 
-  private descargarPlantillaCargaMasiva(): void {
-    const config = this.configurarCargaMasiva();
-    this.cargaMasivaService.generarPlantilla(config);
-  }
+  private descargarPlantillaCargaMasiva(): void {}
 
-  private procesarArchivoCargaMasiva(archivo: File): void {
-    const config = this.configurarCargaMasiva();
-    this.cargaMasivaService
-      .procesarArchivo(archivo, config)
-      .then((resultado) => {
-        console.log('Archivo procesado:', resultado);
-        if (resultado.exitosa) {
-          this.cargarDatos();
-        }
-      })
-      .catch((error) => {
-        console.error('Error al procesar archivo:', error);
-      });
-  }
+  private procesarArchivoCargaMasiva(archivo: File): void {}
 
   private obtenerFiltrosActivos(): any {
-    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
-    const filtrosColumna = this.filtrosColumnaForm.value;
+    return {};
+  }
 
-    return {
-      busquedaGeneral: filtroGeneral || null,
-      filtrosColumna: Object.keys(filtrosColumna).reduce((acc, key) => {
-        if (filtrosColumna[key]) {
-          acc[key] = filtrosColumna[key];
-        }
-        return acc;
-      }, {} as any),
+  exportarLogIndividual(log: LogEvento): void {
+    console.log('Exportar log individual:', log);
+    // Aquí iría la lógica para exportar un log específico
+  }
+
+  // Métodos para el DataTable
+  handleAction(event: {action: string, item: any}) {
+    switch (event.action) {
+      case 'view':
+        this.verDetalle(event.item);
+        break;
+      case 'export':
+        this.exportarLogIndividual(event.item);
+        break;
+      case 'delete':
+        this.eliminar(event.item);
+        break;
+    }
+  }
+
+  handleSort(event: {column: string, direction: 'asc' | 'desc'}) {
+    console.log('Ordenar:', event);
+    this.sortData(event.column);
+  }
+
+  handleFilters(filters: any) {
+    console.log('Filtros aplicados:', filters);
+    // Los filtros ya se aplican automáticamente en el DataTable
+    this.tableState = {
+      ...this.tableState,
+      filteredEmpty: this.dataSource.data.length === 0 && this.logs.length > 0
     };
   }
 }

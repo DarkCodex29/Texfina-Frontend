@@ -241,7 +241,13 @@ export class AuditoriaComponent implements OnInit {
               '{"cantidad":175,"fecha_ultima_actualizacion":"2024-01-21T20:00:00"}',
           },
         ];
-
+        // Mapear alias para binding correcto
+        this.auditorias = this.auditorias.map((a) => ({
+          ...a,
+          entidad: a.tipo_entidad,
+          fecha: a.fecha_hora,
+          campos: a.campos_modificados,
+        }));
         this.dataSource.data = [...this.auditorias];
         this.cargando = false;
       } catch (error) {

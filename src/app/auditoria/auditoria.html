@@ -164,6 +164,7 @@
 
         <div class="table-container">
           <div *ngIf="hasError" class="error-state">
+            <mat-icon class="error-icon">error_outline</mat-icon>
             <h3 class="error-title text-texfina text-primary">
               Error al cargar datos
             </h3>
@@ -171,11 +172,13 @@
               {{ errorMessage }}
             </p>
             <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
+              <mat-icon>refresh</mat-icon>
               Reintentar
             </button>
           </div>
 
           <div *ngIf="isEmpty" class="empty-state">
+            <mat-icon class="empty-icon">fact_check</mat-icon>
             <h3 class="empty-title text-texfina text-primary">
               No hay registros de auditoría
             </h3>
@@ -183,11 +186,13 @@
               Los registros de auditoría aparecerán aquí automáticamente
             </p>
             <button class="btn-texfina btn-primary" (click)="agregar()">
+              <mat-icon>add</mat-icon>
               Generar Primera Auditoría
             </button>
           </div>
 
           <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
+            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
             <h3 class="filtered-empty-title text-texfina text-primary">
               No se encontraron resultados
             </h3>
@@ -200,6 +205,11 @@
             >
               Limpiar Filtros
             </button>
+          </div>
+
+          <div *ngIf="cargando" class="loading-state">
+            <mat-spinner diameter="50"></mat-spinner>
+            <p class="loading-text text-texfina text-muted">Cargando auditoría...</p>
           </div>
 
           <table mat-table [dataSource]="dataSource" matSort class="data-table">
@@ -271,11 +281,10 @@
               <td
                 mat-cell
                 *matCellDef="let auditoria"
-                class="table-cell table-actions"
+                class="table-cell"
               >
-                <div class="actions-container">
+                <div class="action-buttons">
                   <button
-                    mat-icon-button
                     class="btn-action btn-view"
                     (click)="verDetalle(auditoria)"
                     matTooltip="Ver detalle"
@@ -283,7 +292,6 @@
                     <mat-icon>visibility</mat-icon>
                   </button>
                   <button
-                    mat-icon-button
                     class="btn-action btn-compare"
                     (click)="compararCambios(auditoria)"
                     matTooltip="Comparar cambios"
@@ -291,7 +299,6 @@
                     <mat-icon>compare_arrows</mat-icon>
                   </button>
                   <button
-                    mat-icon-button
                     class="btn-action btn-delete"
                     (click)="eliminar(auditoria)"
                     matTooltip="Eliminar registro"
@@ -302,8 +309,55 @@
               </td>
             </ng-container>
 
+            <!-- Filas de datos reales -->
             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
+
+          <!-- Skeleton superpuesto mientras carga -->
+          <div *ngIf="cargando" class="skeleton-overlay">
+            <table class="skeleton-table">
+              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5, 6]">
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                  <div class="skeleton-line skeleton-subtext"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-badge"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                  <div class="skeleton-line skeleton-subtext"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-text"></div>
+                </td>
+                <td class="table-cell">
+                  <div class="skeleton-line skeleton-actions"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <div class="table-footer">
+        <div class="pagination-info">
+          <span class="text-texfina text-muted">Página 1 de 10</span>
+        </div>
+        <div class="pagination-controls">
+          <button class="pagination-button" disabled>
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button class="pagination-button">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
         </div>
       </div>
     </div>

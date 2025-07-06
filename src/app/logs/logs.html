@@ -34,253 +34,28 @@
       </div>
     </div>
 
-    <div class="filters-card">
-      <div class="filters-content">
-        <form [formGroup]="filtroGeneralForm" class="filters-form">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <input
-                  class="simple-input"
-                  formControlName="busquedaGeneral"
-                  placeholder="Buscar en acción, descripción, módulo, IP..."
-                  type="text"
-                />
-                <button
-                  class="btn-limpiar"
-                  type="button"
-                  (click)="limpiarFiltroGeneral()"
-                  matTooltip="Limpiar búsqueda"
-                >
-                  Limpiar
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+    <!-- Card de filtros eliminada - ahora se usa el filtro integrado en la tabla -->
 
-    <div class="table-card">
-      <div class="table-with-headers">
-        <div class="column-headers">
-          <div class="header-row header-titles">
-            <div class="header-col id-col" (click)="sortData('id')">
-              <span>ID</span>
-            </div>
-            <div
-              class="header-col timestamp-col"
-              (click)="sortData('timestamp')"
-            >
-              <span>Fecha/Hora</span>
-            </div>
-            <div
-              class="header-col usuario-col"
-              (click)="sortData('id_usuario')"
-            >
-              <span>Usuario</span>
-            </div>
-            <div class="header-col accion-col" (click)="sortData('accion')">
-              <span>Acción</span>
-            </div>
-            <div class="header-col modulo-col" (click)="sortData('modulo')">
-              <span>Módulo</span>
-            </div>
-            <div class="header-col ip-col" (click)="sortData('ip_origen')">
-              <span>IP Origen</span>
-            </div>
-            <div class="header-col acciones-col">
-              <span>ACCIONES</span>
-            </div>
-          </div>
-
-          <div
-            class="header-row header-filters"
-            *ngIf="filtrosColumnaHabilitados"
-            [formGroup]="filtrosColumnaForm"
-          >
-            <div class="header-col id-col">
-              <input
-                class="column-filter-input"
-                formControlName="id"
-                placeholder="ID..."
-                type="text"
-              />
-            </div>
-            <div class="header-col timestamp-col">
-              <input
-                class="column-filter-input"
-                formControlName="timestamp"
-                placeholder="Fecha..."
-                type="date"
-              />
-            </div>
-            <div class="header-col usuario-col">
-              <input
-                class="column-filter-input"
-                formControlName="usuario"
-                placeholder="Usuario..."
-                type="text"
-              />
-            </div>
-            <div class="header-col accion-col">
-              <input
-                class="column-filter-input"
-                formControlName="accion"
-                placeholder="Acción..."
-                type="text"
-              />
-            </div>
-            <div class="header-col modulo-col">
-              <input
-                class="column-filter-input"
-                formControlName="modulo"
-                placeholder="Módulo..."
-                type="text"
-              />
-            </div>
-            <div class="header-col ip-col">
-              <input
-                class="column-filter-input"
-                formControlName="ip_origen"
-                placeholder="IP..."
-                type="text"
-              />
-            </div>
-            <div class="header-col acciones-col">
-              <button
-                class="btn-clear-column-filters"
-                type="button"
-                (click)="limpiarFiltrosColumna()"
-                matTooltip="Limpiar filtros de columna"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <div *ngIf="hasError" class="error-state">
-            <h3 class="error-title text-texfina text-primary">
-              Error al cargar datos
-            </h3>
-            <p class="error-subtitle text-texfina text-muted">
-              {{ errorMessage }}
-            </p>
-            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
-              Reintentar
-            </button>
-          </div>
-
-          <div *ngIf="isEmpty" class="empty-state">
-            <h3 class="empty-title text-texfina text-primary">
-              No hay logs registrados
-            </h3>
-            <p class="empty-subtitle text-texfina text-muted">
-              Los logs del sistema aparecerán aquí automáticamente
-            </p>
-            <button class="btn-texfina btn-primary" (click)="agregar()">
-              Agregar Primer Log
-            </button>
-          </div>
-
-          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
-            <h3 class="filtered-empty-title text-texfina text-primary">
-              No se encontraron resultados
-            </h3>
-            <p class="filtered-empty-subtitle text-texfina text-muted">
-              Intenta ajustar los filtros o limpiar la búsqueda
-            </p>
-            <button
-              class="btn-texfina btn-secondary"
-              (click)="limpiarFiltroGeneral()"
-            >
-              Limpiar Filtros
-            </button>
-          </div>
-
-          <table mat-table [dataSource]="dataSource" matSort class="data-table">
-            <ng-container matColumnDef="id">
-              <td mat-cell *matCellDef="let log" class="table-cell">
-                <span class="codigo-cell">{{ formatearCodigo(log.id) }}</span>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="timestamp">
-              <td mat-cell *matCellDef="let log" class="table-cell">
-                <div class="timestamp-cell">
-                  <div class="fecha-text">
-                    {{ formatearFecha(log.timestamp) }}
-                  </div>
-                  <div class="hora-text">
-                    {{ formatearHora(log.timestamp) }}
-                  </div>
-                </div>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="usuario">
-              <td mat-cell *matCellDef="let log" class="table-cell">
-                <span class="usuario-name"
-                  >{{ formatearTexto(log.usuario) }}</span
-                >
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="accion">
-              <td mat-cell *matCellDef="let log" class="table-cell">
-                <span class="accion-text"
-                  >{{ formatearTexto(log.accion) }}</span
-                >
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="modulo">
-              <td mat-cell *matCellDef="let log" class="table-cell">
-                <span class="modulo-text"
-                  >{{ formatearTexto(log.modulo) }}</span
-                >
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="ip_origen">
-              <td mat-cell *matCellDef="let log" class="table-cell">
-                <span class="ip-text">{{ formatearTexto(log.ip_origen) }}</span>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="acciones">
-              <td
-                mat-cell
-                *matCellDef="let log"
-                class="table-cell table-actions"
-              >
-                <div class="actions-container">
-                  <button
-                    mat-icon-button
-                    class="btn-action btn-view"
-                    (click)="verDetalle(log)"
-                    matTooltip="Ver detalle"
-                  >
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                  <button
-                    mat-icon-button
-                    class="btn-action btn-delete"
-                    (click)="eliminar(log)"
-                    matTooltip="Eliminar log"
-                  >
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-          </table>
-        </div>
-      </div>
-    </div>
+    <!-- PrimeNG Data Table -->
+    <app-prime-data-table
+      [columns]="tableColumns"
+      [data]="logs"
+      [actions]="tableActions"
+      [state]="tableState"
+      [showGlobalFilter]="true"
+      [showColumnFilters]="true"
+      [showPagination]="true"
+      [pageSize]="10"
+      [actionsPinned]="true"
+      emptyIcon="history"
+      emptyTitle="No hay logs registrados"
+      emptySubtitle="Los eventos y actividades del sistema aparecerán aquí automáticamente"
+      emptyActionText="Registrar Primer Log"
+      (actionClicked)="handleAction($event)"
+      (sortChanged)="handleSort($event)"
+      (filtersChanged)="handleFilters($event)"
+      (retryClicked)="reintentarCarga()"
+      (addNewClicked)="agregar()"
+    ></app-prime-data-table>
   </div>
 </div>

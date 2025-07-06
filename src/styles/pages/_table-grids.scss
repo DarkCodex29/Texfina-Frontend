@@ -110,6 +110,30 @@ $grid-configurations: (
     ),
     min-width: 1100px,
   ),
+  logs: (
+    columns: (
+      0.8fr 1.4fr 2fr 1.5fr 1.2fr 1.2fr 1fr,
+    ),
+    tablet: (
+      0.7fr 1.3fr 1.8fr 1.3fr 1.1fr 1.1fr 0.9fr,
+    ),
+    mobile: (
+      0.6fr 1.2fr 1.6fr 1.2fr 1fr 1fr 0.8fr,
+    ),
+    min-width: 900px,
+  ),
+  auditoria: (
+    columns: (
+      0.8fr 1.4fr 2fr 1.8fr 1.2fr 1fr,
+    ),
+    tablet: (
+      0.7fr 1.3fr 1.8fr 1.6fr 1.1fr 0.9fr,
+    ),
+    mobile: (
+      0.6fr 1.2fr 1.6fr 1.4fr 1fr 0.8fr,
+    ),
+    min-width: 850px,
+  ),
 );
 
 @each $page, $config in $grid-configurations {
@@ -215,6 +239,23 @@ $cell-alignments: (
     6: center,
     7: right,
     8: center,
+  ),
+  logs: (
+    1: center,
+    2: center,
+    3: left,
+    4: left,
+    5: center,
+    6: center,
+    7: center,
+  ),
+  auditoria: (
+    1: center,
+    2: center,
+    3: left,
+    4: left,
+    5: center,
+    6: center,
   ),
 );
 
