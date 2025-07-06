@@ -6,11 +6,8 @@ node_modules
 .editorconfig
 .vscode
 
-# Source files (not needed in production)
-src
+# Source files (not needed in production - but keep angular.json and tsconfig.*)
 .eslintrc.json
-angular.json
-tsconfig.*
 karma.conf.js
 
 # Test files

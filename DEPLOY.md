@@ -65,9 +65,9 @@ npm run test
 ## Configuraciones Importantes
 
 ### vercel.json
-- Framework: Angular
-- Build Command: `npm run build`
-- Output Directory: `dist/texfina-web/browser`
+- Framework: null (custom build)
+- Build Command: `chmod +x build.sh && ./build.sh`
+- Output Directory: `dist/texfina-web`
 - Install Command: `npm install --legacy-peer-deps`
 
 ### angular.json

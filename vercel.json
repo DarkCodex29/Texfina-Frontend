@@ -2,10 +2,10 @@
   "version": 2,
   "name": "texfina-web",
   "public": false,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/texfina-web/browser",
+  "buildCommand": "chmod +x build.sh && ./build.sh",
+  "outputDirectory": "dist/texfina-web",
   "installCommand": "npm install --legacy-peer-deps",
-  "framework": "angular",
+  "framework": null,
   "rewrites": [
     {
       "source": "/(.*)",
