@@ -10,420 +10,323 @@
         </p>
       </div>
       <div class="header-actions">
-        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
-          Carga Masiva
-        </button>
-        <div class="dropdown-export">
-          <button
-            class="btn-texfina btn-neutral dropdown-trigger"
-            (click)="toggleDropdownExport()"
-          >
-            Exportar
-          </button>
-          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
-            <button class="dropdown-item" (click)="exportarExcel()">
-              Exportar a Excel
-            </button>
-            <button class="dropdown-item" (click)="exportarPDF()">
-              Exportar a PDF
-            </button>
-          </div>
-        </div>
-        <button
-          class="btn-texfina btn-primary"
-          (click)="guardarConfiguracion()"
+        <p-button
+          label="Guardar Cambios"
           [disabled]="!hayCambios"
-        >
-          Guardar Cambios
-        </button>
+          [loading]="guardandoConfig"
+          (onClick)="guardarConfiguracion()"
+          severity="contrast"
+          icon="pi pi-save"
+        ></p-button>
       </div>
     </div>
 
-    <div class="table-card">
-      <mat-tab-group [(selectedIndex)]="tabActual" class="config-tabs">
-        <mat-tab label="General">
-          <div class="tab-content">
-            <div class="card-texfina">
-              <div class="card-header">
-                <div class="card-title">
-                  <span class="text-texfina text-primary"
-                    >Información de la Empresa</span
-                  >
+    <div class="table-card config-container">
+      <p-tabs [(value)]="activeTab" scrollable>
+        <p-tablist>
+          @for (tab of tabs; track tab.value) {
+            <p-tab [value]="tab.value" class="flex items-center gap-2">
+              <i [class]="tab.icon"></i>
+              <span>{{ tab.title }}</span>
+            </p-tab>
+          }
+        </p-tablist>
+        
+        <p-tabpanels>
+          <!-- Tab General -->
+          <p-tabpanel value="0">
+            <div class="tab-content">
+              <!-- Información de la Empresa -->
+              <div class="config-section">
+                <div class="section-header">
+                  <h3 class="section-title">
+                    <i class="pi pi-building"></i>
+                    Información de la Empresa
+                  </h3>
                 </div>
-              </div>
-              <div class="card-content">
                 <div class="config-grid">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Nombre de la Empresa</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="empresa-nombre"
                       [(ngModel)]="configuracion.empresa.nombre"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="empresa-nombre">Nombre de la Empresa</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>RUC</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="empresa-ruc"
                       [(ngModel)]="configuracion.empresa.ruc"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="empresa-ruc">RUC</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Dirección</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="empresa-direccion"
                       [(ngModel)]="configuracion.empresa.direccion"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="empresa-direccion">Dirección</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Teléfono</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="empresa-telefono"
                       [(ngModel)]="configuracion.empresa.telefono"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="empresa-telefono">Teléfono</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Email</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="empresa-email"
                       type="email"
                       [(ngModel)]="configuracion.empresa.email"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="empresa-email">Email</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Sitio Web</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="empresa-sitio"
                       [(ngModel)]="configuracion.empresa.sitio_web"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="empresa-sitio">Sitio Web</label>
+                  </p-floatlabel>
                 </div>
               </div>
-            </div>
 
-            <div class="card-texfina">
-              <div class="card-header">
-                <div class="card-title">
-                  <span class="text-texfina text-primary"
-                    >Configuración del Sistema</span
-                  >
+              <!-- Configuración del Sistema -->
+              <div class="config-section">
+                <div class="section-header">
+                  <h3 class="section-title">
+                    <i class="pi pi-cog"></i>
+                    Configuración del Sistema
+                  </h3>
                 </div>
-              </div>
-              <div class="card-content">
                 <div class="config-grid">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Zona Horaria</mat-label>
-                    <mat-select
+                  <p-floatlabel>
+                    <p-select 
+                      id="zona-horaria"
+                      [options]="zonaHorariaOpciones"
                       [(ngModel)]="configuracion.sistema.zona_horaria"
-                      (ngModelChange)="marcarCambios()"
-                    >
-                      <mat-option value="America/Lima"
-                        >America/Lima (UTC-5)</mat-option
-                      >
-                      <mat-option value="America/Bogota"
-                        >America/Bogota (UTC-5)</mat-option
-                      >
-                      <mat-option value="America/Mexico_City"
-                        >America/Mexico_City (UTC-6)</mat-option
-                      >
-                    </mat-select>
-                  </mat-form-field>
+                      (onChange)="marcarCambios()"
+                      class="w-full"
+                    ></p-select>
+                    <label for="zona-horaria">Zona Horaria</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Idioma por Defecto</mat-label>
-                    <mat-select
+                  <p-floatlabel>
+                    <p-select 
+                      id="idioma"
+                      [options]="idiomaOpciones"
                       [(ngModel)]="configuracion.sistema.idioma"
-                      (ngModelChange)="marcarCambios()"
-                    >
-                      <mat-option value="es">Español</mat-option>
-                      <mat-option value="en">English</mat-option>
-                      <mat-option value="pt">Português</mat-option>
-                    </mat-select>
-                  </mat-form-field>
+                      (onChange)="marcarCambios()"
+                      class="w-full"
+                    ></p-select>
+                    <label for="idioma">Idioma por Defecto</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Formato de Fecha</mat-label>
-                    <mat-select
+                  <p-floatlabel>
+                    <p-select 
+                      id="formato-fecha"
+                      [options]="formatoFechaOpciones"
                       [(ngModel)]="configuracion.sistema.formato_fecha"
-                      (ngModelChange)="marcarCambios()"
-                    >
-                      <mat-option value="DD/MM/YYYY">DD/MM/YYYY</mat-option>
-                      <mat-option value="MM/DD/YYYY">MM/DD/YYYY</mat-option>
-                      <mat-option value="YYYY-MM-DD">YYYY-MM-DD</mat-option>
-                    </mat-select>
-                  </mat-form-field>
+                      (onChange)="marcarCambios()"
+                      class="w-full"
+                    ></p-select>
+                    <label for="formato-fecha">Formato de Fecha</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Moneda</mat-label>
-                    <mat-select
+                  <p-floatlabel>
+                    <p-select 
+                      id="moneda"
+                      [options]="monedaOpciones"
                       [(ngModel)]="configuracion.sistema.moneda"
-                      (ngModelChange)="marcarCambios()"
-                    >
-                      <mat-option value="PEN">Soles (S/)</mat-option>
-                      <mat-option value="USD">Dólares ($)</mat-option>
-                      <mat-option value="EUR">Euros (€)</mat-option>
-                    </mat-select>
-                  </mat-form-field>
+                      (onChange)="marcarCambios()"
+                      class="w-full"
+                    ></p-select>
+                    <label for="moneda">Moneda</label>
+                  </p-floatlabel>
 
-                  <div class="checkbox-grid">
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.sistema.modo_oscuro"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Modo Oscuro por Defecto
-                    </mat-checkbox>
-
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.sistema.notificaciones_email"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Notificaciones por Email
-                    </mat-checkbox>
-                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </mat-tab>
+          </p-tabpanel>
 
-        <mat-tab label="Inventario">
-          <div class="tab-content">
-            <div class="card-texfina">
-              <div class="card-header">
-                <div class="card-title">
-                  <span class="text-texfina text-primary"
-                    >Configuración de Inventario</span
-                  >
+          <!-- Tab Inventario -->
+          <p-tabpanel value="1">
+            <div class="tab-content">
+              <div class="config-section">
+                <div class="section-header">
+                  <h3 class="section-title">
+                    <i class="pi pi-box"></i>
+                    Configuración de Inventario
+                  </h3>
                 </div>
-              </div>
-              <div class="card-content">
                 <div class="config-grid">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Stock Mínimo por Defecto</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="stock-minimo"
                       type="number"
                       [(ngModel)]="configuracion.inventario.stock_minimo_defecto"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="stock-minimo">Stock Mínimo por Defecto</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Stock Máximo por Defecto</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="stock-maximo"
                       type="number"
                       [(ngModel)]="configuracion.inventario.stock_maximo_defecto"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="stock-maximo">Stock Máximo por Defecto</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Método de Valorización</mat-label>
-                    <mat-select
+                  <p-floatlabel>
+                    <p-select 
+                      id="metodo-valorizacion"
+                      [options]="metodoValorizacionOpciones"
                       [(ngModel)]="configuracion.inventario.metodo_valorizacion"
-                      (ngModelChange)="marcarCambios()"
-                    >
-                      <mat-option value="FIFO"
-                        >FIFO (Primero en Entrar, Primero en Salir)</mat-option
-                      >
-                      <mat-option value="LIFO"
-                        >LIFO (Último en Entrar, Primero en Salir)</mat-option
-                      >
-                      <mat-option value="PROMEDIO"
-                        >Costo Promedio Ponderado</mat-option
-                      >
-                    </mat-select>
-                  </mat-form-field>
+                      (onChange)="marcarCambios()"
+                      class="w-full"
+                    ></p-select>
+                    <label for="metodo-valorizacion">Método de Valorización</label>
+                  </p-floatlabel>
 
-                  <div class="checkbox-grid">
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.inventario.alerta_stock_bajo"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Alertas de Stock Bajo
-                    </mat-checkbox>
-
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.inventario.seguimiento_lotes"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Seguimiento por Lotes
-                    </mat-checkbox>
-
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.inventario.control_fechas_vencimiento"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Control de Fechas de Vencimiento
-                    </mat-checkbox>
-                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </mat-tab>
+          </p-tabpanel>
 
-        <mat-tab label="Usuarios">
-          <div class="tab-content">
-            <div class="card-texfina">
-              <div class="card-header">
-                <div class="card-title">
-                  <span class="text-texfina text-primary"
-                    >Configuración de Usuarios</span
-                  >
+          <!-- Tab Usuarios -->
+          <p-tabpanel value="2">
+            <div class="tab-content">
+              <div class="config-section">
+                <div class="section-header">
+                  <h3 class="section-title">
+                    <i class="pi pi-users"></i>
+                    Configuración de Usuarios
+                  </h3>
                 </div>
-              </div>
-              <div class="card-content">
                 <div class="config-grid">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Días para Expirar Contraseña</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="expiracion-password"
                       type="number"
                       [(ngModel)]="configuracion.usuarios.dias_expiracion_password"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="expiracion-password">Días para Expirar Contraseña</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Máximo Intentos de Login</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="max-intentos"
                       type="number"
                       [(ngModel)]="configuracion.usuarios.max_intentos_login"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="max-intentos">Máximo Intentos de Login</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Duración de Sesión (horas)</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="duracion-sesion"
                       type="number"
                       [(ngModel)]="configuracion.usuarios.duracion_sesion_horas"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="duracion-sesion">Duración de Sesión (horas)</label>
+                  </p-floatlabel>
 
-                  <div class="checkbox-grid">
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.usuarios.autenticacion_doble_factor"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Autenticación de Doble Factor
-                    </mat-checkbox>
-
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.usuarios.bloqueo_automatico"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Bloqueo Automático de Usuarios
-                    </mat-checkbox>
-
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.usuarios.historial_passwords"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Recordar Historial de Contraseñas
-                    </mat-checkbox>
-                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </mat-tab>
+          </p-tabpanel>
 
-        <mat-tab label="Auditoría">
-          <div class="tab-content">
-            <div class="card-texfina">
-              <div class="card-header">
-                <div class="card-title">
-                  <span class="text-texfina text-primary"
-                    >Configuración de Auditoría</span
-                  >
+          <!-- Tab Auditoría -->
+          <p-tabpanel value="3">
+            <div class="tab-content">
+              <div class="config-section">
+                <div class="section-header">
+                  <h3 class="section-title">
+                    <i class="pi pi-shield"></i>
+                    Configuración de Auditoría
+                  </h3>
                 </div>
-              </div>
-              <div class="card-content">
                 <div class="config-grid">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Días de Retención de Logs</mat-label>
-                    <input
-                      matInput
+                  <p-floatlabel>
+                    <input 
+                      pInputText 
+                      id="retencion-logs"
                       type="number"
                       [(ngModel)]="configuracion.auditoria.dias_retencion_logs"
                       (ngModelChange)="marcarCambios()"
+                      class="w-full"
+                      placeholder=" "
                     />
-                  </mat-form-field>
+                    <label for="retencion-logs">Días de Retención de Logs</label>
+                  </p-floatlabel>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Nivel de Log</mat-label>
-                    <mat-select
+                  <p-floatlabel>
+                    <p-select 
+                      id="nivel-log"
+                      [options]="nivelLogOpciones"
                       [(ngModel)]="configuracion.auditoria.nivel_log"
-                      (ngModelChange)="marcarCambios()"
-                    >
-                      <mat-option value="ERROR">Solo Errores</mat-option>
-                      <mat-option value="WARNING"
-                        >Advertencias y Errores</mat-option
-                      >
-                      <mat-option value="INFO"
-                        >Información, Advertencias y Errores</mat-option
-                      >
-                      <mat-option value="DEBUG"
-                        >Todos los Eventos (Debug)</mat-option
-                      >
-                    </mat-select>
-                  </mat-form-field>
+                      (onChange)="marcarCambios()"
+                      class="w-full"
+                    ></p-select>
+                    <label for="nivel-log">Nivel de Log</label>
+                  </p-floatlabel>
 
-                  <div class="checkbox-grid">
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.auditoria.auditoria_activa"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Auditoría Activa
-                    </mat-checkbox>
-
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.auditoria.log_cambios_datos"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Registrar Cambios en Datos
-                    </mat-checkbox>
-
-                    <mat-checkbox
-                      [(ngModel)]="configuracion.auditoria.log_acceso_usuarios"
-                      (ngModelChange)="marcarCambios()"
-                      class="text-texfina text-primary"
-                    >
-                      Registrar Acceso de Usuarios
-                    </mat-checkbox>
-                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
     </div>
   </div>
 </div>

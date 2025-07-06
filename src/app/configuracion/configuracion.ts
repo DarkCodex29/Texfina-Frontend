@@ -4,15 +4,18 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+
+// PrimeNG imports
+import { TabsModule } from 'primeng/tabs';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { CheckboxModule } from 'primeng/checkbox';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { ButtonModule } from 'primeng/button';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -75,12 +78,13 @@ export interface ConfiguracionSistema {
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatCheckboxModule,
     MatSnackBarModule,
+    TabsModule,
+    InputTextModule,
+    SelectModule,
+    CheckboxModule,
+    FloatLabelModule,
+    ButtonModule,
   ],
   templateUrl: './configuracion.html',
   styleUrls: ['./configuracion.scss'],
@@ -133,8 +137,74 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
   configuracionOriginal: ConfiguracionSistema = {} as ConfiguracionSistema;
   hayCambios = false;
   guardandoConfig = false;
-  tabActual = 0;
+  activeTab = '0';
   dropdownExportAbierto = false;
+
+  // Configuración de tabs
+  tabs = [
+    { 
+      value: '0', 
+      title: 'General', 
+      icon: 'pi pi-cog',
+      content: 'Configuración general del sistema y empresa'
+    },
+    { 
+      value: '1', 
+      title: 'Inventario', 
+      icon: 'pi pi-box',
+      content: 'Configuración específica del módulo de inventario'
+    },
+    { 
+      value: '2', 
+      title: 'Usuarios', 
+      icon: 'pi pi-users',
+      content: 'Configuración de seguridad y gestión de usuarios'
+    },
+    { 
+      value: '3', 
+      title: 'Auditoría', 
+      icon: 'pi pi-shield',
+      content: 'Configuración de logs y auditoría del sistema'
+    }
+  ];
+
+  // Opciones para selects
+  zonaHorariaOpciones = [
+    { label: 'America/Lima (UTC-5)', value: 'America/Lima' },
+    { label: 'America/Bogota (UTC-5)', value: 'America/Bogota' },
+    { label: 'America/Mexico_City (UTC-6)', value: 'America/Mexico_City' }
+  ];
+
+  idiomaOpciones = [
+    { label: 'Español', value: 'es' },
+    { label: 'English', value: 'en' },
+    { label: 'Português', value: 'pt' }
+  ];
+
+  formatoFechaOpciones = [
+    { label: 'DD/MM/YYYY', value: 'DD/MM/YYYY' },
+    { label: 'MM/DD/YYYY', value: 'MM/DD/YYYY' },
+    { label: 'YYYY-MM-DD', value: 'YYYY-MM-DD' }
+  ];
+
+  monedaOpciones = [
+    { label: 'Soles (S/)', value: 'PEN' },
+    { label: 'Dólares ($)', value: 'USD' },
+    { label: 'Euros (€)', value: 'EUR' }
+  ];
+
+  metodoValorizacionOpciones = [
+    { label: 'FIFO (Primero en Entrar, Primero en Salir)', value: 'FIFO' },
+    { label: 'LIFO (Último en Entrar, Primero en Salir)', value: 'LIFO' },
+    { label: 'Costo Promedio Ponderado', value: 'PROMEDIO' }
+  ];
+
+  nivelLogOpciones = [
+    { label: 'Solo Errores', value: 'ERROR' },
+    { label: 'Advertencias y Errores', value: 'WARNING' },
+    { label: 'Información, Advertencias y Errores', value: 'INFO' },
+    { label: 'Todos los Eventos (Debug)', value: 'DEBUG' }
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -146,6 +216,10 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarConfiguracion();
+    // Trigger change detection after a short delay to ensure float labels work correctly
+    setTimeout(() => {
+      this.marcarCambios();
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -187,23 +261,23 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     }, 2000);
   }
 
-  resetearTab(tabIndex: number): void {
-    switch (tabIndex) {
-      case 0:
+  resetearTab(tabValue: string): void {
+    switch (tabValue) {
+      case '0':
         this.configuracion.empresa = { ...this.configuracionOriginal.empresa };
         this.configuracion.sistema = { ...this.configuracionOriginal.sistema };
         break;
-      case 1:
+      case '1':
         this.configuracion.inventario = {
           ...this.configuracionOriginal.inventario,
         };
         break;
-      case 2:
+      case '2':
         this.configuracion.usuarios = {
           ...this.configuracionOriginal.usuarios,
         };
         break;
-      case 3:
+      case '3':
         this.configuracion.auditoria = {
           ...this.configuracionOriginal.auditoria,
         };
