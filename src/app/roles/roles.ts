@@ -139,6 +139,12 @@ export class RolesComponent implements OnInit, OnDestroy {
       tooltip: 'Gestionar permisos',
       action: 'permissions',
       color: 'warn'
+    },
+    {
+      icon: 'pi pi-trash',
+      tooltip: 'Eliminar rol',
+      action: 'delete',
+      color: 'danger'
     }
   ];
 
@@ -415,31 +421,196 @@ export class RolesComponent implements OnInit, OnDestroy {
   }
 
   agregar(): void {
-    console.log('Agregar nuevo rol');
+    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(({ FormularioDialogComponent }) => {
+      import('../shared/configs/roles-config').then(({ RolesConfig }) => {
+        const dialogRef = this.dialog.open(FormularioDialogComponent, {
+          width: '600px',
+          disableClose: true,
+          data: {
+            configuracion: RolesConfig.getConfiguracionFormulario(false),
+          },
+        });
+
+        dialogRef.afterClosed().subscribe((resultado) => {
+          if (resultado && resultado.accion === 'guardar') {
+            console.log('Guardando nuevo rol:', resultado.datos);
+            this.guardarRol(resultado.datos).then(() => {
+              this.cargarDatos();
+            });
+          }
+        });
+      });
+    });
   }
 
   verDetalle(rol: Rol): void {
-    console.log('Ver detalle del rol:', rol);
+    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(({ DetalleDialogComponent }) => {
+      import('../shared/configs/roles-config').then(({ RolesConfig }) => {
+        const dialogRef = this.dialog.open(DetalleDialogComponent, {
+          width: '800px',
+          disableClose: true,
+          data: {
+            configuracion: RolesConfig.getConfiguracionDetalle(rol),
+          },
+        });
+      });
+    });
   }
 
   editar(rol: Rol): void {
-    console.log('Editar rol:', rol);
+    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(({ FormularioDialogComponent }) => {
+      import('../shared/configs/roles-config').then(({ RolesConfig }) => {
+        const dialogRef = this.dialog.open(FormularioDialogComponent, {
+          width: '600px',
+          disableClose: true,
+          data: {
+            configuracion: RolesConfig.getConfiguracionFormulario(true, rol),
+          },
+        });
+
+        dialogRef.afterClosed().subscribe((resultado) => {
+          if (resultado && resultado.accion === 'guardar') {
+            console.log('Actualizando rol:', resultado.datos);
+            this.actualizarRol(rol.id_rol, resultado.datos).then(() => {
+              this.cargarDatos();
+            });
+          }
+        });
+      });
+    });
   }
 
   gestionarPermisos(rol: Rol): void {
-    console.log('Gestionar permisos del rol:', rol);
+    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(({ FormularioDialogComponent }) => {
+      const dialogRef = this.dialog.open(FormularioDialogComponent, {
+        width: '800px',
+        disableClose: true,
+        data: {
+          configuracion: {
+            titulo: {
+              agregar: `Gestionar Permisos - ${rol.nombre}`,
+              editar: `Gestionar Permisos - ${rol.nombre}`,
+            },
+            entidad: 'permisos',
+            entidadArticulo: 'los',
+            esEdicion: true,
+            datosIniciales: {
+              id_rol: rol.id_rol,
+              nombre_rol: rol.nombre,
+              permisos_actuales: this.obtenerPermisosRol(rol.id_rol),
+            },
+            filas: [
+              [
+                {
+                  key: 'nombre_rol',
+                  label: 'Rol',
+                  tipo: 'text',
+                  obligatorio: false,
+                  disabled: true,
+                },
+              ],
+              [
+                {
+                  key: 'permisos_dashboard',
+                  label: 'Dashboard',
+                  tipo: 'checkbox-group',
+                  obligatorio: false,
+                  opciones: [
+                    { value: 'dashboard_view', label: 'Ver Dashboard' },
+                    { value: 'dashboard_export', label: 'Exportar Dashboard' },
+                  ],
+                },
+              ],
+              [
+                {
+                  key: 'permisos_inventario',
+                  label: 'Inventario',
+                  tipo: 'checkbox-group',
+                  obligatorio: false,
+                  opciones: [
+                    { value: 'inventario_view', label: 'Ver Inventario' },
+                    { value: 'inventario_create', label: 'Crear Materiales' },
+                    { value: 'inventario_edit', label: 'Editar Materiales' },
+                    { value: 'inventario_delete', label: 'Eliminar Materiales' },
+                    { value: 'inventario_export', label: 'Exportar Inventario' },
+                  ],
+                },
+              ],
+              [
+                {
+                  key: 'permisos_almacenes',
+                  label: 'Almacenes',
+                  tipo: 'checkbox-group',
+                  obligatorio: false,
+                  opciones: [
+                    { value: 'almacenes_view', label: 'Ver Almacenes' },
+                    { value: 'almacenes_create', label: 'Crear Almacenes' },
+                    { value: 'almacenes_edit', label: 'Editar Almacenes' },
+                    { value: 'almacenes_delete', label: 'Eliminar Almacenes' },
+                  ],
+                },
+              ],
+              [
+                {
+                  key: 'permisos_usuarios',
+                  label: 'Usuarios y Roles',
+                  tipo: 'checkbox-group',
+                  obligatorio: false,
+                  opciones: [
+                    { value: 'usuarios_view', label: 'Ver Usuarios' },
+                    { value: 'usuarios_create', label: 'Crear Usuarios' },
+                    { value: 'usuarios_edit', label: 'Editar Usuarios' },
+                    { value: 'usuarios_delete', label: 'Eliminar Usuarios' },
+                    { value: 'roles_manage', label: 'Gestionar Roles' },
+                  ],
+                },
+              ],
+              [
+                {
+                  key: 'permisos_reportes',
+                  label: 'Reportes',
+                  tipo: 'checkbox-group',
+                  obligatorio: false,
+                  opciones: [
+                    { value: 'reportes_view', label: 'Ver Reportes' },
+                    { value: 'reportes_export', label: 'Exportar Reportes' },
+                    { value: 'reportes_advanced', label: 'Reportes Avanzados' },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((resultado) => {
+        if (resultado && resultado.accion === 'guardar') {
+          console.log('Actualizando permisos del rol:', resultado.datos);
+          this.actualizarPermisosRol(rol.id_rol, resultado.datos).then(() => {
+            this.cargarDatos();
+          });
+        }
+      });
+    });
   }
 
   private configurarExportacion(): ConfiguracionExportacion<Rol> {
     return {
-      entidades: this.dataSource.data,
-      nombreArchivo: 'roles',
-      nombreEntidad: 'Roles',
+      entidades: this.dataSource.data.length > 0 ? this.dataSource.data : this.roles,
+      nombreArchivo: 'roles_sistema',
+      nombreEntidad: 'Roles del Sistema',
       columnas: [
-        { campo: 'id_rol', titulo: 'Código', formato: 'texto' },
-        { campo: 'nombre', titulo: 'Nombre', formato: 'texto' },
+        { campo: 'id_rol', titulo: 'Código del Rol', formato: 'texto' },
+        { campo: 'nombre', titulo: 'Nombre del Rol', formato: 'texto' },
         { campo: 'descripcion', titulo: 'Descripción', formato: 'texto' },
-        { campo: 'activo', titulo: 'Estado', formato: 'texto' },
+        { campo: 'usuarios_count', titulo: 'Usuarios Asignados', formato: 'numero' },
+        { campo: 'permisos_count', titulo: 'Permisos Configurados', formato: 'numero' },
+        { 
+          campo: 'activo', 
+          titulo: 'Estado', 
+          formato: 'texto',
+          transformar: (valor: boolean) => valor ? 'Activo' : 'Inactivo'
+        },
       ],
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
@@ -514,21 +685,34 @@ export class RolesComponent implements OnInit, OnDestroy {
 
   exportarExcel(): void {
     try {
-      const config = this.configurarExportacion();
-      this.exportacionService.exportarExcel(config);
+      console.log('📊 Exportando roles a Excel...');
+      console.log('🔍 Datos en dataSource:', this.dataSource.data.length);
+      console.log('🔍 Roles totales:', this.roles.length);
+      
       this.dropdownExportAbierto = false;
+      
+      const config = this.configurarExportacion();
+      console.log('⚙️ Configuración de exportación:', config);
+      
+      this.exportacionService.exportarExcel(config);
+      
+      console.log(`✅ ${this.dataSource.data.length} roles exportados a Excel`);
     } catch (error) {
-      console.error('Error al exportar Excel:', error);
+      console.error('❌ Error al exportar Excel:', error);
     }
   }
 
   exportarPDF(): void {
     try {
+      console.log('📄 Exportando roles a PDF...');
+      this.dropdownExportAbierto = false;
+      
       const config = this.configurarExportacion();
       this.exportacionService.exportarPDF(config);
-      this.dropdownExportAbierto = false;
+      
+      console.log(`✅ ${this.dataSource.data.length} roles exportados a PDF`);
     } catch (error) {
-      console.error('Error al exportar PDF:', error);
+      console.error('❌ Error al exportar PDF:', error);
     }
   }
 
@@ -559,6 +743,111 @@ export class RolesComponent implements OnInit, OnDestroy {
     };
   }
 
+  private async guardarRol(datosRol: any): Promise<void> {
+    console.log('💾 Guardando nuevo rol:', datosRol);
+    
+    // Simular guardado en backend
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Aquí iría la llamada al servicio real
+    // return this.rolesService.crearRol(datosRol);
+    
+    console.log('✅ Rol guardado exitosamente');
+  }
+
+  private async actualizarRol(idRol: string, datosRol: any): Promise<void> {
+    console.log('📝 Actualizando rol:', idRol, datosRol);
+    
+    // Simular actualización en backend
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Aquí iría la llamada al servicio real
+    // return this.rolesService.actualizarRol(idRol, datosRol);
+    
+    console.log('✅ Rol actualizado exitosamente');
+  }
+
+  private async eliminarRol(idRol: string): Promise<void> {
+    console.log('🗑️ Eliminando rol:', idRol);
+    
+    // Simular eliminación en backend
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Aquí iría la llamada al servicio real
+    // return this.rolesService.eliminarRol(idRol);
+    
+    console.log('✅ Rol eliminado exitosamente');
+  }
+
+  private obtenerPermisosRol(idRol: string): any {
+    // Simular obtención de permisos actuales del rol
+    const permisosPorRol: { [key: string]: any } = {
+      ADMIN: {
+        permisos_dashboard: ['dashboard_view', 'dashboard_export'],
+        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit', 'inventario_delete', 'inventario_export'],
+        permisos_almacenes: ['almacenes_view', 'almacenes_create', 'almacenes_edit', 'almacenes_delete'],
+        permisos_usuarios: ['usuarios_view', 'usuarios_create', 'usuarios_edit', 'usuarios_delete', 'roles_manage'],
+        permisos_reportes: ['reportes_view', 'reportes_export', 'reportes_advanced'],
+      },
+      SUPERVISOR: {
+        permisos_dashboard: ['dashboard_view', 'dashboard_export'],
+        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit', 'inventario_export'],
+        permisos_almacenes: ['almacenes_view', 'almacenes_create', 'almacenes_edit'],
+        permisos_usuarios: ['usuarios_view'],
+        permisos_reportes: ['reportes_view', 'reportes_export'],
+      },
+      OPERARIO: {
+        permisos_dashboard: ['dashboard_view'],
+        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit'],
+        permisos_almacenes: ['almacenes_view'],
+        permisos_usuarios: [],
+        permisos_reportes: ['reportes_view'],
+      },
+      CONSULTOR: {
+        permisos_dashboard: ['dashboard_view'],
+        permisos_inventario: ['inventario_view'],
+        permisos_almacenes: ['almacenes_view'],
+        permisos_usuarios: [],
+        permisos_reportes: ['reportes_view'],
+      },
+    };
+
+    return permisosPorRol[idRol] || {};
+  }
+
+  private async actualizarPermisosRol(idRol: string, permisos: any): Promise<void> {
+    console.log('🔒 Actualizando permisos del rol:', idRol, permisos);
+    
+    // Simular actualización en backend
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Aquí iría la llamada al servicio real
+    // return this.rolesService.actualizarPermisos(idRol, permisos);
+    
+    console.log('✅ Permisos actualizados exitosamente');
+  }
+
+  eliminar(rol: Rol): void {
+    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(({ ConfirmacionDialogComponent }) => {
+      import('../shared/configs/roles-config').then(({ RolesConfig }) => {
+        const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+          width: '400px',
+          disableClose: true,
+          data: RolesConfig.eliminarRol(rol),
+        });
+
+        dialogRef.afterClosed().subscribe((confirmado) => {
+          if (confirmado) {
+            console.log('Eliminando rol:', rol);
+            this.eliminarRol(rol.id_rol).then(() => {
+              this.cargarDatos();
+            });
+          }
+        });
+      });
+    });
+  }
+
   // Métodos para el DataTable
   handleAction(event: {action: string, item: any}) {
     switch (event.action) {
@@ -570,6 +859,9 @@ export class RolesComponent implements OnInit, OnDestroy {
         break;
       case 'permissions':
         this.gestionarPermisos(event.item);
+        break;
+      case 'delete':
+        this.eliminar(event.item);
         break;
     }
   }

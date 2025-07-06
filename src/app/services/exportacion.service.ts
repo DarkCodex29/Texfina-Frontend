@@ -17,6 +17,7 @@ export interface ColumnaExportacion {
   titulo: string; // Título para la columna en la exportación
   ancho?: number; // Ancho para PDF (opcional)
   formato?: 'texto' | 'numero' | 'fecha' | 'moneda';
+  transformar?: (valor: any) => string; // Función para transformar el valor
 }
 
 export interface MetadatosExportacion {
@@ -280,6 +281,11 @@ export class ExportacionService {
       return '-';
     }
 
+    // Si hay función de transformación, usarla
+    if (columna.transformar) {
+      return columna.transformar(valor);
+    }
+
     switch (columna.formato) {
       case 'numero':
         return parseFloat(valor) || 0;
@@ -303,6 +309,11 @@ export class ExportacionService {
 
     if (valor === null || valor === undefined) {
       return '-';
+    }
+
+    // Si hay función de transformación, usarla
+    if (columna.transformar) {
+      return columna.transformar(valor);
     }
 
     switch (columna.formato) {

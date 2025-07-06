@@ -448,6 +448,9 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
 
   onGlobalFilter(event: any) {
     this.globalFilterValue = event.target.value;
+    if (this.table) {
+      this.table.filterGlobal(this.globalFilterValue, 'contains');
+    }
   }
 
   onColumnFilter(event: any, field: string) {
@@ -455,8 +458,10 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   clearAllFilters() {
-    // Implementar limpieza de filtros
     this.globalFilterValue = '';
+    if (this.table) {
+      this.table.clear();
+    }
   }
 
 
