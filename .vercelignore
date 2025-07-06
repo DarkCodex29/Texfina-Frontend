@@ -1,0 +1,42 @@
+# Development files
+node_modules
+.angular
+.git
+.gitignore
+.editorconfig
+.vscode
+
+# Source files (not needed in production)
+src
+.eslintrc.json
+angular.json
+tsconfig.*
+karma.conf.js
+
+# Test files
+*.spec.ts
+*.test.ts
+e2e
+
+# Documentation
+*.md
+docs
+
+# Environment files (handled by Vercel)
+.env*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE files
+.idea
+*.swp
+*.swo
+*~
