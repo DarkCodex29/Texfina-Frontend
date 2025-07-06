@@ -1,401 +1,297 @@
-.sidebar {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  border-right: 1px solid var(--texfina-border-light);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
-  overflow: hidden !important;
-  position: relative;
+// Estilos para PrimeNG Drawer Headless con colores de Texfina
+:host ::ng-deep {
+  .p-drawer {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border-right: 1px solid var(--texfina-border-light);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 3px;
-    height: 100%;
-    background: linear-gradient(
-      180deg,
-      var(--texfina-secondary),
-      var(--texfina-primary)
-    );
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(
+        180deg,
+        var(--texfina-secondary),
+        var(--texfina-primary)
+      );
+    }
+  }
+
+  .p-drawer-mask {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
   }
 }
 
-.sidebar-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 64px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--texfina-border-light);
-  flex-shrink: 0;
-  background: linear-gradient(
-    135deg,
-    var(--texfina-secondary),
-    var(--texfina-secondary-dark)
-  );
-  position: relative;
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      var(--texfina-primary),
-      var(--texfina-secondary)
-    );
-  }
-}
-
-.sidebar-logo img {
+// Logo del drawer
+.drawer-logo {
   max-height: 32px;
   max-width: 130px;
   object-fit: contain;
 }
 
-.sidebar-menu {
-  list-style: none;
-  padding: 4px 6px 0 6px;
-  margin: 0;
-  flex: 1;
-  overflow: hidden !important;
-  max-height: calc(100vh - 64px);
-  display: flex;
-  flex-direction: column;
+// Colores de Texfina
+.text-texfina-secondary {
+  color: var(--texfina-secondary) !important;
 }
 
-.sidebar-menu > li {
-  margin: 1px 0;
-  flex-shrink: 0;
+.text-texfina-primary {
+  color: var(--texfina-primary) !important;
 }
 
-.sidebar-menu a {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  color: var(--texfina-text-primary);
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  position: relative;
-  margin: 2px 0;
-
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 0;
-    background: linear-gradient(
-      135deg,
-      var(--texfina-secondary),
-      var(--texfina-secondary-dark)
-    );
-    transition: width 0.3s ease;
-    border-radius: 8px 0 0 8px;
-  }
+.text-texfina-text-primary {
+  color: var(--texfina-text-primary) !important;
 }
 
-.sidebar-menu a.active {
+.text-texfina-text-secondary {
+  color: var(--texfina-text-secondary) !important;
+}
+
+.text-texfina-text-muted {
+  color: var(--texfina-text-muted) !important;
+}
+
+.hover\:bg-texfina-secondary-bg:hover {
+  background: var(--texfina-secondary-bg) !important;
+}
+
+.hover\:bg-texfina-primary-bg:hover {
+  background: var(--texfina-primary-bg) !important;
+}
+
+.hover\:text-texfina-secondary:hover {
+  color: var(--texfina-secondary) !important;
+}
+
+// Estados activos
+.active-link {
   background: linear-gradient(
     135deg,
     var(--texfina-secondary-bg),
     rgba(18, 30, 102, 0.1)
-  );
-  color: var(--texfina-secondary);
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(18, 30, 102, 0.15);
-
-  &::before {
-    width: 4px;
-  }
+  ) !important;
+  color: var(--texfina-secondary) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(18, 30, 102, 0.15) !important;
+  border-left: 4px solid var(--texfina-secondary) !important;
 }
 
-.sidebar-menu a:hover:not(.active) {
-  background: linear-gradient(
-    135deg,
-    var(--texfina-bg-secondary),
-    rgba(18, 30, 102, 0.05)
-  );
-  color: var(--texfina-secondary);
-  transform: translateX(2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-  &::before {
-    width: 2px;
-  }
-}
-
-.sidebar-icon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-  flex-shrink: 0;
-  opacity: 0.8;
-  transition: all 0.3s ease;
-  filter: brightness(0.7);
-}
-
-.sidebar-menu a.active .sidebar-icon {
-  opacity: 1;
-  filter: brightness(1) saturate(1.2);
-  transform: scale(1.05);
-}
-
-.sidebar-menu a:hover .sidebar-icon {
-  opacity: 1;
-  filter: brightness(1) saturate(1.1);
-  transform: scale(1.02);
-}
-
-.sidebar-section .sidebar-icon {
-  filter: brightness(0.6);
-}
-
-.sidebar-section:hover .sidebar-icon,
-.sidebar-section:focus .sidebar-icon {
-  filter: brightness(1) saturate(1.2);
-  transform: scale(1.05);
-}
-
-.sidebar-section {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: var(--texfina-text-primary);
-  user-select: none;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
-  margin: 4px 0;
-  position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 0;
-    background: linear-gradient(
-      135deg,
-      var(--texfina-primary),
-      var(--texfina-primary-dark)
-    );
-    transition: width 0.3s ease;
-    border-radius: 8px 0 0 8px;
-  }
-}
-
-.sidebar-section:hover,
-.sidebar-section:focus {
-  background: linear-gradient(
-    135deg,
-    var(--texfina-primary-bg),
-    rgba(189, 33, 38, 0.1)
-  );
-  color: var(--texfina-primary);
-  transform: translateX(2px);
-  box-shadow: 0 2px 8px rgba(189, 33, 38, 0.15);
-
-  &::before {
-    width: 3px;
-  }
-}
-
-.arrow {
-  margin-left: auto;
-  transition: all 0.3s ease;
-  font-size: 16px;
-  color: var(--texfina-text-secondary);
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-
-.arrow.open {
-  transform: rotate(180deg);
-  color: var(--texfina-primary);
-  opacity: 1;
-}
-
-.sidebar-section:hover .arrow,
-.sidebar-section:focus .arrow {
-  color: var(--texfina-primary);
-  opacity: 1;
-}
-
-.sidebar-submenu {
-  list-style: none;
-  padding: 4px 0 8px 24px;
-  margin: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(248, 250, 252, 0.5),
-    rgba(241, 245, 249, 0.3)
-  );
-  overflow: hidden !important;
-  flex-shrink: 0;
-  border-radius: 0 0 8px 8px;
-  border-left: 2px solid var(--texfina-border-light);
-  margin-left: 12px;
-  position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    left: -2px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: linear-gradient(
-      180deg,
-      var(--texfina-primary),
-      var(--texfina-secondary)
-    );
-    opacity: 0.3;
-  }
-}
-
-.sidebar-submenu li {
-  margin: 2px 0;
-  flex-shrink: 0;
-}
-
-.sidebar-submenu li a {
-  font-size: 0.8rem;
-  font-weight: 400;
-  padding: 8px 12px;
-  color: var(--texfina-text-secondary);
-  border-radius: 6px;
-  overflow: hidden;
-  white-space: nowrap;
-  transition: all 0.3s ease;
-  position: relative;
-  display: block;
-
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 4px;
-    background: var(--texfina-text-secondary);
-    border-radius: 50%;
-    opacity: 0.4;
-    transition: all 0.3s ease;
-  }
-}
-
-.sidebar-submenu li a.active {
-  color: var(--texfina-secondary);
+.active-sublink {
   background: linear-gradient(
     135deg,
     var(--texfina-secondary-bg),
     rgba(18, 30, 102, 0.1)
-  );
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(18, 30, 102, 0.1);
+  ) !important;
+  color: var(--texfina-secondary) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 6px rgba(18, 30, 102, 0.1) !important;
+  border-left: 3px solid var(--texfina-secondary) !important;
+}
 
-  &::before {
-    background: var(--texfina-secondary);
+// Botón de cerrar personalizado
+:host ::ng-deep .close-button-custom {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: var(--texfina-text-primary) !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+  }
+}
+
+// Transiciones suaves
+.transition-colors {
+  transition: all 0.2s ease !important;
+}
+
+.transition-transform {
+  transition: transform 0.2s ease !important;
+}
+
+.rotate-180 {
+  transform: rotate(180deg) !important;
+}
+
+// Animaciones de deslizamiento
+@keyframes slidedown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
     opacity: 1;
-    width: 6px;
-    height: 6px;
+    transform: translateY(0);
   }
 }
 
-.sidebar-submenu li a:hover:not(.active) {
-  color: var(--texfina-text-primary);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.8),
-    rgba(248, 250, 252, 0.9)
-  );
-  transform: translateX(4px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-
-  &::before {
-    background: var(--texfina-primary);
-    opacity: 0.8;
-    width: 5px;
-    height: 5px;
+@keyframes slideup {
+  from {
+    opacity: 1;
+    transform: translateY(0);
   }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.animate-slidedown {
+  animation: slidedown 0.3s ease;
+}
+
+.animate-slideup {
+  animation: slideup 0.3s ease;
+}
+
+// Utilidades de Tailwind personalizadas
+.rounded-border {
+  border-radius: 8px !important;
+}
+
+.flex {
+  display: flex !important;
+}
+
+.flex-col {
+  flex-direction: column !important;
+}
+
+.items-center {
+  align-items: center !important;
+}
+
+.justify-between {
+  justify-content: space-between !important;
+}
+
+.gap-2 {
+  gap: 0.5rem !important;
+}
+
+.p-4 {
+  padding: 1rem !important;
+}
+
+.p-3 {
+  padding: 0.75rem !important;
+}
+
+.px-6 {
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+}
+
+.pt-4 {
+  padding-top: 1rem !important;
+}
+
+.pl-12 {
+  padding-left: 3rem !important;
+}
+
+.mr-3 {
+  margin-right: 0.75rem !important;
+}
+
+.h-full {
+  height: 100% !important;
+}
+
+.h-8 {
+  height: 2rem !important;
+}
+
+.w-8 {
+  width: 2rem !important;
+}
+
+.flex-1 {
+  flex: 1 !important;
+}
+
+.shrink-0 {
+  flex-shrink: 0 !important;
+}
+
+.overflow-y-auto {
+  overflow-y: auto !important;
+}
+
+.overflow-hidden {
+  overflow: hidden !important;
+}
+
+.list-none {
+  list-style: none !important;
+}
+
+.m-0 {
+  margin: 0 !important;
+}
+
+.p-0 {
+  padding: 0 !important;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+.font-medium {
+  font-weight: 500 !important;
+}
+
+.font-semibold {
+  font-weight: 600 !important;
+}
+
+.text-2xl {
+  font-size: 1.5rem !important;
+  line-height: 2rem !important;
+}
+
+.inline-flex {
+  display: inline-flex !important;
+}
+
+.hidden {
+  display: none !important;
 }
 
 // Responsive
-@media (max-width: 800px) {
-  .sidebar {
-    width: 64px;
-    min-width: 64px;
-    padding: 0;
-
-    &::before {
-      width: 2px;
-    }
+@media (max-width: 768px) {
+  :host ::ng-deep .p-drawer {
+    width: 85vw !important;
+    max-width: 320px !important;
   }
 
-  .sidebar-logo {
-    height: 64px;
-    padding: 8px 0;
+  .drawer-logo {
+    max-height: 28px;
+    max-width: 110px;
   }
 
-  .sidebar-logo img {
-    max-width: 40px;
-    max-height: 40px;
+  .text-2xl {
+    font-size: 1.25rem !important;
+    line-height: 1.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :host ::ng-deep .p-drawer {
+    width: 90vw !important;
+    max-width: 280px !important;
   }
 
-  .sidebar-menu a span,
-  .sidebar-section span {
-    display: none;
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
   }
 
-  .sidebar-section {
-    padding: 12px;
-    justify-content: center;
-    margin: 2px 4px;
-  }
-
-  .sidebar-menu a {
-    padding: 12px;
-    justify-content: center;
-    margin: 2px 4px;
-  }
-
-  .sidebar-submenu {
-    display: none;
-  }
-
-  .arrow {
-    display: none;
-  }
-
-  .sidebar-icon {
-    width: 20px;
-    height: 20px;
+  .p-4 {
+    padding: 0.75rem !important;
   }
 }

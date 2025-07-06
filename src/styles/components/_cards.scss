@@ -1,0 +1,257 @@
+// Cards for Texfina
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--texfina-border-light);
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--texfina-border-light);
+  background: var(--texfina-neutral-bg);
+
+  .card-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--texfina-text-primary);
+  }
+
+  .card-subtitle {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.875rem;
+    color: var(--texfina-text-muted);
+  }
+}
+
+.card-content {
+  padding: 1.5rem;
+
+  &.no-padding {
+    padding: 0;
+  }
+
+  &.small-padding {
+    padding: 1rem;
+  }
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--texfina-border-light);
+  background: var(--texfina-neutral-bg);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .btn-texfina {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+// Variantes de tarjetas
+.card-primary {
+  border-color: var(--texfina-primary);
+
+  .card-header {
+    background: var(--texfina-primary-bg);
+    border-bottom-color: var(--texfina-primary);
+  }
+}
+
+.card-secondary {
+  border-color: var(--texfina-secondary);
+
+  .card-header {
+    background: var(--texfina-secondary-bg);
+    border-bottom-color: var(--texfina-secondary);
+  }
+}
+
+.card-success {
+  border-color: var(--texfina-success);
+
+  .card-header {
+    background: rgba(22, 163, 74, 0.1);
+    border-bottom-color: var(--texfina-success);
+  }
+}
+
+// Tarjetas de estadísticas
+.stats-card {
+  @extend .card;
+
+  .stats-content {
+    padding: 1.5rem;
+    text-align: center;
+
+    .stats-icon {
+      font-size: 2.5rem;
+      color: var(--texfina-primary);
+      margin-bottom: 1rem;
+    }
+
+    .stats-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--texfina-text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stats-label {
+      font-size: 0.875rem;
+      color: var(--texfina-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stats-change {
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+
+      &.positive {
+        color: var(--texfina-success);
+      }
+
+      &.negative {
+        color: #dc3545;
+      }
+    }
+  }
+}
+
+// Tarjetas de filtros
+.filters-card {
+  @extend .card;
+  margin-bottom: 1.5rem;
+
+  .filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: var(--texfina-neutral-bg);
+    border-bottom: 1px solid var(--texfina-border-light);
+    cursor: pointer;
+    user-select: none;
+
+    .filters-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--texfina-text-primary);
+    }
+
+    .filters-toggle {
+      color: var(--texfina-text-muted);
+      transition: transform 0.2s ease;
+
+      &.expanded {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .filters-content {
+    padding: 1.5rem;
+    background: var(--texfina-neutral-bg);
+
+    &.collapsed {
+      display: none;
+    }
+  }
+}
+
+// Tarjetas de tabla
+.table-card {
+  @extend .card;
+  overflow: hidden;
+
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: var(--texfina-neutral-bg);
+    border-bottom: 1px solid var(--texfina-border-light);
+
+    .table-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--texfina-text-primary);
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+
+  .table-content {
+    padding: 0;
+    overflow-x: auto;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .card {
+    margin: 0.5rem;
+    border-radius: 6px;
+  }
+
+  .card-header,
+  .card-content,
+  .card-actions {
+    padding: 1rem;
+  }
+
+  .stats-card {
+    .stats-content {
+      padding: 1rem;
+
+      .stats-icon {
+        font-size: 2rem;
+      }
+
+      .stats-value {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .filters-card {
+    .filters-header,
+    .filters-content {
+      padding: 1rem;
+    }
+  }
+
+  .table-card {
+    .table-header {
+      padding: 1rem;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+
+      .table-actions {
+        justify-content: center;
+      }
+    }
+  }
+}

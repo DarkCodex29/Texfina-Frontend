@@ -1,28 +1,62 @@
-.main-toolbar {
-  background: white;
-  color: #212529;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid #e9ecef;
-  height: 64px;
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+// Estilos para PrimeNG Toolbar con colores de Texfina
+:host ::ng-deep {
+  .custom-toolbar {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--texfina-border-light) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    height: 64px !important;
+    padding: 0 1rem !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+
+    .p-toolbar-group-start,
+    .p-toolbar-group-center,
+    .p-toolbar-group-end {
+      display: flex !important;
+      align-items: center !important;
+      gap: 1rem !important;
+    }
+
+    .p-toolbar-group-start {
+      flex: 0 0 auto !important;
+    }
+
+    .p-toolbar-group-center {
+      flex: 1 !important;
+      justify-content: center !important;
+    }
+
+    .p-toolbar-group-end {
+      flex: 0 0 auto !important;
+    }
+  }
 }
 
-.menu-toggle {
+// Botón de menú hamburguesa
+:host ::ng-deep .menu-toggle-button {
   display: none !important;
+  background: transparent !important;
+  border: none !important;
   color: var(--texfina-text-primary) !important;
+
+  &:hover {
+    background: var(--texfina-secondary-bg) !important;
+    color: var(--texfina-secondary) !important;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px var(--texfina-primary-alpha) !important;
+  }
 
   @media (max-width: 800px) {
     display: flex !important;
   }
 }
 
-.toolbar-logos {
+// Contenedor del logo
+.toolbar-logo-container {
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -33,16 +67,69 @@
   width: auto;
   margin: 0;
   padding: 0;
+  object-fit: contain;
 }
 
-.spacer {
-  flex: 1;
+// Breadcrumb personalizado
+:host ::ng-deep .custom-breadcrumb {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+
+  .p-breadcrumb-list {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    .p-breadcrumb-item {
+      .p-breadcrumb-home {
+        background: var(--texfina-secondary-bg) !important;
+        color: var(--texfina-secondary) !important;
+        border-radius: 6px !important;
+        padding: 0.5rem !important;
+        transition: all 0.2s ease !important;
+
+        &:hover {
+          background: var(--texfina-secondary) !important;
+          color: white !important;
+        }
+
+        .p-breadcrumb-icon {
+          color: inherit !important;
+        }
+      }
+
+      .p-breadcrumb-separator {
+        color: var(--texfina-text-muted) !important;
+        margin: 0 0.5rem !important;
+      }
+
+      &.breadcrumb-parent {
+        .p-breadcrumb-label {
+          color: var(--texfina-text-secondary) !important;
+          font-weight: 500 !important;
+        }
+      }
+
+      &.breadcrumb-current {
+        .p-breadcrumb-label {
+          color: var(--texfina-primary) !important;
+          font-weight: 600 !important;
+        }
+      }
+    }
+  }
 }
 
-@media (max-width: 800px) {
-  .main-toolbar {
-    padding: 0 12px;
-    gap: 12px;
+// Responsive
+@media (max-width: 1200px) {
+  :host ::ng-deep .custom-toolbar {
+    padding: 0 0.75rem !important;
+
+    .p-toolbar-group-start,
+    .p-toolbar-group-center,
+    .p-toolbar-group-end {
+      gap: 0.75rem !important;
+    }
   }
 
   .toolbar-logo {
@@ -50,13 +137,55 @@
   }
 }
 
-@media (max-width: 480px) {
-  .main-toolbar {
-    padding: 0 8px;
-    gap: 8px;
+@media (max-width: 800px) {
+  :host ::ng-deep .custom-toolbar {
+    padding: 0 0.5rem !important;
+
+    .p-toolbar-group-start,
+    .p-toolbar-group-center,
+    .p-toolbar-group-end {
+      gap: 0.5rem !important;
+    }
+
+    .p-toolbar-group-center {
+      justify-content: flex-start !important;
+      margin-left: 1rem !important;
+    }
   }
 
   .toolbar-logo {
     height: 28px;
+  }
+
+  // Ocultar breadcrumb en móvil si es muy largo
+  :host ::ng-deep .custom-breadcrumb {
+    .p-breadcrumb-list {
+      .p-breadcrumb-item {
+        &.breadcrumb-parent {
+          display: none !important;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  :host ::ng-deep .custom-toolbar {
+    padding: 0 0.25rem !important;
+
+    .p-toolbar-group-start,
+    .p-toolbar-group-center,
+    .p-toolbar-group-end {
+      gap: 0.25rem !important;
+    }
+  }
+
+  .toolbar-logo {
+    height: 24px;
+  }
+
+  // En móviles muy pequeños, ocultar el breadcrumb completamente
+  :host ::ng-deep .custom-breadcrumb {
+    display: none !important;
   }
 }

@@ -1,205 +1,279 @@
 <div class="page-container">
   <div class="page-content">
+    <!-- Header -->
     <div class="page-header">
       <div class="header-content">
-        <h1 class="page-title">Dashboard</h1>
-        <p class="page-subtitle">
-          Panel de control ejecutivo - Vista general del sistema
+        <h1 class="page-title text-texfina text-primary">
+          <i class="pi pi-chart-bar"></i>
+          Dashboard Analytics
+        </h1>
+        <p class="page-subtitle text-texfina text-muted">
+          Panel de control con métricas y tendencias del inventario
         </p>
       </div>
       <div class="header-actions">
-        <div class="quick-actions-inline">
-          <button class="action-btn" routerLink="/dashboard/insumos">
-            Agregar Insumo
-          </button>
-          <button class="action-btn" routerLink="/dashboard/ingresos">
-            Registrar Ingreso
-          </button>
-          <button class="action-btn" routerLink="/dashboard/consumos">
-            Registrar Consumo
-          </button>
-          <button class="action-btn primary" routerLink="/dashboard/reportes">
-            Ver Reportes
-          </button>
-        </div>
+        <p-button 
+          label="Actualizar Datos" 
+          icon="pi pi-refresh" 
+          [loading]="isLoading"
+          (onClick)="actualizarDashboard()"
+          size="small"
+        ></p-button>
       </div>
     </div>
 
+    <!-- Loading State -->
     <div *ngIf="isLoading" class="loading-container">
       <mat-spinner diameter="40"></mat-spinner>
       <p>Cargando métricas del dashboard...</p>
     </div>
 
+    <!-- Error State -->
     <div *ngIf="hasError && !isLoading" class="error-container">
+      <i class="pi pi-exclamation-triangle"></i>
+      <h3>Error al cargar dashboard</h3>
       <p>{{ errorMessage }}</p>
-      <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
-        Reintentar
-      </button>
+      <p-button 
+        label="Reintentar" 
+        icon="pi pi-refresh" 
+        (onClick)="reintentarCarga()"
+        size="small"
+      ></p-button>
     </div>
 
+    <!-- Dashboard Content -->
     <div *ngIf="!isLoading && !hasError" class="dashboard-content">
+      
+      <!-- KPIs Row -->
       <div class="kpis-section">
-        <h2 class="section-title">Indicadores Clave</h2>
         <div class="kpis-grid">
           <div class="kpi-card primary">
+            <div class="kpi-icon">
+              <i class="pi pi-box"></i>
+            </div>
             <div class="kpi-content">
-              <div class="kpi-value">{{resumen?.totalInsumos || 0}}</div>
+              <div class="kpi-value">{{ formatearNumero(resumen?.totalInsumos) }}</div>
               <div class="kpi-label">Total Insumos</div>
-              <div class="kpi-trend positive">+3.2% vs mes anterior</div>
-            </div>
-          </div>
-
-          <div class="kpi-card secondary">
-            <div class="kpi-content">
-              <div class="kpi-value">
-                {{resumen?.valorInventario | currency:'PEN':'symbol':'1.2-2'}}
+              <div class="kpi-trend positive">
+                <i class="pi pi-arrow-up"></i>
+                +3.2% vs mes anterior
               </div>
-              <div class="kpi-label">Valor Inventario</div>
-              <div class="kpi-trend positive">+1.8% vs mes anterior</div>
-            </div>
-          </div>
-
-          <div class="kpi-card warning">
-            <div class="kpi-content">
-              <div class="kpi-value">{{resumen?.stockCritico || 0}}</div>
-              <div class="kpi-label">Stock Crítico</div>
-              <div class="kpi-trend negative">+5 items esta semana</div>
             </div>
           </div>
 
           <div class="kpi-card success">
+            <div class="kpi-icon">
+              <i class="pi pi-dollar"></i>
+            </div>
             <div class="kpi-content">
-              <div class="kpi-value">95%</div>
-              <div class="kpi-label">Eficiencia Global</div>
-              <div class="kpi-trend positive">+2.1% vs mes anterior</div>
+              <div class="kpi-value">{{ formatearMoneda(resumen?.valorInventario) }}</div>
+              <div class="kpi-label">Valor Inventario</div>
+              <div class="kpi-trend positive">
+                <i class="pi pi-arrow-up"></i>
+                +5.8% vs mes anterior
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card warning">
+            <div class="kpi-icon">
+              <i class="pi pi-exclamation-triangle"></i>
+            </div>
+            <div class="kpi-content">
+              <div class="kpi-value">{{ formatearNumero(resumen?.stockCritico) }}</div>
+              <div class="kpi-label">Stock Crítico</div>
+              <div class="kpi-trend negative">
+                <i class="pi pi-arrow-down"></i>
+                -12% vs mes anterior
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card info">
+            <div class="kpi-icon">
+              <i class="pi pi-users"></i>
+            </div>
+            <div class="kpi-content">
+              <div class="kpi-value">{{ formatearNumero(resumen?.totalProveedores) }}</div>
+              <div class="kpi-label">Proveedores Activos</div>
+              <div class="kpi-trend stable">
+                <i class="pi pi-minus"></i>
+                Sin cambios
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <h2 class="section-title">Estadísticas Detalladas</h2>
-      <div class="stats-grid">
-        <div class="stats-card">
-          <div class="stats-header">
-            <h3>Estado de Almacenes</h3>
-          </div>
-          <div class="stats-content">
-            <div
-              class="almacen-item"
-              *ngFor="let almacen of estadisticasAlmacenes"
-            >
-              <div class="almacen-info">
-                <div class="almacen-nombre">{{almacen.nombre}}</div>
-                <div class="almacen-ubicacion">{{almacen.ubicacion}}</div>
-              </div>
-              <div class="almacen-metrics">
-                <div class="metric-value">{{almacen.cantidadInsumos}}</div>
-                <div class="metric-label">INSUMOS</div>
-              </div>
-              <div class="almacen-status">
-                <div
-                  class="status-indicator"
-                  [ngClass]="'estado-' + almacen.estado.toLowerCase()"
-                ></div>
-                <div
-                  class="status-badge"
-                  [ngClass]="'badge-' + almacen.estado.toLowerCase()"
-                >
-                  {{almacen.estado}}
+      <!-- Charts Section -->
+      <div class="charts-section">
+        
+        <!-- Primera fila de gráficos -->
+        <div class="charts-row">
+          <!-- Gráfico de Inventario por Almacén -->
+          <div class="chart-card">
+            <p-card>
+              <ng-template pTemplate="header">
+                <div class="chart-header">
+                  <h3>
+                    <i class="pi pi-chart-pie"></i>
+                    Distribución de Inventario
+                  </h3>
+                  <span class="chart-subtitle">Por almacén</span>
                 </div>
+              </ng-template>
+              <div class="chart-container pie-chart">
+                <p-chart 
+                  type="doughnut" 
+                  [data]="inventarioChartData" 
+                  [options]="inventarioChartOptions"
+                  ariaLabel="Distribución de inventario por almacén"
+                ></p-chart>
               </div>
-            </div>
+            </p-card>
           </div>
-          <div class="stats-footer">
-            <button class="btn-link">
-              <span>Ver todos los almacenes</span>
-            </button>
+
+          <!-- Gráfico de Tendencia de Stock -->
+          <div class="chart-card large">
+            <p-card>
+              <ng-template pTemplate="header">
+                <div class="chart-header">
+                  <h3>
+                    <i class="pi pi-chart-line"></i>
+                    Tendencia de Stock
+                  </h3>
+                  <span class="chart-subtitle">Últimos 6 meses</span>
+                </div>
+              </ng-template>
+              <div class="chart-container line-chart">
+                <p-chart 
+                  type="line" 
+                  [data]="stockTendenciaData" 
+                  [options]="stockTendenciaOptions"
+                  ariaLabel="Tendencia de stock en los últimos meses"
+                ></p-chart>
+              </div>
+            </p-card>
           </div>
         </div>
 
-        <div class="stats-card">
-          <div class="stats-header">
-            <h3>Top Insumos por Valor</h3>
-          </div>
-          <div class="stats-content">
-            <div
-              class="insumo-item"
-              *ngFor="let insumo of topInsumos; let i = index"
-              [ngClass]="'rank-' + (i + 1)"
-            >
-              <div class="rank-number">{{i + 1}}</div>
-              <div class="insumo-info">
-                <div class="insumo-nombre">{{insumo.nombre}}</div>
-                <div class="insumo-codigo">{{insumo.codigo}}</div>
-              </div>
-              <div class="insumo-metrics">
-                <div class="metric-value">
-                  {{insumo.valorTotal | currency:'PEN':'symbol':'1.0-0'}}
+        <!-- Segunda fila de gráficos -->
+        <div class="charts-row">
+          <!-- Gráfico de Movimientos -->
+          <div class="chart-card">
+            <p-card>
+              <ng-template pTemplate="header">
+                <div class="chart-header">
+                  <h3>
+                    <i class="pi pi-chart-bar"></i>
+                    Movimientos Mensuales
+                  </h3>
+                  <span class="chart-subtitle">Ingresos, salidas y transferencias</span>
                 </div>
-                <div class="metric-label">VALOR</div>
+              </ng-template>
+              <div class="chart-container bar-chart">
+                <p-chart 
+                  type="bar" 
+                  [data]="movimientosBarData" 
+                  [options]="movimientosBarOptions"
+                  ariaLabel="Movimientos mensuales de inventario"
+                ></p-chart>
               </div>
-              <div class="insumo-status">
-                <div class="status-badge badge-activo">ACTIVO</div>
-              </div>
-            </div>
+            </p-card>
           </div>
-          <div class="stats-footer">
-            <button class="btn-link">
-              <span>Ver todos los insumos</span>
-            </button>
+
+          <!-- Gráfico de Top Proveedores -->
+          <div class="chart-card">
+            <p-card>
+              <ng-template pTemplate="header">
+                <div class="chart-header">
+                  <h3>
+                    <i class="pi pi-building"></i>
+                    Top Proveedores
+                  </h3>
+                  <span class="chart-subtitle">Por valor de compras</span>
+                </div>
+              </ng-template>
+              <div class="chart-container horizontal-bar-chart">
+                <p-chart 
+                  type="bar" 
+                  [data]="proveedoresData" 
+                  [options]="proveedoresOptions"
+                  ariaLabel="Top proveedores por valor de compras"
+                ></p-chart>
+              </div>
+            </p-card>
           </div>
         </div>
 
-        <div class="stats-card">
-          <div class="stats-header">
-            <h3>Consumo por Áreas</h3>
-          </div>
-          <div class="stats-content">
-            <div class="consumo-item" *ngFor="let consumo of metricasConsumo">
-              <div class="consumo-info">
-                <div class="area-nombre">{{consumo.area}}</div>
-                <div class="consumo-valor">
-                  {{consumo.consumoMensual | currency:'PEN':'symbol':'1.0-0'}}
+        <!-- Tercera fila de gráficos -->
+        <div class="charts-row">
+          <!-- Gráfico de Consumos por Área -->
+          <div class="chart-card">
+            <p-card>
+              <ng-template pTemplate="header">
+                <div class="chart-header">
+                  <h3>
+                    <i class="pi pi-chart-pie"></i>
+                    Consumos por Área
+                  </h3>
+                  <span class="chart-subtitle">Distribución mensual</span>
                 </div>
+              </ng-template>
+              <div class="chart-container polar-chart">
+                <p-chart 
+                  type="polarArea" 
+                  [data]="consumosPorTipoData" 
+                  [options]="consumosPorTipoOptions"
+                  ariaLabel="Consumos por área de trabajo"
+                ></p-chart>
               </div>
-              <div class="consumo-trend">
-                <div
-                  class="trend-indicator"
-                  [ngClass]="'trend-' + consumo.tendencia.toLowerCase()"
-                >
-                  {{formatearPorcentaje(consumo.porcentajeDiferencia)}}
-                </div>
-              </div>
-            </div>
+            </p-card>
           </div>
-          <div class="stats-footer">
-            <button class="btn-link">
-              <span>Ver análisis completo</span>
-            </button>
-          </div>
-        </div>
 
-        <div class="stats-card critical">
-          <div class="stats-header">
-            <h3>Stock Crítico</h3>
-          </div>
-          <div class="stats-content">
-            <div class="stock-item" *ngFor="let stock of insumosStockBajo">
-              <div class="stock-info">
-                <div class="stock-nombre">{{stock.nombre}}</div>
-                <div class="stock-codigo">{{stock.codigo}}</div>
+          <!-- Panel de Alertas -->
+          <div class="chart-card">
+            <p-card>
+              <ng-template pTemplate="header">
+                <div class="chart-header">
+                  <h3>
+                    <i class="pi pi-bell"></i>
+                    Alertas Recientes
+                  </h3>
+                  <span class="chart-subtitle">{{ alertas.length }} alertas activas</span>
+                </div>
+              </ng-template>
+              <div class="alerts-container">
+                <div *ngFor="let alerta of alertas; let i = index" class="alert-item" [class]="'alert-' + alerta.nivel.toLowerCase()">
+                  <div class="alert-icon">
+                    <i [class]="getAlertIcon(alerta.tipo)"></i>
+                  </div>
+                  <div class="alert-content">
+                    <h4>{{ alerta.titulo }}</h4>
+                    <p>{{ alerta.descripcion }}</p>
+                    <div class="alert-meta">
+                      <span class="alert-time">{{ formatearFecha(alerta.fechaCreacion) }}</span>
+                      <span class="alert-location">{{ alerta.almacen }}</span>
+                    </div>
+                  </div>
+                  <div class="alert-actions">
+                    <p-button 
+                      icon="pi pi-check" 
+                      [text]="true" 
+                      [rounded]="true" 
+                      size="small"
+                      (onClick)="resolverAlerta(alerta)"
+                      pTooltip="Resolver alerta"
+                    ></p-button>
+                  </div>
+                </div>
+                
+                <div *ngIf="alertas.length === 0" class="no-alerts">
+                  <i class="pi pi-check-circle"></i>
+                  <p>No hay alertas activas</p>
+                </div>
               </div>
-              <div class="stock-metrics">
-                <div class="metric-value critical">{{stock.stockActual}}</div>
-                <div class="metric-label">UNIDADES</div>
-              </div>
-              <div class="status-badge badge-critico">CRÍTICO</div>
-            </div>
-          </div>
-          <div class="stats-footer">
-            <button class="btn-link critical">
-              <span>Ver gestión de stock</span>
-            </button>
+            </p-card>
           </div>
         </div>
       </div>

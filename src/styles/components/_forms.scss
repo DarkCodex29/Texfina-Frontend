@@ -1,0 +1,177 @@
+// Forms for Texfina
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 200px;
+
+  @media (max-width: 768px) {
+    min-width: 100%;
+  }
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--texfina-text-primary);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+
+  &.required::after {
+    content: " *";
+    color: var(--texfina-primary);
+  }
+}
+
+.form-input {
+  padding: 0.75rem;
+  border: 1px solid var(--texfina-border-light);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: white;
+  color: var(--texfina-text-primary);
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-primary);
+    box-shadow: 0 0 0 3px var(--texfina-primary-alpha);
+  }
+
+  &:disabled {
+    background: var(--texfina-neutral-bg);
+    color: var(--texfina-text-muted);
+    cursor: not-allowed;
+  }
+
+  &.error {
+    border-color: #dc3545;
+
+    &:focus {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+  }
+}
+
+.form-select {
+  @extend .form-input;
+  cursor: pointer;
+
+  option {
+    padding: 0.5rem;
+  }
+}
+
+.form-textarea {
+  @extend .form-input;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--texfina-primary);
+  }
+
+  label {
+    font-size: 0.875rem;
+    color: var(--texfina-text-primary);
+    cursor: pointer;
+  }
+}
+
+.form-radio {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  input[type="radio"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--texfina-primary);
+  }
+
+  label {
+    font-size: 0.875rem;
+    color: var(--texfina-text-primary);
+    cursor: pointer;
+  }
+}
+
+.form-error {
+  color: #dc3545;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.form-help {
+  color: var(--texfina-text-muted);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--texfina-border-light);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .btn-texfina {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+// Estilos específicos para Angular Material en formularios
+.mat-form-field {
+  width: 100%;
+
+  .mat-form-field-label {
+    color: var(--texfina-text-primary);
+  }
+
+  .mat-form-field-underline {
+    background-color: var(--texfina-border-light);
+  }
+
+  &.mat-focused {
+    .mat-form-field-underline {
+      background-color: var(--texfina-primary);
+    }
+
+    .mat-form-field-label {
+      color: var(--texfina-primary);
+    }
+  }
+}

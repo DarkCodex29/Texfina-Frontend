@@ -39,7 +39,8 @@
               "xlsx",
               "rgbcolor",
               "raf",
-              "core-js"
+              "core-js",
+              "chart.js"
             ]
           },
           "configurations": {
