@@ -1,3 +1,6 @@
+/* ===== LAYOUT OVERRIDES ELIMINADOS USUARIOS ===== */
+/* Se eliminan definiciones locales de .page-container, .page-content, .page-header y .header-actions */
+
 // Variables CSS específicas de Texfina
 :root {
   --texfina-primary: #bd2126;
@@ -29,38 +32,30 @@
 
 // Estructura principal de página
 .page-container {
-  min-height: 100vh;
-  background-color: var(--texfina-neutral-bg);
-  display: flex;
-  flex-direction: column;
+  padding: var(--texfina-spacing-lg) !important;
+  background-color: var(--texfina-bg-secondary) !important;
 }
 
 .page-content {
-  flex: 1;
-  padding: var(--texfina-spacing-xxl);
-  max-width: 100%;
-  overflow-x: auto;
+  padding: 0 !important;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--texfina-spacing-xxl);
-  flex-wrap: wrap;
-  gap: var(--texfina-spacing-lg);
-}
-
-.header-content {
-  flex: 1;
-  min-width: 200px;
+  padding: var(--texfina-spacing-lg) !important;
+  background-color: var(--texfina-bg-primary) !important;
+  border: 1px solid var(--texfina-border-light) !important;
+  box-shadow: var(--texfina-shadow-md) !important;
+  border-radius: var(--texfina-radius-lg) !important;
+  margin-bottom: var(--texfina-spacing-lg) !important;
+  align-items: center !important;
 }
 
 .page-title {
-  margin: 0 0 var(--texfina-spacing-sm) 0;
-  font-size: var(--texfina-font-size-xxl);
-  font-weight: 700;
-  color: var(--texfina-text-primary);
+  font-size: var(--texfina-font-size-3xl) !important;
+  margin: 0 !important;
+  /* color eliminado para respetar clases de título */
 }
 
 .page-subtitle {
@@ -71,10 +66,9 @@
 
 // Header actions
 .header-actions {
-  display: flex;
-  gap: var(--texfina-spacing-md);
-  align-items: center;
-  flex-wrap: nowrap;
+  display: flex !important;
+  gap: var(--texfina-spacing-md) !important;
+  align-items: center !important;
 }
 
 // Estilos de botones Texfina
@@ -642,4 +636,38 @@
   .action-buttons {
     gap: 4px !important;
   }
+}
+
+/* === OVERRIDES FINALES PARA UNIFICAR LAYOUT TEXFINA === */
+.page-container {
+  padding: var(--texfina-spacing-lg) !important;
+  background-color: var(--texfina-bg-secondary) !important;
+}
+
+.page-content {
+  padding: 0 !important;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--texfina-spacing-lg) !important;
+  background-color: var(--texfina-bg-primary) !important;
+  border: 1px solid var(--texfina-border-light) !important;
+  box-shadow: var(--texfina-shadow-md) !important;
+  border-radius: var(--texfina-radius-lg) !important;
+  margin-bottom: var(--texfina-spacing-lg) !important;
+  align-items: center !important;
+}
+
+.page-title {
+  font-size: var(--texfina-font-size-3xl) !important;
+  margin: 0 !important;
+  /* color eliminado para respetar clases de título */
+}
+
+.header-actions {
+  display: flex !important;
+  gap: var(--texfina-spacing-md) !important;
+  align-items: center !important;
 }

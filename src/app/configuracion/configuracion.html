@@ -2,22 +2,17 @@
   <div class="page-content">
     <div class="page-header">
       <div class="header-content">
-        <h1 class="page-title text-texfina text-primary">
-          Configuración del Sistema
-        </h1>
-        <p class="page-subtitle text-texfina text-muted">
-          Gestiona la configuración general y parámetros del sistema
-        </p>
+        <h1 class="page-title text-texfina text-primary">Configuración</h1>
       </div>
       <div class="header-actions">
-        <p-button
-          label="Guardar Cambios"
+        <button
+          class="btn-texfina btn-primary"
           [disabled]="!hayCambios"
-          [loading]="guardandoConfig"
-          (onClick)="guardarConfiguracion()"
-          severity="contrast"
-          icon="pi pi-save"
-        ></p-button>
+          (click)="guardarConfiguracion()"
+        >
+          <mat-icon>save</mat-icon>
+          Guardar Cambios
+        </button>
       </div>
     </div>
 
@@ -25,13 +20,13 @@
       <p-tabs [(value)]="activeTab" scrollable>
         <p-tablist>
           @for (tab of tabs; track tab.value) {
-            <p-tab [value]="tab.value" class="flex items-center gap-2">
-              <i [class]="tab.icon"></i>
-              <span>{{ tab.title }}</span>
-            </p-tab>
+          <p-tab [value]="tab.value" class="flex items-center gap-2">
+            <i [class]="tab.icon"></i>
+            <span>{{ tab.title }}</span>
+          </p-tab>
           }
         </p-tablist>
-        
+
         <p-tabpanels>
           <!-- Tab General -->
           <p-tabpanel value="0">
@@ -46,8 +41,8 @@
                 </div>
                 <div class="config-grid">
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="empresa-nombre"
                       [(ngModel)]="configuracion.empresa.nombre"
                       (ngModelChange)="marcarCambios()"
@@ -58,8 +53,8 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="empresa-ruc"
                       [(ngModel)]="configuracion.empresa.ruc"
                       (ngModelChange)="marcarCambios()"
@@ -70,8 +65,8 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="empresa-direccion"
                       [(ngModel)]="configuracion.empresa.direccion"
                       (ngModelChange)="marcarCambios()"
@@ -82,8 +77,8 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="empresa-telefono"
                       [(ngModel)]="configuracion.empresa.telefono"
                       (ngModelChange)="marcarCambios()"
@@ -94,8 +89,8 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="empresa-email"
                       type="email"
                       [(ngModel)]="configuracion.empresa.email"
@@ -107,8 +102,8 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="empresa-sitio"
                       [(ngModel)]="configuracion.empresa.sitio_web"
                       (ngModelChange)="marcarCambios()"
@@ -130,7 +125,7 @@
                 </div>
                 <div class="config-grid">
                   <p-floatlabel>
-                    <p-select 
+                    <p-select
                       id="zona-horaria"
                       [options]="zonaHorariaOpciones"
                       [(ngModel)]="configuracion.sistema.zona_horaria"
@@ -141,7 +136,7 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <p-select 
+                    <p-select
                       id="idioma"
                       [options]="idiomaOpciones"
                       [(ngModel)]="configuracion.sistema.idioma"
@@ -152,7 +147,7 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <p-select 
+                    <p-select
                       id="formato-fecha"
                       [options]="formatoFechaOpciones"
                       [(ngModel)]="configuracion.sistema.formato_fecha"
@@ -163,7 +158,7 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <p-select 
+                    <p-select
                       id="moneda"
                       [options]="monedaOpciones"
                       [(ngModel)]="configuracion.sistema.moneda"
@@ -172,7 +167,6 @@
                     ></p-select>
                     <label for="moneda">Moneda</label>
                   </p-floatlabel>
-
                 </div>
               </div>
             </div>
@@ -190,8 +184,8 @@
                 </div>
                 <div class="config-grid">
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="stock-minimo"
                       type="number"
                       [(ngModel)]="configuracion.inventario.stock_minimo_defecto"
@@ -203,8 +197,8 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="stock-maximo"
                       type="number"
                       [(ngModel)]="configuracion.inventario.stock_maximo_defecto"
@@ -216,16 +210,17 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <p-select 
+                    <p-select
                       id="metodo-valorizacion"
                       [options]="metodoValorizacionOpciones"
                       [(ngModel)]="configuracion.inventario.metodo_valorizacion"
                       (onChange)="marcarCambios()"
                       class="w-full"
                     ></p-select>
-                    <label for="metodo-valorizacion">Método de Valorización</label>
+                    <label for="metodo-valorizacion"
+                      >Método de Valorización</label
+                    >
                   </p-floatlabel>
-
                 </div>
               </div>
             </div>
@@ -243,8 +238,8 @@
                 </div>
                 <div class="config-grid">
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="expiracion-password"
                       type="number"
                       [(ngModel)]="configuracion.usuarios.dias_expiracion_password"
@@ -252,12 +247,14 @@
                       class="w-full"
                       placeholder=" "
                     />
-                    <label for="expiracion-password">Días para Expirar Contraseña</label>
+                    <label for="expiracion-password"
+                      >Días para Expirar Contraseña</label
+                    >
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="max-intentos"
                       type="number"
                       [(ngModel)]="configuracion.usuarios.max_intentos_login"
@@ -269,8 +266,8 @@
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="duracion-sesion"
                       type="number"
                       [(ngModel)]="configuracion.usuarios.duracion_sesion_horas"
@@ -278,9 +275,10 @@
                       class="w-full"
                       placeholder=" "
                     />
-                    <label for="duracion-sesion">Duración de Sesión (horas)</label>
+                    <label for="duracion-sesion"
+                      >Duración de Sesión (horas)</label
+                    >
                   </p-floatlabel>
-
                 </div>
               </div>
             </div>
@@ -298,8 +296,8 @@
                 </div>
                 <div class="config-grid">
                   <p-floatlabel>
-                    <input 
-                      pInputText 
+                    <input
+                      pInputText
                       id="retencion-logs"
                       type="number"
                       [(ngModel)]="configuracion.auditoria.dias_retencion_logs"
@@ -307,11 +305,13 @@
                       class="w-full"
                       placeholder=" "
                     />
-                    <label for="retencion-logs">Días de Retención de Logs</label>
+                    <label for="retencion-logs"
+                      >Días de Retención de Logs</label
+                    >
                   </p-floatlabel>
 
                   <p-floatlabel>
-                    <p-select 
+                    <p-select
                       id="nivel-log"
                       [options]="nivelLogOpciones"
                       [(ngModel)]="configuracion.auditoria.nivel_log"
@@ -320,7 +320,6 @@
                     ></p-select>
                     <label for="nivel-log">Nivel de Log</label>
                   </p-floatlabel>
-
                 </div>
               </div>
             </div>
