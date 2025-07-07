@@ -378,7 +378,8 @@
 // ============================================================================
 @media (max-width: 768px) {
   .sidebar-wrapper {
-    width: 260px;
+    width: 100%;
+    max-width: 260px;
   }
 
   .sidebar-header {
@@ -396,7 +397,8 @@
 
 @media (max-width: 480px) {
   .sidebar-wrapper {
-    width: 240px;
+    width: 100%;
+    max-width: 240px;
   }
 
   .sidebar-footer {

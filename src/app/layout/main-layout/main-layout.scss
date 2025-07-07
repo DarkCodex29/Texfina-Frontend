@@ -105,7 +105,7 @@
 }
 
 .sidebar-drawer {
-  width: 320px !important;
+  width: 280px !important;
   max-width: 100vw !important;
   background: #ffffff !important;
   box-shadow: none !important;
@@ -190,7 +190,7 @@
     outline: none !important;
     box-shadow: none !important;
   }
-  
+
   .p-drawer-left {
     border: none !important;
     border-right: none !important;
@@ -200,18 +200,18 @@
     outline: none !important;
     box-shadow: none !important;
   }
-  
+
   .p-component {
     border: none !important;
     outline: none !important;
   }
-  
+
   // Eliminar cualquier borde del contenedor drawer
   .p-drawer-mask + .p-drawer {
     border: none !important;
     outline: none !important;
   }
-  
+
   // Asegurar que no haya scrollbars molestos
   .p-drawer-content {
     overflow: hidden !important;
@@ -219,7 +219,7 @@
     -ms-overflow-style: none !important;
     border: none !important;
     outline: none !important;
-    
+
     &::-webkit-scrollbar {
       width: 0px !important;
       background: transparent !important;
@@ -233,7 +233,7 @@
     border: none !important;
     outline: none !important;
   }
-  
+
   .p-drawer-left,
   .p-drawer-right,
   .p-drawer-top,

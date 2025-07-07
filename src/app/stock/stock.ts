@@ -1,54 +1,24 @@
-import {
-  Component,
-  OnInit,
-  AfterViewInit,
-  OnDestroy,
-  ViewChild,
-  HostListener,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-} from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatCardModule } from '@angular/material/card';
-import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Subject, of } from 'rxjs';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  takeUntil,
-  finalize,
-  delay,
-} from 'rxjs/operators';
-import { MaterialService } from '../services/material.service';
+import { Subject, takeUntil, finalize } from 'rxjs';
 import {
   ExportacionService,
   ConfiguracionExportacion,
-  ColumnaExportacion,
 } from '../services/exportacion.service';
 import {
   CargaMasivaService,
   ConfiguracionCargaMasiva,
-  MapeoColumna,
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
-import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
-import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
-import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
-import { StockConfig } from '../shared/configs/stock-config';
+import { PrimeDataTableComponent } from '../shared/components/prime-data-table/prime-data-table.component';
+import {
+  TableColumn,
+  TableAction,
+  TableButtonConfig,
+  TableState,
+} from '../shared/components/prime-data-table/prime-data-table.component';
 
 export interface Stock {
   id_insumo: number;
@@ -90,147 +60,196 @@ export interface Clase {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule,
     MatDialogModule,
-    MatPaginatorModule,
-    MatCardModule,
-    MatSortModule,
     MatTooltipModule,
-    MatProgressSpinnerModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './stock.html',
   styleUrls: ['./stock.scss'],
 })
-export class StockComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatSort) sort!: MatSort;
-
-  stocks: Stock[] = [];
-  dataSource = new MatTableDataSource<Stock>([]);
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosExpanded = true;
-  filtrosColumnaHabilitados = false;
-  filtrosColumnaActivos = false;
-  dropdownExportAbierto = false;
+export class StockComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  isLoading: boolean = false;
-  hasError: boolean = false;
-  errorMessage: string = '';
+  dropdownExportAbierto = false;
+  stocks: Stock[] = [];
 
-  displayedColumns: string[] = [
-    'codigo',
-    'material',
-    'almacen',
-    'clase',
-    'stock',
-    'estado',
-    'valor',
-    'acciones',
+  tableState: TableState = {
+    loading: false,
+    error: false,
+    empty: false,
+    filteredEmpty: false
+  };
+
+  columns: TableColumn[] = [
+    {
+      key: 'codigo_fox',
+      title: 'Código',
+      sortable: true,
+      filterable: true,
+      width: '120px',
+      type: 'text'
+    },
+    {
+      key: 'nombre_material',
+      title: 'Material',
+      sortable: true,
+      filterable: true,
+      width: '200px',
+      type: 'text'
+    },
+    {
+      key: 'nombre_almacen',
+      title: 'Almacén',
+      sortable: true,
+      filterable: true,
+      width: '150px',
+      type: 'text'
+    },
+    {
+      key: 'clase',
+      title: 'Clase',
+      sortable: true,
+      filterable: true,
+      width: '130px',
+      type: 'badge'
+    },
+    {
+      key: 'cantidad_actual',
+      title: 'Stock',
+      sortable: true,
+      filterable: false,
+      width: '100px',
+      type: 'number'
+    },
+    {
+      key: 'estado',
+      title: 'Estado',
+      sortable: true,
+      filterable: true,
+      width: '120px',
+      type: 'badge'
+    },
+    {
+      key: 'valor_total',
+      title: 'Valor Total',
+      sortable: true,
+      filterable: false,
+      width: '120px',
+      type: 'currency'
+    },
+    {
+      key: 'unidad',
+      title: 'Unidad',
+      sortable: false,
+      filterable: true,
+      width: '80px',
+      type: 'text'
+    }
   ];
 
-  get stockFiltrado(): Stock[] {
-    return this.dataSource.data;
-  }
+  actions: TableAction[] = [
+    {
+      action: 'view',
+      tooltip: 'Ver Detalle',
+      icon: 'visibility',
+      color: 'secondary'
+    },
+    {
+      action: 'edit',
+      tooltip: 'Editar',
+      icon: 'edit',
+      color: 'primary'
+    },
+    {
+      action: 'delete',
+      tooltip: 'Eliminar',
+      icon: 'delete',
+      color: 'danger'
+    }
+  ];
 
-  get isEmpty(): boolean {
-    return !this.isLoading && this.stocks.length === 0 && !this.hasError;
-  }
+  buttons: TableButtonConfig[] = [
+    {
+      action: 'add',
+      label: 'Agregar Stock',
+      icon: 'add',
+      color: 'primary'
+    },
+    {
+      action: 'bulk',
+      label: 'Carga Masiva',
+      icon: 'upload_file',
+      color: 'secondary'
+    }
+  ];
 
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      this.dataSource.data.length === 0 &&
-      this.stocks.length > 0
-    );
-  }
+  globalFilterFields: string[] = ['codigo_fox', 'nombre_material', 'nombre_almacen', 'clase', 'unidad', 'estado'];
 
   constructor(
-    private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder,
     private exportacionService: ExportacionService,
     private cargaMasivaService: CargaMasivaService
-  ) {
-    this.filtroGeneralForm = this.fb.group({ busquedaGeneral: [''] });
-    this.filtrosColumnaForm = this.fb.group({
-      codigo: [''],
-      material: [''],
-      almacen: [''],
-      clase: [''],
-      stock: [''],
-      estado: [''],
-      valor: [''],
-    });
-  }
+  ) {}
 
-  ngOnInit() {
-    this.configurarFiltros();
+  ngOnInit(): void {
     this.cargarDatos();
   }
 
-  ngAfterViewInit() {
-    if (this.sort) {
-      this.dataSource.sort = this.sort;
-    }
-  }
-
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  private configurarFiltros() {
-    this.filtroGeneralForm
-      .get('busquedaGeneral')
-      ?.valueChanges.pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(() => {
-        this.aplicarFiltroGeneral();
-      });
-
-    this.filtrosColumnaForm.valueChanges
-      .pipe(debounceTime(300), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltrosColumna();
-        this.verificarFiltrosColumnaActivos();
-      });
+  onActionClick(event: { action: string; item: any }): void {
+    const { action, item } = event;
+    switch (action) {
+      case 'view':
+        this.verDetalle(item);
+        break;
+      case 'edit':
+        this.editar(item);
+        break;
+      case 'delete':
+        this.eliminar(item);
+        break;
+    }
   }
 
-  cargarDatos(): void {
-    this.isLoading = true;
-    this.hasError = false;
-    this.errorMessage = '';
+  onButtonClick(action: string): void {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk':
+        this.cargaMasiva();
+        break;
+    }
+  }
 
-    of(null)
-      .pipe(
-        delay(800),
-        finalize(() => {
-          this.isLoading = false;
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: () => {
-          this.cargarDatosMock();
-          this.aplicarFiltroGeneral();
-        },
-        error: (error: any) => {
-          this.hasError = true;
-          this.errorMessage = 'Error al cargar datos de stock';
-          console.error('Error:', error);
-        },
-      });
+  private updateTableStates(): void {
+    this.tableState.empty = this.stocks.length === 0;
+  }
+
+  private async cargarDatos() {
+    this.tableState.loading = true;
+    this.tableState.error = false;
+    this.tableState.errorMessage = '';
+
+    try {
+      this.cargarDatosMock();
+    } catch (error) {
+      this.tableState.error = true;
+      this.tableState.errorMessage = 'Error al cargar los datos de stock';
+      console.error('Error cargando stock:', error);
+      this.stocks = [];
+    } finally {
+      this.tableState.loading = false;
+      this.updateTableStates();
+    }
+  }
+
+  recargarDatos(): void {
+    this.cargarDatos();
   }
 
   private cargarDatosMock() {
@@ -375,108 +394,7 @@ export class StockComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     ];
 
-    this.dataSource.data = this.stocks;
-  }
-
-  aplicarFiltroGeneral(): void {
-    const filtro =
-      this.filtroGeneralForm.get('busquedaGeneral')?.value?.toLowerCase() || '';
-
-    if (!filtro) {
-      this.dataSource.data = this.stocks;
-      return;
-    }
-
-    this.dataSource.data = this.stocks.filter(
-      (stock) =>
-        stock.codigo_fox.toLowerCase().includes(filtro) ||
-        stock.nombre_material.toLowerCase().includes(filtro) ||
-        stock.nombre_almacen.toLowerCase().includes(filtro) ||
-        stock.clase.toLowerCase().includes(filtro) ||
-        stock.unidad.toLowerCase().includes(filtro) ||
-        stock.estado.toLowerCase().includes(filtro)
-    );
-  }
-
-  private aplicarFiltrosColumna(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    let stockFiltrado = [...this.stocks];
-
-    Object.keys(filtros).forEach((key) => {
-      const valor = filtros[key];
-      if (valor && valor.trim()) {
-        switch (key) {
-          case 'codigo':
-            stockFiltrado = stockFiltrado.filter((s) =>
-              s.codigo_fox.toLowerCase().includes(valor.toLowerCase())
-            );
-            break;
-          case 'material':
-            stockFiltrado = stockFiltrado.filter((s) =>
-              s.nombre_material.toLowerCase().includes(valor.toLowerCase())
-            );
-            break;
-          case 'almacen':
-            stockFiltrado = stockFiltrado.filter((s) =>
-              s.nombre_almacen.toLowerCase().includes(valor.toLowerCase())
-            );
-            break;
-          case 'clase':
-            stockFiltrado = stockFiltrado.filter((s) =>
-              s.clase.toLowerCase().includes(valor.toLowerCase())
-            );
-            break;
-          case 'stock':
-            const stockValue = parseFloat(valor);
-            if (!isNaN(stockValue)) {
-              stockFiltrado = stockFiltrado.filter(
-                (s) => s.cantidad_actual >= stockValue
-              );
-            }
-            break;
-          case 'estado':
-            stockFiltrado = stockFiltrado.filter((s) =>
-              s.estado.toLowerCase().includes(valor.toLowerCase())
-            );
-            break;
-          case 'valor':
-            const valorValue = parseFloat(valor);
-            if (!isNaN(valorValue)) {
-              stockFiltrado = stockFiltrado.filter(
-                (s) => s.valor_total >= valorValue
-              );
-            }
-            break;
-        }
-      }
-    });
-
-    this.dataSource.data = stockFiltrado;
-  }
-
-  private verificarFiltrosColumnaActivos(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    this.filtrosColumnaActivos = Object.values(filtros).some(
-      (valor) => valor && valor.toString().trim()
-    );
-  }
-
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.reset();
-    this.aplicarFiltroGeneral();
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
-    this.aplicarFiltrosColumna();
-    this.verificarFiltrosColumnaActivos();
-  }
-
-  toggleFiltrosColumna(): void {
-    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
-    if (!this.filtrosColumnaHabilitados) {
-      this.limpiarFiltrosColumna();
-    }
+    console.log('✅ Datos mock cargados:', this.stocks.length, 'stocks');
   }
 
   formatearCodigo(codigo: string): string {
@@ -525,73 +443,92 @@ export class StockComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   verDetalle(stock: Stock): void {
-    const configuracion = StockConfig.getConfiguracionDetalle(stock);
-
-    this.dialog.open(DetalleDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: configuracion,
-    });
+    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
+      ({ DetalleDialogComponent }) => {
+        import('../shared/configs/stock-config').then(
+          ({ StockConfig }) => {
+            const dialogRef = this.dialog.open(DetalleDialogComponent, {
+              width: '800px',
+              disableClose: true,
+              data: StockConfig.getConfiguracionDetalle(stock),
+            });
+          }
+        );
+      }
+    );
   }
 
   editar(stock: Stock): void {
-    const configuracion = StockConfig.getConfiguracionFormulario(true, stock);
-
-    const dialogRef = this.dialog.open(FormularioDialogComponent, {
-      width: '600px',
-      disableClose: true,
-      data: configuracion,
-    });
-
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado && resultado.accion === 'guardar') {
-        this.actualizarStock(stock.id_insumo!, resultado.datos).then(() => {
-          this.cargarDatos();
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      import('../shared/configs/stock-config').then(({ StockConfig }) => {
+        const dialogRef = this.dialog.open(FormularioDialogComponent, {
+          width: '600px',
+          disableClose: true,
+          data: StockConfig.getConfiguracionFormulario(true, stock),
         });
-      }
+
+        dialogRef.afterClosed().subscribe((resultado) => {
+          if (resultado?.accion === 'guardar') {
+            console.log('Actualizando stock:', resultado.datos);
+            this.cargarDatos();
+          }
+        });
+      });
     });
   }
 
   eliminar(stock: Stock): void {
-    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
-      width: '400px',
-      disableClose: true,
-      data: StockConfig.eliminarStock(stock),
-    });
-
-    dialogRef.afterClosed().subscribe((confirmado) => {
-      if (confirmado && stock.id_insumo) {
-        console.log('Eliminar stock - Funcionalidad en desarrollo');
-        this.cargarDatos();
+    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(
+      ({ ConfirmacionDialogComponent }) => {
+        const config = {
+          titulo: 'Eliminar Stock',
+          mensaje: `¿Está seguro que desea eliminar el stock de "${stock.nombre_material}"?`,
+          confirmar: 'Eliminar',
+          cancelar: 'Cancelar'
+        };
+        
+        const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+          width: '500px',
+          disableClose: true,
+          data: config,
+        });
+        
+        dialogRef.afterClosed().subscribe((confirmado) => {
+          if (confirmado && stock.id_insumo) {
+            console.log('Eliminar stock:', stock);
+            this.cargarDatos();
+          }
+        });
       }
-    });
+    );
   }
 
   agregar(): void {
-    const configuracion = StockConfig.getConfiguracionFormulario(false);
-
-    const dialogRef = this.dialog.open(FormularioDialogComponent, {
-      width: '600px',
-      disableClose: true,
-      data: configuracion,
-    });
-
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado && resultado.accion === 'guardar') {
-        this.guardarStock(resultado.datos).then(() => {
-          this.cargarDatos();
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      import('../shared/configs/stock-config').then(({ StockConfig }) => {
+        const dialogRef = this.dialog.open(FormularioDialogComponent, {
+          width: '600px',
+          disableClose: true,
+          data: StockConfig.getConfiguracionFormulario(false),
         });
-      }
-    });
-  }
 
-  reintentarCarga(): void {
-    this.cargarDatos();
+        dialogRef.afterClosed().subscribe((resultado) => {
+          if (resultado?.accion === 'guardar') {
+            console.log('Creando stock:', resultado.datos);
+            this.cargarDatos();
+          }
+        });
+      });
+    });
   }
 
   private configurarExportacion(): ConfiguracionExportacion<Stock> {
     return {
-      entidades: this.dataSource.data,
+      entidades: this.stocks,
       nombreArchivo: 'stock',
       nombreEntidad: 'Stock de Inventario',
       columnas: [
@@ -619,7 +556,7 @@ export class StockComponent implements OnInit, AfterViewInit, OnDestroy {
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
         cantidadTotal: this.stocks.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.stocks.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
       },
@@ -771,126 +708,7 @@ export class StockComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  async guardarStock(datos: any): Promise<any> {
-    try {
-      const nuevoStock: Stock = {
-        id_insumo: 0, // Se asignará automáticamente
-        codigo_fox: datos.codigo_fox,
-        nombre: datos.nombre_material,
-        nombre_material: datos.nombre_material,
-        id_almacen: this.obtenerIdAlmacen(datos.nombre_almacen),
-        almacen: datos.nombre_almacen,
-        nombre_almacen: datos.nombre_almacen,
-        id_clase: this.obtenerIdClase(datos.clase),
-        clase: datos.clase,
-        id_unidad: this.obtenerIdUnidad(datos.unidad),
-        unidad: datos.unidad,
-        stock_actual: datos.cantidad_actual,
-        cantidad_actual: datos.cantidad_actual,
-        stock_minimo: datos.stock_minimo || 0,
-        stock_maximo: datos.stock_maximo || 0,
-        costo_unitario: datos.precio_unitario || 0,
-        precio_unitario: datos.precio_unitario || 0,
-        valor_total:
-          (datos.cantidad_actual || 0) * (datos.precio_unitario || 0),
-        fecha_ultimo_movimiento: new Date().toISOString().split('T')[0],
-        estado_stock: this.calcularEstadoStock(
-          datos.cantidad_actual,
-          datos.stock_minimo,
-          datos.stock_maximo
-        ),
-        estado: this.calcularEstadoStock(
-          datos.cantidad_actual,
-          datos.stock_minimo,
-          datos.stock_maximo
-        ),
-      };
-
-      console.log('Stock a crear:', nuevoStock);
-      return Promise.resolve(nuevoStock);
-    } catch (error) {
-      console.error('Error al crear stock:', error);
-      throw error;
-    }
-  }
-
-  async actualizarStock(id: number, datos: any): Promise<any> {
-    try {
-      const stockActualizado: Partial<Stock> = {
-        id_insumo: id,
-        codigo_fox: datos.codigo_fox,
-        nombre: datos.nombre_material,
-        nombre_material: datos.nombre_material,
-        nombre_almacen: datos.nombre_almacen,
-        clase: datos.clase,
-        unidad: datos.unidad,
-        cantidad_actual: datos.cantidad_actual,
-        stock_minimo: datos.stock_minimo || 0,
-        stock_maximo: datos.stock_maximo || 0,
-        precio_unitario: datos.precio_unitario || 0,
-        valor_total:
-          (datos.cantidad_actual || 0) * (datos.precio_unitario || 0),
-        estado: this.calcularEstadoStock(
-          datos.cantidad_actual,
-          datos.stock_minimo,
-          datos.stock_maximo
-        ),
-      };
-
-      console.log('Stock a actualizar:', stockActualizado);
-      return Promise.resolve(stockActualizado);
-    } catch (error) {
-      console.error('Error al actualizar stock:', error);
-      throw error;
-    }
-  }
-
-  private obtenerIdAlmacen(nombreAlmacen: string): number {
-    const almacenes: Record<string, number> = {
-      'Almacén Principal': 1,
-      'Cámara Fría': 2,
-      'Almacén Especiales': 3,
-    };
-    return almacenes[nombreAlmacen] || 1;
-  }
-
-  private obtenerIdClase(nombreClase: string): number {
-    const clases: Record<string, number> = {
-      'Materia Prima': 1,
-      Lácteos: 2,
-      Aditivos: 3,
-      Chocolatería: 4,
-      Condimentos: 5,
-    };
-    return clases[nombreClase] || 1;
-  }
-
-  private obtenerIdUnidad(nombreUnidad: string): number {
-    const unidades: Record<string, number> = {
-      KG: 1,
-      GR: 2,
-      LT: 3,
-      UN: 4,
-    };
-    return unidades[nombreUnidad] || 1;
-  }
-
-  private calcularEstadoStock(
-    actual: number,
-    minimo: number,
-    maximo: number
-  ): 'CRITICO' | 'BAJO' | 'NORMAL' | 'ALTO' {
-    if (!actual || actual === 0) return 'CRITICO';
-    if (actual < minimo) return 'CRITICO';
-    if (actual <= minimo * 1.2) return 'BAJO';
-    if (actual >= maximo * 0.9) return 'ALTO';
-    return 'NORMAL';
-  }
-
   private obtenerFiltrosActivos(): any {
-    return {
-      busquedaGeneral: this.filtroGeneralForm.get('busquedaGeneral')?.value,
-      filtrosColumna: this.filtrosColumnaForm.value,
-    };
+    return {};
   }
 }
