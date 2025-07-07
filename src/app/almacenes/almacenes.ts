@@ -13,16 +13,11 @@ import {
   FormBuilder,
   FormGroup,
 } from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSortModule, MatSort } from '@angular/material/sort';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { PrimeDataTableComponent, TableColumn, TableAction, TableButtonConfig, TableState } from '../shared/components/prime-data-table/prime-data-table.component';
 
 import { MaterialService } from '../services/material.service';
 import { Almacen } from '../models/insumo.model';
@@ -41,7 +36,7 @@ import {
   ConfiguracionCargaMasiva,
   MapeoColumna,
 } from '../services/carga-masiva.service';
-import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
+import { CargaMasivaDialogComponent, CargaMasivaDialogData } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
 import {
   Subject,
   debounceTime,
@@ -56,98 +51,102 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatTableModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
     MatDialogModule,
-    MatSortModule,
-    MatProgressSpinnerModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './almacenes.html',
   styleUrls: ['./almacenes.scss'],
 })
-export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatSort) sort!: MatSort;
-
-  // ============================================================================
-  // PROPIEDADES DE DATOS
-  // ============================================================================
+export class AlmacenesComponent implements OnInit, OnDestroy {
   almacenes: Almacen[] = [];
-  dataSource = new MatTableDataSource<Almacen>([]);
-
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosExpanded = true;
-  filtrosColumnaHabilitados = false;
-  filtrosColumnaActivos = false;
+  dropdownExportAbierto = false;
   private destroy$ = new Subject<void>();
 
-  // ============================================================================
-  // PROPIEDADES DE ESTADO
-  // ============================================================================
-  isLoading = false;
-  hasError = false;
-  errorMessage = '';
-  dropdownExportAbierto: boolean = false;
+  // Estado de la tabla
+  tableState: TableState = {
+    loading: false,
+    error: false,
+    empty: false,
+    filteredEmpty: false
+  };
 
-  // ============================================================================
-  // CONFIGURACIÓN DE TABLA
-  // ============================================================================
-  displayedColumns: string[] = [
-    'id_almacen',
-    'nombre',
-    'ubicacion',
-    'acciones',
+  // Configuración de tabla PrimeNG
+  columns: TableColumn[] = [
+    {
+      key: 'id_almacen',
+      title: 'ID',
+      sortable: true,
+      filterable: true,
+      width: '100px',
+      type: 'badge'
+    },
+    {
+      key: 'nombre',
+      title: 'Nombre',
+      sortable: true,
+      filterable: true,
+      width: '250px'
+    },
+    {
+      key: 'ubicacion',
+      title: 'Ubicación',
+      sortable: true,
+      filterable: true,
+      width: '300px'
+    }
   ];
-
-  get almacenesFiltrados(): Almacen[] {
-    return this.dataSource.data;
-  }
+  actions: TableAction[] = [
+    {
+      tooltip: 'Ver',
+      icon: 'pi pi-eye',
+      action: 'view',
+      color: 'primary'
+    },
+    {
+      tooltip: 'Editar',
+      icon: 'pi pi-pencil',
+      action: 'edit',
+      color: 'primary'
+    },
+    {
+      tooltip: 'Eliminar',
+      icon: 'pi pi-trash',
+      action: 'delete',
+      color: 'warn'
+    }
+  ];
+  buttons: TableButtonConfig[] = [
+    {
+      label: 'Agregar Almacén',
+      icon: 'pi pi-plus',
+      action: 'add',
+      color: 'primary'
+    },
+    {
+      label: 'Carga Masiva',
+      icon: 'pi pi-upload',
+      action: 'bulk-upload',
+      color: 'secondary'
+    }
+  ];
+  globalFilterFields: string[] = ['id_almacen', 'nombre', 'ubicacion'];
 
   get isEmpty(): boolean {
-    return !this.isLoading && this.almacenes.length === 0 && !this.hasError;
-  }
-
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      this.dataSource.data.length === 0 &&
-      this.almacenes.length > 0
-    );
+    return !this.tableState.loading && this.almacenes.length === 0 && !this.tableState.error;
   }
 
   constructor(
     private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder,
     private exportacionService: ExportacionService,
     private cargaMasivaService: CargaMasivaService
-  ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
-    this.filtrosColumnaForm = this.fb.group({
-      idAlmacen: [''],
-      nombre: [''],
-      ubicacion: [''],
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cargarAlmacenes();
-    this.configurarFiltroGeneralEnTiempoReal();
-    this.configurarFiltrosColumnaEnTiempoReal();
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
   }
 
   ngOnDestroy(): void {
@@ -155,186 +154,89 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltroGeneralEnTiempoReal(): void {
-    this.filtroGeneralForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltroGeneral();
-      });
-  }
-
-  configurarFiltrosColumnaEnTiempoReal(): void {
-    this.filtrosColumnaForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltrosColumna();
-      });
-  }
-
   // ============================================================================
-  // MÉTODOS DE INICIALIZACIÓN
+  // MÉTODOS DE CARGA DE DATOS
   // ============================================================================
   cargarAlmacenes(): void {
-    this.isLoading = true;
-    this.hasError = false;
-    this.errorMessage = '';
-
-    console.log('🔄 Iniciando carga de almacenes - isLoading:', this.isLoading);
+    this.tableState = { ...this.tableState, loading: true, error: false };
 
     this.materialService
       .getAlmacenes()
       .pipe(
         delay(1500),
         finalize(() => {
-          this.isLoading = false;
-          console.log('✅ Carga completada - isLoading:', this.isLoading);
+          this.tableState = { ...this.tableState, loading: false };
         }),
         takeUntil(this.destroy$)
       )
       .subscribe({
-        next: (almacenes) => {
-          console.log('📦 Almacenes cargados:', almacenes.length);
+        next: (almacenes: Almacen[]) => {
           this.almacenes = almacenes;
-          this.dataSource.data = [...almacenes];
+          this.tableState = {
+            ...this.tableState,
+            loading: false,
+            empty: almacenes.length === 0,
+            filteredEmpty: false
+          };
         },
-        error: (error) => {
-          console.error('❌ Error al cargar almacenes:', error);
-          this.hasError = true;
-          this.errorMessage =
-            'Error al cargar los almacenes. Por favor, intenta nuevamente.';
-          this.almacenes = [];
-          this.dataSource.data = [];
+        error: (error: any) => {
+          console.error('Error al cargar almacenes:', error);
+          this.tableState = {
+            ...this.tableState,
+            loading: false,
+            error: true,
+            errorMessage: 'Error al cargar los almacenes. Intente nuevamente.'
+          };
         },
       });
   }
 
-  reintentarCarga(): void {
+  recargarDatos(): void {
     this.cargarAlmacenes();
   }
 
   // ============================================================================
-  // MÉTODOS DE FILTROS
+  // MANEJADORES DE ACCIONES DE TABLA
   // ============================================================================
-  aplicarFiltroGeneral(): void {
-    const busqueda = this.filtroGeneralForm
-      .get('busquedaGeneral')
-      ?.value?.trim()
-      .toLowerCase();
 
-    if (!busqueda) {
-      this.dataSource.data = [...this.almacenes];
-      return;
-    }
+  onActionClick(event: { action: string; item: any }): void {
+    const { action, item } = event;
 
-    const almacenesFiltrados = this.almacenes.filter((almacen) => {
-      const id = almacen.id_almacen?.toString() || '';
-      const nombre = almacen.nombre?.toLowerCase() || '';
-      const ubicacion = almacen.ubicacion?.toLowerCase() || '';
-
-      return (
-        id.includes(busqueda) ||
-        nombre.includes(busqueda) ||
-        ubicacion.includes(busqueda)
-      );
-    });
-
-    this.dataSource.data = almacenesFiltrados;
-  }
-
-  aplicarFiltrosColumna(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    let almacenesFiltrados = [...this.almacenes];
-
-    // Filtro por ID Almacén
-    if (filtros.idAlmacen && filtros.idAlmacen.toString().trim()) {
-      const idFiltro = parseInt(filtros.idAlmacen);
-      if (!isNaN(idFiltro)) {
-        almacenesFiltrados = almacenesFiltrados.filter(
-          (almacen) => almacen.id_almacen === idFiltro
-        );
-      }
-    }
-
-    // Filtro por Nombre
-    if (filtros.nombre && filtros.nombre.trim()) {
-      almacenesFiltrados = almacenesFiltrados.filter((almacen) =>
-        almacen.nombre?.toLowerCase().includes(filtros.nombre.toLowerCase())
-      );
-    }
-
-    // Filtro por Ubicación
-    if (filtros.ubicacion && filtros.ubicacion.trim()) {
-      almacenesFiltrados = almacenesFiltrados.filter((almacen) =>
-        almacen.ubicacion
-          ?.toLowerCase()
-          .includes(filtros.ubicacion.toLowerCase())
-      );
-    }
-
-    this.dataSource.data = almacenesFiltrados;
-  }
-
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.reset();
-    this.dataSource.data = [...this.almacenes];
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
-    this.dataSource.data = [...this.almacenes];
-  }
-
-  toggleFiltrosColumna() {
-    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
-    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
-
-    if (this.filtrosColumnaHabilitados) {
-      if (this.filtrosColumnaActivos) {
-        this.limpiarFiltroGeneral();
-      } else {
-        this.limpiarFiltrosColumna();
-      }
+    switch (action) {
+      case 'view':
+        this.verDetalle(item);
+        break;
+      case 'edit':
+        this.editar(item);
+        break;
+      case 'delete':
+        this.eliminar(item);
+        break;
+      default:
+        console.warn(`Acción no reconocida: ${action}`);
     }
   }
 
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent): void {
-    if (event.key === 'F3') {
-      event.preventDefault();
-      this.toggleFiltrosColumna();
+  onButtonClick(action: string): void {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk-upload':
+        this.cargaMasiva();
+        break;
+      default:
+        console.warn(`Acción de botón no reconocida: ${action}`);
     }
   }
 
-  toggleFiltros(): void {
-    this.filtrosExpanded = !this.filtrosExpanded;
-  }
-
-  // ============================================================================
-  // MÉTODOS DE TABLA
-  // ============================================================================
-  sortData(column: string): void {
-    if (this.sort) {
-      // Si ya está ordenado por esta columna, cambiar dirección
-      if (this.sort.active === column) {
-        this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc';
-      } else {
-        // Nueva columna, empezar con ascendente
-        this.sort.active = column;
-        this.sort.direction = 'asc';
-      }
-      this.sort.sortChange.emit({
-        active: this.sort.active,
-        direction: this.sort.direction,
-      });
-    }
-  }
 
   // ============================================================================
   // CONFIGURACIONES SEGÚN REGLA DE ORO
   // ============================================================================
   private configurarExportacion(): ConfiguracionExportacion<Almacen> {
     return {
-      entidades: this.dataSource.data,
+      entidades: this.almacenes,
       nombreArchivo: 'almacenes',
       nombreEntidad: 'Almacenes',
       columnas: [
@@ -345,9 +247,10 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
         cantidadTotal: this.almacenes.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.almacenes.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
+        empresa: 'Texfina'
       },
     };
   }
@@ -385,13 +288,8 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private obtenerFiltrosActivos(): any {
-    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
-    const filtrosColumna = this.filtrosColumnaForm.value;
-
-    return {
-      busquedaGeneral: filtroGeneral || null,
-      ...filtrosColumna,
-    };
+    // TODO: Implementar obtención de filtros activos de la tabla
+    return {};
   }
 
   // ============================================================================
@@ -418,57 +316,85 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cargaMasiva(): void {
+    const configuracion = this.configurarCargaMasiva();
+    
+    const dialogData: CargaMasivaDialogData = {
+      configuracion,
+      onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(configuracion),
+      onProcesarArchivo: (archivo: File) => this.procesarArchivoCargaMasiva(archivo, configuracion)
+    };
+
     const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
       width: '600px',
-      disableClose: true,
-      data: {
-        configuracion: this.configurarCargaMasiva(),
-        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
-        onProcesarArchivo: (archivo: File) =>
-          this.procesarArchivoCargaMasiva(archivo),
-      },
+      data: dialogData,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(resultado => {
+      if (resultado) {
+        // Se procesó el archivo exitosamente, recargar datos
+        this.cargarAlmacenes();
+      }
     });
   }
 
-  descargarPlantillaCargaMasiva(): void {
+  private descargarPlantillaCargaMasiva(configuracion: ConfiguracionCargaMasiva<Almacen>): void {
     try {
-      const config = this.configurarCargaMasiva();
-      this.cargaMasivaService.generarPlantilla(config);
+      this.cargaMasivaService.generarPlantilla(configuracion);
     } catch (error) {
-      console.error('Error al generar plantilla:', error);
+      console.error('Error al descargar plantilla:', error);
+      throw error;
     }
   }
 
-  async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
+  private async procesarArchivoCargaMasiva(archivo: File, configuracion: ConfiguracionCargaMasiva<Almacen>): Promise<void> {
     try {
-      const config = this.configurarCargaMasiva();
-      const resultado = await this.cargaMasivaService.procesarArchivo(
-        archivo,
-        config
-      );
+      // Procesar archivo
+      const resultado = await this.cargaMasivaService.procesarArchivo(archivo, configuracion);
 
-      if (resultado.exitosa) {
-        await this.guardarAlmacenesMasivos(resultado.entidadesValidas);
-        console.log(
-          `✅ ${resultado.registrosValidos} registros procesados exitosamente`
-        );
-        this.cargarAlmacenes();
-      } else {
-        console.log('❌ Errores en el archivo:', resultado.errores);
+      if (!resultado.exitosa) {
+        const mensajeError = `Error al procesar archivo:\n${resultado.errores.map(e => `Fila ${e.fila}: ${e.mensaje}`).join('\n')}`;
+        throw new Error(mensajeError);
       }
+
+      // Si hay entidades válidas, crearlas en lotes
+      if (resultado.entidadesValidas.length > 0) {
+        const promesasCreacion = resultado.entidadesValidas.map(almacen => 
+          this.materialService.crearAlmacen(almacen).toPromise()
+        );
+
+        await Promise.all(promesasCreacion);
+
+        console.log(`✅ Carga masiva completada: ${resultado.registrosValidos} almacenes creados`);
+        
+        if (resultado.registrosInvalidos > 0) {
+          console.warn(`⚠️  ${resultado.registrosInvalidos} registros fueron omitidos por errores`);
+        }
+      } else {
+        throw new Error('No se encontraron registros válidos para procesar');
+      }
+
     } catch (error) {
-      console.error('Error al procesar archivo:', error);
+      console.error('Error en carga masiva:', error);
+      throw error;
     }
   }
 
-  private async guardarAlmacenesMasivos(almacenes: Almacen[]): Promise<void> {
-    for (const almacen of almacenes) {
-      await this.materialService.crearAlmacen(almacen).toPromise();
-    }
-  }
 
   toggleDropdownExport(): void {
     this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  // ============================================================================
+  // MANEJADORES DE EVENTOS
+  // ============================================================================
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-export')) {
+      this.dropdownExportAbierto = false;
+    }
   }
 
   // ============================================================================
@@ -476,78 +402,105 @@ export class AlmacenesComponent implements OnInit, AfterViewInit, OnDestroy {
   // ============================================================================
   agregar(): void {
     const config = AlmacenesConfig.getConfiguracionFormulario(false);
+    
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
-      disableClose: true,
       data: config,
+      disableClose: true
     });
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado?.accion === 'guardar') {
-        this.materialService.crearAlmacen(resultado.datos).subscribe(() => {
-          this.cargarAlmacenes();
-        });
+
+    dialogRef.afterClosed().subscribe(resultado => {
+      if (resultado && resultado.accion === 'guardar') {
+        this.crear(resultado.datos);
       }
     });
   }
 
   editar(almacen: Almacen): void {
     const config = AlmacenesConfig.getConfiguracionFormulario(true, almacen);
+    
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
-      disableClose: true,
       data: config,
+      disableClose: true
     });
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado?.accion === 'guardar') {
-        const almacenActualizado = {
-          ...resultado.datos,
-          id_almacen: almacen.id_almacen,
-        };
-        this.materialService
-          .actualizarAlmacen(almacenActualizado)
-          .subscribe(() => {
-            this.cargarAlmacenes();
-          });
+
+    dialogRef.afterClosed().subscribe(resultado => {
+      if (resultado && resultado.accion === 'guardar') {
+        this.actualizar(almacen.id_almacen!, resultado.datos);
       }
     });
   }
 
   verDetalle(almacen: Almacen): void {
     const config = AlmacenesConfig.getConfiguracionDetalle(almacen);
-    this.dialog.open(DetalleDialogComponent, {
+    
+    const dialogRef = this.dialog.open(DetalleDialogComponent, {
       width: '800px',
-      disableClose: true,
       data: config,
+      disableClose: true
     });
   }
 
   eliminar(almacen: Almacen): void {
     const config = ConfirmacionConfig.eliminarAlmacen(almacen);
+    
     const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
       width: '500px',
-      disableClose: true,
       data: config,
+      disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe((confirmado) => {
-      if (confirmado && almacen.id_almacen) {
-        this.materialService.eliminarAlmacen(almacen.id_almacen).subscribe({
-          next: () => {
-            console.log('✅ Almacén eliminado exitosamente');
-            this.cargarAlmacenes();
-          },
-          error: (error: any) => {
-            console.error('❌ Error al eliminar almacén:', error);
-          },
-        });
+    dialogRef.afterClosed().subscribe(confirmado => {
+      if (confirmado) {
+        this.ejecutarEliminacion(almacen.id_almacen!);
       }
     });
   }
 
-  formatearCodigo(id?: number): string {
-    if (!id) return '00001';
-    return id.toString().padStart(5, '0');
+  private crear(almacenData: any): void {
+    this.materialService.crearAlmacen(almacenData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado: any) => {
+          console.log('Almacén creado:', resultado);
+          this.cargarAlmacenes();
+        },
+        error: (error: any) => {
+          console.error('Error al crear almacén:', error);
+        }
+      });
   }
+
+  private actualizar(id: number, almacenData: any): void {
+    const almacenCompleto = { ...almacenData, id_almacen: id };
+    this.materialService.actualizarAlmacen(almacenCompleto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado: any) => {
+          console.log('Almacén actualizado:', resultado);
+          this.cargarAlmacenes();
+        },
+        error: (error: any) => {
+          console.error('Error al actualizar almacén:', error);
+        }
+      });
+  }
+
+  private ejecutarEliminacion(id: number): void {
+    this.materialService.eliminarAlmacen(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado: any) => {
+          console.log('Almacén eliminado:', resultado);
+          this.cargarAlmacenes();
+        },
+        error: (error: any) => {
+          console.error('Error al eliminar almacén:', error);
+        }
+      });
+  }
+
 }
 
 export { AlmacenesComponent as Almacenes };
