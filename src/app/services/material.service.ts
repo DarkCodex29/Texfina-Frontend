@@ -991,6 +991,16 @@ export class MaterialService {
     });
   }
 
+  eliminarMaterial(id: number): Observable<boolean> {
+    if (this.useApi) {
+      // Por ahora solo mock hasta que el API esté disponible
+      console.log('Eliminando material (API no disponible):', id);
+      return of(true);
+    }
+    console.log('Eliminando material (mock):', id);
+    return of(true);
+  }
+
   crearProveedor(proveedor: Proveedor): Observable<Proveedor> {
     const nuevoId =
       Math.max(...this.getProveedoresMock().map((p) => p.id_proveedor || 0)) +

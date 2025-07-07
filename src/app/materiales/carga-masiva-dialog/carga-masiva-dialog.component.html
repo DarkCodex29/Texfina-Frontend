@@ -6,14 +6,6 @@
         Carga múltiples materiales desde un archivo Excel
       </p>
     </div>
-    <button
-      mat-icon-button
-      class="close-button"
-      (click)="cerrar()"
-      aria-label="Cerrar"
-    >
-      <mat-icon>close</mat-icon>
-    </button>
   </div>
 
   <div class="dialog-content">
@@ -135,5 +127,9 @@
         </ul>
       </div>
     </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="cerrar()">Cancelar</button>
   </div>
 </div>

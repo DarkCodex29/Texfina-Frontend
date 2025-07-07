@@ -26,6 +26,12 @@ import {
   ConfiguracionExportacion,
 } from '../services/exportacion.service';
 import { PrimeDataTableComponent, TableColumn, TableAction, TableButtonConfig, TableState } from '../shared/components/prime-data-table/prime-data-table.component';
+// Modales
+import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
+// Configuraciones
+import { MaterialesConfig } from '../shared/configs/materiales-config';
 
 @Component({
   selector: 'app-materiales',
@@ -38,6 +44,9 @@ import { PrimeDataTableComponent, TableColumn, TableAction, TableButtonConfig, T
     MatDialogModule,
     PrimeDataTableComponent,
     ConfirmDialogModule,
+    FormularioDialogComponent,
+    DetalleDialogComponent,
+    ConfirmacionDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './materiales.component.html',
@@ -106,6 +115,12 @@ export class MaterialesComponent implements OnInit, OnDestroy {
       icon: 'pi pi-pencil',
       action: 'edit',
       color: 'primary'
+    },
+    {
+      tooltip: 'Eliminar',
+      icon: 'pi pi-trash',
+      action: 'delete',
+      color: 'warn'
     }
   ];
   buttons: TableButtonConfig[] = [
@@ -198,6 +213,9 @@ export class MaterialesComponent implements OnInit, OnDestroy {
       case 'edit':
         this.editar(item);
         break;
+      case 'delete':
+        this.eliminar(item);
+        break;
       default:
         console.warn(`Acción no reconocida: ${action}`);
     }
@@ -217,18 +235,51 @@ export class MaterialesComponent implements OnInit, OnDestroy {
   }
 
   async agregar(): Promise<void> {
-    // TODO: Implementar diálogo de agregar material
-    console.log('Agregar material');
+    const config = MaterialesConfig.formulario(false);
+    
+    // Cargar opciones dinámicamente
+    await this.cargarOpcionesFormulario(config);
+    
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '800px',
+      data: config,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(resultado => {
+      if (resultado && resultado.accion === 'guardar') {
+        this.crear(resultado.datos);
+      }
+    });
   }
 
   async editar(material: Insumo): Promise<void> {
-    // TODO: Implementar diálogo de editar material
-    console.log('Editar material:', material);
+    const config = MaterialesConfig.formulario(true, material);
+    
+    // Cargar opciones dinámicamente
+    await this.cargarOpcionesFormulario(config);
+    
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '800px',
+      data: config,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(resultado => {
+      if (resultado && resultado.accion === 'guardar') {
+        this.actualizar(material.id_insumo!, resultado.datos);
+      }
+    });
   }
 
   async verDetalle(material: Insumo): Promise<void> {
-    // TODO: Implementar diálogo de ver detalle material
-    console.log('Ver detalle material:', material);
+    const config = MaterialesConfig.detalle(material);
+    
+    const dialogRef = this.dialog.open(DetalleDialogComponent, {
+      width: '800px',
+      data: config,
+      disableClose: true
+    });
   }
 
   cargaMasiva(): void {
@@ -438,5 +489,93 @@ export class MaterialesComponent implements OnInit, OnDestroy {
       console.error('Error en carga masiva:', error);
       throw error;
     }
+  }
+
+  eliminar(material: Insumo): void {
+    const config = MaterialesConfig.eliminarMaterial(material.nombre);
+    
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '500px',
+      data: config,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(confirmado => {
+      if (confirmado) {
+        this.ejecutarEliminacion(material.id_insumo!);
+      }
+    });
+  }
+
+  private async cargarOpcionesFormulario(config: any): Promise<void> {
+    try {
+      // Cargar clases y unidades en paralelo
+      const [clases, unidades] = await Promise.all([
+        this.materialService.getClases().toPromise(),
+        this.materialService.getUnidades().toPromise()
+      ]);
+
+      // Buscar campos de clase y unidad y asignar opciones
+      config.filas.forEach((fila: any[]) => {
+        fila.forEach((campo: any) => {
+          if (campo.key === 'clase_id') {
+            campo.opciones = clases?.map((clase: any) => ({
+              value: clase.id,
+              label: clase.nombre
+            })) || [];
+          } else if (campo.key === 'unidad_id') {
+            campo.opciones = unidades?.map((unidad: any) => ({
+              value: unidad.id,
+              label: unidad.nombre
+            })) || [];
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error al cargar opciones:', error);
+    }
+  }
+
+  private crear(materialData: any): void {
+    this.materialService.crearMaterial(materialData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado: any) => {
+          console.log('Material creado:', resultado);
+          this.cargarMateriales();
+        },
+        error: (error: any) => {
+          console.error('Error al crear material:', error);
+        }
+      });
+  }
+
+  private actualizar(id: number, materialData: any): void {
+    const materialCompleto = { ...materialData, id_insumo: id };
+    this.materialService.actualizarMaterial(materialCompleto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado: any) => {
+          console.log('Material actualizado:', resultado);
+          this.cargarMateriales();
+        },
+        error: (error: any) => {
+          console.error('Error al actualizar material:', error);
+        }
+      });
+  }
+
+  private ejecutarEliminacion(id: number): void {
+    this.materialService.eliminarMaterial(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado: any) => {
+          console.log('Material eliminado:', resultado);
+          this.cargarMateriales();
+        },
+        error: (error: any) => {
+          console.error('Error al eliminar material:', error);
+        }
+      });
   }
 }
