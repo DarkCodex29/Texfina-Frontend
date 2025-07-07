@@ -1,22 +1,8 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatSortModule } from '@angular/material/sort';
-import { MatDialog } from '@angular/material/dialog';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, takeUntil, finalize } from 'rxjs';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -26,6 +12,13 @@ import {
   ConfiguracionCargaMasiva,
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
+import { PrimeDataTableComponent } from '../shared/components/prime-data-table/prime-data-table.component';
+import {
+  TableColumn,
+  TableAction,
+  TableButtonConfig,
+  TableState,
+} from '../shared/components/prime-data-table/prime-data-table.component';
 
 export interface Reporte {
   id_reporte: number;
@@ -51,122 +44,187 @@ export interface KPI {
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatTableModule,
-    MatTabsModule,
+    MatDialogModule,
     MatTooltipModule,
-    MatProgressBarModule,
-    MatSnackBarModule,
-    MatSortModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './reportes.html',
   styleUrls: ['./reportes.scss'],
 })
-export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ReportesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  isLoading = false;
-  hasError = false;
-  errorMessage = '';
   dropdownExportAbierto = false;
-
   reportes: Reporte[] = [];
-  dataSource = new MatTableDataSource<Reporte>([]);
-  displayedColumns: string[] = [
-    'tipo',
-    'fecha',
-    'usuario',
-    'parametros',
-    'estado',
-    'tamano',
-    'acciones',
-  ];
-
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosColumnaHabilitados = false;
   kpis: KPI[] = [];
 
+  tableState: TableState = {
+    loading: false,
+    error: false,
+    empty: false,
+    filteredEmpty: false
+  };
+
+  columns: TableColumn[] = [
+    {
+      key: 'tipo_reporte',
+      title: 'Tipo',
+      sortable: true,
+      filterable: true,
+      width: '180px',
+      type: 'badge'
+    },
+    {
+      key: 'fecha_generacion',
+      title: 'Fecha',
+      sortable: true,
+      filterable: true,
+      width: '160px',
+      type: 'date'
+    },
+    {
+      key: 'usuario',
+      title: 'Usuario',
+      sortable: true,
+      filterable: true,
+      width: '140px',
+      type: 'user'
+    },
+    {
+      key: 'parametros',
+      title: 'Parámetros',
+      sortable: false,
+      filterable: true,
+      width: '200px',
+      type: 'description'
+    },
+    {
+      key: 'estado',
+      title: 'Estado',
+      sortable: true,
+      filterable: true,
+      width: '120px',
+      type: 'badge'
+    },
+    {
+      key: 'tamano_archivo',
+      title: 'Tamaño',
+      sortable: true,
+      filterable: false,
+      width: '100px'
+    }
+  ];
+
+  actions: TableAction[] = [
+    {
+      action: 'download',
+      tooltip: 'Descargar',
+      icon: 'download',
+      color: 'primary',
+      condition: (item: any) => item.estado === 'COMPLETADO'
+    },
+    {
+      action: 'view',
+      tooltip: 'Ver Detalle',
+      icon: 'visibility',
+      color: 'secondary'
+    },
+    {
+      action: 'delete',
+      tooltip: 'Eliminar',
+      icon: 'delete',
+      color: 'danger'
+    }
+  ];
+
+  buttons: TableButtonConfig[] = [
+    {
+      action: 'generate',
+      label: 'Generar Reporte',
+      icon: 'add',
+      color: 'primary'
+    },
+    {
+      action: 'bulk',
+      label: 'Carga Masiva',
+      icon: 'upload_file',
+      color: 'secondary'
+    }
+  ];
+
+  globalFilterFields: string[] = ['tipo_reporte', 'usuario', 'parametros', 'estado'];
+
   constructor(
-    private fb: FormBuilder,
-    private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private exportacionService: ExportacionService,
     private cargaMasivaService: CargaMasivaService
-  ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
-    this.filtrosColumnaForm = this.fb.group({
-      tipo: [''],
-      fecha: [''],
-      usuario: [''],
-      parametros: [''],
-      estado: [''],
-      tamano: [''],
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.configurarFiltros();
     this.cargarDatos();
     this.cargarKPIs();
   }
-
-  ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  get isEmpty(): boolean {
-    return !this.isLoading && !this.hasError && this.reportes.length === 0;
-  }
-
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      !this.hasError &&
-      this.reportes.length > 0 &&
-      this.dataSource.filteredData.length === 0
-    );
-  }
-
-  private configurarFiltros() {
-    this.filtroGeneralForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltroGeneral();
-      });
-  }
-
-  private async cargarDatos() {
-    this.isLoading = true;
-    this.hasError = false;
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.cargarDatosMock();
-    } catch (error) {
-      this.hasError = true;
-      this.errorMessage = 'Error al cargar los datos de reportes';
-      console.error('Error cargando reportes:', error);
-    } finally {
-      this.isLoading = false;
+  onActionClick(event: { action: string; item: any }): void {
+    const { action, item } = event;
+    switch (action) {
+      case 'download':
+        this.descargarReporte(item);
+        break;
+      case 'view':
+        this.verDetalle(item);
+        break;
+      case 'delete':
+        this.eliminar(item);
+        break;
     }
   }
 
+  onButtonClick(action: string): void {
+    switch (action) {
+      case 'generate':
+        this.agregar();
+        break;
+      case 'bulk':
+        this.cargaMasiva();
+        break;
+    }
+  }
+
+  private updateTableStates(): void {
+    this.tableState.empty = this.reportes.length === 0;
+  }
+
+  private async cargarDatos() {
+    this.tableState.loading = true;
+    this.tableState.error = false;
+    this.tableState.errorMessage = '';
+
+    try {
+      this.cargarDatosMock();
+    } catch (error) {
+      this.tableState.error = true;
+      this.tableState.errorMessage = 'Error al cargar los datos de reportes';
+      console.error('Error cargando reportes:', error);
+      this.reportes = [];
+    } finally {
+      this.tableState.loading = false;
+      this.updateTableStates();
+      console.log('🏁 Estado final - loading:', this.tableState.loading, 'reportes:', this.reportes.length);
+    }
+  }
+
+  recargarDatos(): void {
+    this.cargarDatos();
+  }
+
   private cargarDatosMock() {
+    console.log('🔄 Cargando datos mock de reportes...');
     this.reportes = [
       {
         id_reporte: 1,
@@ -207,8 +265,8 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
         tamano_archivo: 0,
       },
     ];
-
-    this.dataSource.data = [...this.reportes];
+    console.log('✅ Datos mock cargados:', this.reportes.length, 'reportes');
+    console.log('📊 Datos de reportes:', this.reportes);
   }
 
   cargarKPIs(): void {
@@ -243,55 +301,39 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
     ];
   }
 
-  aplicarFiltroGeneral(): void {
-    const filtro =
-      this.filtroGeneralForm.get('busquedaGeneral')?.value?.toLowerCase() || '';
 
-    if (!filtro.trim()) {
-      this.dataSource.data = [...this.reportes];
-      return;
-    }
-
-    this.dataSource.data = this.reportes.filter(
-      (reporte) =>
-        reporte.tipo_reporte.toLowerCase().includes(filtro) ||
-        reporte.usuario.toLowerCase().includes(filtro) ||
-        reporte.parametros.toLowerCase().includes(filtro) ||
-        this.getEstadoTexto(reporte.estado).toLowerCase().includes(filtro) ||
-        this.formatearFecha(reporte.fecha_generacion)
-          .toLowerCase()
-          .includes(filtro)
-    );
-  }
-
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.get('busquedaGeneral')?.setValue('');
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
-  }
-
-  descargar(reporte: Reporte): void {
+  descargarReporte(reporte: Reporte): void {
     if (reporte.estado === 'COMPLETADO' && reporte.ruta_archivo) {
       console.log('Descargando reporte:', reporte.ruta_archivo);
-      this.snackBar.open('Descargando reporte...', 'Cerrar', {
-        duration: 3000,
-      });
+      // Implementar descarga real
     }
   }
 
   eliminar(reporte: Reporte): void {
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar el reporte "${reporte.tipo_reporte}"?`
+    // Usar dialog de confirmación shared
+    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(
+      ({ ConfirmacionDialogComponent }) => {
+        const config = {
+          titulo: 'Eliminar Reporte',
+          mensaje: `¿Está seguro que desea eliminar el reporte "${reporte.tipo_reporte}"?`,
+          confirmar: 'Eliminar',
+          cancelar: 'Cancelar'
+        };
+        
+        const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+          width: '500px',
+          disableClose: true,
+          data: config,
+        });
+        
+        dialogRef.afterClosed().subscribe((confirmado) => {
+          if (confirmado && reporte.id_reporte) {
+            console.log('Eliminar reporte:', reporte);
+            this.cargarDatos();
+          }
+        });
+      }
     );
-    if (confirmacion && reporte.id_reporte) {
-      console.log('Eliminar reporte:', reporte);
-      this.snackBar.open('Reporte eliminado correctamente', 'Cerrar', {
-        duration: 3000,
-      });
-      this.cargarDatos();
-    }
   }
 
   formatearTexto(texto?: string): string {
@@ -375,9 +417,7 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
             const dialogRef = this.dialog.open(DetalleDialogComponent, {
               width: '800px',
               disableClose: true,
-              data: {
-                configuracion: ReportesConfig.getConfiguracionDetalle(reporte),
-              },
+              data: ReportesConfig.getConfiguracionDetalle(reporte),
             });
           }
         );
@@ -393,17 +433,12 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
         const dialogRef = this.dialog.open(FormularioDialogComponent, {
           width: '600px',
           disableClose: true,
-          data: {
-            configuracion: ReportesConfig.getConfiguracionFormulario(false),
-          },
+          data: ReportesConfig.getConfiguracionFormulario(false),
         });
 
         dialogRef.afterClosed().subscribe((resultado) => {
-          if (resultado) {
-            console.log('Generando reporte con configuración:', resultado);
-            this.snackBar.open('Reporte programado para generación', 'Cerrar', {
-              duration: 3000,
-            });
+          if (resultado?.accion === 'guardar') {
+            console.log('Generando reporte con configuración:', resultado.datos);
             this.cargarDatos();
           }
         });
@@ -413,7 +448,7 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private configurarExportacion(): ConfiguracionExportacion<Reporte> {
     return {
-      entidades: this.dataSource.data,
+      entidades: this.reportes,
       nombreArchivo: 'reportes',
       nombreEntidad: 'Reportes',
       columnas: [
@@ -432,7 +467,7 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
         cantidadTotal: this.reportes.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.reportes.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
       },
@@ -535,13 +570,18 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private obtenerFiltrosActivos(): any {
-    return {
-      busquedaGeneral:
-        this.filtroGeneralForm.get('busquedaGeneral')?.value || '',
-    };
+    return {};
   }
 
   reintentarCarga(): void {
     this.cargarDatos();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-export')) {
+      this.dropdownExportAbierto = false;
+    }
   }
 }
