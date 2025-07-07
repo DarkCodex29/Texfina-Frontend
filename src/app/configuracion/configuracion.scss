@@ -130,13 +130,15 @@
 
   .mat-mdc-tab-group {
     .mat-mdc-tab-header {
-      .mat-mdc-tab-label {
-        &.mdc-tab--active {
-          .mdc-tab__text-label {
-            color: var(--texfina-primary);
-          }
-          .mdc-tab-indicator__content--underline {
-            border-color: var(--texfina-primary);
+      .mat-mdc-tab-labels {
+        .mat-mdc-tab-label {
+          &.mdc-tab--active {
+            .mdc-tab__text-label {
+              color: var(--texfina-primary);
+            }
+            .mdc-tab-indicator__content--underline {
+              border-color: var(--texfina-primary);
+            }
           }
         }
       }
@@ -153,9 +155,9 @@
     .p-tabview-nav {
       display: flex;
       gap: var(--texfina-spacing-md);
-      padding: 0 var(--texfina-spacing-lg);
-      border: none;
-      background: transparent;
+      padding: var(--texfina-spacing-sm) var(--texfina-spacing-lg) !important;
+      border: none !important;
+      background: transparent !important;
       overflow-x: auto;
       scrollbar-width: thin;
 
@@ -172,7 +174,7 @@
       display: flex;
       align-items: center;
       gap: var(--texfina-spacing-xs);
-      padding: var(--texfina-spacing-md) var(--texfina-spacing-lg);
+      padding: var(--texfina-spacing-sm) var(--texfina-spacing-lg) !important;
       font-weight: 600;
       font-size: var(--texfina-font-size-sm);
       color: var(--texfina-text-muted);
@@ -605,8 +607,8 @@
   z-index: 9999 !important;
 }
 
-// Force override any conflicting styles
-.config-container .p-tabs {
+// Force override any conflicting styles atravesando el encapsulamiento de Angular
+::ng-deep .config-container .p-tabs {
   .p-tablist {
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
     border-bottom: 2px solid #e2e8f0 !important;
@@ -627,17 +629,16 @@
       transition: all 0.3s ease !important;
 
       &:hover {
-        background: rgba(189, 33, 38, 0.08) !important;
-        transform: translateY(-2px) !important;
+        background: var(--texfina-primary-bg) !important;
 
         .p-tab-header-content {
-          color: #bd2126 !important;
+          color: var(--texfina-primary) !important;
         }
       }
 
       &.p-tab-active {
         background: white !important;
-        color: #bd2126 !important;
+        color: var(--texfina-primary) !important;
         box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1) !important;
         z-index: 10 !important;
         border-bottom: none !important;
@@ -649,12 +650,12 @@
           left: 0 !important;
           right: 0 !important;
           height: 4px !important;
-          background: linear-gradient(90deg, #bd2126, #a01e23) !important;
+          background: var(--texfina-primary) !important;
           border-radius: 12px 12px 0 0 !important;
         }
 
         .p-tab-header-content {
-          color: #bd2126 !important;
+          color: var(--texfina-primary) !important;
           font-weight: 700 !important;
         }
       }
@@ -662,9 +663,9 @@
       .p-tab-header-content {
         padding: 18px 24px 16px !important;
         border: none !important;
-        color: #64748b !important;
+        color: var(--texfina-text-muted) !important;
         font-weight: 500 !important;
-        transition: all 0.3s ease !important;
+        transition: color 0.2s ease !important;
         display: flex !important;
         align-items: center !important;
         gap: 10px !important;
@@ -673,12 +674,8 @@
 
         i {
           font-size: 18px !important;
-          transition: transform 0.3s ease !important;
+          transition: none !important;
         }
-      }
-
-      &:hover .p-tab-header-content i {
-        transform: scale(1.1) !important;
       }
     }
   }

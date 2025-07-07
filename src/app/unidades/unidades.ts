@@ -13,18 +13,10 @@ import {
   FormBuilder,
   FormGroup,
 } from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatCardModule } from '@angular/material/card';
-import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
   Subject,
   debounceTime,
@@ -51,6 +43,12 @@ import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle
 import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
 import { UnidadesConfig } from '../shared/configs/unidades-config';
 import { ConfirmacionConfig } from '../shared/configs/confirmacion-config';
+import {
+  PrimeDataTableComponent,
+  TableColumn,
+  TableAction,
+  TableButtonConfig,
+} from '../shared/components/prime-data-table/prime-data-table.component';
 
 @Component({
   selector: 'app-unidades',
@@ -59,32 +57,33 @@ import { ConfirmacionConfig } from '../shared/configs/confirmacion-config';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatTableModule,
     MatButtonModule,
     MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule,
     MatDialogModule,
-    MatPaginatorModule,
-    MatCardModule,
-    MatSortModule,
     MatTooltipModule,
-    MatProgressSpinnerModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './unidades.html',
   styleUrls: ['./unidades.scss'],
 })
-export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatSort) sort!: MatSort;
-
+export class UnidadesComponent implements OnInit, OnDestroy {
   unidades: Unidad[] = [];
-  dataSource = new MatTableDataSource<Unidad>([]);
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosExpanded = true;
-  filtrosColumnaHabilitados = false;
-  filtrosColumnaActivos = false;
+  columns: TableColumn[] = UnidadesConfig.getTableColumns();
+  actions: TableAction[] = UnidadesConfig.getTableActions();
+  tableButtons: TableButtonConfig[] = [
+    {
+      label: 'Agregar Unidad',
+      icon: 'pi pi-plus',
+      action: 'add',
+      color: 'primary',
+    },
+    {
+      label: 'Carga Masiva',
+      icon: 'pi pi-upload',
+      action: 'bulk-upload',
+      color: 'secondary',
+    },
+  ];
   private destroy$ = new Subject<void>();
 
   isLoading: boolean = false;
@@ -92,46 +91,19 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
   errorMessage: string = '';
   dropdownExportAbierto: boolean = false;
 
-  displayedColumns: string[] = ['id_unidad', 'nombre', 'acciones'];
-
-  get unidadesFiltradas(): Unidad[] {
-    return this.dataSource.data;
-  }
-
   get isEmpty(): boolean {
     return !this.isLoading && this.unidades.length === 0 && !this.hasError;
   }
 
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      this.dataSource.data.length === 0 &&
-      this.unidades.length > 0
-    );
-  }
-
   constructor(
-    private fb: FormBuilder,
     private materialService: MaterialService,
     private dialog: MatDialog,
     private exportacionService: ExportacionService,
     private cargaMasivaService: CargaMasivaService
-  ) {
-    this.filtroGeneralForm = this.fb.group({ busquedaGeneral: [''] });
-    this.filtrosColumnaForm = this.fb.group({
-      id_unidad: [''],
-      nombre: [''],
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cargarUnidades();
-    this.configurarFiltroGeneralEnTiempoReal();
-    this.configurarFiltrosColumnaEnTiempoReal();
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
   }
 
   ngOnDestroy(): void {
@@ -139,21 +111,6 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltroGeneralEnTiempoReal(): void {
-    this.filtroGeneralForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltroGeneral();
-      });
-  }
-
-  configurarFiltrosColumnaEnTiempoReal(): void {
-    this.filtrosColumnaForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltrosColumna();
-      });
-  }
 
   cargarUnidades(): void {
     this.isLoading = true;
@@ -165,7 +122,6 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.materialService
       .getUnidades()
       .pipe(
-        delay(1500),
         finalize(() => {
           this.isLoading = false;
           console.log('✅ Carga completada - isLoading:', this.isLoading);
@@ -176,7 +132,6 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
         next: (unidades) => {
           console.log('📦 Unidades cargadas:', unidades.length);
           this.unidades = unidades;
-          this.dataSource.data = [...unidades];
         },
         error: (error) => {
           console.error('❌ Error al cargar unidades:', error);
@@ -184,7 +139,6 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
           this.errorMessage =
             'Error al cargar las unidades. Por favor, intenta nuevamente.';
           this.unidades = [];
-          this.dataSource.data = [];
         },
       });
   }
@@ -193,111 +147,21 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargarUnidades();
   }
 
-  aplicarFiltroGeneral(): void {
-    const busqueda = this.filtroGeneralForm
-      .get('busquedaGeneral')
-      ?.value?.trim()
-      .toLowerCase();
 
-    if (!busqueda) {
-      this.dataSource.data = [...this.unidades];
-      return;
-    }
-
-    const unidadesFiltradas = this.unidades.filter((unidad) => {
-      const codigo = unidad.id_unidad?.toLowerCase() || '';
-      const nombre = unidad.nombre?.toLowerCase() || '';
-
-      return codigo.includes(busqueda) || nombre.includes(busqueda);
-    });
-
-    this.dataSource.data = unidadesFiltradas;
-  }
-
-  aplicarFiltrosColumna(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    let unidadesFiltradas = [...this.unidades];
-
-    if (filtros.id_unidad && filtros.id_unidad.trim()) {
-      unidadesFiltradas = unidadesFiltradas.filter((unidad) =>
-        unidad.id_unidad
-          ?.toLowerCase()
-          .includes(filtros.id_unidad.toLowerCase())
-      );
-    }
-
-    if (filtros.nombre && filtros.nombre.trim()) {
-      unidadesFiltradas = unidadesFiltradas.filter((unidad) =>
-        unidad.nombre?.toLowerCase().includes(filtros.nombre.toLowerCase())
-      );
-    }
-
-    this.dataSource.data = unidadesFiltradas;
-  }
-
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.reset();
-    this.dataSource.data = [...this.unidades];
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
-    this.dataSource.data = [...this.unidades];
-  }
-
-  toggleFiltrosColumna() {
-    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
-    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
-
-    if (this.filtrosColumnaHabilitados) {
-      if (this.filtrosColumnaActivos) {
-        this.limpiarFiltroGeneral();
-      } else {
-        this.limpiarFiltrosColumna();
-      }
-    }
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent): void {
-    if (event.key === 'F3') {
-      event.preventDefault();
-      this.toggleFiltrosColumna();
-    }
-  }
-
-  toggleFiltros(): void {
-    this.filtrosExpanded = !this.filtrosExpanded;
-  }
-
-  sortData(column: string): void {
-    if (this.sort) {
-      if (this.sort.active === column) {
-        this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc';
-      } else {
-        this.sort.active = column;
-        this.sort.direction = 'asc';
-      }
-      this.sort.sortChange.emit({
-        active: this.sort.active,
-        direction: this.sort.direction,
-      });
-    }
-  }
 
   private configurarExportacion(): ConfiguracionExportacion<Unidad> {
     return {
-      entidades: this.dataSource.data,
+      entidades: this.unidades,
       nombreArchivo: 'unidades',
       nombreEntidad: 'Unidades',
       columnas: [
         { campo: 'id_unidad', titulo: 'Código', formato: 'texto' },
         { campo: 'nombre', titulo: 'Descripción', formato: 'texto' },
       ],
-      filtrosActivos: this.obtenerFiltrosActivos(),
+      filtrosActivos: {},
       metadatos: {
         cantidadTotal: this.unidades.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.unidades.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
       },
@@ -336,15 +200,6 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  private obtenerFiltrosActivos(): any {
-    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
-    const filtrosColumna = this.filtrosColumnaForm.value;
-
-    return {
-      busquedaGeneral: filtroGeneral || null,
-      ...filtrosColumna,
-    };
-  }
 
   exportarExcel(): void {
     try {
@@ -485,6 +340,31 @@ export class UnidadesComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     });
+  }
+
+  onActionClick(event: { action: string; item: Unidad }): void {
+    switch (event.action) {
+      case 'view':
+        this.verDetalle(event.item);
+        break;
+      case 'edit':
+        this.editar(event.item);
+        break;
+      case 'delete':
+        this.eliminar(event.item);
+        break;
+    }
+  }
+
+  onButtonClick(action: string): void {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk-upload':
+        this.cargaMasiva();
+        break;
+    }
   }
 
   formatearTexto(texto?: string): string {

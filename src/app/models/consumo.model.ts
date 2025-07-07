@@ -2,12 +2,16 @@ export interface Consumo {
   id_consumo?: number;
   fecha?: Date;
   id_insumo?: number;
-  area?: string;
   cantidad?: number;
+  id_unidad?: string;
   id_lote?: number;
-  estado?: string;
+  area?: string;
+  area_consumo?: string;
+  motivo_consumo?: string;
   responsable?: string;
+  usuario_registro?: string;
   observaciones?: string;
+  estado?: string;
   created_at?: Date;
   updated_at?: Date;
 }

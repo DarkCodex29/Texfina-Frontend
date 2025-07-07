@@ -6,6 +6,10 @@ import {
   CampoDetalle,
   ConfiguracionDetalle,
 } from '../dialogs/detalle-dialog/detalle-dialog.component';
+import {
+  TableColumn,
+  TableAction,
+} from '../components/prime-data-table/prime-data-table.component';
 
 export class UnidadesConfig {
   static getConfiguracionFormulario(
@@ -66,5 +70,46 @@ export class UnidadesConfig {
         ],
       ],
     };
+  }
+
+  static getTableColumns(): TableColumn[] {
+    return [
+      {
+        key: 'id_unidad',
+        title: 'Código',
+        sortable: true,
+        filterable: true,
+        width: '150px',
+        type: 'badge',
+        align: 'center',
+        visible: true,
+      },
+      {
+        key: 'nombre',
+        title: 'Descripción',
+        sortable: true,
+        filterable: true,
+        type: 'text',
+        align: 'left',
+        visible: true,
+      },
+    ];
+  }
+
+  static getTableActions(): TableAction[] {
+    return [
+      {
+        icon: 'pi pi-eye',
+        tooltip: 'Ver detalle',
+        action: 'view',
+        color: 'secondary',
+      },
+      {
+        icon: 'pi pi-pencil',
+        tooltip: 'Editar',
+        action: 'edit',
+        color: 'primary',
+      },
+    ];
   }
 }

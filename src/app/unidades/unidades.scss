@@ -1,5 +1,5 @@
 // ============================================================================
-// UNIDADES - SISTEMA DE COLORES OBLIGATORIO
+// UNIDADES - MIGRADO A PRIME DATA TABLE
 // ============================================================================
 
 :host {
@@ -13,6 +13,11 @@
   --texfina-primary-bg: #fef2f2;
   --texfina-secondary-bg: #f1f5f9;
   --texfina-neutral-bg: #f8fafc;
+}
+
+.page-container {
+  min-height: 100vh;
+  background-color: var(--color-background);
 }
 
 // ============================================================================

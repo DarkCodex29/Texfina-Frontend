@@ -162,3 +162,37 @@ See `README_CONTROLADORES.md` for complete API documentation.
 - OnPush change detection where applicable
 - Efficient data fetching with pagination
 - Optimized build configurations for production
+
+## Current Migration Progress
+
+### Component Architecture Migration
+The application is currently undergoing a migration from traditional Angular Material components to PrimeDataTable for improved data visualization and performance.
+
+#### Migration Pattern
+- **From**: Custom Angular Material tables with manual filtering and pagination
+- **To**: PrimeDataTable with built-in features and configurations
+- **Benefits**: Reduced boilerplate, better performance, consistent UI patterns
+
+#### Completed Migrations
+- ✅ Ingresos component - migrated to PrimeDataTable
+- ✅ Unidades component - migrated to PrimeDataTable with button reorganization
+- ✅ Dashboard component - refactored for improved presentation
+- ✅ Various layout components - unified styling approach
+- ✅ Model updates - added missing properties (area, responsable) to Consumo model
+
+#### Migration Pattern Established
+**Standard PrimeDataTable Integration:**
+- Header: Page title + Export dropdown only
+- Table: All CRUD actions via `tableButtons` (Add, Bulk Upload) and row `actions` (View, Edit, Delete)
+- Config: Separate `getTableColumns()` and `getTableActions()` methods in config files
+- Loading: Natural API response times without artificial delays
+
+#### Migration Guidelines
+1. Replace component-specific table logic with PrimeDataTable configuration
+2. Move table configurations to dedicated config files in `src/app/shared/configs/`
+3. Simplify component templates by removing manual table implementations
+4. Update component TypeScript to use simplified data loading patterns
+5. Ensure SCSS follows the unified styling approach
+6. **Header Actions**: Keep only export functionality in page header
+7. **Table Buttons**: Move "Add" and "Bulk Upload" buttons to table header via `tableButtons` property
+8. **Loading States**: Remove artificial delays - let real API response times determine loading duration

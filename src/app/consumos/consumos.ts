@@ -1,27 +1,8 @@
-import {
-  Component,
-  OnInit,
-  AfterViewInit,
-  OnDestroy,
-  HostListener,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatSortModule } from '@angular/material/sort';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDialog } from '@angular/material/dialog';
-import {
-  Subject,
-  of,
-  debounceTime,
-  distinctUntilChanged,
-  takeUntil,
-  finalize,
-  delay,
-} from 'rxjs';
+import { Subject, takeUntil, finalize, delay } from 'rxjs';
 
 import { Consumo } from '../models/consumo.model';
 import { Insumo, Lote } from '../models/insumo.model';
@@ -29,23 +10,19 @@ import { MaterialService } from '../services/material.service';
 import {
   ExportacionService,
   ConfiguracionExportacion,
-  ColumnaExportacion,
 } from '../services/exportacion.service';
 import {
   CargaMasivaService,
   ConfiguracionCargaMasiva,
-  MapeoColumna,
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
+import { PrimeDataTableComponent } from '../shared/components/prime-data-table/prime-data-table.component';
 import {
-  FormularioDialogComponent,
-  ConfiguracionFormulario,
-} from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
-import {
-  DetalleDialogComponent,
-  ConfiguracionDetalle,
-} from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
-import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
+  TableColumn,
+  TableAction,
+  TableButtonConfig,
+  TableState,
+} from '../shared/components/prime-data-table/prime-data-table.component';
 import {
   ConsumosConfig,
   CONSUMOS_CONFIG,
@@ -56,677 +33,777 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatTableModule,
-    MatSortModule,
-    MatIconModule,
-    MatButtonModule,
+    MatDialogModule,
     MatTooltipModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './consumos.html',
   styleUrls: ['./consumos.scss'],
 })
-export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
-  // ============================================================================
-  // PROPIEDADES DE DATOS
-  // ============================================================================
+export class ConsumosComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  
+  dropdownExportAbierto = false;
   consumos: Consumo[] = [];
   insumos: Insumo[] = [];
   lotes: Lote[] = [];
-  dataSource = new MatTableDataSource<Consumo>([]);
 
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosExpanded = true;
-  filtrosColumnaHabilitados = false;
-  filtrosColumnaActivos = false;
-  dropdownExportAbierto = false;
-  private destroy$ = new Subject<void>();
+  tableState: TableState = {
+    loading: false,
+    error: false,
+    empty: false,
+    filteredEmpty: false
+  };
 
-  // ============================================================================
-  // PROPIEDADES DE ESTADO
-  // ============================================================================
-  isLoading = false;
-  hasError = false;
-  errorMessage = '';
-
-  // ============================================================================
-  // CONFIGURACIÓN DE TABLA
-  // ============================================================================
-  displayedColumns: string[] = [
-    'fecha',
-    'insumo',
-    'area',
-    'cantidad',
-    'lote',
-    'estado',
-    'acciones',
+  columns: TableColumn[] = [
+    {
+      key: 'fecha',
+      title: 'Fecha',
+      sortable: true,
+      filterable: false,
+      width: '120px',
+      type: 'date'
+    },
+    {
+      key: 'id_insumo',
+      title: 'Insumo',
+      sortable: true,
+      filterable: true,
+      width: '200px',
+      type: 'text'
+    },
+    {
+      key: 'area_consumo',
+      title: 'Área',
+      sortable: true,
+      filterable: true,
+      width: '150px',
+      type: 'text'
+    },
+    {
+      key: 'cantidad',
+      title: 'Cantidad',
+      sortable: true,
+      filterable: false,
+      width: '120px',
+      type: 'number'
+    },
+    {
+      key: 'id_lote',
+      title: 'Lote',
+      sortable: true,
+      filterable: true,
+      width: '120px',
+      type: 'text'
+    },
+    {
+      key: 'motivo_consumo',
+      title: 'Motivo',
+      sortable: true,
+      filterable: true,
+      width: '150px',
+      type: 'text'
+    },
+    {
+      key: 'estado',
+      title: 'Estado',
+      sortable: true,
+      filterable: true,
+      width: '120px',
+      type: 'badge'
+    }
   ];
 
-  get isEmpty(): boolean {
-    return !this.isLoading && !this.hasError && this.consumos.length === 0;
-  }
+  actions: TableAction[] = [
+    {
+      action: 'view',
+      tooltip: 'Ver Detalle',
+      icon: 'pi pi-eye',
+      color: 'secondary'
+    },
+    {
+      action: 'edit',
+      tooltip: 'Editar',
+      icon: 'pi pi-pencil',
+      color: 'primary',
+      condition: (item: Consumo) => item.estado !== 'CONFIRMADO'
+    },
+    {
+      action: 'delete',
+      tooltip: 'Eliminar',
+      icon: 'pi pi-trash',
+      color: 'danger',
+      condition: (item: Consumo) => item.estado !== 'CONFIRMADO'
+    }
+  ];
 
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      this.dataSource.data.length === 0 &&
-      this.consumos.length > 0
-    );
-  }
+  buttons: TableButtonConfig[] = [
+    {
+      action: 'add',
+      label: 'Agregar Consumo',
+      icon: 'pi pi-plus',
+      color: 'primary'
+    },
+    {
+      action: 'bulk',
+      label: 'Carga Masiva',
+      icon: 'pi pi-upload',
+      color: 'secondary'
+    }
+  ];
+
+  globalFilterFields: string[] = ['area_consumo', 'motivo_consumo', 'estado'];
 
   constructor(
-    private fb: FormBuilder,
     private materialService: MaterialService,
     private dialog: MatDialog,
     private exportacionService: ExportacionService,
     private cargaMasivaService: CargaMasivaService
-  ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
+  ) {}
 
-    this.filtrosColumnaForm = this.fb.group({
-      fecha: [''],
-      insumo: [''],
-      area: [''],
-      cantidad: [''],
-      lote: [''],
-      estado: [''],
-    });
-  }
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.cargarDatos();
-    this.configurarFiltroGeneralEnTiempoReal();
-    this.configurarFiltrosColumnaEnTiempoReal();
+    this.cargarInsumos();
+    this.cargarLotes();
   }
 
-  ngAfterViewInit() {
-    // Configuración adicional después de la vista
-  }
-
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  configurarFiltroGeneralEnTiempoReal(): void {
-    this.filtroGeneralForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltroGeneral();
-      });
+  onActionClick(event: { action: string; item: any }): void {
+    const { action, item } = event;
+    switch (action) {
+      case 'view':
+        this.verDetalle(item);
+        break;
+      case 'edit':
+        this.editar(item);
+        break;
+      case 'delete':
+        this.eliminar(item);
+        break;
+    }
   }
 
-  configurarFiltrosColumnaEnTiempoReal(): void {
-    this.filtrosColumnaForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltrosColumna();
-      });
+  onButtonClick(action: string): void {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk':
+        this.cargaMasiva();
+        break;
+    }
   }
 
-  // ============================================================================
-  // MÉTODOS DE INICIALIZACIÓN
-  // ============================================================================
-  private cargarDatos() {
-    this.isLoading = true;
-    this.hasError = false;
-    this.errorMessage = '';
-
-    console.log('�� Iniciando carga de consumos - isLoading:', this.isLoading);
-
-    Promise.all([
-      this.materialService.getConsumos().toPromise(),
-      this.materialService.getMateriales().toPromise(),
-      this.materialService.getLotes().toPromise(),
-    ])
-      .then(([consumosData, insumosData, lotesData]) => {
-        // Delay artificial para demostrar el skeleton
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve([consumosData, insumosData, lotesData]);
-          }, 1500);
-        });
-      })
-      .then(([consumosData, insumosData, lotesData]: any) => {
-        console.log('📋 Consumos cargados:', (consumosData || []).length);
-        this.consumos = consumosData || [];
-        this.insumos = insumosData || [];
-        this.lotes = lotesData || [];
-        this.dataSource.data = [...this.consumos];
-      })
-      .catch((error) => {
-        console.error('❌ Error al cargar consumos:', error);
-        this.hasError = true;
-        this.errorMessage = 'Error al cargar los datos de consumos';
-        this.consumos = [];
-        this.insumos = [];
-        this.lotes = [];
-        this.dataSource.data = [];
-      })
-      .finally(() => {
-        this.isLoading = false;
-        console.log('✅ Carga completada - isLoading:', this.isLoading);
-      });
+  private updateTableStates(): void {
+    this.tableState.empty = this.consumos.length === 0;
   }
 
-  reintentarCarga(): void {
+  private async cargarDatos() {
+    this.tableState.loading = true;
+    this.tableState.error = false;
+    this.tableState.errorMessage = '';
+
+    try {
+      this.cargarDatosMock();
+    } catch (error) {
+      this.tableState.error = true;
+      this.tableState.errorMessage = 'Error al cargar los datos de consumos';
+      console.error('Error cargando consumos:', error);
+      this.consumos = [];
+    } finally {
+      this.tableState.loading = false;
+      this.updateTableStates();
+    }
+  }
+
+  recargarDatos(): void {
     this.cargarDatos();
   }
 
-  // ============================================================================
-  // MÉTODOS DE FILTROS
-  // ============================================================================
-  aplicarFiltroGeneral(): void {
-    const busqueda = this.filtroGeneralForm
-      .get('busquedaGeneral')
-      ?.value?.trim()
-      .toLowerCase();
-
-    if (!busqueda) {
-      this.dataSource.data = [...this.consumos];
-      return;
-    }
-
-    const consumosFiltrados = this.consumos.filter((consumo) => {
-      const fecha = this.formatearFecha(consumo.fecha).toLowerCase();
-      const insumoNombre = this.getInsumoNombre(
-        consumo.id_insumo
-      ).toLowerCase();
-      const insumoCodigoFox = this.getInsumoCodigoFox(
-        consumo.id_insumo
-      ).toLowerCase();
-      const area = (consumo.area || '').toLowerCase();
-      const cantidad = this.formatearCantidad(consumo.cantidad);
-      const loteNombre = this.getLoteNombre(consumo.id_lote).toLowerCase();
-      const estado = this.getEstadoConsumo(consumo).toLowerCase();
-
-      return (
-        fecha.includes(busqueda) ||
-        insumoNombre.includes(busqueda) ||
-        insumoCodigoFox.includes(busqueda) ||
-        area.includes(busqueda) ||
-        cantidad.includes(busqueda) ||
-        loteNombre.includes(busqueda) ||
-        estado.includes(busqueda)
-      );
-    });
-
-    this.dataSource.data = consumosFiltrados;
-  }
-
-  aplicarFiltrosColumna(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    let consumosFiltrados = [...this.consumos];
-
-    // Filtro por Fecha
-    if (filtros.fecha && filtros.fecha.toString().trim()) {
-      const fechaFiltro = filtros.fecha.toString();
-      consumosFiltrados = consumosFiltrados.filter((consumo) => {
-        const fechaConsumo = this.formatearFecha(consumo.fecha);
-        return fechaConsumo.includes(fechaFiltro);
-      });
-    }
-
-    // Filtro por Insumo
-    if (filtros.insumo && filtros.insumo.trim()) {
-      consumosFiltrados = consumosFiltrados.filter((consumo) => {
-        const insumoNombre = this.getInsumoNombre(
-          consumo.id_insumo
-        ).toLowerCase();
-        const insumoCodigoFox = this.getInsumoCodigoFox(
-          consumo.id_insumo
-        ).toLowerCase();
-        return (
-          insumoNombre.includes(filtros.insumo.toLowerCase()) ||
-          insumoCodigoFox.includes(filtros.insumo.toLowerCase())
-        );
-      });
-    }
-
-    // Filtro por Área
-    if (filtros.area && filtros.area.trim()) {
-      consumosFiltrados = consumosFiltrados.filter((consumo) =>
-        (consumo.area || '').toLowerCase().includes(filtros.area.toLowerCase())
-      );
-    }
-
-    // Filtro por Cantidad
-    if (filtros.cantidad && filtros.cantidad.toString().trim()) {
-      const cantidadFiltro = parseFloat(filtros.cantidad);
-      if (!isNaN(cantidadFiltro)) {
-        consumosFiltrados = consumosFiltrados.filter((consumo) => {
-          const cantidad = consumo.cantidad || 0;
-          return (
-            cantidad >= cantidadFiltro - 0.01 &&
-            cantidad <= cantidadFiltro + 0.01
-          );
-        });
-      }
-    }
-
-    // Filtro por Lote
-    if (filtros.lote && filtros.lote.trim()) {
-      consumosFiltrados = consumosFiltrados.filter((consumo) =>
-        this.getLoteNombre(consumo.id_lote)
-          .toLowerCase()
-          .includes(filtros.lote.toLowerCase())
-      );
-    }
-
-    // Filtro por Estado
-    if (filtros.estado && filtros.estado.trim()) {
-      consumosFiltrados = consumosFiltrados.filter((consumo) =>
-        this.getEstadoConsumo(consumo)
-          .toLowerCase()
-          .includes(filtros.estado.toLowerCase())
-      );
-    }
-
-    this.dataSource.data = consumosFiltrados;
-  }
-
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.reset();
-    this.dataSource.data = [...this.consumos];
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
-    this.dataSource.data = [...this.consumos];
-  }
-
-  toggleFiltrosColumna() {
-    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
-    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
-
-    if (this.filtrosColumnaHabilitados) {
-      if (this.filtrosColumnaActivos) {
-        this.limpiarFiltroGeneral();
-      } else {
-        this.limpiarFiltrosColumna();
-      }
-    }
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent): void {
-    if (event.key === 'F3') {
-      event.preventDefault();
-      this.toggleFiltrosColumna();
-    }
-  }
-
-  // ============================================================================
-  // MÉTODOS DE TABLA
-  // ============================================================================
-  sortData(column: string) {
-    console.log('Ordenar por:', column);
-    // TODO: Implementar ordenamiento
-  }
-
-  // ============================================================================
-  // MÉTODOS DE ACCIONES
-  // ============================================================================
-  verDetalle(consumo: Consumo): void {
-    const configuracion: ConfiguracionDetalle = {
-      entidad: 'Consumo',
-      entidadArticulo: 'el consumo',
-      datos: consumo,
-      filas: [
-        [
-          {
-            key: 'id_consumo',
-            label: 'Código',
-            tipo: 'text',
-            formateo: (valor) => ConsumosConfig.formatearCodigo(valor),
-            ancho: 'normal',
-          },
-          {
-            key: 'fecha',
-            label: 'Fecha',
-            tipo: 'text',
-            formateo: (valor) => ConsumosConfig.formatearFecha(valor),
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'id_insumo',
-            label: 'Insumo',
-            tipo: 'text',
-            formateo: (valor) =>
-              ConsumosConfig.formatearTexto(this.getInsumoNombre(valor)),
-            ancho: 'completo',
-          },
-        ],
-        [
-          {
-            key: 'area',
-            label: 'Área',
-            tipo: 'text',
-            formateo: (valor) => ConsumosConfig.formatearTexto(valor),
-            ancho: 'normal',
-          },
-          {
-            key: 'cantidad',
-            label: 'Cantidad',
-            tipo: 'number',
-            formateo: (valor) => ConsumosConfig.formatearCantidad(valor),
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'id_lote',
-            label: 'Lote',
-            tipo: 'text',
-            formateo: (valor) =>
-              ConsumosConfig.formatearTexto(this.getLoteNombre(valor)),
-            ancho: 'normal',
-          },
-          {
-            key: 'estado',
-            label: 'Estado',
-            tipo: 'text',
-            formateo: (valor) => ConsumosConfig.formatearEstado(valor).texto,
-            ancho: 'normal',
-          },
-        ],
-      ],
-    };
-
-    this.dialog.open(DetalleDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: configuracion,
-    });
-  }
-
-  editar(consumo: Consumo): void {
-    const configuracion: ConfiguracionFormulario = {
-      titulo: {
-        agregar: 'Agregar Consumo',
-        editar: 'Editar Consumo',
+  private cargarDatosMock() {
+    this.consumos = [
+      {
+        id_consumo: 1,
+        fecha: new Date('2024-01-15'),
+        id_insumo: 1,
+        cantidad: 25.5,
+        id_unidad: 'KG',
+        id_lote: 1,
+        area_consumo: 'Producción',
+        motivo_consumo: 'Producción diaria',
+        usuario_registro: 'Juan Pérez',
+        observaciones: 'Consumo normal',
+        estado: 'CONFIRMADO'
       },
-      entidad: 'Consumo',
-      entidadArticulo: 'el consumo',
-      esEdicion: true,
-      datosIniciales: consumo,
-      filas: [
-        [
-          {
-            key: 'id_insumo',
-            label: 'Insumo',
-            tipo: 'select',
-            opciones: this.insumos.map((i) => ({
-              value: i.id_insumo!,
-              label: i.nombre,
-            })),
-            obligatorio: true,
-            ancho: 'completo',
-          },
-        ],
-        [
-          {
-            key: 'fecha',
-            label: 'Fecha',
-            tipo: 'text',
-            placeholder: 'dd/mm/aaaa',
-            obligatorio: true,
-            ancho: 'normal',
-          },
-          {
-            key: 'area',
-            label: 'Área',
-            tipo: 'text',
-            placeholder: 'Área de consumo',
-            obligatorio: true,
-            maxLength: 100,
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'cantidad',
-            label: 'Cantidad',
-            tipo: 'number',
-            placeholder: 'Cantidad consumida',
-            obligatorio: true,
-            min: 0.01,
-            ancho: 'normal',
-          },
-          {
-            key: 'id_lote',
-            label: 'Lote',
-            tipo: 'select',
-            opciones: this.lotes.map((l) => ({
-              value: l.id_lote!,
-              label: l.lote || '',
-            })),
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'estado',
-            label: 'Estado',
-            tipo: 'select',
-            opciones: Object.entries(CONSUMOS_CONFIG.ESTADOS).map(
-              ([key, value]: [string, any]) => ({
-                value: key,
-                label: value.texto,
-              })
-            ),
-            obligatorio: true,
-            ancho: 'completo',
-          },
-        ],
-      ],
-    };
-
-    const dialogRef = this.dialog.open(FormularioDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: configuracion,
-    });
-
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado && resultado.datos) {
-        this.materialService.actualizarConsumo(resultado.datos).subscribe({
-          next: () => {
-            this.cargarDatos();
-          },
-          error: (error: any) => {
-            console.error('Error al editar consumo:', error);
-          },
-        });
-      }
-    });
-  }
-
-  eliminar(consumo: Consumo): void {
-    const configuracion = ConsumosConfig.eliminarConsumo(consumo);
-
-    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
-      width: '500px',
-      disableClose: true,
-      data: configuracion,
-    });
-
-    dialogRef.afterClosed().subscribe((confirmado) => {
-      if (confirmado && consumo.id_consumo) {
-        this.materialService.eliminarConsumo(consumo.id_consumo).subscribe({
-          next: () => {
-            this.cargarDatos();
-          },
-          error: (error: any) => {
-            console.error('Error al eliminar consumo:', error);
-          },
-        });
-      }
-    });
-  }
-
-  editarConsumo(consumo: Consumo): void {
-    this.editar(consumo);
-  }
-
-  agregar(): void {
-    const configuracion: ConfiguracionFormulario = {
-      titulo: {
-        agregar: 'Agregar Consumo',
-        editar: 'Editar Consumo',
+      {
+        id_consumo: 2,
+        fecha: new Date('2024-01-20'),
+        id_insumo: 2,
+        cantidad: 12.0,
+        id_unidad: 'KG',
+        id_lote: 2,
+        area_consumo: 'Panadería',
+        motivo_consumo: 'Producción especial',
+        usuario_registro: 'María García',
+        observaciones: 'Para pedido especial',
+        estado: 'PENDIENTE'
       },
-      entidad: 'Consumo',
-      entidadArticulo: 'el consumo',
-      esEdicion: false,
-      filas: [
-        [
-          {
-            key: 'id_insumo',
-            label: 'Insumo',
-            tipo: 'select',
-            opciones: this.insumos.map((i) => ({
-              value: i.id_insumo!,
-              label: i.nombre,
-            })),
-            obligatorio: true,
-            ancho: 'completo',
-          },
-        ],
-        [
-          {
-            key: 'fecha',
-            label: 'Fecha',
-            tipo: 'text',
-            placeholder: 'dd/mm/aaaa',
-            obligatorio: true,
-            ancho: 'normal',
-          },
-          {
-            key: 'area',
-            label: 'Área',
-            tipo: 'text',
-            placeholder: 'Área de consumo',
-            obligatorio: true,
-            maxLength: 100,
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'cantidad',
-            label: 'Cantidad',
-            tipo: 'number',
-            placeholder: 'Cantidad consumida',
-            obligatorio: true,
-            min: 0.01,
-            ancho: 'normal',
-          },
-          {
-            key: 'id_lote',
-            label: 'Lote',
-            tipo: 'select',
-            opciones: this.lotes.map((l) => ({
-              value: l.id_lote!,
-              label: l.lote || '',
-            })),
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'estado',
-            label: 'Estado',
-            tipo: 'select',
-            opciones: Object.entries(CONSUMOS_CONFIG.ESTADOS).map(
-              ([key, value]: [string, any]) => ({
-                value: key,
-                label: value.texto,
-              })
-            ),
-            obligatorio: true,
-            ancho: 'completo',
-          },
-        ],
-      ],
-    };
-
-    const dialogRef = this.dialog.open(FormularioDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: configuracion,
-    });
-
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado && resultado.datos) {
-        this.materialService.crearConsumo(resultado.datos).subscribe({
-          next: () => {
-            this.cargarDatos();
-          },
-          error: (error: any) => {
-            console.error('Error al crear consumo:', error);
-          },
-        });
+      {
+        id_consumo: 3,
+        fecha: new Date('2024-01-25'),
+        id_insumo: 3,
+        cantidad: 5.0,
+        id_unidad: 'KG',
+        id_lote: 3,
+        area_consumo: 'Repostería',
+        motivo_consumo: 'Pruebas',
+        usuario_registro: 'Carlos López',
+        observaciones: 'Pruebas de calidad',
+        estado: 'ANULADO'
+      },
+      {
+        id_consumo: 4,
+        fecha: new Date('2024-02-01'),
+        id_insumo: 4,
+        cantidad: 250,
+        id_unidad: 'G',
+        id_lote: 4,
+        area_consumo: 'Producción',
+        motivo_consumo: 'Producción diaria',
+        usuario_registro: 'Ana Martínez',
+        observaciones: 'Uso normal',
+        estado: 'CONFIRMADO'
+      },
+      {
+        id_consumo: 5,
+        fecha: new Date('2024-02-05'),
+        id_insumo: 5,
+        cantidad: 100,
+        id_unidad: 'G',
+        id_lote: 5,
+        area_consumo: 'Chocolatería',
+        motivo_consumo: 'Productos premium',
+        usuario_registro: 'Luis Rodríguez',
+        observaciones: 'Para línea premium',
+        estado: 'PENDIENTE'
       }
-    });
+    ];
+
+    console.log('✅ Datos mock cargados:', this.consumos.length, 'consumos');
   }
 
-  abrirRegistroConsumo(): void {
-    this.agregar();
+  private cargarInsumos(): void {
+    this.insumos = [
+      { id_insumo: 1, nombre: 'Harina de Trigo Premium', id_fox: 'H001' },
+      { id_insumo: 2, nombre: 'Azúcar Blanca', id_fox: 'A001' },
+      { id_insumo: 3, nombre: 'Mantequilla Sin Sal', id_fox: 'M001' },
+      { id_insumo: 4, nombre: 'Levadura Seca', id_fox: 'L001' },
+      { id_insumo: 5, nombre: 'Chocolate Negro 70%', id_fox: 'C001' }
+    ];
   }
 
-  abrirConsumoMasivo() {
-    this.cargaMasiva();
+  private cargarLotes(): void {
+    this.lotes = [
+      {
+        id_lote: 1,
+        lote: 'LT-001',
+        id_insumo: 1,
+        ubicacion: 'A-01-01',
+        stock_inicial: 1000,
+        stock_actual: 850,
+        fecha_expiracion: new Date('2024-06-15'),
+        precio_total: 2500,
+        estado_lote: 'ACTIVO'
+      },
+      {
+        id_lote: 2,
+        lote: 'LT-002',
+        id_insumo: 2,
+        ubicacion: 'A-01-02',
+        stock_inicial: 500,
+        stock_actual: 75,
+        fecha_expiracion: new Date('2024-03-20'),
+        precio_total: 900,
+        estado_lote: 'BAJO'
+      },
+      {
+        id_lote: 3,
+        lote: 'LT-003',
+        id_insumo: 3,
+        ubicacion: 'B-02-01',
+        stock_inicial: 200,
+        stock_actual: 0,
+        fecha_expiracion: new Date('2024-01-10'),
+        precio_total: 1700,
+        estado_lote: 'AGOTADO'
+      },
+      {
+        id_lote: 4,
+        lote: 'LT-004',
+        id_insumo: 4,
+        ubicacion: 'A-03-01',
+        stock_inicial: 300,
+        stock_actual: 280,
+        fecha_expiracion: new Date('2025-12-31'),
+        precio_total: 150,
+        estado_lote: 'ACTIVO'
+      },
+      {
+        id_lote: 5,
+        lote: 'LT-005',
+        id_insumo: 5,
+        ubicacion: 'C-01-01',
+        stock_inicial: 100,
+        stock_actual: 95,
+        fecha_expiracion: new Date('2024-08-15'),
+        precio_total: 1200,
+        estado_lote: 'ACTIVO'
+      }
+    ];
   }
 
-  // ============================================================================
-  // MÉTODOS UTILITARIOS
-  // ============================================================================
-  getInsumoNombre(idInsumo?: number): string {
-    if (!idInsumo) return 'Sin insumo';
-    const insumo = this.insumos.find((i) => i.id_insumo === idInsumo);
-    return insumo?.nombre || 'Insumo no encontrado';
+  getInsumoNombre(id_insumo?: number): string {
+    const insumo = this.insumos.find((i) => i.id_insumo === id_insumo);
+    return insumo ? insumo.nombre : 'Sin asignar';
   }
 
-  getInsumoCodigoFox(idInsumo?: number): string {
-    if (!idInsumo) return '';
-    const insumo = this.insumos.find((i) => i.id_insumo === idInsumo);
-    return insumo?.id_fox || '';
+  getInsumoCodigoFox(id_insumo?: number): string {
+    const insumo = this.insumos.find((i) => i.id_insumo === id_insumo);
+    return insumo?.id_fox || '-';
   }
 
-  getUnidadPorInsumo(idInsumo?: number): string {
-    if (!idInsumo) return '';
-    const insumo = this.insumos.find((i) => i.id_insumo === idInsumo);
-    return insumo?.unidad?.nombre || '';
-  }
-
-  getLoteNombre(idLote?: number): string {
-    if (!idLote) return 'Sin lote';
-    const lote = this.lotes.find((l) => l.id_lote === idLote);
-    return lote?.lote || 'Lote no encontrado';
+  getLoteNombre(id_lote?: number): string {
+    const lote = this.lotes.find((l) => l.id_lote === id_lote);
+    return lote ? lote.lote! : `L-${id_lote}`;
   }
 
   getEstadoConsumo(consumo: Consumo): string {
     return consumo.estado || 'PENDIENTE';
   }
 
-  formatearFecha(fecha?: Date): string {
-    if (!fecha) return '';
-    const fechaObj = new Date(fecha);
-    return fechaObj.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
+  getEstadoColor(estado?: string): string {
+    switch (estado?.toLowerCase()) {
+      case 'confirmado':
+        return 'success';
+      case 'pendiente':
+        return 'warning';
+      case 'anulado':
+        return 'danger';
+      default:
+        return 'neutral';
+    }
+  }
+
+  formatearFecha(fecha?: Date | string): string {
+    if (!fecha) return '-';
+    const fechaObj = typeof fecha === 'string' ? new Date(fecha) : fecha;
+    return fechaObj.toLocaleDateString('es-ES');
+  }
+
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
+  }
+
+  formatearNumero(valor?: number): string {
+    if (valor === null || valor === undefined) return '-';
+    return valor.toLocaleString('es-ES', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     });
   }
 
   formatearCantidad(cantidad?: number): string {
-    if (!cantidad) return '-';
-    return `${cantidad.toFixed(2)}`;
+    return cantidad?.toLocaleString('es-ES', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }) || '0';
+  }
+
+  verDetalle(consumo: Consumo): void {
+    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
+      ({ DetalleDialogComponent }) => {
+        const datosDetalle = {
+          ...consumo,
+          id_insumo: this.getInsumoNombre(consumo.id_insumo),
+          id_lote: this.getLoteNombre(consumo.id_lote),
+          fecha: this.formatearFecha(consumo.fecha),
+          cantidad: this.formatearNumero(consumo.cantidad)
+        };
+        
+        const config = {
+          entidad: 'Consumo',
+          entidadArticulo: 'el consumo',
+          datos: datosDetalle,
+          filas: [
+            [
+              { key: 'fecha', label: 'Fecha', tipo: 'text' as const },
+              { key: 'id_insumo', label: 'Insumo', tipo: 'text' as const }
+            ],
+            [
+              { key: 'cantidad_consumida', label: 'Cantidad', tipo: 'text' as const },
+              { key: 'id_unidad', label: 'Unidad', tipo: 'text' as const }
+            ],
+            [
+              { key: 'area_consumo', label: 'Área', tipo: 'text' as const },
+              { key: 'id_lote', label: 'Lote', tipo: 'text' as const }
+            ],
+            [
+              { key: 'motivo_consumo', label: 'Motivo', tipo: 'text' as const },
+              { key: 'estado', label: 'Estado', tipo: 'text' as const }
+            ],
+            [
+              { key: 'usuario_registro', label: 'Usuario', tipo: 'text' as const },
+              { key: 'observaciones', label: 'Observaciones', tipo: 'text' as const }
+            ]
+          ]
+        };
+        
+        const dialogRef = this.dialog.open(DetalleDialogComponent, {
+          width: '800px',
+          disableClose: true,
+          data: config,
+        });
+      }
+    );
+  }
+
+  editar(consumo: Consumo): void {
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      const config = {
+        titulo: {
+          agregar: 'Agregar Consumo',
+          editar: 'Editar Consumo'
+        },
+        entidad: 'Consumo',
+        entidadArticulo: 'el consumo',
+        esEdicion: true,
+        datosIniciales: consumo,
+        filas: [
+          [
+            {
+              key: 'fecha',
+              label: 'Fecha',
+              tipo: 'date' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_insumo',
+              label: 'Insumo',
+              tipo: 'select' as const,
+              obligatorio: true,
+              opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'cantidad_consumida',
+              label: 'Cantidad',
+              tipo: 'number' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_unidad',
+              label: 'Unidad',
+              tipo: 'text' as const,
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'area_consumo',
+              label: 'Área de Consumo',
+              tipo: 'text' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_lote',
+              label: 'Lote',
+              tipo: 'select' as const,
+              opciones: this.lotes.map(l => ({ value: l.id_lote!, label: l.lote! })),
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'motivo_consumo',
+              label: 'Motivo',
+              tipo: 'text' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'estado',
+              label: 'Estado',
+              tipo: 'select' as const,
+              obligatorio: true,
+              opciones: [
+                { value: 'PENDIENTE', label: 'Pendiente' },
+                { value: 'CONFIRMADO', label: 'Confirmado' },
+                { value: 'ANULADO', label: 'Anulado' }
+              ],
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'observaciones',
+              label: 'Observaciones',
+              tipo: 'textarea' as const,
+              ancho: 'completo' as const
+            }
+          ]
+        ]
+      };
+      
+      const dialogRef = this.dialog.open(FormularioDialogComponent, {
+        width: '800px',
+        disableClose: true,
+        data: config,
+      });
+
+      dialogRef.afterClosed().subscribe((resultado) => {
+        if (resultado?.accion === 'guardar') {
+          console.log('Actualizando consumo:', resultado.datos);
+          this.cargarDatos();
+        }
+      });
+    });
+  }
+
+  eliminar(consumo: Consumo): void {
+    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(
+      ({ ConfirmacionDialogComponent }) => {
+        const config = {
+          titulo: 'Eliminar Consumo',
+          subtitulo: 'Esta acción no se puede deshacer',
+          mensaje: `¿Está seguro que desea eliminar el consumo de "${this.getInsumoNombre(consumo.id_insumo)}"?`,
+          mensajeSecundario: 'Todos los datos relacionados con este consumo se perderán permanentemente.',
+          tipo: 'danger' as const,
+          textoBotonConfirmar: 'Eliminar',
+          textoBotonCancelar: 'Cancelar'
+        };
+        
+        const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+          width: '500px',
+          disableClose: true,
+          data: config,
+        });
+        
+        dialogRef.afterClosed().subscribe((confirmado) => {
+          if (confirmado && consumo.id_consumo) {
+            console.log('Eliminar consumo:', consumo);
+            this.cargarDatos();
+          }
+        });
+      }
+    );
+  }
+
+  agregar(): void {
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      const config = {
+        titulo: {
+          agregar: 'Agregar Consumo',
+          editar: 'Editar Consumo'
+        },
+        entidad: 'Consumo',
+        entidadArticulo: 'el consumo',
+        esEdicion: false,
+        filas: [
+          [
+            {
+              key: 'fecha',
+              label: 'Fecha',
+              tipo: 'date' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_insumo',
+              label: 'Insumo',
+              tipo: 'select' as const,
+              obligatorio: true,
+              opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'cantidad_consumida',
+              label: 'Cantidad',
+              tipo: 'number' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_unidad',
+              label: 'Unidad',
+              tipo: 'text' as const,
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'area_consumo',
+              label: 'Área de Consumo',
+              tipo: 'text' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_lote',
+              label: 'Lote',
+              tipo: 'select' as const,
+              opciones: this.lotes.map(l => ({ value: l.id_lote!, label: l.lote! })),
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'motivo_consumo',
+              label: 'Motivo',
+              tipo: 'text' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'estado',
+              label: 'Estado',
+              tipo: 'select' as const,
+              obligatorio: true,
+              opciones: [
+                { value: 'PENDIENTE', label: 'Pendiente' },
+                { value: 'CONFIRMADO', label: 'Confirmado' },
+                { value: 'ANULADO', label: 'Anulado' }
+              ],
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'observaciones',
+              label: 'Observaciones',
+              tipo: 'textarea' as const,
+              ancho: 'completo' as const
+            }
+          ]
+        ]
+      };
+      
+      const dialogRef = this.dialog.open(FormularioDialogComponent, {
+        width: '800px',
+        disableClose: true,
+        data: config,
+      });
+
+      dialogRef.afterClosed().subscribe((resultado) => {
+        if (resultado?.accion === 'guardar') {
+          console.log('Creando consumo:', resultado.datos);
+          this.cargarDatos();
+        }
+      });
+    });
+  }
+
+  private configurarExportacion(): ConfiguracionExportacion<Consumo> {
+    return {
+      entidades: this.consumos,
+      nombreArchivo: 'consumos',
+      nombreEntidad: 'Consumos',
+      columnas: [
+        { campo: 'id_consumo', titulo: 'ID', formato: 'numero' },
+        { campo: 'fecha', titulo: 'Fecha', formato: 'fecha' },
+        { campo: 'id_insumo', titulo: 'ID Insumo', formato: 'numero' },
+        { campo: 'cantidad_consumida', titulo: 'Cantidad', formato: 'numero' },
+        { campo: 'id_unidad', titulo: 'Unidad', formato: 'texto' },
+        { campo: 'id_lote', titulo: 'ID Lote', formato: 'numero' },
+        { campo: 'area_consumo', titulo: 'Área', formato: 'texto' },
+        { campo: 'motivo_consumo', titulo: 'Motivo', formato: 'texto' },
+        { campo: 'usuario_registro', titulo: 'Usuario', formato: 'texto' },
+        { campo: 'observaciones', titulo: 'Observaciones', formato: 'texto' },
+        { campo: 'estado', titulo: 'Estado', formato: 'texto' },
+      ],
+      filtrosActivos: this.obtenerFiltrosActivos(),
+      metadatos: {
+        cantidadTotal: this.consumos.length,
+        cantidadFiltrada: this.consumos.length,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+  }
+
+  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Consumo> {
+    return {
+      tipoEntidad: 'consumos',
+      mapeoColumnas: [
+        {
+          columnaArchivo: 'Fecha',
+          campoEntidad: 'fecha',
+          obligatorio: true,
+          tipoEsperado: 'fecha',
+        },
+        {
+          columnaArchivo: 'ID Insumo',
+          campoEntidad: 'id_insumo',
+          obligatorio: true,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Cantidad',
+          campoEntidad: 'cantidad_consumida',
+          obligatorio: true,
+          tipoEsperado: 'numero',
+        },
+        {
+          columnaArchivo: 'Área',
+          campoEntidad: 'area_consumo',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Motivo',
+          campoEntidad: 'motivo_consumo',
+          obligatorio: true,
+          tipoEsperado: 'texto',
+        },
+        {
+          columnaArchivo: 'Estado',
+          campoEntidad: 'estado',
+          obligatorio: false,
+          tipoEsperado: 'texto',
+        },
+      ],
+      validaciones: [
+        {
+          campo: 'area_consumo',
+          validador: (valor) => valor && valor.length <= 100,
+          mensajeError: 'El área debe tener máximo 100 caracteres',
+        },
+        {
+          campo: 'motivo_consumo',
+          validador: (valor) => valor && valor.length <= 200,
+          mensajeError: 'El motivo debe tener máximo 200 caracteres',
+        },
+        {
+          campo: 'estado',
+          validador: (valor) => !valor || ['PENDIENTE', 'CONFIRMADO', 'ANULADO'].includes(valor),
+          mensajeError: 'El estado debe ser PENDIENTE, CONFIRMADO o ANULADO',
+        },
+      ],
+    };
   }
 
   cargaMasiva(): void {
@@ -740,10 +817,24 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
           this.procesarArchivoCargaMasiva(archivo),
       },
     });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarDatos();
+      }
+    });
   }
 
   toggleDropdownExport(): void {
     this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-export')) {
+      this.dropdownExportAbierto = false;
+    }
   }
 
   exportarExcel(): void {
@@ -766,123 +857,27 @@ export class ConsumosComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private configurarExportacion(): ConfiguracionExportacion<Consumo> {
-    return {
-      entidades: this.dataSource.data,
-      nombreArchivo: 'consumos',
-      nombreEntidad: 'Consumos',
-      columnas: [
-        { campo: 'id_consumo', titulo: 'ID', formato: 'numero' },
-        { campo: 'fecha', titulo: 'Fecha', formato: 'fecha' },
-        { campo: 'id_insumo', titulo: 'Insumo', formato: 'texto' },
-        { campo: 'area', titulo: 'Área', formato: 'texto' },
-        { campo: 'cantidad', titulo: 'Cantidad', formato: 'numero' },
-        { campo: 'id_lote', titulo: 'Lote', formato: 'texto' },
-        { campo: 'estado', titulo: 'Estado', formato: 'texto' },
-        { campo: 'created_at', titulo: 'Fecha Creación', formato: 'fecha' },
-        {
-          campo: 'updated_at',
-          titulo: 'Última Actualización',
-          formato: 'fecha',
-        },
-      ],
-      filtrosActivos: this.obtenerFiltrosActivos(),
-      metadatos: {
-        cantidadTotal: this.consumos.length,
-        cantidadFiltrada: this.dataSource.data.length,
-        fechaExportacion: new Date(),
-        usuario: 'Usuario Actual',
-      },
-    };
+  private descargarPlantillaCargaMasiva(): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService.generarPlantilla(config);
   }
 
-  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Consumo> {
-    return {
-      tipoEntidad: 'consumos',
-      mapeoColumnas: [
-        {
-          columnaArchivo: 'Fecha',
-          campoEntidad: 'fecha',
-          obligatorio: true,
-          tipoEsperado: 'fecha',
-        },
-        {
-          columnaArchivo: 'Insumo',
-          campoEntidad: 'id_insumo',
-          obligatorio: true,
-          tipoEsperado: 'numero',
-        },
-        {
-          columnaArchivo: 'Área',
-          campoEntidad: 'area',
-          obligatorio: true,
-          tipoEsperado: 'texto',
-        },
-        {
-          columnaArchivo: 'Cantidad',
-          campoEntidad: 'cantidad',
-          obligatorio: true,
-          tipoEsperado: 'numero',
-        },
-        {
-          columnaArchivo: 'Lote',
-          campoEntidad: 'id_lote',
-          obligatorio: false,
-          tipoEsperado: 'numero',
-        },
-        {
-          columnaArchivo: 'Estado',
-          campoEntidad: 'estado',
-          obligatorio: false,
-          tipoEsperado: 'texto',
-        },
-      ],
-      validaciones: [
-        {
-          campo: 'area',
-          validador: (valor) => valor && valor.length <= 100,
-          mensajeError: 'El área debe tener máximo 100 caracteres',
-        },
-        {
-          campo: 'cantidad',
-          validador: (valor) => valor && valor > 0,
-          mensajeError: 'La cantidad debe ser mayor a 0',
-        },
-      ],
-    };
+  private procesarArchivoCargaMasiva(archivo: File): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService
+      .procesarArchivo(archivo, config)
+      .then((resultado) => {
+        console.log('Archivo procesado:', resultado);
+        if (resultado.exitosa) {
+          this.cargarDatos();
+        }
+      })
+      .catch((error: any) => {
+        console.error('Error procesando archivo:', error);
+      });
   }
 
   private obtenerFiltrosActivos(): any {
-    const filtros: any = {};
-    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
-    if (filtroGeneral) {
-      filtros.busquedaGeneral = filtroGeneral;
-    }
-
-    const filtrosColumna = this.filtrosColumnaForm.value;
-    Object.keys(filtrosColumna).forEach((key) => {
-      if (filtrosColumna[key]) {
-        filtros[key] = filtrosColumna[key];
-      }
-    });
-
-    return filtros;
-  }
-
-  private descargarPlantillaCargaMasiva(): void {
-    this.cargaMasivaService.generarPlantilla(this.configurarCargaMasiva());
-  }
-
-  private async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
-    try {
-      const resultado = await this.cargaMasivaService.procesarArchivo(
-        archivo,
-        this.configurarCargaMasiva()
-      );
-      console.log('Carga masiva completada:', resultado);
-      this.cargarDatos();
-    } catch (error) {
-      console.error('Error en carga masiva:', error);
-    }
+    return {};
   }
 }
