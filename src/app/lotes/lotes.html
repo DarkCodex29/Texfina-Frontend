@@ -6,419 +6,50 @@
         <h1 class="page-title text-texfina text-primary">Lotes</h1>
       </div>
       <div class="header-actions">
-        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
-          Carga Masiva
-        </button>
+        <!-- Dropdown de Exportar -->
         <div class="dropdown-export">
           <button
             class="btn-texfina btn-neutral dropdown-trigger"
             (click)="toggleDropdownExport()"
+            [class.active]="dropdownExportAbierto"
+            matTooltip="Exportar listado de lotes"
           >
             Exportar
           </button>
-          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+
+          <div
+            class="dropdown-menu"
+            [class.show]="dropdownExportAbierto"
+            (click)="$event.stopPropagation()"
+          >
             <button class="dropdown-item" (click)="exportarExcel()">
-              Exportar a Excel
+              <span>Exportar a Excel</span>
             </button>
             <button class="dropdown-item" (click)="exportarPDF()">
-              Exportar a PDF
+              <span>Exportar a PDF</span>
             </button>
           </div>
         </div>
-        <button class="btn-texfina btn-primary" (click)="agregar()">
-          Agregar Lote
-        </button>
-      </div>
-    </div>
-
-    <!-- Filtro General -->
-    <div class="filters-card">
-      <div class="filters-content">
-        <form [formGroup]="filtroGeneralForm" class="filters-form">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <input
-                  class="simple-input"
-                  formControlName="busquedaGeneral"
-                  placeholder="Buscar en código, insumo, ubicación, estado..."
-                  type="text"
-                />
-                <button
-                  class="btn-limpiar"
-                  type="button"
-                  (click)="limpiarFiltroGeneral()"
-                  matTooltip="Limpiar búsqueda"
-                >
-                  Limpiar
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
       </div>
     </div>
 
     <!-- Tabla de lotes -->
     <div class="table-card">
-      <div class="table-with-headers">
-        <!-- Encabezados de columnas con filtros integrados -->
-        <div class="column-headers">
-          <!-- Fila de títulos -->
-          <div class="header-row header-titles">
-            <div class="header-col codigo-col" (click)="sortData('lote')">
-              <span>Código Lote</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col insumo-col" (click)="sortData('id_insumo')">
-              <span>Insumo</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col ubicacion-col"
-              (click)="sortData('ubicacion')"
-            >
-              <span>Ubicación</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col stock-col"
-              (click)="sortData('stock_actual')"
-            >
-              <span>Stock</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col fecha-col"
-              (click)="sortData('fecha_expiracion')"
-            >
-              <span>Vencimiento</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col estado-col"
-              (click)="sortData('estado_lote')"
-            >
-              <span>Estado</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col acciones-col">
-              <span>ACCIONES</span>
-            </div>
-          </div>
-
-          <!-- Fila de filtros por columna -->
-          <div
-            class="header-row header-filters"
-            *ngIf="filtrosColumnaHabilitados"
-            [formGroup]="filtrosColumnaForm"
-          >
-            <div class="header-col codigo-col">
-              <input
-                class="column-filter-input"
-                formControlName="lote"
-                placeholder="Código..."
-                type="text"
-              />
-            </div>
-            <div class="header-col insumo-col">
-              <input
-                class="column-filter-input"
-                formControlName="insumo"
-                placeholder="Insumo..."
-                type="text"
-              />
-            </div>
-            <div class="header-col ubicacion-col">
-              <input
-                class="column-filter-input"
-                formControlName="ubicacion"
-                placeholder="Ubicación..."
-                type="text"
-              />
-            </div>
-            <div class="header-col stock-col">
-              <input
-                class="column-filter-input"
-                formControlName="stockActual"
-                placeholder="Stock..."
-                type="number"
-                step="0.01"
-              />
-            </div>
-            <div class="header-col fecha-col">
-              <input
-                class="column-filter-input"
-                formControlName="fechaExpiracion"
-                placeholder="Año..."
-                type="number"
-              />
-            </div>
-            <div class="header-col estado-col">
-              <input
-                class="column-filter-input"
-                formControlName="estadoLote"
-                placeholder="Estado..."
-                type="text"
-              />
-            </div>
-            <div class="header-col acciones-col">
-              <button
-                class="btn-clear-column-filters"
-                type="button"
-                (click)="limpiarFiltrosColumna()"
-                matTooltip="Limpiar filtros de columna"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <!-- Estado de error -->
-          <div *ngIf="hasError" class="error-state">
-            <mat-icon class="error-icon">error_outline</mat-icon>
-            <h3 class="error-title text-texfina text-primary">
-              Error al cargar datos
-            </h3>
-            <p class="error-subtitle text-texfina text-muted">
-              {{ errorMessage }}
-            </p>
-            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
-              <mat-icon>refresh</mat-icon>
-              Reintentar
-            </button>
-          </div>
-
-          <!-- Estado vacío (sin datos) -->
-          <div *ngIf="isEmpty" class="empty-state">
-            <mat-icon class="empty-icon">inventory</mat-icon>
-            <h3 class="empty-title text-texfina text-primary">
-              No hay lotes registrados
-            </h3>
-            <p class="empty-subtitle text-texfina text-muted">
-              Comienza agregando tu primer lote para gestionar el inventario
-            </p>
-            <button class="btn-texfina btn-primary" (click)="agregar()">
-              <mat-icon>add</mat-icon>
-              Agregar Primer Lote
-            </button>
-          </div>
-
-          <!-- Estado filtrado vacío -->
-          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
-            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
-            <h3 class="filtered-empty-title text-texfina text-primary">
-              No se encontraron resultados
-            </h3>
-            <p class="filtered-empty-subtitle text-texfina text-muted">
-              Intenta ajustar los filtros o limpiar la búsqueda
-            </p>
-          </div>
-
-          <!-- Tabla siempre visible (con skeleton o datos) -->
-          <table mat-table [dataSource]="dataSource" matSort class="data-table">
-            <!-- Columna Código de Lote -->
-            <ng-container matColumnDef="lote">
-              <td mat-cell *matCellDef="let lote" class="table-cell">
-                <span class="badge-texfina badge-neutral">{{ lote.lote }}</span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Insumo -->
-            <ng-container matColumnDef="id_insumo">
-              <td mat-cell *matCellDef="let lote" class="table-cell">
-                <div class="lote-cell">
-                  <div class="insumo-name text-texfina font-medium">
-                    {{ getInsumoNombre(lote.id_insumo) }}
-                  </div>
-                  <div class="lote-codigo text-texfina text-muted">
-                    Lote: {{ lote.lote }}
-                  </div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Columna Ubicación -->
-            <ng-container matColumnDef="ubicacion">
-              <td mat-cell *matCellDef="let lote" class="table-cell">
-                <span class="text-texfina text-secondary">
-                  {{ lote.ubicacion || "Sin ubicación" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Stock -->
-            <ng-container matColumnDef="stock_actual">
-              <td mat-cell *matCellDef="let lote" class="table-cell">
-                <div class="stock-info">
-                  <span class="stock-actual text-texfina text-secondary">
-                    {{ (lote.stock_actual || 0) | number:'1.2-2' }}
-                  </span>
-                  <span class="stock-separator text-texfina text-muted">/</span>
-                  <span class="stock-inicial text-texfina text-muted"
-                    >{{ (lote.stock_inicial || 0) | number:'1.2-2' }}</span
-                  >
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Columna Fecha de Expiración -->
-            <ng-container matColumnDef="fecha_expiracion">
-              <td mat-cell *matCellDef="let lote" class="table-cell">
-                <span
-                  *ngIf="lote.fecha_expiracion; else noFecha"
-                  class="text-texfina text-secondary"
-                >
-                  {{ formatearFecha(lote.fecha_expiracion) }}
-                </span>
-                <ng-template #noFecha>
-                  <span class="text-texfina text-muted">Sin vencimiento</span>
-                </ng-template>
-              </td>
-            </ng-container>
-
-            <!-- Columna Estado -->
-            <ng-container matColumnDef="estado_lote">
-              <td mat-cell *matCellDef="let lote" class="table-cell">
-                <span
-                  class="badge-texfina"
-                  [class]="'badge-' + getEstadoColor(lote.estado_lote)"
-                >
-                  {{ lote.estado_lote || "Sin estado" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Acciones -->
-            <ng-container matColumnDef="acciones">
-              <td
-                mat-cell
-                *matCellDef="let lote"
-                class="table-cell actions-cell"
-              >
-                <div class="action-buttons">
-                  <button
-                    class="btn-action btn-view"
-                    (click)="verDetalle(lote)"
-                    matTooltip="Ver detalle"
-                  >
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                  <button
-                    class="btn-action btn-edit"
-                    (click)="editar(lote)"
-                    matTooltip="Editar"
-                  >
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button
-                    class="btn-action btn-delete"
-                    (click)="eliminar(lote)"
-                    matTooltip="Eliminar"
-                  >
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Filas de datos reales -->
-            <tr
-              mat-row
-              *matRowDef="let row; columns: displayedColumns"
-              [class.row-vencido]="isLoteVencido(row)"
-              [class.row-por-vencer]="isLotePorVencer(row)"
-              [class.row-agotado]="isLoteAgotado(row)"
-              [class.row-stock-bajo]="isStockBajo(row)"
-            ></tr>
-          </table>
-
-          <!-- Skeleton superpuesto mientras carga -->
-          <div *ngIf="isLoading" class="skeleton-overlay">
-            <table class="skeleton-table">
-              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5, 6]">
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                  <div class="skeleton-line skeleton-subtext"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-actions"></div>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Paginación con leyenda -->
-      <div class="table-footer">
-        <div class="pagination-info">
-          <span class="text-texfina text-muted">Página 1 de 10</span>
-        </div>
-
-        <!-- Leyenda compacta -->
-        <div class="footer-legend">
-          <div class="legend-compact">
-            <span class="legend-label"> Estados: </span>
-            <div class="legend-indicators">
-              <div
-                class="legend-mini-item"
-                matTooltip="Lote vencido - Requiere atención inmediata"
-              >
-                <div class="legend-mini-indicator vencido"></div>
-                <span>Vencido</span>
-              </div>
-              <div
-                class="legend-mini-item"
-                matTooltip="Por vencer - Próximo a fecha límite"
-              >
-                <div class="legend-mini-indicator por-vencer"></div>
-                <span>Por vencer</span>
-              </div>
-              <div
-                class="legend-mini-item"
-                matTooltip="Agotado - Sin stock disponible"
-              >
-                <div class="legend-mini-indicator agotado"></div>
-                <span>Agotado</span>
-              </div>
-              <div
-                class="legend-mini-item"
-                matTooltip="Stock bajo - Menor al 20% del stock inicial"
-              >
-                <div class="legend-mini-indicator stock-bajo"></div>
-                <span>Stock bajo</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="pagination-controls">
-          <button class="pagination-button" disabled>
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button class="pagination-button">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
-      </div>
+      <app-prime-data-table
+        [data]="lotes"
+        [columns]="columns"
+        [actions]="actions"
+        [buttons]="buttons"
+        [globalFilterFields]="globalFilterFields"
+        [state]="tableState"
+        emptyIcon="inventory"
+        emptyTitle="No hay lotes registrados"
+        emptySubtitle="Comienza agregando tu primer lote para gestionar el inventario"
+        emptyActionText="Agregar Primer Lote"
+        (actionClick)="onActionClick($event)"
+        (buttonClick)="onButtonClick($event)"
+        (retryClicked)="recargarDatos()"
+      ></app-prime-data-table>
     </div>
   </div>
 </div>

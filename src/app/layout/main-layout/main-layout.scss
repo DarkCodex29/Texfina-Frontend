@@ -160,6 +160,11 @@
 .drawer-content {
   background: #ffffff !important;
   padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 :host ::ng-deep .p-drawer-mask {
@@ -224,6 +229,34 @@
       width: 0px !important;
       background: transparent !important;
     }
+  }
+
+  .p-drawer * {
+    border: none !important;
+    outline: none !important;
+  }
+
+  .p-drawer-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  .sidebar-drawer .drawer-content {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .p-drawer-left,
+  .p-drawer-right,
+  .p-drawer-top,
+  .p-drawer-bottom {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 }
 

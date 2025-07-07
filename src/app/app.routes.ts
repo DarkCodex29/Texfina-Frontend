@@ -60,7 +60,7 @@ export const routes: Routes = [
       },
       {
         path: 'lotes',
-        loadComponent: () => import('./lotes/lotes').then((m) => m.Lotes),
+        loadComponent: () => import('./lotes/lotes').then((m) => m.LotesComponent),
       },
       {
         path: 'recetas',

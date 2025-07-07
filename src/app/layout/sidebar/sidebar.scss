@@ -14,25 +14,11 @@
 
   // Estilo card moderno como las del resto de la app
   border-radius: 0 16px 16px 0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 
   // Borde sutil en el lado derecho
   &::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: linear-gradient(
-      180deg,
-      transparent 0%,
-      rgba(226, 232, 240, 0.8) 20%,
-      rgba(203, 213, 225, 1) 50%,
-      rgba(226, 232, 240, 0.8) 80%,
-      transparent 100%
-    );
+    display: none;
   }
 }
 
