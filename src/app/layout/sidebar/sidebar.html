@@ -17,13 +17,13 @@
       <h3 class="section-title">Principal</h3>
       <ul class="nav-list">
         <li>
-          <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link" (click)="closeCallback($event)">
             <i class="pi pi-th-large"></i>
             <span>Dashboard</span>
           </a>
         </li>
         <li>
-          <a routerLink="/reportes" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/reportes" routerLinkActive="active" class="nav-link">
             <i class="pi pi-chart-line"></i>
             <span>Reportes</span>
           </a>
@@ -36,31 +36,31 @@
       <h3 class="section-title">Inventario</h3>
       <ul class="nav-list">
         <li>
-          <a routerLink="/materiales" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/insumos" routerLinkActive="active" class="nav-link">
             <i class="pi pi-box"></i>
             <span>Materiales</span>
           </a>
         </li>
         <li>
-          <a routerLink="/stock" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/stock" routerLinkActive="active" class="nav-link">
             <i class="pi pi-database"></i>
             <span>Stock</span>
           </a>
         </li>
         <li>
-          <a routerLink="/lotes" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/lotes" routerLinkActive="active" class="nav-link">
             <i class="pi pi-tag"></i>
             <span>Lotes</span>
           </a>
         </li>
         <li>
-          <a routerLink="/ingresos" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/ingresos" routerLinkActive="active" class="nav-link">
             <i class="pi pi-arrow-down"></i>
             <span>Ingresos</span>
           </a>
         </li>
         <li>
-          <a routerLink="/consumos" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/consumos" routerLinkActive="active" class="nav-link">
             <i class="pi pi-arrow-up"></i>
             <span>Consumos</span>
           </a>
@@ -73,31 +73,31 @@
       <h3 class="section-title">Catálogos</h3>
       <ul class="nav-list">
         <li>
-          <a routerLink="/proveedores" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/proveedores" routerLinkActive="active" class="nav-link">
             <i class="pi pi-building"></i>
             <span>Proveedores</span>
           </a>
         </li>
         <li>
-          <a routerLink="/almacenes" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/almacenes" routerLinkActive="active" class="nav-link">
             <i class="pi pi-home"></i>
             <span>Almacenes</span>
           </a>
         </li>
         <li>
-          <a routerLink="/clases" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/clases" routerLinkActive="active" class="nav-link">
             <i class="pi pi-sitemap"></i>
             <span>Clases</span>
           </a>
         </li>
         <li>
-          <a routerLink="/unidades" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/unidades" routerLinkActive="active" class="nav-link">
             <i class="pi pi-calculator"></i>
             <span>Unidades</span>
           </a>
         </li>
         <li>
-          <a routerLink="/recetas" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/recetas" routerLinkActive="active" class="nav-link">
             <i class="pi pi-list"></i>
             <span>Recetas</span>
           </a>
@@ -110,31 +110,31 @@
       <h3 class="section-title">Administración</h3>
       <ul class="nav-list">
         <li>
-          <a routerLink="/usuarios" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/usuarios" routerLinkActive="active" class="nav-link">
             <i class="pi pi-users"></i>
             <span>Usuarios</span>
           </a>
         </li>
         <li>
-          <a routerLink="/roles" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/roles" routerLinkActive="active" class="nav-link">
             <i class="pi pi-key"></i>
             <span>Roles</span>
           </a>
         </li>
         <li>
-          <a routerLink="/auditoria" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/auditoria" routerLinkActive="active" class="nav-link">
             <i class="pi pi-eye"></i>
             <span>Auditoría</span>
           </a>
         </li>
         <li>
-          <a routerLink="/logs" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/logs" routerLinkActive="active" class="nav-link">
             <i class="pi pi-file"></i>
             <span>Logs</span>
           </a>
         </li>
         <li>
-          <a routerLink="/configuracion" routerLinkActive="active" class="nav-link">
+          <a routerLink="/dashboard/configuracion" routerLinkActive="active" class="nav-link">
             <i class="pi pi-cog"></i>
             <span>Configuración</span>
           </a>
