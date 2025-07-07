@@ -104,19 +104,19 @@ export class LotesComponent implements OnInit, OnDestroy {
     {
       action: 'view',
       tooltip: 'Ver Detalle',
-      icon: 'visibility',
+      icon: 'pi pi-eye',
       color: 'secondary'
     },
     {
       action: 'edit',
       tooltip: 'Editar',
-      icon: 'edit',
+      icon: 'pi pi-pencil',
       color: 'primary'
     },
     {
       action: 'delete',
       tooltip: 'Eliminar',
-      icon: 'delete',
+      icon: 'pi pi-trash',
       color: 'danger'
     }
   ];
@@ -125,13 +125,13 @@ export class LotesComponent implements OnInit, OnDestroy {
     {
       action: 'add',
       label: 'Agregar Lote',
-      icon: 'add',
+      icon: 'pi pi-plus',
       color: 'primary'
     },
     {
       action: 'bulk',
       label: 'Carga Masiva',
-      icon: 'upload_file',
+      icon: 'pi pi-upload',
       color: 'secondary'
     }
   ];
@@ -342,14 +342,36 @@ export class LotesComponent implements OnInit, OnDestroy {
   verDetalle(lote: Lote): void {
     import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
       ({ DetalleDialogComponent }) => {
+        const datosDetalle = {
+          ...lote,
+          id_insumo: this.getInsumoNombre(lote.id_insumo),
+          fecha_expiracion: this.formatearFecha(lote.fecha_expiracion),
+          precio_total: this.formatearPrecio(lote.precio_total),
+          stock_inicial: this.formatearNumero(lote.stock_inicial),
+          stock_actual: this.formatearNumero(lote.stock_actual)
+        };
+        
         const config = {
-          titulo: 'Detalle del Lote',
-          datos: lote,
-          campos: [
-            { key: 'lote', label: 'Código Lote', tipo: 'text' },
-            { key: 'ubicacion', label: 'Ubicación', tipo: 'text' },
-            { key: 'stock_actual', label: 'Stock Actual', tipo: 'number' },
-            { key: 'estado_lote', label: 'Estado', tipo: 'text' }
+          entidad: 'Lote',
+          entidadArticulo: 'el lote',
+          datos: datosDetalle,
+          filas: [
+            [
+              { key: 'lote', label: 'Código Lote', tipo: 'text' as const },
+              { key: 'id_insumo', label: 'Insumo', tipo: 'text' as const }
+            ],
+            [
+              { key: 'ubicacion', label: 'Ubicación', tipo: 'text' as const },
+              { key: 'estado_lote', label: 'Estado', tipo: 'text' as const }
+            ],
+            [
+              { key: 'stock_inicial', label: 'Stock Inicial', tipo: 'text' as const },
+              { key: 'stock_actual', label: 'Stock Actual', tipo: 'text' as const }
+            ],
+            [
+              { key: 'fecha_expiracion', label: 'Fecha Expiración', tipo: 'text' as const },
+              { key: 'precio_total', label: 'Precio Total', tipo: 'text' as const }
+            ]
           ]
         };
         
@@ -367,18 +389,68 @@ export class LotesComponent implements OnInit, OnDestroy {
       '../shared/dialogs/formulario-dialog/formulario-dialog.component'
     ).then(({ FormularioDialogComponent }) => {
       const config = {
-        titulo: 'Editar Lote',
-        datos: lote,
-        campos: [
-          { key: 'lote', label: 'Código Lote', tipo: 'text', required: true },
-          { key: 'ubicacion', label: 'Ubicación', tipo: 'text' },
-          { key: 'stock_actual', label: 'Stock Actual', tipo: 'number', required: true },
-          { key: 'estado_lote', label: 'Estado', tipo: 'select', opciones: [
-            { value: 'ACTIVO', label: 'Activo' },
-            { value: 'BAJO', label: 'Bajo' },
-            { value: 'AGOTADO', label: 'Agotado' },
-            { value: 'VENCIDO', label: 'Vencido' }
-          ]}
+        titulo: {
+          agregar: 'Agregar Lote',
+          editar: 'Editar Lote'
+        },
+        entidad: 'Lote',
+        entidadArticulo: 'el lote',
+        esEdicion: true,
+        datosIniciales: lote,
+        filas: [
+          [
+            {
+              key: 'lote',
+              label: 'Código Lote',
+              tipo: 'text' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_insumo',
+              label: 'Insumo',
+              tipo: 'select' as const,
+              obligatorio: true,
+              opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'ubicacion',
+              label: 'Ubicación',
+              tipo: 'text' as const,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'estado_lote',
+              label: 'Estado',
+              tipo: 'select' as const,
+              opciones: [
+                { value: 'ACTIVO', label: 'Activo' },
+                { value: 'BAJO', label: 'Bajo' },
+                { value: 'AGOTADO', label: 'Agotado' },
+                { value: 'VENCIDO', label: 'Vencido' }
+              ],
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'stock_inicial',
+              label: 'Stock Inicial',
+              tipo: 'number' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'stock_actual',
+              label: 'Stock Actual',
+              tipo: 'number' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            }
+          ]
         ]
       };
       
@@ -402,9 +474,12 @@ export class LotesComponent implements OnInit, OnDestroy {
       ({ ConfirmacionDialogComponent }) => {
         const config = {
           titulo: 'Eliminar Lote',
+          subtitulo: 'Esta acción no se puede deshacer',
           mensaje: `¿Está seguro que desea eliminar el lote "${lote.lote}"?`,
-          confirmar: 'Eliminar',
-          cancelar: 'Cancelar'
+          mensajeSecundario: 'Todos los datos relacionados con este lote se perderán permanentemente.',
+          tipo: 'danger' as const,
+          textoBotonConfirmar: 'Eliminar',
+          textoBotonCancelar: 'Cancelar'
         };
         
         const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
@@ -428,19 +503,67 @@ export class LotesComponent implements OnInit, OnDestroy {
       '../shared/dialogs/formulario-dialog/formulario-dialog.component'
     ).then(({ FormularioDialogComponent }) => {
       const config = {
-        titulo: 'Agregar Lote',
-        campos: [
-          { key: 'lote', label: 'Código Lote', tipo: 'text', required: true },
-          { key: 'id_insumo', label: 'Insumo', tipo: 'select', required: true, opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })) },
-          { key: 'ubicacion', label: 'Ubicación', tipo: 'text' },
-          { key: 'stock_inicial', label: 'Stock Inicial', tipo: 'number', required: true },
-          { key: 'stock_actual', label: 'Stock Actual', tipo: 'number', required: true },
-          { key: 'estado_lote', label: 'Estado', tipo: 'select', opciones: [
-            { value: 'ACTIVO', label: 'Activo' },
-            { value: 'BAJO', label: 'Bajo' },
-            { value: 'AGOTADO', label: 'Agotado' },
-            { value: 'VENCIDO', label: 'Vencido' }
-          ]}
+        titulo: {
+          agregar: 'Agregar Lote',
+          editar: 'Editar Lote'
+        },
+        entidad: 'Lote',
+        entidadArticulo: 'el lote',
+        esEdicion: false,
+        filas: [
+          [
+            {
+              key: 'lote',
+              label: 'Código Lote',
+              tipo: 'text' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_insumo',
+              label: 'Insumo',
+              tipo: 'select' as const,
+              obligatorio: true,
+              opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'ubicacion',
+              label: 'Ubicación',
+              tipo: 'text' as const,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'estado_lote',
+              label: 'Estado',
+              tipo: 'select' as const,
+              opciones: [
+                { value: 'ACTIVO', label: 'Activo' },
+                { value: 'BAJO', label: 'Bajo' },
+                { value: 'AGOTADO', label: 'Agotado' },
+                { value: 'VENCIDO', label: 'Vencido' }
+              ],
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'stock_inicial',
+              label: 'Stock Inicial',
+              tipo: 'number' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'stock_actual',
+              label: 'Stock Actual',
+              tipo: 'number' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            }
+          ]
         ]
       };
       

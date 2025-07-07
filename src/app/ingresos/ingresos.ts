@@ -1,63 +1,27 @@
-import {
-  Component,
-  OnInit,
-  AfterViewInit,
-  OnDestroy,
-  ViewChild,
-  HostListener,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-} from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatSortModule, MatSort } from '@angular/material/sort';
-import {
-  Subject,
-  debounceTime,
-  distinctUntilChanged,
-  takeUntil,
-  finalize,
-  delay,
-} from 'rxjs';
+import { Subject, takeUntil, finalize, delay } from 'rxjs';
 
 import { MaterialService } from '../services/material.service';
 import {
   ExportacionService,
   ConfiguracionExportacion,
-  ColumnaExportacion,
 } from '../services/exportacion.service';
 import {
   CargaMasivaService,
   ConfiguracionCargaMasiva,
-  MapeoColumna,
 } from '../services/carga-masiva.service';
 import { Ingreso, Insumo, Unidad, Lote } from '../models/insumo.model';
-import {
-  FormularioDialogComponent,
-  ConfiguracionFormulario,
-  CampoFormulario,
-} from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
-import {
-  DetalleDialogComponent,
-  ConfiguracionDetalle,
-  CampoDetalle,
-} from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
-import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
 import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
+import { PrimeDataTableComponent } from '../shared/components/prime-data-table/prime-data-table.component';
+import {
+  TableColumn,
+  TableAction,
+  TableButtonConfig,
+  TableState,
+} from '../shared/components/prime-data-table/prime-data-table.component';
 import {
   INGRESOS_CONFIG,
   IngresosConfig,
@@ -68,111 +32,134 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule,
     MatDialogModule,
-    MatPaginatorModule,
-    MatCardModule,
     MatTooltipModule,
-    MatChipsModule,
-    MatSortModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './ingresos.html',
   styleUrls: ['./ingresos.scss'],
 })
-export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatSort) sort!: MatSort;
+export class IngresosComponent implements OnInit, OnDestroy {
 
-  // ============================================================================
-  // PROPIEDADES DE DATOS
-  // ============================================================================
+  private destroy$ = new Subject<void>();
+  
+  dropdownExportAbierto = false;
   ingresos: Ingreso[] = [];
   insumos: Insumo[] = [];
   unidades: Unidad[] = [];
   lotes: Lote[] = [];
-  dataSource = new MatTableDataSource<Ingreso>([]);
 
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosExpanded = true;
-  filtrosColumnaHabilitados = false;
-  filtrosColumnaActivos = false;
-  dropdownExportAbierto = false;
-  private destroy$ = new Subject<void>();
+  tableState: TableState = {
+    loading: false,
+    error: false,
+    empty: false,
+    filteredEmpty: false
+  };
 
-  // ============================================================================
-  // PROPIEDADES DE ESTADO
-  // ============================================================================
-  isLoading = false;
-  hasError = false;
-  errorMessage = '';
-
-  // ============================================================================
-  // CONFIGURACIÓN DE TABLA
-  // ============================================================================
-  displayedColumns: string[] = [
-    'fecha',
-    'insumo',
-    'cantidad',
-    'lote',
-    'precio_total',
-    'numero_remision',
-    'estado',
-    'acciones',
+  columns: TableColumn[] = [
+    {
+      key: 'fecha',
+      title: 'Fecha',
+      sortable: true,
+      filterable: false,
+      width: '120px',
+      type: 'date'
+    },
+    {
+      key: 'id_insumo',
+      title: 'Insumo',
+      sortable: true,
+      filterable: true,
+      width: '200px',
+      type: 'text'
+    },
+    {
+      key: 'cantidad',
+      title: 'Cantidad',
+      sortable: true,
+      filterable: false,
+      width: '120px',
+      type: 'number'
+    },
+    {
+      key: 'id_lote',
+      title: 'Lote',
+      sortable: true,
+      filterable: true,
+      width: '120px',
+      type: 'text'
+    },
+    {
+      key: 'precio_total_formula',
+      title: 'Precio Total',
+      sortable: true,
+      filterable: false,
+      width: '140px',
+      type: 'currency'
+    },
+    {
+      key: 'numero_remision',
+      title: 'N° Remisión',
+      sortable: true,
+      filterable: true,
+      width: '150px',
+      type: 'text'
+    },
+    {
+      key: 'estado',
+      title: 'Estado',
+      sortable: true,
+      filterable: true,
+      width: '120px',
+      type: 'badge'
+    }
   ];
 
-  get ingresosFiltrados(): Ingreso[] {
-    return this.dataSource.data;
-  }
+  actions: TableAction[] = [
+    {
+      action: 'view',
+      tooltip: 'Ver Detalle',
+      icon: 'pi pi-eye',
+      color: 'secondary'
+    },
+    {
+      action: 'edit',
+      tooltip: 'Editar',
+      icon: 'pi pi-pencil',
+      color: 'primary',
+      condition: (item: Ingreso) => item.estado !== 'PROCESADO'
+    }
+  ];
 
-  get isEmpty(): boolean {
-    return !this.isLoading && this.ingresos.length === 0 && !this.hasError;
-  }
+  buttons: TableButtonConfig[] = [
+    {
+      action: 'add',
+      label: 'Agregar Ingreso',
+      icon: 'pi pi-plus',
+      color: 'primary'
+    },
+    {
+      action: 'bulk',
+      label: 'Carga Masiva',
+      icon: 'pi pi-upload',
+      color: 'secondary'
+    }
+  ];
 
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      this.dataSource.data.length === 0 &&
-      this.ingresos.length > 0
-    );
-  }
+  globalFilterFields: string[] = ['numero_remision', 'orden_compra', 'estado'];
 
   constructor(
     private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder,
     private exportacionService: ExportacionService,
     private cargaMasivaService: CargaMasivaService
-  ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
-    this.filtrosColumnaForm = this.fb.group({
-      fecha: [''],
-      insumo: [''],
-      cantidad: [''],
-      lote: [''],
-      precio_total: [''],
-      numero_remision: [''],
-      estado: [''],
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cargarDatos();
-    this.configurarFiltroGeneralEnTiempoReal();
-    this.configurarFiltrosColumnaEnTiempoReal();
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
+    this.cargarInsumos();
+    this.cargarUnidades();
+    this.cargarLotes();
   }
 
   ngOnDestroy(): void {
@@ -180,327 +167,279 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltroGeneralEnTiempoReal(): void {
-    this.filtroGeneralForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltroGeneral();
-      });
+  onActionClick(event: { action: string; item: any }): void {
+    const { action, item } = event;
+    switch (action) {
+      case 'view':
+        this.verDetalle(item);
+        break;
+      case 'edit':
+        this.editar(item);
+        break;
+    }
   }
 
-  configurarFiltrosColumnaEnTiempoReal(): void {
-    this.filtrosColumnaForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltrosColumna();
-      });
+  onButtonClick(action: string): void {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk':
+        this.cargaMasiva();
+        break;
+    }
   }
 
-  // ============================================================================
-  // MÉTODOS DE INICIALIZACIÓN
-  // ============================================================================
-  cargarDatos(): void {
-    this.isLoading = true;
-    this.hasError = false;
-    this.errorMessage = '';
-
-    console.log('🔄 Iniciando carga de ingresos - isLoading:', this.isLoading);
-
-    // Cargar ingresos e insumos en paralelo
-    this.materialService
-      .getIngresos()
-      .pipe(
-        delay(1500),
-        finalize(() => {
-          this.isLoading = false;
-          console.log('✅ Carga completada - isLoading:', this.isLoading);
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (ingresos) => {
-          console.log('📦 Ingresos cargados:', ingresos.length);
-          this.ingresos = ingresos;
-          this.dataSource.data = [...ingresos];
-        },
-        error: (error) => {
-          console.error('❌ Error al cargar ingresos:', error);
-          this.hasError = true;
-          this.errorMessage =
-            'Error al cargar los ingresos. Por favor, intenta nuevamente.';
-          this.ingresos = [];
-          this.dataSource.data = [];
-        },
-      });
-
-    this.materialService.getMateriales().subscribe({
-      next: (insumos: any) => {
-        this.insumos = insumos;
-      },
-      error: (error) => console.error('Error al cargar insumos:', error),
-    });
-
-    this.materialService.getUnidades().subscribe({
-      next: (unidades) => {
-        this.unidades = unidades;
-      },
-      error: (error) => console.error('Error al cargar unidades:', error),
-    });
-
-    this.materialService.getLotes().subscribe({
-      next: (lotes) => {
-        this.lotes = lotes;
-      },
-      error: (error) => console.error('Error al cargar lotes:', error),
-    });
+  private updateTableStates(): void {
+    this.tableState.empty = this.ingresos.length === 0;
   }
 
-  reintentarCarga(): void {
+  private async cargarDatos() {
+    this.tableState.loading = true;
+    this.tableState.error = false;
+    this.tableState.errorMessage = '';
+
+    try {
+      this.cargarDatosMock();
+    } catch (error) {
+      this.tableState.error = true;
+      this.tableState.errorMessage = 'Error al cargar los datos de ingresos';
+      console.error('Error cargando ingresos:', error);
+      this.ingresos = [];
+    } finally {
+      this.tableState.loading = false;
+      this.updateTableStates();
+    }
+  }
+
+  recargarDatos(): void {
     this.cargarDatos();
   }
 
-  // ============================================================================
-  // MÉTODOS DE FILTROS
-  // ============================================================================
-  aplicarFiltroGeneral(): void {
-    const busqueda = this.filtroGeneralForm
-      .get('busquedaGeneral')
-      ?.value?.trim()
-      .toLowerCase();
-
-    if (!busqueda) {
-      this.dataSource.data = [...this.ingresos];
-      return;
-    }
-
-    const ingresosFiltrados = this.ingresos.filter((ingreso) => {
-      const insumoNombre = this.getInsumoNombre(
-        ingreso.id_insumo
-      ).toLowerCase();
-      const insumoCodigoFox = this.getInsumoCodigoFox(
-        ingreso.id_insumo
-      ).toLowerCase();
-      const numeroRemision = ingreso.numero_remision?.toLowerCase() || '';
-      const ordenCompra = ingreso.orden_compra?.toLowerCase() || '';
-      const loteNombre = this.getLoteNombre(ingreso.id_lote).toLowerCase();
-      const estado = this.getEstadoIngreso(ingreso).toLowerCase();
-      const fecha = this.formatearFecha(ingreso.fecha).toLowerCase();
-
-      return (
-        insumoNombre.includes(busqueda) ||
-        insumoCodigoFox.includes(busqueda) ||
-        numeroRemision.includes(busqueda) ||
-        ordenCompra.includes(busqueda) ||
-        loteNombre.includes(busqueda) ||
-        estado.includes(busqueda) ||
-        fecha.includes(busqueda)
-      );
-    });
-
-    this.dataSource.data = ingresosFiltrados;
-  }
-
-  aplicarFiltrosColumna(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    let ingresosFiltrados = [...this.ingresos];
-
-    // Filtro por Fecha
-    if (filtros.fecha && filtros.fecha.trim()) {
-      ingresosFiltrados = ingresosFiltrados.filter((ingreso) => {
-        const fecha = this.formatearFecha(ingreso.fecha);
-        return fecha.includes(filtros.fecha);
-      });
-    }
-
-    // Filtro por Insumo
-    if (filtros.insumo && filtros.insumo.trim()) {
-      ingresosFiltrados = ingresosFiltrados.filter((ingreso) => {
-        const insumoNombre = this.getInsumoNombre(ingreso.id_insumo);
-        return insumoNombre
-          .toLowerCase()
-          .includes(filtros.insumo.toLowerCase());
-      });
-    }
-
-    // Filtro por Cantidad
-    if (filtros.cantidad && filtros.cantidad.toString().trim()) {
-      const cantidadFiltro = parseFloat(filtros.cantidad);
-      if (!isNaN(cantidadFiltro)) {
-        ingresosFiltrados = ingresosFiltrados.filter((ingreso) => {
-          const cantidad = ingreso.cantidad || 0;
-          return (
-            cantidad >= cantidadFiltro - 0.01 &&
-            cantidad <= cantidadFiltro + 0.01
-          );
-        });
+  private cargarDatosMock() {
+    this.ingresos = [
+      {
+        id_ingreso: 1,
+        fecha: new Date('2024-01-15'),
+        id_insumo: 1,
+        presentacion: 'Saco 50kg',
+        id_unidad: 'KG',
+        cantidad: 50,
+        id_lote: 1,
+        precio_unitario_historico: 2.50,
+        precio_total_formula: 125.00,
+        numero_remision: 'R-001-2024',
+        orden_compra: 'OC-001-2024',
+        estado: 'PROCESADO'
+      },
+      {
+        id_ingreso: 2,
+        fecha: new Date('2024-01-20'),
+        id_insumo: 2,
+        presentacion: 'Saco 25kg',
+        id_unidad: 'KG',
+        cantidad: 25,
+        id_lote: 2,
+        precio_unitario_historico: 1.80,
+        precio_total_formula: 45.00,
+        numero_remision: 'R-002-2024',
+        orden_compra: 'OC-002-2024',
+        estado: 'PENDIENTE'
+      },
+      {
+        id_ingreso: 3,
+        fecha: new Date('2024-01-25'),
+        id_insumo: 3,
+        presentacion: 'Bloque 1kg',
+        id_unidad: 'KG',
+        cantidad: 10,
+        id_lote: 3,
+        precio_unitario_historico: 8.50,
+        precio_total_formula: 85.00,
+        numero_remision: 'R-003-2024',
+        orden_compra: 'OC-003-2024',
+        estado: 'PROCESADO'
+      },
+      {
+        id_ingreso: 4,
+        fecha: new Date('2024-02-01'),
+        id_insumo: 4,
+        presentacion: 'Sobre 500g',
+        id_unidad: 'G',
+        cantidad: 500,
+        id_lote: 4,
+        precio_unitario_historico: 0.30,
+        precio_total_formula: 150.00,
+        numero_remision: 'R-004-2024',
+        orden_compra: 'OC-004-2024',
+        estado: 'ANULADO'
+      },
+      {
+        id_ingreso: 5,
+        fecha: new Date('2024-02-05'),
+        id_insumo: 5,
+        presentacion: 'Tableta 200g',
+        id_unidad: 'G',
+        cantidad: 200,
+        id_lote: 5,
+        precio_unitario_historico: 15.00,
+        precio_total_formula: 3000.00,
+        numero_remision: 'R-005-2024',
+        orden_compra: 'OC-005-2024',
+        estado: 'PENDIENTE'
       }
-    }
+    ];
 
-    // Filtro por Lote
-    if (filtros.lote && filtros.lote.trim()) {
-      ingresosFiltrados = ingresosFiltrados.filter((ingreso) => {
-        const loteNombre = this.getLoteNombre(ingreso.id_lote);
-        return loteNombre.toLowerCase().includes(filtros.lote.toLowerCase());
-      });
-    }
+    console.log('✅ Datos mock cargados:', this.ingresos.length, 'ingresos');
+  }
 
-    // Filtro por Precio Total
-    if (filtros.precio_total && filtros.precio_total.toString().trim()) {
-      const precioFiltro = parseFloat(filtros.precio_total);
-      if (!isNaN(precioFiltro)) {
-        ingresosFiltrados = ingresosFiltrados.filter((ingreso) => {
-          const precio = ingreso.precio_total_formula || 0;
-          return precio >= precioFiltro - 0.01 && precio <= precioFiltro + 0.01;
-        });
+  private cargarInsumos(): void {
+    this.insumos = [
+      { id_insumo: 1, nombre: 'Harina de Trigo Premium', id_fox: 'H001' },
+      { id_insumo: 2, nombre: 'Azúcar Blanca', id_fox: 'A001' },
+      { id_insumo: 3, nombre: 'Mantequilla Sin Sal', id_fox: 'M001' },
+      { id_insumo: 4, nombre: 'Levadura Seca', id_fox: 'L001' },
+      { id_insumo: 5, nombre: 'Chocolate Negro 70%', id_fox: 'C001' }
+    ];
+  }
+
+  private cargarUnidades(): void {
+    this.unidades = [
+      { id_unidad: 'KG', nombre: 'Kilogramos' },
+      { id_unidad: 'G', nombre: 'Gramos' },
+      { id_unidad: 'L', nombre: 'Litros' },
+      { id_unidad: 'ML', nombre: 'Mililitros' },
+      { id_unidad: 'UND', nombre: 'Unidades' }
+    ];
+  }
+
+  private cargarLotes(): void {
+    this.lotes = [
+      {
+        id_lote: 1,
+        lote: 'LT-001',
+        id_insumo: 1,
+        ubicacion: 'A-01-01',
+        stock_inicial: 1000,
+        stock_actual: 850,
+        fecha_expiracion: new Date('2024-06-15'),
+        precio_total: 2500,
+        estado_lote: 'ACTIVO'
+      },
+      {
+        id_lote: 2,
+        lote: 'LT-002',
+        id_insumo: 2,
+        ubicacion: 'A-01-02',
+        stock_inicial: 500,
+        stock_actual: 75,
+        fecha_expiracion: new Date('2024-03-20'),
+        precio_total: 900,
+        estado_lote: 'BAJO'
+      },
+      {
+        id_lote: 3,
+        lote: 'LT-003',
+        id_insumo: 3,
+        ubicacion: 'B-02-01',
+        stock_inicial: 200,
+        stock_actual: 0,
+        fecha_expiracion: new Date('2024-01-10'),
+        precio_total: 1700,
+        estado_lote: 'AGOTADO'
+      },
+      {
+        id_lote: 4,
+        lote: 'LT-004',
+        id_insumo: 4,
+        ubicacion: 'A-03-01',
+        stock_inicial: 300,
+        stock_actual: 280,
+        fecha_expiracion: new Date('2025-12-31'),
+        precio_total: 150,
+        estado_lote: 'ACTIVO'
+      },
+      {
+        id_lote: 5,
+        lote: 'LT-005',
+        id_insumo: 5,
+        ubicacion: 'C-01-01',
+        stock_inicial: 100,
+        stock_actual: 95,
+        fecha_expiracion: new Date('2024-08-15'),
+        precio_total: 1200,
+        estado_lote: 'ACTIVO'
       }
-    }
-
-    // Filtro por Número de Remisión
-    if (filtros.numero_remision && filtros.numero_remision.trim()) {
-      ingresosFiltrados = ingresosFiltrados.filter((ingreso) =>
-        ingreso.numero_remision
-          ?.toLowerCase()
-          .includes(filtros.numero_remision.toLowerCase())
-      );
-    }
-
-    // Filtro por Estado
-    if (filtros.estado && filtros.estado.trim()) {
-      ingresosFiltrados = ingresosFiltrados.filter((ingreso) =>
-        this.getEstadoIngreso(ingreso)
-          .toLowerCase()
-          .includes(filtros.estado.toLowerCase())
-      );
-    }
-
-    this.dataSource.data = ingresosFiltrados;
+    ];
   }
 
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.reset();
-    this.dataSource.data = [...this.ingresos];
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
-    this.dataSource.data = [...this.ingresos];
-  }
-
-  toggleFiltrosColumna() {
-    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
-    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
-
-    if (this.filtrosColumnaHabilitados) {
-      if (this.filtrosColumnaActivos) {
-        this.limpiarFiltroGeneral();
-      } else {
-        this.limpiarFiltrosColumna();
-      }
-    }
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent): void {
-    if (event.key === 'F3') {
-      event.preventDefault();
-      this.toggleFiltrosColumna();
-    }
-  }
-
-  toggleFiltros(): void {
-    this.filtrosExpanded = !this.filtrosExpanded;
-  }
-
-  // ============================================================================
-  // MÉTODOS DE TABLA
-  // ============================================================================
-  sortData(column: string): void {
-    if (this.sort) {
-      // Si ya está ordenado por esta columna, cambiar dirección
-      if (this.sort.active === column) {
-        this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc';
-      } else {
-        // Nueva columna, empezar con ascendente
-        this.sort.active = column;
-        this.sort.direction = 'asc';
-      }
-      this.sort.sortChange.emit({
-        active: this.sort.active,
-        direction: this.sort.direction,
-      });
-    }
-  }
-
-  // ============================================================================
-  // MÉTODOS DE ACCIONES
-  // ============================================================================
-
-  // ============================================================================
-  // MÉTODOS UTILITARIOS
-  // ============================================================================
   getInsumoNombre(id_insumo?: number): string {
-    if (!id_insumo) return '-';
     const insumo = this.insumos.find((i) => i.id_insumo === id_insumo);
-    return insumo ? insumo.nombre : `Insumo #${id_insumo}`;
+    return insumo ? insumo.nombre : 'Sin asignar';
   }
 
   getInsumoCodigoFox(id_insumo?: number): string {
-    if (!id_insumo) return '';
     const insumo = this.insumos.find((i) => i.id_insumo === id_insumo);
-    return insumo?.id_fox || '';
+    return insumo?.id_fox || '-';
   }
 
   getUnidadNombre(id_unidad?: string): string {
-    if (!id_unidad) return '';
     const unidad = this.unidades.find((u) => u.id_unidad === id_unidad);
-    return unidad ? unidad.nombre : id_unidad;
+    return unidad ? unidad.nombre : id_unidad || '-';
   }
 
   getLoteNombre(id_lote?: number): string {
-    if (!id_lote) return '-';
     const lote = this.lotes.find((l) => l.id_lote === id_lote);
-    return lote ? lote.lote || `L-${id_lote}` : `L-${id_lote}`;
+    return lote ? lote.lote! : `L-${id_lote}`;
   }
 
   getEstadoIngreso(ingreso: Ingreso): string {
     return ingreso.estado || 'PENDIENTE';
   }
 
-  formatearFecha(fecha?: Date | string): string {
-    if (!fecha) return '-';
-    try {
-      const fechaObj = fecha instanceof Date ? fecha : new Date(fecha);
-      return fechaObj.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      });
-    } catch {
-      return '-';
+  getEstadoColor(estado?: string): string {
+    switch (estado?.toLowerCase()) {
+      case 'procesado':
+        return 'success';
+      case 'pendiente':
+        return 'warning';
+      case 'anulado':
+        return 'danger';
+      default:
+        return 'neutral';
     }
   }
 
-  formatearCantidad(cantidad?: number): string {
-    return (
-      cantidad?.toLocaleString('es-ES', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      }) || '0'
-    );
+  formatearFecha(fecha?: Date | string): string {
+    if (!fecha) return '-';
+    const fechaObj = typeof fecha === 'string' ? new Date(fecha) : fecha;
+    return fechaObj.toLocaleDateString('es-ES');
+  }
+
+  formatearTexto(texto?: string): string {
+    return texto && texto.trim() ? texto : '-';
+  }
+
+  formatearNumero(valor?: number): string {
+    if (valor === null || valor === undefined) return '-';
+    return valor.toLocaleString('es-ES', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   }
 
   formatearPrecio(precio?: number): string {
-    if (!precio || precio === 0) return 'S/ 0.00';
-    return `S/ ${precio.toFixed(2)}`;
+    if (precio === null || precio === undefined) return '-';
+    return `S/ ${precio.toLocaleString('es-ES', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   }
 
-  // ============================================================================
-  // CONFIGURACIONES ESPECÍFICAS SEGÚN BD REAL
-  // ============================================================================
 
   private configurarExportacion(): ConfiguracionExportacion<Ingreso> {
     return {
-      entidades: this.dataSource.data,
+      entidades: this.ingresos,
       nombreArchivo: 'ingresos',
       nombreEntidad: 'Ingresos',
       columnas: [
@@ -523,7 +462,7 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
         cantidadTotal: this.ingresos.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.ingresos.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
       },
@@ -600,20 +539,70 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private obtenerFiltrosActivos(): any {
-    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
-    const filtrosColumna = this.filtrosColumnaForm.value;
-
-    return {
-      filtroGeneral: filtroGeneral || '',
-      filtrosColumna: Object.entries(filtrosColumna)
-        .filter(([_, valor]) => valor && valor.toString().trim())
-        .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {}),
-    };
+    return {};
   }
 
-  // ============================================================================
-  // EXPORTACIÓN
-  // ============================================================================
+  verDetalle(ingreso: Ingreso): void {
+    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
+      ({ DetalleDialogComponent }) => {
+        const datosDetalle = {
+          ...ingreso,
+          id_insumo: this.getInsumoNombre(ingreso.id_insumo),
+          id_lote: this.getLoteNombre(ingreso.id_lote),
+          id_unidad: this.getUnidadNombre(ingreso.id_unidad),
+          fecha: this.formatearFecha(ingreso.fecha),
+          precio_total_formula: this.formatearPrecio(ingreso.precio_total_formula),
+          cantidad: this.formatearNumero(ingreso.cantidad)
+        };
+        
+        const config = {
+          entidad: 'Ingreso',
+          entidadArticulo: 'el ingreso',
+          datos: datosDetalle,
+          filas: [
+            [
+              { key: 'fecha', label: 'Fecha', tipo: 'text' as const },
+              { key: 'id_insumo', label: 'Insumo', tipo: 'text' as const }
+            ],
+            [
+              { key: 'cantidad', label: 'Cantidad', tipo: 'text' as const },
+              { key: 'presentacion', label: 'Presentación', tipo: 'text' as const }
+            ],
+            [
+              { key: 'id_unidad', label: 'Unidad', tipo: 'text' as const },
+              { key: 'id_lote', label: 'Lote', tipo: 'text' as const }
+            ],
+            [
+              { key: 'precio_total_formula', label: 'Precio Total', tipo: 'text' as const },
+              { key: 'estado', label: 'Estado', tipo: 'text' as const }
+            ],
+            [
+              { key: 'numero_remision', label: 'N° Remisión', tipo: 'text' as const },
+              { key: 'orden_compra', label: 'Orden de Compra', tipo: 'text' as const }
+            ]
+          ]
+        };
+        
+        const dialogRef = this.dialog.open(DetalleDialogComponent, {
+          width: '800px',
+          disableClose: true,
+          data: config,
+        });
+      }
+    );
+  }
+
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-export')) {
+      this.dropdownExportAbierto = false;
+    }
+  }
 
   exportarExcel(): void {
     try {
@@ -635,10 +624,6 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // ============================================================================
-  // CARGA MASIVA
-  // ============================================================================
-
   cargaMasiva(): void {
     const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
       width: '600px',
@@ -650,440 +635,261 @@ export class IngresosComponent implements OnInit, AfterViewInit, OnDestroy {
           this.procesarArchivoCargaMasiva(archivo),
       },
     });
-  }
 
-  private descargarPlantillaCargaMasiva(): void {
-    this.cargaMasivaService.generarPlantilla(this.configurarCargaMasiva());
-  }
-
-  private async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
-    try {
-      const resultado = await this.cargaMasivaService.procesarArchivo(
-        archivo,
-        this.configurarCargaMasiva()
-      );
-      console.log('Carga masiva completada:', resultado);
-      this.cargarDatos();
-    } catch (error) {
-      console.error('Error en carga masiva:', error);
-    }
-  }
-
-  // ============================================================================
-  // CRUD COMPLETO
-  // ============================================================================
-
-  guardarIngreso(ingreso: Ingreso): void {
-    this.cargarDatos();
-    console.log('✅ Ingreso guardado exitosamente:', ingreso);
-  }
-
-  eliminar(ingreso: Ingreso): void {
-    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
-      width: '400px',
-      disableClose: true,
-      data: IngresosConfig.eliminarIngreso(ingreso),
-    });
-
-    dialogRef.afterClosed().subscribe((confirmado) => {
-      if (confirmado && ingreso.id_ingreso) {
-        console.log('Eliminar ingreso - Funcionalidad en desarrollo');
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
         this.cargarDatos();
       }
     });
   }
 
-  toggleDropdownExport(): void {
-    this.dropdownExportAbierto = !this.dropdownExportAbierto;
+  private descargarPlantillaCargaMasiva(): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService.generarPlantilla(config);
+  }
+
+  private procesarArchivoCargaMasiva(archivo: File): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService
+      .procesarArchivo(archivo, config)
+      .then((resultado) => {
+        console.log('Archivo procesado:', resultado);
+        if (resultado.exitosa) {
+          this.cargarDatos();
+        }
+      })
+      .catch((error: any) => {
+        console.error('Error procesando archivo:', error);
+      });
   }
 
   agregar(): void {
-    const configuracion: ConfiguracionFormulario = {
-      titulo: {
-        agregar: 'Agregar Ingreso',
-        editar: 'Editar Ingreso',
-      },
-      entidad: 'Ingreso',
-      entidadArticulo: 'el ingreso',
-      esEdicion: false,
-      filas: [
-        [
-          {
-            key: 'id_insumo',
-            label: 'Insumo',
-            tipo: 'select',
-            opciones: this.insumos.map((i) => ({
-              value: i.id_insumo!,
-              label: i.nombre,
-            })),
-            obligatorio: true,
-            ancho: 'completo',
-          },
-        ],
-        [
-          {
-            key: 'fecha',
-            label: 'Fecha',
-            tipo: 'text',
-            placeholder: 'dd/mm/aaaa',
-            obligatorio: true,
-            ancho: 'normal',
-          },
-          {
-            key: 'cantidad',
-            label: 'Cantidad',
-            tipo: 'number',
-            placeholder: 'Cantidad recibida',
-            obligatorio: true,
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'presentacion',
-            label: 'Presentación',
-            tipo: 'text',
-            placeholder: 'Descripción de presentación',
-            maxLength: 100,
-            ancho: 'normal',
-          },
-          {
-            key: 'id_unidad',
-            label: 'Unidad',
-            tipo: 'select',
-            opciones: this.unidades.map((u) => ({
-              value: u.id_unidad,
-              label: u.nombre,
-            })),
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'id_lote',
-            label: 'Lote',
-            tipo: 'select',
-            opciones: this.lotes.map((l) => ({
-              value: l.id_lote!,
-              label: l.lote || '',
-            })),
-            ancho: 'normal',
-          },
-          {
-            key: 'precio_unitario_historico',
-            label: 'Precio Unitario',
-            tipo: 'number',
-            placeholder: '0.00',
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'numero_remision',
-            label: 'N° Remisión',
-            tipo: 'text',
-            placeholder: 'Número de remisión',
-            maxLength: 50,
-            ancho: 'normal',
-          },
-          {
-            key: 'orden_compra',
-            label: 'Orden de Compra',
-            tipo: 'text',
-            placeholder: 'Número de orden',
-            maxLength: 50,
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'estado',
-            label: 'Estado',
-            tipo: 'select',
-            opciones: Object.entries(INGRESOS_CONFIG.ESTADOS).map(
-              ([key, value]) => ({
-                value: key,
-                label: value.texto,
-              })
-            ),
-            obligatorio: true,
-            ancho: 'completo',
-          },
-        ],
-      ],
-    };
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      const config = {
+        titulo: {
+          agregar: 'Agregar Ingreso',
+          editar: 'Editar Ingreso'
+        },
+        entidad: 'Ingreso',
+        entidadArticulo: 'el ingreso',
+        esEdicion: false,
+        filas: [
+          [
+            {
+              key: 'fecha',
+              label: 'Fecha',
+              tipo: 'date' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_insumo',
+              label: 'Insumo',
+              tipo: 'select' as const,
+              obligatorio: true,
+              opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'cantidad',
+              label: 'Cantidad',
+              tipo: 'number' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'presentacion',
+              label: 'Presentación',
+              tipo: 'text' as const,
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'id_unidad',
+              label: 'Unidad',
+              tipo: 'select' as const,
+              opciones: this.unidades.map(u => ({ value: u.id_unidad, label: u.nombre })),
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_lote',
+              label: 'Lote',
+              tipo: 'select' as const,
+              opciones: this.lotes.map(l => ({ value: l.id_lote!, label: l.lote! })),
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'precio_unitario_historico',
+              label: 'Precio Unitario',
+              tipo: 'number' as const,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'estado',
+              label: 'Estado',
+              tipo: 'select' as const,
+              obligatorio: true,
+              opciones: [
+                { value: 'PENDIENTE', label: 'Pendiente' },
+                { value: 'PROCESADO', label: 'Procesado' },
+                { value: 'ANULADO', label: 'Anulado' }
+              ],
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'numero_remision',
+              label: 'N° Remisión',
+              tipo: 'text' as const,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'orden_compra',
+              label: 'Orden de Compra',
+              tipo: 'text' as const,
+              ancho: 'normal' as const
+            }
+          ]
+        ]
+      };
+      
+      const dialogRef = this.dialog.open(FormularioDialogComponent, {
+        width: '800px',
+        disableClose: true,
+        data: config,
+      });
 
-    const dialogRef = this.dialog.open(FormularioDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: configuracion,
-    });
-
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado && resultado.datos) {
-        this.materialService.crearIngreso(resultado.datos).subscribe({
-          next: () => {
-            this.cargarDatos();
-          },
-          error: (error: any) => {
-            console.error('Error al crear ingreso:', error);
-          },
-        });
-      }
+      dialogRef.afterClosed().subscribe((resultado) => {
+        if (resultado?.accion === 'guardar') {
+          console.log('Creando ingreso:', resultado.datos);
+          this.cargarDatos();
+        }
+      });
     });
   }
 
   editar(ingreso: Ingreso): void {
-    const configuracion: ConfiguracionFormulario = {
-      titulo: {
-        agregar: 'Agregar Ingreso',
-        editar: 'Editar Ingreso',
-      },
-      entidad: 'Ingreso',
-      entidadArticulo: 'el ingreso',
-      esEdicion: true,
-      datosIniciales: ingreso,
-      filas: [
-        [
-          {
-            key: 'id_insumo',
-            label: 'Insumo',
-            tipo: 'select',
-            opciones: this.insumos.map((i) => ({
-              value: i.id_insumo!,
-              label: i.nombre,
-            })),
-            obligatorio: true,
-            ancho: 'completo',
-          },
-        ],
-        [
-          {
-            key: 'fecha',
-            label: 'Fecha',
-            tipo: 'text',
-            placeholder: 'dd/mm/aaaa',
-            obligatorio: true,
-            ancho: 'normal',
-          },
-          {
-            key: 'cantidad',
-            label: 'Cantidad',
-            tipo: 'number',
-            placeholder: 'Cantidad recibida',
-            obligatorio: true,
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'presentacion',
-            label: 'Presentación',
-            tipo: 'text',
-            placeholder: 'Descripción de presentación',
-            maxLength: 100,
-            ancho: 'normal',
-          },
-          {
-            key: 'id_unidad',
-            label: 'Unidad',
-            tipo: 'select',
-            opciones: this.unidades.map((u) => ({
-              value: u.id_unidad,
-              label: u.nombre,
-            })),
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'id_lote',
-            label: 'Lote',
-            tipo: 'select',
-            opciones: this.lotes.map((l) => ({
-              value: l.id_lote!,
-              label: l.lote || '',
-            })),
-            ancho: 'normal',
-          },
-          {
-            key: 'precio_unitario_historico',
-            label: 'Precio Unitario',
-            tipo: 'number',
-            placeholder: '0.00',
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'numero_remision',
-            label: 'N° Remisión',
-            tipo: 'text',
-            placeholder: 'Número de remisión',
-            maxLength: 50,
-            ancho: 'normal',
-          },
-          {
-            key: 'orden_compra',
-            label: 'Orden de Compra',
-            tipo: 'text',
-            placeholder: 'Número de orden',
-            maxLength: 50,
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'estado',
-            label: 'Estado',
-            tipo: 'select',
-            opciones: Object.entries(INGRESOS_CONFIG.ESTADOS).map(
-              ([key, value]) => ({
-                value: key,
-                label: value.texto,
-              })
-            ),
-            obligatorio: true,
-            ancho: 'completo',
-          },
-        ],
-      ],
-    };
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      const config = {
+        titulo: {
+          agregar: 'Agregar Ingreso',
+          editar: 'Editar Ingreso'
+        },
+        entidad: 'Ingreso',
+        entidadArticulo: 'el ingreso',
+        esEdicion: true,
+        datosIniciales: ingreso,
+        filas: [
+          [
+            {
+              key: 'fecha',
+              label: 'Fecha',
+              tipo: 'date' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_insumo',
+              label: 'Insumo',
+              tipo: 'select' as const,
+              obligatorio: true,
+              opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'cantidad',
+              label: 'Cantidad',
+              tipo: 'number' as const,
+              obligatorio: true,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'presentacion',
+              label: 'Presentación',
+              tipo: 'text' as const,
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'id_unidad',
+              label: 'Unidad',
+              tipo: 'select' as const,
+              opciones: this.unidades.map(u => ({ value: u.id_unidad, label: u.nombre })),
+              ancho: 'normal' as const
+            },
+            {
+              key: 'id_lote',
+              label: 'Lote',
+              tipo: 'select' as const,
+              opciones: this.lotes.map(l => ({ value: l.id_lote!, label: l.lote! })),
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'precio_unitario_historico',
+              label: 'Precio Unitario',
+              tipo: 'number' as const,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'estado',
+              label: 'Estado',
+              tipo: 'select' as const,
+              obligatorio: true,
+              opciones: [
+                { value: 'PENDIENTE', label: 'Pendiente' },
+                { value: 'PROCESADO', label: 'Procesado' },
+                { value: 'ANULADO', label: 'Anulado' }
+              ],
+              ancho: 'normal' as const
+            }
+          ],
+          [
+            {
+              key: 'numero_remision',
+              label: 'N° Remisión',
+              tipo: 'text' as const,
+              ancho: 'normal' as const
+            },
+            {
+              key: 'orden_compra',
+              label: 'Orden de Compra',
+              tipo: 'text' as const,
+              ancho: 'normal' as const
+            }
+          ]
+        ]
+      };
+      
+      const dialogRef = this.dialog.open(FormularioDialogComponent, {
+        width: '800px',
+        disableClose: true,
+        data: config,
+      });
 
-    const dialogRef = this.dialog.open(FormularioDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: configuracion,
-    });
-
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado && resultado.datos) {
-        this.materialService.actualizarIngreso(resultado.datos).subscribe({
-          next: () => {
-            this.cargarDatos();
-          },
-          error: (error: any) => {
-            console.error('Error al editar ingreso:', error);
-          },
-        });
-      }
+      dialogRef.afterClosed().subscribe((resultado) => {
+        if (resultado?.accion === 'guardar') {
+          console.log('Actualizando ingreso:', resultado.datos);
+          this.cargarDatos();
+        }
+      });
     });
   }
 
-  verDetalle(ingreso: Ingreso): void {
-    const configuracion: ConfiguracionDetalle = {
-      entidad: 'Ingreso',
-      entidadArticulo: 'el ingreso',
-      datos: ingreso,
-      filas: [
-        [
-          {
-            key: 'id_ingreso',
-            label: 'Código',
-            tipo: 'text',
-            formateo: (valor) => IngresosConfig.formatearCodigo(valor),
-            ancho: 'normal',
-          },
-          {
-            key: 'fecha',
-            label: 'Fecha',
-            tipo: 'text',
-            formateo: (valor) => IngresosConfig.formatearFecha(valor),
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'id_insumo',
-            label: 'Insumo',
-            tipo: 'text',
-            formateo: (valor) =>
-              IngresosConfig.formatearTexto(this.getInsumoNombre(valor)),
-            ancho: 'normal',
-          },
-          {
-            key: 'cantidad',
-            label: 'Cantidad',
-            tipo: 'number',
-            formateo: (valor) => IngresosConfig.formatearCantidad(valor),
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'presentacion',
-            label: 'Presentación',
-            tipo: 'text',
-            formateo: (valor) => IngresosConfig.formatearTexto(valor),
-            ancho: 'normal',
-          },
-          {
-            key: 'id_unidad',
-            label: 'Unidad',
-            tipo: 'text',
-            formateo: (valor) =>
-              IngresosConfig.formatearTexto(this.getUnidadNombre(valor)),
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'id_lote',
-            label: 'Lote',
-            tipo: 'text',
-            formateo: (valor) =>
-              IngresosConfig.formatearTexto(this.getLoteNombre(valor)),
-            ancho: 'normal',
-          },
-          {
-            key: 'precio_unitario_historico',
-            label: 'Precio Unitario',
-            tipo: 'number',
-            formateo: (valor) => IngresosConfig.formatearPrecio(valor),
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'precio_total_formula',
-            label: 'Precio Total',
-            tipo: 'number',
-            formateo: (valor) => IngresosConfig.formatearPrecio(valor),
-            ancho: 'normal',
-          },
-          {
-            key: 'estado',
-            label: 'Estado',
-            tipo: 'text',
-            formateo: (valor) => IngresosConfig.formatearEstado(valor).texto,
-            ancho: 'normal',
-          },
-        ],
-        [
-          {
-            key: 'numero_remision',
-            label: 'N° Remisión',
-            tipo: 'text',
-            formateo: (valor) => IngresosConfig.formatearTexto(valor),
-            ancho: 'normal',
-          },
-          {
-            key: 'orden_compra',
-            label: 'Orden de Compra',
-            tipo: 'text',
-            formateo: (valor) => IngresosConfig.formatearTexto(valor),
-            ancho: 'normal',
-          },
-        ],
-      ],
-    };
-
-    this.dialog.open(DetalleDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: configuracion,
-    });
-  }
 }
 
 export { IngresosComponent as Ingresos };

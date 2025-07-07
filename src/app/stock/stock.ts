@@ -151,19 +151,19 @@ export class StockComponent implements OnInit, OnDestroy {
     {
       action: 'view',
       tooltip: 'Ver Detalle',
-      icon: 'visibility',
+      icon: 'pi pi-eye',
       color: 'secondary'
     },
     {
       action: 'edit',
       tooltip: 'Editar',
-      icon: 'edit',
+      icon: 'pi pi-pencil',
       color: 'primary'
     },
     {
       action: 'delete',
       tooltip: 'Eliminar',
-      icon: 'delete',
+      icon: 'pi pi-trash',
       color: 'danger'
     }
   ];
@@ -172,13 +172,13 @@ export class StockComponent implements OnInit, OnDestroy {
     {
       action: 'add',
       label: 'Agregar Stock',
-      icon: 'add',
+      icon: 'pi pi-plus',
       color: 'primary'
     },
     {
       action: 'bulk',
       label: 'Carga Masiva',
-      icon: 'upload_file',
+      icon: 'pi pi-upload',
       color: 'secondary'
     }
   ];
@@ -484,9 +484,12 @@ export class StockComponent implements OnInit, OnDestroy {
       ({ ConfirmacionDialogComponent }) => {
         const config = {
           titulo: 'Eliminar Stock',
+          subtitulo: 'Esta acción no se puede deshacer',
           mensaje: `¿Está seguro que desea eliminar el stock de "${stock.nombre_material}"?`,
-          confirmar: 'Eliminar',
-          cancelar: 'Cancelar'
+          mensajeSecundario: 'Todos los registros de stock relacionados se perderán permanentemente.',
+          tipo: 'danger' as const,
+          textoBotonConfirmar: 'Eliminar',
+          textoBotonCancelar: 'Cancelar'
         };
         
         const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {

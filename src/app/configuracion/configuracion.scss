@@ -142,6 +142,58 @@
       }
     }
   }
+
+  /* === MEJORA DE DISEÑO PARA TABS DE CONFIGURACIÓN === */
+  .p-tabview {
+    border-radius: var(--texfina-radius-lg);
+    box-shadow: var(--texfina-shadow-md);
+    border: 1px solid var(--texfina-border-light);
+    background: var(--texfina-bg-primary);
+
+    .p-tabview-nav {
+      display: flex;
+      gap: var(--texfina-spacing-md);
+      padding: 0 var(--texfina-spacing-lg);
+      border: none;
+      background: transparent;
+      overflow-x: auto;
+      scrollbar-width: thin;
+
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: var(--texfina-secondary);
+        border-radius: 10px;
+      }
+    }
+
+    .p-tabview-nav-link {
+      display: flex;
+      align-items: center;
+      gap: var(--texfina-spacing-xs);
+      padding: var(--texfina-spacing-md) var(--texfina-spacing-lg);
+      font-weight: 600;
+      font-size: var(--texfina-font-size-sm);
+      color: var(--texfina-text-muted);
+      border-bottom: 3px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+
+      &:hover {
+        color: var(--texfina-secondary);
+      }
+    }
+
+    li.p-highlight .p-tabview-nav-link {
+      color: var(--texfina-secondary) !important;
+      border-color: var(--texfina-secondary) !important;
+    }
+
+    .p-tabview-panels {
+      padding: var(--texfina-spacing-lg);
+      background: var(--texfina-bg-primary);
+    }
+  }
 }
 
 /* Grid de configuración */
