@@ -7,21 +7,10 @@
   height: 100vh;
   width: 280px;
   background: #ffffff;
-  color: #1e293b;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+  color: #64748b;
+  box-shadow: none;
   position: relative;
-  border-right: 1px solid #e2e8f0;
-
-  // Línea decorativa lateral
-  &::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: linear-gradient(180deg, #bd2126, #8b1538);
-  }
+  border: none !important;
 }
 
 // ============================================================================
@@ -32,8 +21,19 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 1.25rem;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1rem;
+    right: 1rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #e2e8f0 20%, #cbd5e1 50%, #e2e8f0 80%, transparent 100%);
+  }
 }
 
 .logo-section {
@@ -42,17 +42,34 @@
   gap: 0.75rem;
 }
 
-.logo-img {
-  height: 32px;
-  width: auto;
-  filter: none;
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 1.125rem;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  }
 }
 
 .logo-text {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #bd2126;
+  font-weight: 800;
+  color: #1e293b;
   text-shadow: none;
+  background: linear-gradient(135deg, #1e293b, #475569);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .close-btn {
@@ -107,8 +124,21 @@
 // SECCIONES
 // ============================================================================
 .nav-section {
-  margin-bottom: 1.5rem;
-  padding: 0 1rem;
+  margin-bottom: 2rem;
+  padding: 0 0.5rem;
+  position: relative;
+
+  &:not(:last-child) {
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -1rem;
+      left: 1rem;
+      right: 1rem;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, #e2e8f0 50%, transparent 100%);
+    }
+  }
 
   &:last-child {
     margin-bottom: 0;
@@ -117,12 +147,25 @@
 
 .section-title {
   font-size: 0.75rem;
-  font-weight: 600;
-  color: #64748b;
+  font-weight: 700;
+  color: #475569;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 0.75rem 0.5rem;
-  padding: 0;
+  letter-spacing: 0.8px;
+  margin: 0 0 1rem 1rem;
+  padding: 0.5rem 0;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 16px;
+    background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+    border-radius: 2px;
+  }
 }
 
 // ============================================================================
@@ -138,21 +181,29 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  margin: 0.125rem 0;
-  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  margin: 0.25rem 0.5rem;
+  border-radius: 10px;
   color: #64748b;
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   position: relative;
+  border: 1px solid transparent;
 
   // Estado hover
   &:hover {
-    background: #f1f5f9;
-    color: #334155;
-    transform: translateX(2px);
+    background: #f8fafc;
+    color: #475569;
+    transform: translateX(3px);
+    border-color: #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    i {
+      color: #475569;
+      transform: scale(1.1);
+    }
   }
 
   // Iconos
@@ -164,34 +215,54 @@
     height: 20px;
     font-size: 1rem;
     color: #94a3b8;
-    transition: color 0.2s ease;
+    transition: all 0.3s ease;
   }
 
   // Texto
   span {
     flex: 1;
-    transition: color 0.2s ease;
+    transition: all 0.3s ease;
   }
 
   // Estado activo
   &.active {
-    background: rgba(189, 33, 38, 0.1);
-    border-left: 4px solid #bd2126;
-    color: #bd2126;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border: 1px solid #cbd5e1;
+    color: #1e293b;
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(189, 33, 38, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateX(2px);
+
+    // Indicador visual más prominente
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 70%;
+      background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+      border-radius: 0 2px 2px 0;
+    }
 
     i {
-      color: #bd2126;
+      color: #1e293b;
+      transform: scale(1.15);
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 6px;
+      padding: 2px;
     }
 
     span {
-      color: #bd2126;
+      color: #1e293b;
+      font-weight: 600;
     }
 
     &:hover {
-      background: rgba(189, 33, 38, 0.15);
-      transform: translateX(0);
+      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+      transform: translateX(2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
     }
   }
 }
@@ -202,23 +273,26 @@
 .sidebar-footer {
   margin-top: auto;
   padding: 1rem 1.25rem;
-  border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
 }
 
 .user-profile {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 8px;
-  background: #ffffff;
+  padding: 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border: 1px solid #e2e8f0;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
+  cursor: pointer;
 
   &:hover {
-    background: #f1f5f9;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
     border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -226,13 +300,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: #bd2126;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   border-radius: 50%;
   color: #ffffff;
-  font-size: 1.125rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
 }
 
 .user-info {
@@ -303,10 +378,46 @@
   .p-drawer-content {
     padding: 0 !important;
     background: transparent !important;
+    border: none !important;
   }
 
   .p-drawer-mask {
-    background: rgba(0, 0, 0, 0.5) !important;
-    backdrop-filter: blur(3px) !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(2px) !important;
+  }
+
+  // Eliminar completamente todos los bordes y fondos azules
+  .p-drawer-left,
+  .p-drawer-right,
+  .p-drawer-top,
+  .p-drawer-bottom {
+    border: none !important;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06) !important;
+    background: transparent !important;
+  }
+
+  .p-drawer-header {
+    display: none !important;
+  }
+
+  // Forzar eliminación de cualquier color de fondo azul
+  .p-component {
+    background: transparent !important;
+    border: none !important;
+  }
+}
+
+// Estilos globales para eliminar cualquier borde azul
+::ng-deep {
+  .p-drawer,
+  .p-drawer *,
+  .p-sidebar,
+  .p-sidebar * {
+    border-color: transparent !important;
+    background-color: transparent !important;
+  }
+  
+  .p-drawer-content {
+    background: white !important;
   }
 }
