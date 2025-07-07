@@ -58,7 +58,7 @@ import {
   DetalleDialogComponent,
   ConfiguracionDetalle,
 } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
-import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
 import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
 
 @Component({

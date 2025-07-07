@@ -19,7 +19,7 @@ import { Insumo } from '../models/insumo.model';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 // Carga masiva
-import { CargaMasivaDialogComponent, CargaMasivaDialogData } from './carga-masiva-dialog/carga-masiva-dialog.component';
+import { CargaMasivaDialogComponent, CargaMasivaDialogData } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
 import { CargaMasivaService, ConfiguracionCargaMasiva } from '../services/carga-masiva.service';
 import {
   ExportacionService,
@@ -44,9 +44,6 @@ import { MaterialesConfig } from '../shared/configs/materiales-config';
     MatDialogModule,
     PrimeDataTableComponent,
     ConfirmDialogModule,
-    FormularioDialogComponent,
-    DetalleDialogComponent,
-    ConfirmacionDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './materiales.component.html',

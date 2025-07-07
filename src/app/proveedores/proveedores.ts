@@ -47,7 +47,7 @@ import {
   ConfiguracionCargaMasiva,
   MapeoColumna,
 } from '../services/carga-masiva.service';
-import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
 
 @Component({
   selector: 'app-proveedores',

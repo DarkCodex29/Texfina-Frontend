@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { ConfiguracionCargaMasiva } from '../../services/carga-masiva.service';
+import { ConfiguracionCargaMasiva } from '../../../services/carga-masiva.service';
 
 export interface CargaMasivaDialogData {
   configuracion: ConfiguracionCargaMasiva<any>;

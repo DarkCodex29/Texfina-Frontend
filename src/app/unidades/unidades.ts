@@ -44,7 +44,7 @@ import {
   ConfiguracionCargaMasiva,
   MapeoColumna,
 } from '../services/carga-masiva.service';
-import { CargaMasivaDialogComponent } from '../materiales/carga-masiva-dialog/carga-masiva-dialog.component';
+import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
 import { Unidad } from '../models/insumo.model';
 import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
 import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
