@@ -1,58 +1,158 @@
-<div
-  class="flex flex-col h-full w-80 bg-surface-0 dark:bg-surface-900 shadow-2"
->
+<div class="sidebar-wrapper">
   <!-- Header -->
-  <div class="flex items-center justify-between px-6 pt-4 shrink-0">
-    <span class="inline-flex items-center gap-2">
-      <img src="assets/logo.png" class="h-8" alt="Logo" />
-      <span class="font-semibold text-2xl text-primary">Texfina</span>
-    </span>
-    <span>
-      <p-button
-        type="button"
-        (click)="closeCallback($event)"
-        icon="pi pi-times"
-        rounded="true"
-        outlined="true"
-        styleClass="h-8 w-8"
-      />
-    </span>
+  <div class="sidebar-header">
+    <div class="logo-section">
+      <img src="assets/logo.png" alt="Texfina" class="logo-img">
+      <span class="logo-text">Texfina</span>
+    </div>
+    <button class="close-btn" (click)="closeCallback($event)">
+      <i class="pi pi-times"></i>
+    </button>
   </div>
 
-  <!-- Menu Body -->
-  <div class="overflow-y-auto">
-    <ul class="list-none p-4 m-0">
-      <li>
-        <div class="p-4 flex items-center text-sm font-bold text-surface-500">
-          MAESTROS
-        </div>
-        <ul>
-          <li *ngFor="let item of maestros">
-            <a
-              pRipple
-              class="flex items-center gap-2 p-3 rounded-md text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-150 cursor-pointer"
-            >
-              <i [class]="'pi ' + item.icon + ' text-primary'"></i>
-              <span>{{ item.label }}</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <!-- Agrega más secciones similares (Movimientos, Consultas, Administración) -->
-    </ul>
-  </div>
+  <!-- Navigation Menu -->
+  <nav class="sidebar-nav">
+    <!-- Principal -->
+    <div class="nav-section">
+      <h3 class="section-title">Principal</h3>
+      <ul class="nav-list">
+        <li>
+          <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/reportes" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-chart-line"></i>
+            <span>Reportes</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Inventario -->
+    <div class="nav-section">
+      <h3 class="section-title">Inventario</h3>
+      <ul class="nav-list">
+        <li>
+          <a routerLink="/materiales" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-box"></i>
+            <span>Materiales</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/stock" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-database"></i>
+            <span>Stock</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/lotes" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-tag"></i>
+            <span>Lotes</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/ingresos" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-arrow-down"></i>
+            <span>Ingresos</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/consumos" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-arrow-up"></i>
+            <span>Consumos</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Catálogos -->
+    <div class="nav-section">
+      <h3 class="section-title">Catálogos</h3>
+      <ul class="nav-list">
+        <li>
+          <a routerLink="/proveedores" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-building"></i>
+            <span>Proveedores</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/almacenes" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-home"></i>
+            <span>Almacenes</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/clases" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-sitemap"></i>
+            <span>Clases</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/unidades" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-calculator"></i>
+            <span>Unidades</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/recetas" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-list"></i>
+            <span>Recetas</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Administración -->
+    <div class="nav-section">
+      <h3 class="section-title">Administración</h3>
+      <ul class="nav-list">
+        <li>
+          <a routerLink="/usuarios" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-users"></i>
+            <span>Usuarios</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/roles" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-key"></i>
+            <span>Roles</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/auditoria" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-eye"></i>
+            <span>Auditoría</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/logs" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-file"></i>
+            <span>Logs</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/configuracion" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-cog"></i>
+            <span>Configuración</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
   <!-- Footer -->
-  <div class="mt-auto border-t border-surface-200 dark:border-surface-700 p-4">
-    <a
-      pRipple
-      class="flex items-center gap-3 text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 p-3 rounded-md cursor-pointer"
-    >
-      <p-avatar
-        image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
-        shape="circle"
-      />
-      <div class="font-bold">Amy Elsner</div>
-    </a>
+  <div class="sidebar-footer">
+    <div class="user-profile">
+      <div class="user-avatar">
+        <i class="pi pi-user"></i>
+      </div>
+      <div class="user-info">
+        <div class="user-name">Admin User</div>
+        <div class="user-role">Administrador</div>
+      </div>
+    </div>
   </div>
 </div>

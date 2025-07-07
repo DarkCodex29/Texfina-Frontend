@@ -6,15 +6,6 @@
         <h1 class="page-title text-texfina text-primary">Clases</h1>
       </div>
       <div class="header-actions">
-        <!-- Botón de Carga Masiva -->
-        <button
-          class="btn-texfina btn-secondary"
-          (click)="cargaMasiva()"
-          matTooltip="Importar múltiples clases desde Excel"
-        >
-          Carga Masiva
-        </button>
-
         <!-- Dropdown de Exportar -->
         <div class="dropdown-export">
           <button
@@ -39,255 +30,29 @@
             </button>
           </div>
         </div>
-
-        <!-- Botón principal de la pantalla -->
-        <button class="btn-texfina btn-primary" (click)="agregar()">
-          Agregar Clase
-        </button>
-      </div>
-    </div>
-
-    <!-- Filtro General -->
-    <div class="filters-card">
-      <div class="filters-content">
-        <form [formGroup]="filtroGeneralForm" class="filters-form">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <input
-                  class="simple-input"
-                  formControlName="busquedaGeneral"
-                  placeholder="Buscar en código, familia, subfamilia..."
-                  type="text"
-                />
-                <button
-                  class="btn-limpiar"
-                  type="button"
-                  (click)="limpiarFiltroGeneral()"
-                  matTooltip="Limpiar búsqueda"
-                >
-                  Limpiar
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
       </div>
     </div>
 
     <!-- Tabla de clases -->
     <div class="table-card">
-      <div class="table-with-headers">
-        <!-- Encabezados de columnas con filtros integrados -->
-        <div class="column-headers">
-          <!-- Fila de títulos -->
-          <div class="header-row header-titles">
-            <div class="header-col codigo-col" (click)="sortData('id_clase')">
-              <span>Código Clase</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col familia-col" (click)="sortData('familia')">
-              <span>Familia</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col subfamilia-col"
-              (click)="sortData('sub_familia')"
-            >
-              <span>Subfamilia</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col acciones-col">
-              <span>ACCIONES</span>
-            </div>
-          </div>
-
-          <!-- Fila de filtros por columna -->
-          <div
-            class="header-row header-filters"
-            *ngIf="filtrosColumnaHabilitados"
-            [formGroup]="filtrosColumnaForm"
-          >
-            <div class="header-col codigo-col">
-              <input
-                class="column-filter-input"
-                formControlName="id_clase"
-                placeholder="Código..."
-                type="text"
-              />
-            </div>
-            <div class="header-col familia-col">
-              <input
-                class="column-filter-input"
-                formControlName="familia"
-                placeholder="Familia..."
-                type="text"
-              />
-            </div>
-            <div class="header-col subfamilia-col">
-              <input
-                class="column-filter-input"
-                formControlName="sub_familia"
-                placeholder="Subfamilia..."
-                type="text"
-              />
-            </div>
-            <div class="header-col acciones-col">
-              <button
-                class="btn-clear-column-filters"
-                type="button"
-                (click)="limpiarFiltrosColumna()"
-                matTooltip="Limpiar filtros de columna"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <!-- Estado de error -->
-          <div *ngIf="hasError" class="error-state">
-            <mat-icon class="error-icon">error_outline</mat-icon>
-            <h3 class="error-title text-texfina text-primary">
-              Error al cargar datos
-            </h3>
-            <p class="error-subtitle text-texfina text-muted">
-              {{ errorMessage }}
-            </p>
-            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
-              <mat-icon>refresh</mat-icon>
-              Reintentar
-            </button>
-          </div>
-
-          <!-- Estado vacío (sin datos) -->
-          <div *ngIf="isEmpty" class="empty-state">
-            <mat-icon class="empty-icon">category</mat-icon>
-            <h3 class="empty-title text-texfina text-primary">
-              No hay clases registradas
-            </h3>
-            <p class="empty-subtitle text-texfina text-muted">
-              Comienza agregando tu primera clase para organizar los insumos
-            </p>
-            <button class="btn-texfina btn-primary" (click)="agregar()">
-              <mat-icon>add</mat-icon>
-              Agregar Primera Clase
-            </button>
-          </div>
-
-          <!-- Estado filtrado vacío -->
-          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
-            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
-            <h3 class="filtered-empty-title text-texfina text-primary">
-              No se encontraron resultados
-            </h3>
-            <p class="filtered-empty-subtitle text-texfina text-muted">
-              Intenta ajustar los filtros o limpiar la búsqueda
-            </p>
-          </div>
-
-          <!-- Tabla siempre visible (con skeleton o datos) -->
-          <table mat-table [dataSource]="dataSource" matSort class="data-table">
-            <!-- Columna Código Clase -->
-            <ng-container matColumnDef="id_clase">
-              <td mat-cell *matCellDef="let clase" class="table-cell">
-                <span class="badge-texfina badge-neutral">
-                  {{ formatearTexto(clase.id_clase) }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Familia -->
-            <ng-container matColumnDef="familia">
-              <td mat-cell *matCellDef="let clase" class="table-cell">
-                <div class="clase-cell">
-                  <div class="clase-familia text-texfina font-medium">
-                    {{ formatearTexto(clase.familia) }}
-                  </div>
-                  <div class="clase-type text-texfina text-muted">
-                    Clasificación Principal
-                  </div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Columna Subfamilia -->
-            <ng-container matColumnDef="sub_familia">
-              <td mat-cell *matCellDef="let clase" class="table-cell">
-                <span class="badge-texfina badge-secondary">
-                  {{ formatearTexto(clase.sub_familia) }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Acciones -->
-            <ng-container matColumnDef="acciones">
-              <td
-                mat-cell
-                *matCellDef="let clase"
-                class="table-cell actions-cell"
-              >
-                <div class="action-buttons">
-                  <button
-                    class="btn-action btn-view"
-                    (click)="verDetalle(clase)"
-                    matTooltip="Ver detalle"
-                  >
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                  <button
-                    class="btn-action btn-edit"
-                    (click)="editar(clase)"
-                    matTooltip="Editar"
-                  >
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Filas de datos reales -->
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-          </table>
-
-          <!-- Skeleton superpuesto mientras carga -->
-          <div *ngIf="isLoading" class="skeleton-overlay">
-            <table class="skeleton-table">
-              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5, 6]">
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                  <div class="skeleton-line skeleton-subtext"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-actions"></div>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Paginación -->
-      <div class="table-footer">
-        <div class="pagination-info">
-          <span class="text-texfina text-muted">Página 1 de 10</span>
-        </div>
-        <div class="pagination-controls">
-          <button class="pagination-button" disabled>
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button class="pagination-button">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
-      </div>
+      <app-prime-data-table
+        [data]="clases"
+        [columns]="columns"
+        [actions]="actions"
+        [buttons]="buttons"
+        [globalFilterFields]="globalFilterFields"
+        [state]="tableState"
+        [loading]="tableState.loading"
+        [error]="tableState.error"
+        [errorMessage]="tableState.errorMessage || ''"
+        emptyIcon="category"
+        emptyTitle="No hay clases registradas"
+        emptySubtitle="Comienza agregando tu primera clase para organizar los insumos"
+        emptyActionText="Agregar Primera Clase"
+        (actionClick)="onActionClick($event)"
+        (buttonClick)="onButtonClick($event)"
+        (retryClicked)="recargarDatos()"
+      ></app-prime-data-table>
     </div>
   </div>
 </div>
