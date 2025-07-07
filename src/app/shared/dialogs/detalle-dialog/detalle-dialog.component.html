@@ -6,9 +6,6 @@
         Información completa {{ config.entidadArticulo }} seleccionada
       </p>
     </div>
-    <button mat-icon-button mat-dialog-close class="close-button">
-      <mat-icon>close</mat-icon>
-    </button>
   </div>
 
   <div class="dialog-content">
@@ -70,5 +67,9 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="onClose()">Cerrar</button>
   </div>
 </div>

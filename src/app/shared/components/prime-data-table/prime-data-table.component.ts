@@ -34,7 +34,8 @@ export interface TableColumn {
   sortable?: boolean;
   filterable?: boolean;
   width?: string;
-  type?: 'text' | 'number' | 'date' | 'badge' | 'actions' | 'user' | 'action' | 'module' | 'ip' | 'description';
+  type?: 'text' | 'number' | 'date' | 'badge' | 'actions' | 'user' | 'action' | 'module' | 'ip' | 'description' | 'currency';
+  align?: 'left' | 'center' | 'right';
   pinned?: boolean;
   visible?: boolean;
   icon?: string;
@@ -46,6 +47,14 @@ export interface TableAction {
   action: string;
   color?: 'primary' | 'secondary' | 'warn' | 'danger' | 'success';
   condition?: (item: any) => boolean;
+}
+
+export interface TableButtonConfig {
+  label: string;
+  icon?: string;
+  action: string;
+  color?: 'primary' | 'secondary' | 'warn' | 'danger' | 'success';
+  disabled?: boolean;
 }
 
 export interface TableState {
@@ -93,16 +102,18 @@ export interface TableState {
           </span>
         </div>
 
-        <!-- Toggle para filtros de columna -->
+        <!-- Botones personalizados con estilos Texfina -->
         <div class="filter-controls">
-          <p-button
-            *ngIf="showColumnFilters"
-            icon="pi pi-filter"
-            [text]="true"
-            [rounded]="true"
-            (onClick)="toggleColumnFilters()"
-            [severity]="columnFiltersVisible ? 'primary' : 'secondary'"
-          ></p-button>
+          <button
+            *ngFor="let button of buttons"
+            [class]="getTexfinaButtonClass(button.color)"
+            [disabled]="button.disabled"
+            (click)="handleButtonClick(button.action)"
+            type="button"
+          >
+            <i *ngIf="button.icon" [class]="button.icon" class="mr-2"></i>
+            {{ button.label }}
+          </button>
         </div>
       </div>
 
@@ -271,6 +282,12 @@ export interface TableState {
                     <span class="description-text">{{ formatCellValue(item, column) }}</span>
                   </div>
 
+                  <!-- Tipo currency -->
+                  <span *ngSwitchCase="'currency'" class="currency-cell">
+                    <i class="pi pi-money-bill"></i>
+                    {{ formatCellValue(item, column) }}
+                  </span>
+
                   <!-- Tipo text, number o default -->
                   <span *ngSwitchDefault class="text-texfina text-secondary">
                     {{ formatCellValue(item, column) }}
@@ -370,9 +387,15 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
   @Input() showPagination: boolean = true;
   @Input() pageSize: number = 10;
   @Input() actionsPinned: boolean = true;
+  @Input() buttons: TableButtonConfig[] = [];
+  @Input() globalFilterFields: string[] = [];
+  @Input() loading: boolean = false;
+  @Input() error: boolean = false;
+  @Input() errorMessage: string = '';
 
   // Eventos
-  @Output() actionClicked = new EventEmitter<{ action: string; item: any }>();
+  @Output() actionClick = new EventEmitter<{ action: string; item: any }>();
+  @Output() buttonClick = new EventEmitter<string>();
   @Output() sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
   @Output() filtersChanged = new EventEmitter<any>();
   @Output() retryClicked = new EventEmitter<void>();
@@ -383,7 +406,6 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
   hasActions: boolean = false;
   globalFilterValue: string = '';
   columnFiltersVisible: boolean = false;
-  globalFilterFields: string[] = [];
   displayedColumnsCount: number = 0;
 
   // Propiedades de paginación
@@ -419,8 +441,21 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
   private initializeTable() {
     this.visibleColumns = this.columns.filter(col => col.visible !== false);
     this.hasActions = this.actions.length > 0;
-    this.globalFilterFields = this.visibleColumns.map(col => col.key);
+    if (this.globalFilterFields.length === 0) {
+      this.globalFilterFields = this.visibleColumns.map(col => col.key);
+    }
     this.displayedColumnsCount = this.visibleColumns.length + (this.hasActions ? 1 : 0);
+    
+    // Update state based on inputs
+    if (this.loading || this.error) {
+      this.state = {
+        loading: this.loading,
+        error: this.error,
+        errorMessage: this.errorMessage,
+        empty: false,
+        filteredEmpty: false
+      };
+    }
     this.currentRows = this.pageSize;
     // Inicializar skeleton rows (mostrar entre 5-8 filas skeleton)
     this.skeletonRows = Array.from({ length: Math.min(this.pageSize, 8) }, (_, i) => i);
@@ -466,7 +501,11 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
 
 
   handleAction(action: string, item: any) {
-    this.actionClicked.emit({ action, item });
+    this.actionClick.emit({ action, item });
+  }
+
+  handleButtonClick(action: string) {
+    this.buttonClick.emit(action);
   }
 
   getVisibleActions(item: any): TableAction[] {
@@ -514,6 +553,8 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
         return new Date(value).toLocaleDateString('es-PE');
       case 'number':
         return typeof value === 'number' ? value.toLocaleString() : value;
+      case 'currency':
+        return this.formatearMoneda(value);
       default:
         return this.formatearTexto(value.toString());
     }
@@ -529,6 +570,12 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
       return texto;
     }
     return '—';
+  }
+
+  formatearMoneda(valor: any): string {
+    if (!valor || isNaN(valor)) return 'S/ 0.00';
+    const numero = typeof valor === 'string' ? parseFloat(valor) : valor;
+    return `S/ ${numero.toFixed(2)}`;
   }
 
   formatearFecha(fecha: string): string {
@@ -612,6 +659,20 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
       'success': 'success'
     };
     return severityMap[color || 'secondary'] || 'secondary';
+  }
+
+  getTexfinaButtonClass(color?: string): string {
+    const baseClass = 'btn-texfina';
+    const classMap: { [key: string]: string } = {
+      'primary': 'btn-primary',
+      'secondary': 'btn-secondary',
+      'success': 'btn-success',
+      'warning': 'btn-warning',
+      'danger': 'btn-outline-secondary',
+      'outline': 'btn-outline'
+    };
+    const colorClass = classMap[color || 'primary'] || 'btn-primary';
+    return `${baseClass} ${colorClass}`;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

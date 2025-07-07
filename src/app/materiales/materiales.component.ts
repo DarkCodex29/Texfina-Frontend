@@ -2,148 +2,143 @@ import {
   Component,
   OnInit,
   OnDestroy,
-  AfterViewInit,
-  ViewChild,
   HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-} from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatCardModule } from '@angular/material/card';
-import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
   Subject,
-  debounceTime,
-  distinctUntilChanged,
   takeUntil,
-  finalize,
-  delay,
 } from 'rxjs';
 import { MaterialService } from '../services/material.service';
 import { Insumo } from '../models/insumo.model';
-import { RegistroMaterialDialogComponent } from './registro-material-dialog/registro-material-dialog.component';
-import { DetalleMaterialDialogComponent } from './detalle-material-dialog/detalle-material-dialog.component';
-import { CargaMasivaDialogComponent } from './carga-masiva-dialog/carga-masiva-dialog.component';
+// PrimeNG Dialog y ConfirmDialog
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+// Carga masiva
+import { CargaMasivaDialogComponent, CargaMasivaDialogData } from './carga-masiva-dialog/carga-masiva-dialog.component';
+import { CargaMasivaService, ConfiguracionCargaMasiva } from '../services/carga-masiva.service';
 import {
   ExportacionService,
   ConfiguracionExportacion,
-  ColumnaExportacion,
 } from '../services/exportacion.service';
-import {
-  CargaMasivaService,
-  ConfiguracionCargaMasiva,
-  MapeoColumna,
-} from '../services/carga-masiva.service';
+import { PrimeDataTableComponent, TableColumn, TableAction, TableButtonConfig, TableState } from '../shared/components/prime-data-table/prime-data-table.component';
 
 @Component({
   selector: 'app-materiales',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatTableModule,
     MatButtonModule,
     MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatDialogModule,
-    MatPaginatorModule,
-    MatCardModule,
-    MatSortModule,
     MatTooltipModule,
-    MatProgressSpinnerModule,
+    MatDialogModule,
+    PrimeDataTableComponent,
+    ConfirmDialogModule,
   ],
+  providers: [ConfirmationService],
   templateUrl: './materiales.component.html',
   styleUrls: ['./materiales.component.scss'],
 })
-export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatSort) sort!: MatSort;
-
+export class MaterialesComponent implements OnInit, OnDestroy {
   materiales: Insumo[] = [];
-  dataSource = new MatTableDataSource<Insumo>([]);
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosExpanded = true;
-  filtrosColumnaHabilitados = false;
-  filtrosColumnaActivos = false;
   dropdownExportAbierto = false;
   private destroy$ = new Subject<void>();
 
-  isLoading: boolean = false;
-  hasError: boolean = false;
-  errorMessage: string = '';
+  // Estado de la tabla
+  tableState: TableState = {
+    loading: false,
+    error: false,
+    empty: false,
+    filteredEmpty: false
+  };
 
-  displayedColumns: string[] = [
-    'id_fox',
-    'nombre',
-    'peso_unitario',
-    'id_unidad',
-    'presentacion',
-    'precio_unitario',
-    'acciones',
+  // Configuración de tabla PrimeNG
+  columns: TableColumn[] = [
+    {
+      key: 'id_fox',
+      title: 'Código Fox',
+      sortable: true,
+      filterable: true,
+      width: '120px'
+    },
+    {
+      key: 'nombre',
+      title: 'Nombre',
+      sortable: true,
+      filterable: true,
+      width: '300px'
+    },
+    {
+      key: 'clase.nombre',
+      title: 'Clase',
+      sortable: true,
+      filterable: true,
+      width: '150px'
+    },
+    {
+      key: 'unidad.nombre',
+      title: 'Unidad',
+      sortable: true,
+      filterable: true,
+      width: '100px'
+    },
+    {
+      key: 'presentacion',
+      title: 'Presentación',
+      sortable: true,
+      filterable: true,
+      width: '150px'
+    }
   ];
-
-  get materialesFiltrados(): Insumo[] {
-    return this.dataSource.data;
-  }
+  actions: TableAction[] = [
+    {
+      tooltip: 'Ver',
+      icon: 'pi pi-eye',
+      action: 'view',
+      color: 'primary'
+    },
+    {
+      tooltip: 'Editar',
+      icon: 'pi pi-pencil',
+      action: 'edit',
+      color: 'primary'
+    }
+  ];
+  buttons: TableButtonConfig[] = [
+    {
+      label: 'Agregar Material',
+      icon: 'pi pi-plus',
+      action: 'add',
+      color: 'primary'
+    },
+    {
+      label: 'Carga Masiva',
+      icon: 'pi pi-upload',
+      action: 'bulk-upload',
+      color: 'secondary'
+    }
+  ];
+  globalFilterFields: string[] = ['id_fox', 'nombre', 'clase.nombre', 'unidad.nombre', 'presentacion'];
 
   get isEmpty(): boolean {
-    return !this.isLoading && this.materiales.length === 0 && !this.hasError;
+    return !this.tableState.loading && this.materiales.length === 0 && !this.tableState.error;
   }
 
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      this.dataSource.data.length === 0 &&
-      this.materiales.length > 0
-    );
-  }
 
   constructor(
     private materialService: MaterialService,
-    private dialog: MatDialog,
-    private fb: FormBuilder,
     private exportacionService: ExportacionService,
+    private confirmationService: ConfirmationService,
+    private dialog: MatDialog,
     private cargaMasivaService: CargaMasivaService
-  ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
-    this.filtrosColumnaForm = this.fb.group({
-      codigoFox: [''],
-      nombre: [''],
-      pesoUnitario: [''],
-      unidad: [''],
-      presentacion: [''],
-      precioUnitario: [''],
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cargarMateriales();
-    this.configurarFiltroGeneralEnTiempoReal();
-    this.configurarFiltrosColumnaEnTiempoReal();
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
   }
 
   ngOnDestroy(): void {
@@ -151,295 +146,186 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltroGeneralEnTiempoReal(): void {
-    this.filtroGeneralForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltroGeneral();
-      });
-  }
-
-  configurarFiltrosColumnaEnTiempoReal(): void {
-    this.filtrosColumnaForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltrosColumna();
-      });
-  }
+  // ============================================================================
+  // MÉTODOS DE CARGA DE DATOS
+  // ============================================================================
 
   cargarMateriales(): void {
-    this.isLoading = true;
-    this.hasError = false;
-    this.errorMessage = '';
-
-    console.log(
-      '🔄 Iniciando carga de materiales - isLoading:',
-      this.isLoading
-    );
+    this.tableState = { ...this.tableState, loading: true, error: false };
 
     this.materialService
       .getMateriales()
       .pipe(
-        delay(1500),
-        finalize(() => {
-          this.isLoading = false;
-          console.log('✅ Carga completada - isLoading:', this.isLoading);
-        }),
         takeUntil(this.destroy$)
       )
       .subscribe({
-        next: (materiales) => {
-          console.log('📦 Materiales cargados:', materiales.length);
+        next: (materiales: Insumo[]) => {
           this.materiales = materiales;
-          this.dataSource.data = [...materiales];
+          this.tableState = {
+            ...this.tableState,
+            loading: false,
+            empty: materiales.length === 0,
+            filteredEmpty: false
+          };
         },
-        error: (error) => {
-          console.error('❌ Error al cargar materiales:', error);
-          this.hasError = true;
-          this.errorMessage =
-            'Error al cargar los materiales. Por favor, intenta nuevamente.';
-          this.materiales = [];
-          this.dataSource.data = [];
+        error: (error: any) => {
+          console.error('Error al cargar materiales:', error);
+          this.tableState = {
+            ...this.tableState,
+            loading: false,
+            error: true,
+            errorMessage: 'Error al cargar los materiales. Intente nuevamente.'
+          };
         },
       });
   }
 
-  reintentarCarga(): void {
+  recargarDatos(): void {
     this.cargarMateriales();
   }
 
-  aplicarFiltroGeneral(): void {
-    const busqueda = this.filtroGeneralForm
-      .get('busquedaGeneral')
-      ?.value?.trim()
-      .toLowerCase();
+  // ============================================================================
+  // MANEJADORES DE ACCIONES DE TABLA
+  // ============================================================================
 
-    if (!busqueda) {
-      this.dataSource.data = [...this.materiales];
-      return;
-    }
+  onTableAction(event: { action: string; item: any }): void {
+    const { action, item } = event;
 
-    const materialesFiltrados = this.materiales.filter((material) => {
-      const codigo = material.id_fox?.toLowerCase() || '';
-      const nombre = material.nombre?.toLowerCase() || '';
-      const unidad =
-        material.unidad?.nombre?.toLowerCase() ||
-        material.id_unidad?.toString().toLowerCase() ||
-        '';
-      const presentacion = material.presentacion?.toLowerCase() || '';
-      const precio = material.precio_unitario?.toString() || '';
-      const peso = material.peso_unitario?.toString() || '';
-
-      return (
-        codigo.includes(busqueda) ||
-        nombre.includes(busqueda) ||
-        unidad.includes(busqueda) ||
-        presentacion.includes(busqueda) ||
-        precio.includes(busqueda) ||
-        peso.includes(busqueda)
-      );
-    });
-
-    this.dataSource.data = materialesFiltrados;
-  }
-
-  aplicarFiltrosColumna(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    let materialesFiltrados = [...this.materiales];
-
-    if (filtros.codigoFox && filtros.codigoFox.trim()) {
-      materialesFiltrados = materialesFiltrados.filter((material) =>
-        material.id_fox?.toLowerCase().includes(filtros.codigoFox.toLowerCase())
-      );
-    }
-
-    if (filtros.nombre && filtros.nombre.trim()) {
-      materialesFiltrados = materialesFiltrados.filter((material) =>
-        material.nombre?.toLowerCase().includes(filtros.nombre.toLowerCase())
-      );
-    }
-
-    // Filtro por Peso Unitario
-    if (filtros.pesoUnitario && filtros.pesoUnitario.toString().trim()) {
-      const pesoFiltro = parseFloat(filtros.pesoUnitario);
-      if (!isNaN(pesoFiltro)) {
-        materialesFiltrados = materialesFiltrados.filter((material) => {
-          const peso = material.peso_unitario || 0;
-          return peso >= pesoFiltro - 0.01 && peso <= pesoFiltro + 0.01;
-        });
-      }
-    }
-
-    // Filtro por Unidad
-    if (filtros.unidad && filtros.unidad.trim()) {
-      materialesFiltrados = materialesFiltrados.filter((material) => {
-        const unidadNombre =
-          material.unidad?.nombre || material.id_unidad?.toString() || '';
-        return unidadNombre
-          .toLowerCase()
-          .includes(filtros.unidad.toLowerCase());
-      });
-    }
-
-    // Filtro por Presentación
-    if (filtros.presentacion && filtros.presentacion.trim()) {
-      materialesFiltrados = materialesFiltrados.filter((material) =>
-        material.presentacion
-          ?.toLowerCase()
-          .includes(filtros.presentacion.toLowerCase())
-      );
-    }
-
-    // Filtro por Precio Unitario
-    if (filtros.precioUnitario && filtros.precioUnitario.toString().trim()) {
-      const precioFiltro = parseFloat(filtros.precioUnitario);
-      if (!isNaN(precioFiltro)) {
-        materialesFiltrados = materialesFiltrados.filter((material) => {
-          const precio = material.precio_unitario || 0;
-          return precio >= precioFiltro - 0.01 && precio <= precioFiltro + 0.01;
-        });
-      }
-    }
-
-    this.dataSource.data = materialesFiltrados;
-  }
-
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.reset();
-    this.dataSource.data = [...this.materiales];
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
-    this.dataSource.data = [...this.materiales];
-  }
-
-  toggleFiltrosColumna() {
-    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
-    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
-
-    if (this.filtrosColumnaHabilitados) {
-      if (this.filtrosColumnaActivos) {
-        this.limpiarFiltroGeneral();
-      } else {
-        this.limpiarFiltrosColumna();
-      }
+    switch (action) {
+      case 'view':
+        this.verDetalle(item);
+        break;
+      case 'edit':
+        this.editar(item);
+        break;
+      default:
+        console.warn(`Acción no reconocida: ${action}`);
     }
   }
 
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent): void {
-    if (event.key === 'F3') {
-      event.preventDefault();
-      this.toggleFiltrosColumna();
+  onTableButtonAction(action: string): void {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk-upload':
+        this.cargaMasiva();
+        break;
+      default:
+        console.warn(`Acción de botón no reconocida: ${action}`);
     }
   }
 
-  toggleFiltros() {
-    this.filtrosExpanded = !this.filtrosExpanded;
+  async agregar(): Promise<void> {
+    // TODO: Implementar diálogo de agregar material
+    console.log('Agregar material');
   }
 
-  sortData(column: string): void {
-    if (this.sort) {
-      // Si ya está ordenado por esta columna, cambiar dirección
-      if (this.sort.active === column) {
-        this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc';
-      } else {
-        // Nueva columna, empezar con ascendente
-        this.sort.active = column;
-        this.sort.direction = 'asc';
-      }
-      this.sort.sortChange.emit({
-        active: this.sort.active,
-        direction: this.sort.direction,
-      });
-    }
+  async editar(material: Insumo): Promise<void> {
+    // TODO: Implementar diálogo de editar material
+    console.log('Editar material:', material);
   }
 
-  agregar(): void {
-    const dialogRef = this.dialog.open(RegistroMaterialDialogComponent, {
+  async verDetalle(material: Insumo): Promise<void> {
+    // TODO: Implementar diálogo de ver detalle material
+    console.log('Ver detalle material:', material);
+  }
+
+  cargaMasiva(): void {
+    const configuracion = this.crearConfiguracionCargaMasiva();
+    
+    const dialogData: CargaMasivaDialogData = {
+      configuracion,
+      onDescargarPlantilla: () => this.descargarPlantillaMateriales(configuracion),
+      onProcesarArchivo: (archivo: File) => this.procesarArchivoMateriales(archivo, configuracion)
+    };
+
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
       width: '600px',
-      disableClose: true,
-      data: { esEdicion: false, titulo: 'Agregar Material' },
+      data: dialogData,
+      disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe((resultado) => {
+    dialogRef.afterClosed().subscribe(resultado => {
       if (resultado) {
+        // Se procesó el archivo exitosamente, recargar datos
         this.cargarMateriales();
       }
     });
   }
 
-  abrirRegistroMaterial(): void {
-    this.agregar();
-  }
-
-  abrirAgregarLote(): void {
-    // Implementar modal para agregar lote
-    console.log('Abrir modal de agregar lote');
-  }
-
-  verDetalle(material: Insumo): void {
-    this.dialog.open(DetalleMaterialDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: { entidad: material },
-    });
-  }
-
-  editar(material: Insumo): void {
-    const dialogRef = this.dialog.open(RegistroMaterialDialogComponent, {
-      width: '600px',
-      disableClose: true,
-      data: { esEdicion: true, entidad: material, titulo: 'Editar Material' },
-    });
-
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarMateriales();
-      }
-    });
-  }
-
-  editarMaterial(material: Insumo): void {
-    this.editar(material);
-  }
-
-  formatearFecha(fecha?: Date): string {
-    if (!fecha) return '-';
-    return new Date(fecha).toLocaleDateString('es-ES');
+  toggleDropdownExport(): void {
+    this.dropdownExportAbierto = !this.dropdownExportAbierto;
   }
 
   private configurarExportacion(): ConfiguracionExportacion<Insumo> {
     return {
-      entidades: this.dataSource.data,
+      entidades: this.materiales,
       nombreArchivo: 'materiales',
       nombreEntidad: 'Materiales',
       columnas: [
-        { campo: 'id_fox', titulo: 'Código Fox', formato: 'texto' },
-        { campo: 'nombre', titulo: 'Nombre del Material', formato: 'texto' },
-        { campo: 'peso_unitario', titulo: 'Peso Unitario', formato: 'numero' },
-        { campo: 'unidad.nombre', titulo: 'Unidad', formato: 'texto' },
-        { campo: 'presentacion', titulo: 'Presentación', formato: 'texto' },
-        {
-          campo: 'precio_unitario',
-          titulo: 'Precio Unitario',
-          formato: 'moneda',
-        },
-        { campo: 'id_clase', titulo: 'Clase', formato: 'texto' },
-        { campo: 'estado', titulo: 'Estado', formato: 'texto' },
+        { campo: 'id_fox', titulo: 'Código Fox' },
+        { campo: 'nombre', titulo: 'Nombre' },
+        { campo: 'clase.nombre', titulo: 'Clase' },
+        { campo: 'unidad.nombre', titulo: 'Unidad' },
+        { campo: 'presentacion', titulo: 'Presentación' }
       ],
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
         cantidadTotal: this.materiales.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.materiales.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
-      },
+        empresa: 'Texfina'
+      }
     };
   }
 
-  private configurarCargaMasiva(): ConfiguracionCargaMasiva<Insumo> {
+  exportarExcel(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarExcel(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
+    }
+  }
+
+  exportarPDF(): void {
+    try {
+      const config = this.configurarExportacion();
+      this.exportacionService.exportarPDF(config);
+      this.dropdownExportAbierto = false;
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  }
+
+  private obtenerFiltrosActivos(): any {
+    // TODO: Implementar obtención de filtros activos de la tabla
+    return {};
+  }
+
+  // ============================================================================
+  // MANEJADORES DE EVENTOS
+  // ============================================================================
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-export')) {
+      this.dropdownExportAbierto = false;
+    }
+  }
+
+
+
+
+  // ============================================================================
+  // MÉTODOS DE CARGA MASIVA
+  // ============================================================================
+
+  private crearConfiguracionCargaMasiva(): ConfiguracionCargaMasiva<Insumo> {
     return {
       tipoEntidad: 'materiales',
       mapeoColumnas: [
@@ -447,200 +333,110 @@ export class MaterialesComponent implements OnInit, AfterViewInit, OnDestroy {
           columnaArchivo: 'Código Fox',
           campoEntidad: 'id_fox',
           obligatorio: true,
-          tipoEsperado: 'texto',
+          tipoEsperado: 'texto'
         },
         {
-          columnaArchivo: 'Nombre del Material',
+          columnaArchivo: 'Nombre',
           campoEntidad: 'nombre',
           obligatorio: true,
-          tipoEsperado: 'texto',
+          tipoEsperado: 'texto'
+        },
+        {
+          columnaArchivo: 'Clase',
+          campoEntidad: 'id_clase',
+          obligatorio: true,
+          tipoEsperado: 'texto'
+        },
+        {
+          columnaArchivo: 'Unidad',
+          campoEntidad: 'id_unidad',
+          obligatorio: true,
+          tipoEsperado: 'texto'
         },
         {
           columnaArchivo: 'Peso Unitario',
           campoEntidad: 'peso_unitario',
           obligatorio: false,
-          tipoEsperado: 'numero',
-        },
-        {
-          columnaArchivo: 'ID Unidad',
-          campoEntidad: 'id_unidad',
-          obligatorio: true,
-          tipoEsperado: 'numero',
-        },
-        {
-          columnaArchivo: 'Presentación',
-          campoEntidad: 'presentacion',
-          obligatorio: false,
-          tipoEsperado: 'texto',
+          tipoEsperado: 'numero'
         },
         {
           columnaArchivo: 'Precio Unitario',
           campoEntidad: 'precio_unitario',
           obligatorio: false,
-          tipoEsperado: 'numero',
+          tipoEsperado: 'numero'
         },
         {
-          columnaArchivo: 'ID Clase',
-          campoEntidad: 'id_clase',
+          columnaArchivo: 'Presentación',
+          campoEntidad: 'presentacion',
           obligatorio: false,
-          tipoEsperado: 'numero',
-        },
-        {
-          columnaArchivo: 'Estado',
-          campoEntidad: 'estado',
-          obligatorio: false,
-          tipoEsperado: 'texto',
-        },
+          tipoEsperado: 'texto'
+        }
       ],
       validaciones: [
         {
-          campo: 'precio_unitario',
-          validador: (valor) => valor === null || valor >= 0,
-          mensajeError: 'El precio debe ser mayor o igual a 0',
-        },
-        {
-          campo: 'peso_unitario',
-          validador: (valor) => valor === null || valor > 0,
-          mensajeError: 'El peso debe ser mayor a 0',
+          campo: 'id_fox',
+          validador: (valor) => valor && valor.length >= 3,
+          mensajeError: 'El código Fox debe tener al menos 3 caracteres'
         },
         {
           campo: 'nombre',
-          validador: (valor) => valor && valor.length >= 3,
-          mensajeError: 'El nombre debe tener al menos 3 caracteres',
+          validador: (valor) => valor && valor.length >= 5,
+          mensajeError: 'El nombre debe tener al menos 5 caracteres'
         },
-      ],
-      transformaciones: [
         {
-          campo: 'estado',
-          transformar: (valor) => valor || 'Activo',
+          campo: 'peso_unitario',
+          validador: (valor) => !valor || valor >= 0,
+          mensajeError: 'El peso unitario debe ser mayor o igual a 0'
         },
+        {
+          campo: 'precio_unitario',
+          validador: (valor) => !valor || valor >= 0,
+          mensajeError: 'El precio unitario debe ser mayor o igual a 0'
+        }
       ],
+      permitirActualizacion: false
     };
   }
 
-  cargaMasiva(): void {
-    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
-      width: '600px',
-      disableClose: true,
-      data: {
-        configuracion: this.configurarCargaMasiva(),
-        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
-        onProcesarArchivo: (archivo: File) =>
-          this.procesarArchivoCargaMasiva(archivo),
-      },
-    });
+  private descargarPlantillaMateriales(configuracion: ConfiguracionCargaMasiva<Insumo>): void {
+    try {
+      this.cargaMasivaService.generarPlantilla(configuracion);
+    } catch (error) {
+      console.error('Error al descargar plantilla:', error);
+      throw error;
+    }
+  }
 
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado) {
-        this.cargarMateriales();
+  private async procesarArchivoMateriales(archivo: File, configuracion: ConfiguracionCargaMasiva<Insumo>): Promise<void> {
+    try {
+      // Procesar archivo
+      const resultado = await this.cargaMasivaService.procesarArchivo(archivo, configuracion);
+
+      if (!resultado.exitosa) {
+        const mensajeError = `Error al procesar archivo:\n${resultado.errores.map(e => `Fila ${e.fila}: ${e.mensaje}`).join('\n')}`;
+        throw new Error(mensajeError);
       }
-    });
-  }
 
-  descargarPlantillaCargaMasiva(): void {
-    try {
-      const config = this.configurarCargaMasiva();
-      this.cargaMasivaService.generarPlantilla(config);
-      console.log('✅ Plantilla de materiales descargada');
-    } catch (error) {
-      console.error('❌ Error al generar plantilla:', error);
-      throw new Error('Error al generar la plantilla');
-    }
-  }
+      // Si hay entidades válidas, crearlas en lotes
+      if (resultado.entidadesValidas.length > 0) {
+        const promesasCreacion = resultado.entidadesValidas.map(material => 
+          this.materialService.crearMaterial(material).toPromise()
+        );
 
-  async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
-    console.log('📂 Procesando archivo:', archivo.name);
-    const config = this.configurarCargaMasiva();
-    const resultado = await this.cargaMasivaService.procesarArchivo(
-      archivo,
-      config
-    );
+        await Promise.all(promesasCreacion);
 
-    if (resultado.exitosa) {
-      console.log(
-        `✅ ${resultado.registrosValidos} materiales procesados exitosamente`
-      );
-      await this.guardarMaterialesMasivos(resultado.entidadesValidas);
-    } else {
-      console.log('❌ Errores en el archivo:', resultado.errores);
-      throw new Error(
-        `${resultado.errores.length} errores encontrados en el archivo`
-      );
-    }
-  }
-
-  private async guardarMaterialesMasivos(materiales: Insumo[]): Promise<void> {
-    console.log('💾 Guardando materiales en el backend...');
-
-    // TODO: Implementar guardado masivo en el backend
-    for (const material of materiales) {
-      console.log('📦 Material simulado guardado:', material.nombre);
-    }
-
-    console.log(`✅ ${materiales.length} materiales guardados exitosamente!`);
-  }
-
-  toggleDropdownExport(): void {
-    this.dropdownExportAbierto = !this.dropdownExportAbierto;
-  }
-
-  exportarExcel(): void {
-    try {
-      console.log('📊 Exportando materiales a Excel...');
-      console.log('🔍 Datos en dataSource:', this.dataSource.data.length);
-      console.log('🔍 Materiales totales:', this.materiales.length);
-      console.log('🔍 Datos a exportar:', this.dataSource.data);
-
-      this.dropdownExportAbierto = false;
-
-      const config = this.configurarExportacion();
-      console.log('⚙️ Configuración de exportación:', config);
-
-      this.exportacionService.exportarExcel(config);
-
-      console.log(
-        `✅ ${this.dataSource.data.length} materiales exportados a Excel`
-      );
-    } catch (error) {
-      console.error('❌ Error al exportar a Excel:', error);
-    }
-  }
-
-  exportarPDF(): void {
-    try {
-      console.log('📄 Exportando materiales a PDF...');
-      this.dropdownExportAbierto = false;
-
-      const config = this.configurarExportacion();
-      this.exportacionService.exportarPDF(config);
-
-      console.log(
-        `✅ ${this.dataSource.data.length} materiales exportados a PDF`
-      );
-    } catch (error) {
-      console.error('❌ Error al exportar a PDF:', error);
-    }
-  }
-
-  private obtenerFiltrosActivos(): any {
-    return {
-      busquedaGeneral:
-        this.filtroGeneralForm.get('busquedaGeneral')?.value || '',
-      filtrosColumna: this.filtrosColumnaForm.value,
-      cantidadResultados: this.materialesFiltrados.length,
-      cantidadTotal: this.materiales.length,
-    };
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
-    if (this.dropdownExportAbierto) {
-      const target = event.target as HTMLElement;
-      const dropdownElement = document.querySelector('.dropdown-export');
-
-      if (dropdownElement && !dropdownElement.contains(target)) {
-        this.dropdownExportAbierto = false;
+        console.log(`✅ Carga masiva completada: ${resultado.registrosValidos} materiales creados`);
+        
+        if (resultado.registrosInvalidos > 0) {
+          console.warn(`⚠️  ${resultado.registrosInvalidos} registros fueron omitidos por errores`);
+        }
+      } else {
+        throw new Error('No se encontraron registros válidos para procesar');
       }
+
+    } catch (error) {
+      console.error('Error en carga masiva:', error);
+      throw error;
     }
   }
 }

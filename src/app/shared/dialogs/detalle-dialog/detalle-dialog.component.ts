@@ -67,4 +67,8 @@ export class DetalleDialogComponent {
     }
     return undefined;
   }
+
+  onClose(): void {
+    this.dialogRef.close();
+  }
 }

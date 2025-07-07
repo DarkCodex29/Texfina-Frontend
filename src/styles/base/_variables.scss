@@ -77,6 +77,13 @@
   --texfina-secondary-alpha: rgba(18, 30, 102, 0.1);
   --texfina-neutral-alpha: rgba(152, 149, 148, 0.1);
   --texfina-success-alpha: rgba(22, 163, 74, 0.1);
+
+  // Variables adicionales para formularios
+  --texfina-border: var(--texfina-border-medium);
+  --texfina-input-bg: var(--texfina-bg-primary);
+  --texfina-input-bg-disabled: var(--texfina-neutral-bg);
+  --texfina-input-border-focus: var(--texfina-secondary);
+  --texfina-input-shadow-focus: 0 0 0 2px var(--texfina-secondary-alpha);
 }
 
 $breakpoints: (

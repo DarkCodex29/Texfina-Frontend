@@ -11,22 +11,13 @@
         </p>
       </div>
       <div class="header-actions">
-        <!-- Botón de Carga Masiva -->
-        <button
-          class="btn-texfina btn-secondary"
-          (click)="cargaMasiva()"
-          matTooltip="Importar múltiples insumos desde Excel"
-        >
-          Carga Masiva
-        </button>
-
         <!-- Dropdown de Exportar -->
         <div class="dropdown-export">
           <button
             class="btn-texfina btn-neutral dropdown-trigger"
             (click)="toggleDropdownExport()"
             [class.active]="dropdownExportAbierto"
-            matTooltip="Exportar listado de insumos"
+            matTooltip="Exportar listado de materiales"
           >
             Exportar
           </button>
@@ -44,339 +35,34 @@
             </button>
           </div>
         </div>
-
-        <!-- Botón principal de la pantalla -->
-        <button class="btn-texfina btn-primary" (click)="agregar()">
-          Agregar Insumo
-        </button>
       </div>
     </div>
 
-    <!-- Filtro General -->
-    <div class="filters-card">
-      <div class="filters-content">
-        <form [formGroup]="filtroGeneralForm" class="filters-form">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <input
-                  class="simple-input"
-                  formControlName="busquedaGeneral"
-                  placeholder="Buscar en código, nombre, unidad, presentación, precio, peso..."
-                  type="text"
-                />
-                <button
-                  class="btn-limpiar"
-                  type="button"
-                  (click)="limpiarFiltroGeneral()"
-                  matTooltip="Limpiar búsqueda"
-                >
-                  Limpiar
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+    <!-- Tabla PrimeNG para Materiales/Insumos -->
+    <app-prime-data-table
+      [data]="materiales"
+      [columns]="columns"
+      [actions]="actions"
+      [buttons]="buttons"
+      [state]="tableState"
+      [globalFilterFields]="globalFilterFields"
+      [showGlobalFilter]="true"
+      [showColumnFilters]="true"
+      [showPagination]="true"
+      [pageSize]="10"
+      [actionsPinned]="true"
+      emptyIcon="inventory_2"
+      emptyTitle="No hay materiales registrados"
+      emptySubtitle="Comienza agregando el primer material al catálogo"
+      emptyActionText="Agregar Primer Material"
+      (actionClick)="onTableAction($event)"
+      (buttonClick)="onTableButtonAction($event)"
+      (retryClicked)="recargarDatos()"
+      (addNewClicked)="agregar()"
+    ></app-prime-data-table>
 
-    <!-- Tabla de insumos -->
-    <div class="table-card">
-      <div class="table-with-headers">
-        <!-- Encabezados de columnas con filtros integrados -->
-        <div class="column-headers">
-          <!-- Fila de títulos -->
-          <div class="header-row header-titles">
-            <div class="header-col codigo-col" (click)="sortData('id_fox')">
-              <span>Código Fox</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col nombre-col" (click)="sortData('nombre')">
-              <span>Nombre</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col peso-col"
-              (click)="sortData('peso_unitario')"
-            >
-              <span>Peso Unit.</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col unidad-col" (click)="sortData('id_unidad')">
-              <span>Unidad</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col presentacion-col"
-              (click)="sortData('presentacion')"
-            >
-              <span>Presentación</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col precio-col"
-              (click)="sortData('precio_unitario')"
-            >
-              <span>Precio Unit.</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col acciones-col">
-              <span>ACCIONES</span>
-            </div>
-          </div>
-
-          <!-- Fila de filtros por columna -->
-          <div
-            class="header-row header-filters"
-            *ngIf="filtrosColumnaHabilitados"
-            [formGroup]="filtrosColumnaForm"
-          >
-            <div class="header-col codigo-col">
-              <input
-                class="column-filter-input"
-                formControlName="codigoFox"
-                placeholder="Código..."
-                type="text"
-              />
-            </div>
-            <div class="header-col nombre-col">
-              <input
-                class="column-filter-input"
-                formControlName="nombre"
-                placeholder="Nombre..."
-                type="text"
-              />
-            </div>
-            <div class="header-col peso-col">
-              <input
-                class="column-filter-input"
-                formControlName="pesoUnitario"
-                placeholder="Peso..."
-                type="number"
-                step="0.01"
-              />
-            </div>
-            <div class="header-col unidad-col">
-              <input
-                class="column-filter-input"
-                formControlName="unidad"
-                placeholder="Unidad..."
-                type="text"
-              />
-            </div>
-            <div class="header-col presentacion-col">
-              <input
-                class="column-filter-input"
-                formControlName="presentacion"
-                placeholder="Presentación..."
-                type="text"
-              />
-            </div>
-            <div class="header-col precio-col">
-              <input
-                class="column-filter-input"
-                formControlName="precioUnitario"
-                placeholder="Precio..."
-                type="number"
-                step="0.01"
-              />
-            </div>
-            <div class="header-col acciones-col">
-              <button
-                class="btn-clear-column-filters"
-                type="button"
-                (click)="limpiarFiltrosColumna()"
-                matTooltip="Limpiar filtros de columna"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <!-- Estado de error -->
-          <div *ngIf="hasError" class="error-state">
-            <mat-icon class="error-icon">error_outline</mat-icon>
-            <h3 class="error-title text-texfina text-primary">
-              Error al cargar datos
-            </h3>
-            <p class="error-subtitle text-texfina text-muted">
-              {{ errorMessage }}
-            </p>
-            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
-              <mat-icon>refresh</mat-icon>
-              Reintentar
-            </button>
-          </div>
-
-          <!-- Estado vacío (sin datos) -->
-          <div *ngIf="isEmpty" class="empty-state">
-            <mat-icon class="empty-icon">inventory_2</mat-icon>
-            <h3 class="empty-title text-texfina text-primary">
-              No hay materiales registrados
-            </h3>
-            <p class="empty-subtitle text-texfina text-muted">
-              Comienza agregando tu primer material para gestionar el inventario
-            </p>
-            <button class="btn-texfina btn-primary" (click)="agregar()">
-              <mat-icon>add</mat-icon>
-              Agregar Primer Material
-            </button>
-          </div>
-
-          <!-- Estado filtrado vacío -->
-          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
-            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
-            <h3 class="filtered-empty-title text-texfina text-primary">
-              No se encontraron resultados
-            </h3>
-            <p class="filtered-empty-subtitle text-texfina text-muted">
-              Intenta ajustar los filtros o limpiar la búsqueda
-            </p>
-          </div>
-
-          <!-- Tabla siempre visible (con skeleton o datos) -->
-          <table mat-table [dataSource]="dataSource" matSort class="data-table">
-            <!-- Columna Código Fox -->
-            <ng-container matColumnDef="id_fox">
-              <td mat-cell *matCellDef="let material" class="table-cell">
-                <span class="badge-texfina badge-neutral">
-                  {{ material.id_fox || "-" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Nombre -->
-            <ng-container matColumnDef="nombre">
-              <td mat-cell *matCellDef="let material" class="table-cell">
-                <div class="material-cell">
-                  <div class="material-name text-texfina font-medium">
-                    {{ material.nombre }}
-                  </div>
-                  <div class="material-class text-texfina text-muted">
-                    {{ material.id_clase || "Sin clase" }}
-                  </div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Columna Peso Unitario -->
-            <ng-container matColumnDef="peso_unitario">
-              <td mat-cell *matCellDef="let material" class="table-cell">
-                <span class="text-texfina text-secondary">
-                  {{ material.peso_unitario || "-" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Unidad -->
-            <ng-container matColumnDef="id_unidad">
-              <td mat-cell *matCellDef="let material" class="table-cell">
-                <span class="badge-texfina badge-secondary">
-                  {{ material.unidad?.nombre || material.id_unidad || "-" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Presentación -->
-            <ng-container matColumnDef="presentacion">
-              <td mat-cell *matCellDef="let material" class="table-cell">
-                <span class="text-texfina text-secondary">
-                  {{ material.presentacion || "-" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Precio Unitario -->
-            <ng-container matColumnDef="precio_unitario">
-              <td mat-cell *matCellDef="let material" class="table-cell">
-                <span class="text-texfina font-semibold">
-                  {{
-                    material.precio_unitario
-                      ? "S/ " + material.precio_unitario.toFixed(2)
-                      : "-"
-                  }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Acciones -->
-            <ng-container matColumnDef="acciones">
-              <td
-                mat-cell
-                *matCellDef="let material"
-                class="table-cell actions-cell"
-              >
-                <div class="action-buttons">
-                  <button
-                    class="btn-action btn-view"
-                    (click)="verDetalle(material)"
-                    matTooltip="Ver detalle"
-                  >
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                  <button
-                    class="btn-action btn-edit"
-                    (click)="editar(material)"
-                    matTooltip="Editar"
-                  >
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Filas de datos reales -->
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-          </table>
-
-          <!-- Skeleton superpuesto mientras carga -->
-          <div *ngIf="isLoading" class="skeleton-overlay">
-            <table class="skeleton-table">
-              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5, 6]">
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                  <div class="skeleton-line skeleton-subtext"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-price"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-actions"></div>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Paginación -->
-      <div class="table-footer">
-        <div class="pagination-info">
-          <span class="text-texfina text-muted">Página 1 de 10</span>
-        </div>
-        <div class="pagination-controls">
-          <button class="pagination-button" disabled>
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button class="pagination-button">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
+
+<!-- Diálogo de Confirmación PrimeNG -->
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
