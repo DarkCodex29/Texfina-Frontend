@@ -303,48 +303,6 @@
   }
 }
 
-// ============================================================================
-// HEADER ACTIONS RESPONSIVE
-// ============================================================================
-
-.header-actions {
-  display: flex;
-  gap: var(--texfina-spacing-md);
-  align-items: center;
-  flex-wrap: nowrap;
-
-  // MÓVIL: Reorganizar botones
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: var(--texfina-spacing-sm);
-    width: 100%;
-
-    .btn-texfina {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .dropdown-export {
-      width: 100%;
-
-      .dropdown-trigger {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  }
-
-  // MÓVIL PEQUEÑO: Stack vertical
-  @media (max-width: 480px) {
-    gap: var(--texfina-spacing-xs);
-
-    .btn-texfina {
-      padding: 10px 16px;
-      font-size: 13px;
-    }
-  }
-}
-
 /* Estilos específicos para información de lotes */
 .lote-cell {
   .insumo-name {
@@ -989,69 +947,6 @@
   }
 }
 
-.page-container {
-  padding: var(--texfina-spacing-md);
-  gap: var(--texfina-spacing-sm);
-
-  @media (max-width: 768px) {
-    padding: var(--texfina-spacing-sm);
-    gap: var(--texfina-spacing-xs);
-  }
-
-  @media (max-width: 480px) {
-    padding: var(--texfina-spacing-xs);
-  }
-}
-
-.page-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--texfina-spacing-sm);
-
-  @media (max-width: 480px) {
-    gap: var(--texfina-spacing-xs);
-  }
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: var(--texfina-spacing-md);
-  background: var(--surface-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-
-  .page-title {
-    font-size: var(--texfina-font-size-2xl);
-    margin: 0 0 var(--texfina-spacing-xs) 0;
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: var(--texfina-spacing-lg);
-    align-items: stretch;
-    padding: var(--texfina-spacing-sm);
-
-    .header-content {
-      text-align: center;
-    }
-
-    .page-title {
-      font-size: var(--texfina-font-size-xl);
-    }
-  }
-
-  @media (max-width: 480px) {
-    padding: var(--texfina-spacing-xs);
-
-    .page-title {
-      font-size: var(--texfina-font-size-lg);
-    }
-  }
-}
-
 .table-card {
   background: var(--surface-color);
   border-radius: var(--border-radius-lg);
@@ -1150,3 +1045,6 @@
     color: #6b7280;
   }
 }
+
+/* ===== LAYOUT OVERRIDES ELIMINADOS ===== */
+/* Se eliminan .page-container, .page-content, .page-header y .header-actions para usar los estilos globales unificados */

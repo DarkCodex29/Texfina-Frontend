@@ -6,13 +6,10 @@
         <h1 class="page-title text-texfina text-primary">Dashboard</h1>
       </div>
       <div class="header-actions">
-        <p-button
-          label="Actualizar Datos"
-          icon="pi pi-refresh"
-          [loading]="isLoading"
-          (onClick)="actualizarDashboard()"
-          size="small"
-        ></p-button>
+        <button class="btn-texfina btn-primary" (click)="actualizarDashboard()">
+          <i class="pi pi-refresh" [class.pi-spin]="isLoading"></i>
+          Actualizar Datos
+        </button>
       </div>
     </div>
 

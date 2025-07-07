@@ -5,9 +5,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Subject, forkJoin } from 'rxjs';
+import { Subject, forkJoin, of } from 'rxjs';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
 
 // PrimeNG imports
 import { ChartModule } from 'primeng/chart';
@@ -42,7 +41,7 @@ import {
   styleUrls: ['./dashboard.scss'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   isLoading = true;
   hasError = false;
@@ -59,20 +58,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Chart data y options
   inventarioChartData: any = {};
   inventarioChartOptions: any = {};
-  
+
   stockTendenciaData: any = {};
   stockTendenciaOptions: any = {};
-  
+
   movimientosBarData: any = {};
   movimientosBarOptions: any = {};
-  
+
   proveedoresData: any = {};
   proveedoresOptions: any = {};
-  
+
   consumosPorTipoData: any = {};
   consumosPorTipoOptions: any = {};
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private readonly dashboardService: DashboardService) {}
 
   ngOnInit(): void {
     this.cargarDashboard();
@@ -448,12 +447,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getAlertIcon(tipo: string): string {
     const iconMap: { [key: string]: string } = {
-      'STOCK_BAJO': 'pi pi-exclamation-triangle',
-      'LOTE_POR_VENCER': 'pi pi-clock',
-      'SISTEMA': 'pi pi-cog',
-      'CRITICO': 'pi pi-times-circle',
-      'WARNING': 'pi pi-exclamation-triangle',
-      'INFO': 'pi pi-info-circle'
+      STOCK_BAJO: 'pi pi-exclamation-triangle',
+      LOTE_POR_VENCER: 'pi pi-clock',
+      SISTEMA: 'pi pi-cog',
+      CRITICO: 'pi pi-times-circle',
+      WARNING: 'pi pi-exclamation-triangle',
+      INFO: 'pi pi-info-circle',
     };
     return iconMap[tipo] || 'pi pi-bell';
   }
@@ -479,22 +478,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
       '#8b5cf6', // Purple
       '#06b6d4', // Cyan
       '#ef4444', // Red variant
-      '#10b981'  // Emerald
+      '#10b981', // Emerald
     ];
-    
+
     this.inventarioChartData = {
-      labels: this.estadisticasAlmacenes.map(a => a.nombre),
+      labels: this.estadisticasAlmacenes.map((a) => a.nombre),
       datasets: [
         {
-          data: this.estadisticasAlmacenes.map(a => a.cantidadInsumos),
+          data: this.estadisticasAlmacenes.map((a) => a.cantidadInsumos),
           backgroundColor: texfinaColors,
           borderWidth: 2,
           borderColor: '#ffffff',
           hoverBorderWidth: 3,
           hoverBorderColor: '#ffffff',
-          hoverBackgroundColor: texfinaColors.map(color => color + '90') // Add transparency on hover
-        }
-      ]
+          hoverBackgroundColor: texfinaColors.map((color) => color + '90'), // Add transparency on hover
+        },
+      ],
     };
 
     this.inventarioChartOptions = {
@@ -508,9 +507,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
             padding: 20,
             font: {
               size: 12,
-              family: 'Segoe UI'
-            }
-          }
+              family: 'Segoe UI',
+            },
+          },
         },
         tooltip: {
           callbacks: {
@@ -519,12 +518,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
               return [
                 `${context.label}: ${context.parsed} insumos`,
                 `Valor: ${this.formatearMoneda(almacen.valorInventario)}`,
-                `Ocupación: ${almacen.ocupacion}%`
+                `Ocupación: ${almacen.ocupacion}%`,
               ];
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     };
   }
 
@@ -551,7 +550,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           pointHoverRadius: 10,
           tension: 0.4,
           fill: true,
-          yAxisID: 'y'
+          yAxisID: 'y',
         },
         {
           type: 'bar',
@@ -561,9 +560,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
           borderColor: '#121e66',
           borderWidth: 2,
           borderRadius: 6,
-          yAxisID: 'y1'
-        }
-      ]
+          yAxisID: 'y1',
+        },
+      ],
     };
 
     this.stockTendenciaOptions = {
@@ -578,8 +577,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           position: 'top',
           labels: {
             usePointStyle: true,
-            padding: 20
-          }
+            padding: 20,
+          },
         },
         tooltip: {
           callbacks: {
@@ -587,19 +586,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
               if (context.datasetIndex === 0) {
                 return `${context.dataset.label}: ${context.parsed.y} insumos`;
               } else {
-                return `${context.dataset.label}: ${this.formatearMoneda(context.parsed.y)}`;
+                return `${context.dataset.label}: ${this.formatearMoneda(
+                  context.parsed.y
+                )}`;
               }
-            }
-          }
-        }
+            },
+          },
+        },
       },
       scales: {
         x: {
           display: true,
           title: {
             display: true,
-            text: 'Mes'
-          }
+            text: 'Mes',
+          },
         },
         y: {
           type: 'linear',
@@ -607,7 +608,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           position: 'left',
           title: {
             display: true,
-            text: 'Cantidad de Insumos'
+            text: 'Cantidad de Insumos',
           },
         },
         y1: {
@@ -616,19 +617,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
           position: 'right',
           title: {
             display: true,
-            text: 'Valor (S/)'
+            text: 'Valor (S/)',
           },
           grid: {
             drawOnChartArea: false,
           },
-        }
-      }
+        },
+      },
     };
   }
 
   private configurarGraficoMovimientos(): void {
     const meses = ['Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    
+
     this.movimientosBarData = {
       labels: meses,
       datasets: [
@@ -639,7 +640,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           borderColor: '#16a34a',
           borderWidth: 2,
           borderRadius: 6,
-          borderSkipped: false
+          borderSkipped: false,
         },
         {
           label: 'Salidas',
@@ -648,7 +649,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           borderColor: '#bd2126',
           borderWidth: 2,
           borderRadius: 6,
-          borderSkipped: false
+          borderSkipped: false,
         },
         {
           label: 'Transferencias',
@@ -657,9 +658,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
           borderColor: '#f59e0b',
           borderWidth: 2,
           borderRadius: 6,
-          borderSkipped: false
-        }
-      ]
+          borderSkipped: false,
+        },
+      ],
     };
 
     this.movimientosBarOptions = {
@@ -670,32 +671,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
           position: 'top',
           labels: {
             usePointStyle: true,
-            padding: 20
-          }
+            padding: 20,
+          },
         },
         tooltip: {
           callbacks: {
             label: (context: any) => {
               return `${context.dataset.label}: ${context.parsed.y} movimientos`;
-            }
-          }
-        }
+            },
+          },
+        },
       },
       scales: {
         x: {
           title: {
             display: true,
-            text: 'Mes'
-          }
+            text: 'Mes',
+          },
         },
         y: {
           beginAtZero: true,
           title: {
             display: true,
-            text: 'Cantidad de Movimientos'
-          }
-        }
-      }
+            text: 'Cantidad de Movimientos',
+          },
+        },
+      },
     };
   }
 
@@ -706,33 +707,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
       { nombre: 'Industrias Lima', valor: 98000 },
       { nombre: 'Solventes Perú', valor: 87000 },
       { nombre: 'Reactivos Unidos', valor: 72000 },
-      { nombre: 'Chemicals Express', valor: 65000 }
+      { nombre: 'Chemicals Express', valor: 65000 },
     ];
 
     this.proveedoresData = {
-      labels: proveedoresTop.map(p => p.nombre),
+      labels: proveedoresTop.map((p) => p.nombre),
       datasets: [
         {
           label: 'Valor de Compras (S/)',
-          data: proveedoresTop.map(p => p.valor),
+          data: proveedoresTop.map((p) => p.valor),
           backgroundColor: [
-            'rgba(189, 33, 38, 0.9)',   // Texfina Primary Red
-            'rgba(18, 30, 102, 0.9)',   // Texfina Secondary Blue  
-            'rgba(22, 163, 74, 0.9)',   // Success Green
-            'rgba(245, 158, 11, 0.9)',  // Warning Orange
-            'rgba(139, 92, 246, 0.9)'   // Purple
+            'rgba(189, 33, 38, 0.9)', // Texfina Primary Red
+            'rgba(18, 30, 102, 0.9)', // Texfina Secondary Blue
+            'rgba(22, 163, 74, 0.9)', // Success Green
+            'rgba(245, 158, 11, 0.9)', // Warning Orange
+            'rgba(139, 92, 246, 0.9)', // Purple
           ],
-          borderColor: [
-            '#bd2126',
-            '#121e66', 
-            '#16a34a',
-            '#f59e0b',
-            '#8b5cf6'
-          ],
+          borderColor: ['#bd2126', '#121e66', '#16a34a', '#f59e0b', '#8b5cf6'],
           borderWidth: 2,
-          borderRadius: 8
-        }
-      ]
+          borderRadius: 8,
+        },
+      ],
     };
 
     this.proveedoresOptions = {
@@ -741,50 +736,52 @@ export class DashboardComponent implements OnInit, OnDestroy {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: false
+          display: false,
         },
         tooltip: {
           callbacks: {
             label: (context: any) => {
-              return `${context.label}: ${this.formatearMoneda(context.parsed.x)}`;
-            }
-          }
-        }
+              return `${context.label}: ${this.formatearMoneda(
+                context.parsed.x
+              )}`;
+            },
+          },
+        },
       },
       scales: {
         x: {
           beginAtZero: true,
           title: {
             display: true,
-            text: 'Valor de Compras (S/)'
+            text: 'Valor de Compras (S/)',
           },
           ticks: {
-            callback: (value: any) => this.formatearMoneda(value)
-          }
+            callback: (value: any) => this.formatearMoneda(value),
+          },
         },
         y: {
           title: {
             display: true,
-            text: 'Proveedores'
-          }
-        }
-      }
+            text: 'Proveedores',
+          },
+        },
+      },
     };
   }
 
   private configurarGraficoConsumosPorTipo(): void {
     this.consumosPorTipoData = {
-      labels: this.metricasConsumo.map(m => m.area),
+      labels: this.metricasConsumo.map((m) => m.area),
       datasets: [
         {
-          data: this.metricasConsumo.map(m => m.consumoMensual),
+          data: this.metricasConsumo.map((m) => m.consumoMensual),
           backgroundColor: [
-            'rgba(189, 33, 38, 0.8)',   // Texfina Primary Red
-            'rgba(18, 30, 102, 0.8)',   // Texfina Secondary Blue
-            'rgba(22, 163, 74, 0.8)',   // Success Green
-            'rgba(245, 158, 11, 0.8)',  // Warning Orange
-            'rgba(139, 92, 246, 0.8)',  // Purple
-            'rgba(6, 182, 212, 0.8)'    // Cyan
+            'rgba(189, 33, 38, 0.8)', // Texfina Primary Red
+            'rgba(18, 30, 102, 0.8)', // Texfina Secondary Blue
+            'rgba(22, 163, 74, 0.8)', // Success Green
+            'rgba(245, 158, 11, 0.8)', // Warning Orange
+            'rgba(139, 92, 246, 0.8)', // Purple
+            'rgba(6, 182, 212, 0.8)', // Cyan
           ],
           borderWidth: 3,
           borderColor: [
@@ -793,10 +790,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
             '#16a34a',
             '#f59e0b',
             '#8b5cf6',
-            '#06b6d4'
-          ]
-        }
-      ]
+            '#06b6d4',
+          ],
+        },
+      ],
     };
 
     this.consumosPorTipoOptions = {
@@ -815,21 +812,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   const meta = chart.getDatasetMeta(0);
                   const style = meta.controller.getStyle(i);
                   const metrica = this.metricasConsumo[i];
-                  
+
                   return {
-                    text: `${label} (${this.formatearMoneda(metrica.consumoMensual)})`,
+                    text: `${label} (${this.formatearMoneda(
+                      metrica.consumoMensual
+                    )})`,
                     fillStyle: style.backgroundColor,
                     strokeStyle: style.borderColor,
                     lineWidth: style.borderWidth,
                     pointStyle: 'circle',
-                    hidden: isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
-                    index: i
+                    hidden:
+                      isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
+                    index: i,
                   };
                 });
               }
               return [];
-            }
-          }
+            },
+          },
         },
         tooltip: {
           callbacks: {
@@ -838,12 +838,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
               return [
                 `${context.label}: ${this.formatearMoneda(context.parsed)}`,
                 `Tendencia: ${metrica.tendencia}`,
-                `Variación: ${metrica.porcentajeDiferencia > 0 ? '+' : ''}${metrica.porcentajeDiferencia}%`
+                `Variación: ${metrica.porcentajeDiferencia > 0 ? '+' : ''}${
+                  metrica.porcentajeDiferencia
+                }%`,
               ];
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     };
   }
 }

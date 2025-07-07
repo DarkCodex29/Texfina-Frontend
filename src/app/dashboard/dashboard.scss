@@ -7,137 +7,6 @@
 // ESTRUCTURA PRINCIPAL MEJORADA
 // ============================================================================
 
-.page-container {
-  padding: var(--texfina-spacing-sm);
-  gap: var(--texfina-spacing-xs);
-  min-height: 100vh;
-  background: #f8fafc;
-
-  @media (max-width: 768px) {
-    padding: var(--texfina-spacing-xs);
-    gap: var(--texfina-spacing-xs);
-  }
-
-  @media (max-width: 480px) {
-    padding: var(--texfina-spacing-xs);
-  }
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: var(--texfina-spacing-lg) var(--texfina-spacing-xl);
-  background: linear-gradient(135deg, white, #fafbfc);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  margin-bottom: var(--texfina-spacing-lg);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(
-      90deg,
-      var(--texfina-primary),
-      var(--texfina-secondary),
-      #f59e0b
-    );
-  }
-
-  .page-title {
-    font-size: 28px;
-    color: var(--texfina-text-primary);
-    margin: 0;
-    font-weight: 800;
-    letter-spacing: -0.7px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  }
-
-  .page-subtitle {
-    color: var(--texfina-text-muted);
-    margin: 6px 0 0 0;
-    font-size: 14px;
-    font-weight: 500;
-    opacity: 0.8;
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: var(--texfina-spacing-lg);
-    padding: var(--texfina-spacing-md) var(--texfina-spacing-lg);
-
-    .header-content {
-      text-align: center;
-    }
-
-    .page-title {
-      font-size: 24px;
-    }
-
-    .page-subtitle {
-      font-size: 13px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    padding: var(--texfina-spacing-md);
-
-    .page-title {
-      font-size: 22px;
-    }
-
-    .page-subtitle {
-      font-size: 12px;
-    }
-  }
-}
-
-.header-actions {
-  display: flex;
-  gap: var(--texfina-spacing-md);
-  align-items: center;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    width: 100%;
-    gap: var(--texfina-spacing-sm);
-
-    .btn-texfina {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-
-  @media (max-width: 480px) {
-    gap: var(--texfina-spacing-xs);
-
-    .btn-texfina {
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 500;
-    }
-  }
-}
-
-.page-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--texfina-spacing-md);
-  width: 100%;
-  max-width: 100%;
-
-  @media (max-width: 480px) {
-    gap: var(--texfina-spacing-sm);
-  }
-}
-
 // ============================================================================
 // LOADING Y ERROR STATES MEJORADOS
 // ============================================================================
@@ -1190,7 +1059,7 @@
   // PrimeNG Card overrides
   ::ng-deep p-card {
     height: 100%;
-    
+
     .p-card {
       height: 100%;
       display: flex;
@@ -1219,7 +1088,11 @@
           left: 0;
           right: 0;
           height: 2px;
-          background: linear-gradient(90deg, var(--texfina-primary), var(--texfina-secondary));
+          background: linear-gradient(
+            90deg,
+            var(--texfina-primary),
+            var(--texfina-secondary)
+          );
         }
       }
 
@@ -1242,7 +1115,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
+
   h3 {
     margin: 0;
     font-size: 18px;
@@ -1260,7 +1133,7 @@
 
     @media (max-width: 768px) {
       font-size: 16px;
-      
+
       i {
         font-size: 18px;
       }
@@ -1386,7 +1259,11 @@
     right: 0;
     width: 60px;
     height: 60px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.2) 0%,
+      transparent 70%
+    );
     border-radius: 50%;
     transform: translate(20px, -20px);
   }
@@ -1398,7 +1275,7 @@
 
   &.alert-alta {
     border-left-color: var(--texfina-primary);
-    
+
     .alert-icon {
       background: rgba(189, 33, 38, 0.1);
       color: var(--texfina-primary);
@@ -1407,7 +1284,7 @@
 
   &.alert-media {
     border-left-color: #f59e0b;
-    
+
     .alert-icon {
       background: rgba(245, 158, 11, 0.1);
       color: #f59e0b;
@@ -1416,7 +1293,7 @@
 
   &.alert-baja {
     border-left-color: var(--texfina-success);
-    
+
     .alert-icon {
       background: rgba(22, 163, 74, 0.1);
       color: var(--texfina-success);
@@ -1459,7 +1336,7 @@
       gap: var(--texfina-spacing-sm);
       font-size: 11px;
       color: var(--texfina-text-muted);
-      
+
       .alert-time {
         font-weight: 500;
       }
@@ -1475,7 +1352,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    
+
     ::ng-deep p-button .p-button {
       width: 32px;
       height: 32px;
@@ -1530,7 +1407,7 @@
   justify-content: center;
   height: 120px;
   color: var(--texfina-text-muted);
-  
+
   i {
     font-size: 32px;
     margin-bottom: 8px;
@@ -1640,7 +1517,7 @@
 
   .chart-header h3 {
     font-size: 14px;
-    
+
     i {
       font-size: 16px;
     }
