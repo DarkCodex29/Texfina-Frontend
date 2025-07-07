@@ -1,162 +1,58 @@
-<nav class="sidebar-container">
-  <!-- Header del Sidebar -->
-  <div class="sidebar-header">
-    <div class="logo-container">
-      <img src="assets/logo.svg" alt="Texfina Logo" class="sidebar-logo" />
-      <span class="brand-text">Texfina</span>
-    </div>
+<div
+  class="flex flex-col h-full w-80 bg-surface-0 dark:bg-surface-900 shadow-2"
+>
+  <!-- Header -->
+  <div class="flex items-center justify-between px-6 pt-4 shrink-0">
+    <span class="inline-flex items-center gap-2">
+      <img src="assets/logo.png" class="h-8" alt="Logo" />
+      <span class="font-semibold text-2xl text-primary">Texfina</span>
+    </span>
+    <span>
+      <p-button
+        type="button"
+        (click)="closeCallback($event)"
+        icon="pi pi-times"
+        rounded="true"
+        outlined="true"
+        styleClass="h-8 w-8"
+      />
+    </span>
   </div>
 
-  <!-- Contenido del menú -->
-  <div class="sidebar-content">
-    <ul class="menu-list">
-      <!-- Inicio -->
-      <li class="menu-item">
-        <a routerLink="/dashboard" routerLinkActive="active-link" class="menu-link">
-          <mat-icon class="menu-icon">home</mat-icon>
-          <span class="menu-text">Inicio</span>
-        </a>
-      </li>
-
-      <!-- Maestros -->
-      <li class="menu-item">
-        <div class="menu-section" (click)="toggleSection('maestros')">
-          <div class="section-header">
-            <mat-icon class="menu-icon">inventory</mat-icon>
-            <span class="menu-text">Maestros</span>
-          </div>
-          <mat-icon class="expand-icon" [class.expanded]="openSection === 'maestros'">
-            expand_more
-          </mat-icon>
+  <!-- Menu Body -->
+  <div class="overflow-y-auto">
+    <ul class="list-none p-4 m-0">
+      <li>
+        <div class="p-4 flex items-center text-sm font-bold text-surface-500">
+          MAESTROS
         </div>
-        <ul class="submenu" [class.hidden]="openSection !== 'maestros'">
-          <li>
-            <a routerLink="/dashboard/insumos" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Insumos</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/proveedores" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Proveedores</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/almacenes" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Almacenes</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/clases" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Clases</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/unidades" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Unidades</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/lotes" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Lotes</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/recetas" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Recetas</span>
+        <ul>
+          <li *ngFor="let item of maestros">
+            <a
+              pRipple
+              class="flex items-center gap-2 p-3 rounded-md text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-150 cursor-pointer"
+            >
+              <i [class]="'pi ' + item.icon + ' text-primary'"></i>
+              <span>{{ item.label }}</span>
             </a>
           </li>
         </ul>
       </li>
-
-      <!-- Movimientos -->
-      <li class="menu-item">
-        <div class="menu-section" (click)="toggleSection('movimientos')">
-          <div class="section-header">
-            <mat-icon class="menu-icon">assignment</mat-icon>
-            <span class="menu-text">Movimientos</span>
-          </div>
-          <mat-icon class="expand-icon" [class.expanded]="openSection === 'movimientos'">
-            expand_more
-          </mat-icon>
-        </div>
-        <ul class="submenu" [class.hidden]="openSection !== 'movimientos'">
-          <li>
-            <a routerLink="/dashboard/ingresos" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Ingresos</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/consumos" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Consumos</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-
-      <!-- Consultas -->
-      <li class="menu-item">
-        <div class="menu-section" (click)="toggleSection('consultas')">
-          <div class="section-header">
-            <mat-icon class="menu-icon">description</mat-icon>
-            <span class="menu-text">Consultas</span>
-          </div>
-          <mat-icon class="expand-icon" [class.expanded]="openSection === 'consultas'">
-            expand_more
-          </mat-icon>
-        </div>
-        <ul class="submenu" [class.hidden]="openSection !== 'consultas'">
-          <li>
-            <a routerLink="/dashboard/stock" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Stock</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/reportes" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Reportes</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-
-      <!-- Administración -->
-      <li class="menu-item">
-        <div class="menu-section" (click)="toggleSection('administracion')">
-          <div class="section-header">
-            <mat-icon class="menu-icon">settings</mat-icon>
-            <span class="menu-text">Administración</span>
-          </div>
-          <mat-icon class="expand-icon" [class.expanded]="openSection === 'administracion'">
-            expand_more
-          </mat-icon>
-        </div>
-        <ul class="submenu" [class.hidden]="openSection !== 'administracion'">
-          <li>
-            <a routerLink="/dashboard/usuarios" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Usuarios</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/logs" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Logs</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/auditoria" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Auditoría</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/roles" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Roles y Permisos</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/dashboard/configuracion" routerLinkActive="active-sublink" class="submenu-link">
-              <span class="submenu-text">Configuración</span>
-            </a>
-          </li>
-        </ul>
-      </li>
+      <!-- Agrega más secciones similares (Movimientos, Consultas, Administración) -->
     </ul>
   </div>
-</nav>
+
+  <!-- Footer -->
+  <div class="mt-auto border-t border-surface-200 dark:border-surface-700 p-4">
+    <a
+      pRipple
+      class="flex items-center gap-3 text-surface-700 dark:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 p-3 rounded-md cursor-pointer"
+    >
+      <p-avatar
+        image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
+        shape="circle"
+      />
+      <div class="font-bold">Amy Elsner</div>
+    </a>
+  </div>
+</div>

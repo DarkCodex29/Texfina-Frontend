@@ -36,7 +36,7 @@
 
 // Botón de menú hamburguesa
 :host ::ng-deep .menu-toggle-button {
-  display: none !important;
+  display: flex !important;
   background: transparent !important;
   border: none !important;
   color: var(--texfina-text-primary) !important;
@@ -48,10 +48,6 @@
 
   &:focus {
     box-shadow: 0 0 0 2px var(--texfina-primary-alpha) !important;
-  }
-
-  @media (max-width: 800px) {
-    display: flex !important;
   }
 }
 
@@ -69,8 +65,6 @@
   padding: 0;
   object-fit: contain;
 }
-
-
 
 // Responsive
 @media (max-width: 1200px) {
@@ -108,8 +102,6 @@
   .toolbar-logo {
     height: 28px;
   }
-
-
 }
 
 @media (max-width: 480px) {
@@ -126,6 +118,4 @@
   .toolbar-logo {
     height: 24px;
   }
-
-
 }

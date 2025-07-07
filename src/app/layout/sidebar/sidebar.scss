@@ -1,294 +1,156 @@
-// Estilos para PrimeNG Drawer Headless con colores de Texfina
 :host ::ng-deep {
   .p-drawer {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-    border-right: 1px solid var(--texfina-border-light);
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+    background: var(--texfina-secondary) !important;
+    color: #fff !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 6px 0 24px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(4px);
+    position: relative;
 
     &::before {
       content: "";
       position: absolute;
       top: 0;
       right: 0;
-      width: 3px;
+      width: 4px;
       height: 100%;
-      background: linear-gradient(
-        180deg,
-        var(--texfina-secondary),
-        var(--texfina-primary)
-      );
+      background: linear-gradient(180deg, var(--texfina-secondary), var(--texfina-primary));
     }
   }
 
   .p-drawer-mask {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
   }
 }
 
-// Logo del drawer
+// HEADER
+.drawer-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+}
+
+// LOGO
 .drawer-logo {
-  max-height: 32px;
-  max-width: 130px;
+  max-height: 36px;
+  max-width: 140px;
   object-fit: contain;
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.3));
 }
 
-// Colores de Texfina
-.text-texfina-secondary {
-  color: var(--texfina-secondary) !important;
-}
-
-.text-texfina-primary {
-  color: var(--texfina-primary) !important;
-}
-
-.text-texfina-text-primary {
-  color: var(--texfina-text-primary) !important;
-}
-
-.text-texfina-text-secondary {
-  color: var(--texfina-text-secondary) !important;
-}
-
-.text-texfina-text-muted {
-  color: var(--texfina-text-muted) !important;
-}
-
-.hover\:bg-texfina-secondary-bg:hover {
-  background: var(--texfina-secondary-bg) !important;
-}
-
-.hover\:bg-texfina-primary-bg:hover {
-  background: var(--texfina-primary-bg) !important;
-}
-
-.hover\:text-texfina-secondary:hover {
-  color: var(--texfina-secondary) !important;
-}
-
-// Estados activos
-.active-link {
-  background: linear-gradient(
-    135deg,
-    var(--texfina-secondary-bg),
-    rgba(18, 30, 102, 0.1)
-  ) !important;
-  color: var(--texfina-secondary) !important;
-  font-weight: 600 !important;
-  box-shadow: 0 2px 8px rgba(18, 30, 102, 0.15) !important;
-  border-left: 4px solid var(--texfina-secondary) !important;
-}
-
-.active-sublink {
-  background: linear-gradient(
-    135deg,
-    var(--texfina-secondary-bg),
-    rgba(18, 30, 102, 0.1)
-  ) !important;
-  color: var(--texfina-secondary) !important;
-  font-weight: 600 !important;
-  box-shadow: 0 2px 6px rgba(18, 30, 102, 0.1) !important;
-  border-left: 3px solid var(--texfina-secondary) !important;
-}
-
-// Botón de cerrar personalizado
-:host ::ng-deep .close-button-custom {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: var(--texfina-text-primary) !important;
+// MENÚ
+.menu-link,
+.menu-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 500;
+  transition: background 0.25s, color 0.25s;
+  position: relative;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.08);
   }
-}
 
-// Transiciones suaves
-.transition-colors {
-  transition: all 0.2s ease !important;
-}
-
-.transition-transform {
-  transition: transform 0.2s ease !important;
-}
-
-.rotate-180 {
-  transform: rotate(180deg) !important;
-}
-
-// Animaciones de deslizamiento
-@keyframes slidedown {
-  from {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
     opacity: 0;
-    transform: translateY(-10px);
+    background: var(--texfina-primary-bg);
+    transition: opacity 0.2s ease;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@keyframes slideup {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-10px);
+  &:hover::before {
+    opacity: 0.15;
   }
 }
 
-.animate-slidedown {
-  animation: slidedown 0.3s ease;
+.menu-icon {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.animate-slideup {
-  animation: slideup 0.3s ease;
+.expand-icon {
+  margin-left: auto;
+  transition: transform 0.2s;
+  color: rgba(255, 255, 255, 0.75);
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
 }
 
-// Utilidades de Tailwind personalizadas
-.rounded-border {
-  border-radius: 8px !important;
+// SUBMENÚ
+.submenu-link {
+  padding: 0.45rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.85);
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 }
 
-.flex {
-  display: flex !important;
-}
-
-.flex-col {
-  flex-direction: column !important;
-}
-
-.items-center {
-  align-items: center !important;
-}
-
-.justify-between {
-  justify-content: space-between !important;
-}
-
-.gap-2 {
-  gap: 0.5rem !important;
-}
-
-.p-4 {
-  padding: 1rem !important;
-}
-
-.p-3 {
-  padding: 0.75rem !important;
-}
-
-.px-6 {
-  padding-left: 1.5rem !important;
-  padding-right: 1.5rem !important;
-}
-
-.pt-4 {
-  padding-top: 1rem !important;
-}
-
-.pl-12 {
-  padding-left: 3rem !important;
-}
-
-.mr-3 {
-  margin-right: 0.75rem !important;
-}
-
-.h-full {
-  height: 100% !important;
-}
-
-.h-8 {
-  height: 2rem !important;
-}
-
-.w-8 {
-  width: 2rem !important;
-}
-
-.flex-1 {
-  flex: 1 !important;
-}
-
-.shrink-0 {
-  flex-shrink: 0 !important;
-}
-
-.overflow-y-auto {
-  overflow-y: auto !important;
-}
-
-.overflow-hidden {
-  overflow: hidden !important;
-}
-
-.list-none {
-  list-style: none !important;
-}
-
-.m-0 {
-  margin: 0 !important;
-}
-
-.p-0 {
-  padding: 0 !important;
-}
-
-.cursor-pointer {
-  cursor: pointer !important;
-}
-
-.font-medium {
-  font-weight: 500 !important;
-}
-
-.font-semibold {
+// ESTADO ACTIVO
+.active-link,
+.active-sublink {
+  background: rgba(189, 33, 38, 0.25) !important;
+  border-left: 4px solid var(--texfina-primary) !important;
+  color: #ffffff !important;
   font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.text-2xl {
-  font-size: 1.5rem !important;
-  line-height: 2rem !important;
+// BOTÓN CIERRE
+.close-button-custom,
+.close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--texfina-text-primary);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: var(--texfina-primary);
+  }
 }
 
-.inline-flex {
-  display: inline-flex !important;
-}
-
-.hidden {
-  display: none !important;
-}
-
-// Responsive
+// RESPONSIVE
 @media (max-width: 768px) {
   :host ::ng-deep .p-drawer {
     width: 85vw !important;
-    max-width: 320px !important;
+    max-width: 320px;
   }
 
   .drawer-logo {
-    max-height: 28px;
-    max-width: 110px;
-  }
-
-  .text-2xl {
-    font-size: 1.25rem !important;
-    line-height: 1.75rem !important;
+    max-height: 30px;
+    max-width: 120px;
   }
 }
 
 @media (max-width: 480px) {
   :host ::ng-deep .p-drawer {
     width: 90vw !important;
-    max-width: 280px !important;
-  }
-
-  .px-6 {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+    max-width: 280px;
   }
 
   .p-4 {

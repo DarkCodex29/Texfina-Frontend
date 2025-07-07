@@ -6,12 +6,18 @@ import { ToolbarComponent } from '../toolbar/toolbar';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { DrawerModule } from 'primeng/drawer';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, ToolbarComponent, MatSidenavModule],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    SidebarComponent,
+    ToolbarComponent,
+    DrawerModule,
+  ],
   templateUrl: './main-layout.html',
   styleUrls: ['./main-layout.scss'],
 })
