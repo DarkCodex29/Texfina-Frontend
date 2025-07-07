@@ -41,6 +41,14 @@ export class SidebarComponent {
     this.close.emit();
   }
 
+  onNavClick(event: Event) {
+    const target = event.target as HTMLElement;
+    if (target.closest('a[routerLink]')) {
+      // Cerrar sidebar cuando se hace clic en un enlace
+      this.close.emit();
+    }
+  }
+
   toggleSection(section: string) {
     this.sections = {
       ...this.sections,

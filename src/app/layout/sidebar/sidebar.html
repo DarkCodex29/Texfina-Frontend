@@ -11,13 +11,13 @@
   </div>
 
   <!-- Navigation Menu -->
-  <nav class="sidebar-nav">
+  <nav class="sidebar-nav" (click)="onNavClick($event)">
     <!-- Principal -->
     <div class="nav-section">
       <h3 class="section-title">Principal</h3>
       <ul class="nav-list">
         <li>
-          <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link" (click)="closeCallback($event)">
+          <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
             <i class="pi pi-th-large"></i>
             <span>Dashboard</span>
           </a>
