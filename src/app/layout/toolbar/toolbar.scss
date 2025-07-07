@@ -70,55 +70,7 @@
   object-fit: contain;
 }
 
-// Breadcrumb personalizado
-:host ::ng-deep .custom-breadcrumb {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
 
-  .p-breadcrumb-list {
-    margin: 0 !important;
-    padding: 0 !important;
-
-    .p-breadcrumb-item {
-      .p-breadcrumb-home {
-        background: var(--texfina-secondary-bg) !important;
-        color: var(--texfina-secondary) !important;
-        border-radius: 6px !important;
-        padding: 0.5rem !important;
-        transition: all 0.2s ease !important;
-
-        &:hover {
-          background: var(--texfina-secondary) !important;
-          color: white !important;
-        }
-
-        .p-breadcrumb-icon {
-          color: inherit !important;
-        }
-      }
-
-      .p-breadcrumb-separator {
-        color: var(--texfina-text-muted) !important;
-        margin: 0 0.5rem !important;
-      }
-
-      &.breadcrumb-parent {
-        .p-breadcrumb-label {
-          color: var(--texfina-text-secondary) !important;
-          font-weight: 500 !important;
-        }
-      }
-
-      &.breadcrumb-current {
-        .p-breadcrumb-label {
-          color: var(--texfina-primary) !important;
-          font-weight: 600 !important;
-        }
-      }
-    }
-  }
-}
 
 // Responsive
 @media (max-width: 1200px) {
@@ -157,16 +109,7 @@
     height: 28px;
   }
 
-  // Ocultar breadcrumb en móvil si es muy largo
-  :host ::ng-deep .custom-breadcrumb {
-    .p-breadcrumb-list {
-      .p-breadcrumb-item {
-        &.breadcrumb-parent {
-          display: none !important;
-        }
-      }
-    }
-  }
+
 }
 
 @media (max-width: 480px) {
@@ -184,8 +127,5 @@
     height: 24px;
   }
 
-  // En móviles muy pequeños, ocultar el breadcrumb completamente
-  :host ::ng-deep .custom-breadcrumb {
-    display: none !important;
-  }
+
 }

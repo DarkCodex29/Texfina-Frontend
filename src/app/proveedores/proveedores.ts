@@ -13,16 +13,11 @@ import {
   FormBuilder,
   FormGroup,
 } from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSortModule, MatSort } from '@angular/material/sort';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { PrimeDataTableComponent, TableColumn, TableAction, TableButtonConfig, TableState } from '../shared/components/prime-data-table/prime-data-table.component';
 import {
   Subject,
   debounceTime,
@@ -36,6 +31,7 @@ import { Proveedor } from '../models/insumo.model';
 import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
 import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
 import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import { CargaMasivaDialogComponent, CargaMasivaDialogData } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
 import { ProveedoresConfig } from '../shared/configs/proveedores-config';
 import {
   ExportacionService,
@@ -47,7 +43,6 @@ import {
   ConfiguracionCargaMasiva,
   MapeoColumna,
 } from '../services/carga-masiva.service';
-import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
 
 @Component({
   selector: 'app-proveedores',
@@ -56,89 +51,108 @@ import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialo
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatTableModule,
     MatButtonModule,
     MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatDialogModule,
-    MatCardModule,
     MatTooltipModule,
-    MatSortModule,
-    MatProgressSpinnerModule,
+    MatDialogModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './proveedores.html',
   styleUrls: ['./proveedores.scss'],
 })
-export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatSort) sort!: MatSort;
-
+export class ProveedoresComponent implements OnInit, OnDestroy {
   proveedores: Proveedor[] = [];
-  dataSource = new MatTableDataSource<Proveedor>([]);
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosExpanded = true;
-  filtrosColumnaHabilitados = false;
-  filtrosColumnaActivos = false;
+  dropdownExportAbierto = false;
   private destroy$ = new Subject<void>();
 
-  // Estados de carga y error
-  isLoading: boolean = false;
-  hasError: boolean = false;
-  errorMessage: string = '';
-  dropdownExportAbierto: boolean = false;
+  // Estado de la tabla
+  tableState: TableState = {
+    loading: false,
+    error: false,
+    empty: false,
+    filteredEmpty: false
+  };
 
-  displayedColumns: string[] = [
-    'empresa',
-    'ruc',
-    'contacto',
-    'direccion',
-    'acciones',
+  // Configuración de tabla PrimeNG
+  columns: TableColumn[] = [
+    {
+      key: 'empresa',
+      title: 'Empresa',
+      sortable: true,
+      filterable: true,
+      width: '250px'
+    },
+    {
+      key: 'ruc',
+      title: 'RUC',
+      sortable: true,
+      filterable: true,
+      width: '150px'
+    },
+    {
+      key: 'contacto',
+      title: 'Contacto',
+      sortable: true,
+      filterable: true,
+      width: '200px'
+    },
+    {
+      key: 'direccion',
+      title: 'Dirección',
+      sortable: true,
+      filterable: true,
+      width: '250px'
+    }
   ];
-
-  get proveedoresFiltrados(): Proveedor[] {
-    return this.dataSource.data;
-  }
+  actions: TableAction[] = [
+    {
+      tooltip: 'Ver',
+      icon: 'pi pi-eye',
+      action: 'view',
+      color: 'primary'
+    },
+    {
+      tooltip: 'Editar',
+      icon: 'pi pi-pencil',
+      action: 'edit',
+      color: 'primary'
+    },
+    {
+      tooltip: 'Eliminar',
+      icon: 'pi pi-trash',
+      action: 'delete',
+      color: 'warn'
+    }
+  ];
+  buttons: TableButtonConfig[] = [
+    {
+      label: 'Agregar Proveedor',
+      icon: 'pi pi-plus',
+      action: 'add',
+      color: 'primary'
+    },
+    {
+      label: 'Carga Masiva',
+      icon: 'pi pi-upload',
+      action: 'bulk-upload',
+      color: 'secondary'
+    }
+  ];
+  globalFilterFields: string[] = ['empresa', 'ruc', 'contacto', 'direccion'];
 
   get isEmpty(): boolean {
-    return !this.isLoading && this.proveedores.length === 0 && !this.hasError;
-  }
-
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      this.dataSource.data.length === 0 &&
-      this.proveedores.length > 0
-    );
+    return !this.tableState.loading && this.proveedores.length === 0 && !this.tableState.error;
   }
 
   constructor(
     private materialService: MaterialService,
     private dialog: MatDialog,
-    private fb: FormBuilder,
     private exportacionService: ExportacionService,
     private cargaMasivaService: CargaMasivaService
-  ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
-    this.filtrosColumnaForm = this.fb.group({
-      empresa: [''],
-      ruc: [''],
-      contacto: [''],
-      direccion: [''],
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cargarProveedores();
-    this.configurarFiltroGeneralEnTiempoReal();
-    this.configurarFiltrosColumnaEnTiempoReal();
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
   }
 
   ngOnDestroy(): void {
@@ -146,205 +160,91 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  configurarFiltroGeneralEnTiempoReal(): void {
-    this.filtroGeneralForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltroGeneral();
-      });
-  }
-
-  configurarFiltrosColumnaEnTiempoReal(): void {
-    this.filtrosColumnaForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltrosColumna();
-      });
-  }
+  // ============================================================================
+  // MÉTODOS DE CARGA DE DATOS
+  // ============================================================================
 
   cargarProveedores(): void {
-    this.isLoading = true;
-    this.hasError = false;
-    this.errorMessage = '';
-
-    console.log(
-      '🔄 Iniciando carga de proveedores - isLoading:',
-      this.isLoading
-    );
+    this.tableState = { ...this.tableState, loading: true, error: false };
 
     this.materialService
       .getProveedores()
       .pipe(
-        // Delay artificial para demostrar el skeleton (remover en producción)
         delay(1500),
         finalize(() => {
-          this.isLoading = false;
-          console.log('✅ Carga completada - isLoading:', this.isLoading);
+          this.tableState = { ...this.tableState, loading: false };
         }),
         takeUntil(this.destroy$)
       )
       .subscribe({
-        next: (proveedores) => {
-          console.log('🏢 Proveedores cargados:', proveedores.length);
+        next: (proveedores: Proveedor[]) => {
           this.proveedores = proveedores;
-          this.dataSource.data = [...proveedores];
+          this.tableState = {
+            ...this.tableState,
+            loading: false,
+            empty: proveedores.length === 0,
+            filteredEmpty: false
+          };
         },
-        error: (error) => {
-          console.error('❌ Error al cargar proveedores:', error);
-          this.hasError = true;
-          this.errorMessage =
-            'Error al cargar los proveedores. Por favor, intenta nuevamente.';
-          this.proveedores = [];
-          this.dataSource.data = [];
+        error: (error: any) => {
+          console.error('Error al cargar proveedores:', error);
+          this.tableState = {
+            ...this.tableState,
+            loading: false,
+            error: true,
+            errorMessage: 'Error al cargar los proveedores. Intente nuevamente.'
+          };
         },
       });
   }
 
-  reintentarCarga(): void {
+  recargarDatos(): void {
     this.cargarProveedores();
   }
 
-  aplicarFiltroGeneral(): void {
-    const busqueda = this.filtroGeneralForm
-      .get('busquedaGeneral')
-      ?.value?.trim()
-      .toLowerCase();
+  // ============================================================================
+  // MANEJADORES DE ACCIONES DE TABLA
+  // ============================================================================
 
-    if (!busqueda) {
-      this.dataSource.data = [...this.proveedores];
-      return;
-    }
+  onActionClick(event: { action: string; item: any }): void {
+    const { action, item } = event;
 
-    const proveedoresFiltrados = this.proveedores.filter((proveedor) => {
-      const empresa = proveedor.empresa?.toLowerCase() || '';
-      const ruc = proveedor.ruc?.toLowerCase() || '';
-      const contacto = proveedor.contacto?.toLowerCase() || '';
-      const direccion = proveedor.direccion?.toLowerCase() || '';
-
-      return (
-        empresa.includes(busqueda) ||
-        ruc.includes(busqueda) ||
-        contacto.includes(busqueda) ||
-        direccion.includes(busqueda)
-      );
-    });
-
-    this.dataSource.data = proveedoresFiltrados;
-  }
-
-  aplicarFiltrosColumna(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    let proveedoresFiltrados = [...this.proveedores];
-
-    // Filtro por Empresa
-    if (filtros.empresa && filtros.empresa.trim()) {
-      proveedoresFiltrados = proveedoresFiltrados.filter((proveedor) =>
-        proveedor.empresa?.toLowerCase().includes(filtros.empresa.toLowerCase())
-      );
-    }
-
-    // Filtro por RUC
-    if (filtros.ruc && filtros.ruc.trim()) {
-      proveedoresFiltrados = proveedoresFiltrados.filter((proveedor) =>
-        proveedor.ruc?.toLowerCase().includes(filtros.ruc.toLowerCase())
-      );
-    }
-
-    // Filtro por Contacto
-    if (filtros.contacto && filtros.contacto.trim()) {
-      proveedoresFiltrados = proveedoresFiltrados.filter((proveedor) =>
-        proveedor.contacto
-          ?.toLowerCase()
-          .includes(filtros.contacto.toLowerCase())
-      );
-    }
-
-    // Filtro por Dirección
-    if (filtros.direccion && filtros.direccion.trim()) {
-      proveedoresFiltrados = proveedoresFiltrados.filter((proveedor) =>
-        proveedor.direccion
-          ?.toLowerCase()
-          .includes(filtros.direccion.toLowerCase())
-      );
-    }
-
-    this.dataSource.data = proveedoresFiltrados;
-  }
-
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.reset();
-    this.dataSource.data = [...this.proveedores];
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
-    this.dataSource.data = [...this.proveedores];
-  }
-
-  toggleFiltrosColumna() {
-    this.filtrosColumnaHabilitados = !this.filtrosColumnaHabilitados;
-    this.filtrosColumnaActivos = !this.filtrosColumnaActivos;
-
-    if (this.filtrosColumnaHabilitados) {
-      if (this.filtrosColumnaActivos) {
-        this.limpiarFiltroGeneral();
-      } else {
-        this.limpiarFiltrosColumna();
-      }
+    switch (action) {
+      case 'view':
+        this.verDetalle(item);
+        break;
+      case 'edit':
+        this.editar(item);
+        break;
+      case 'delete':
+        this.eliminar(item);
+        break;
+      default:
+        console.warn(`Acción no reconocida: ${action}`);
     }
   }
 
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent): void {
-    if (event.key === 'F3') {
-      event.preventDefault();
-      this.toggleFiltrosColumna();
+  onButtonClick(action: string): void {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk-upload':
+        this.cargaMasiva();
+        break;
+      default:
+        console.warn(`Acción de botón no reconocida: ${action}`);
     }
   }
 
-  toggleFiltros(): void {
-    this.filtrosExpanded = !this.filtrosExpanded;
-  }
 
-  sortData(column: string): void {
-    if (this.sort) {
-      // Si ya está ordenado por esta columna, cambiar dirección
-      if (this.sort.active === column) {
-        this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc';
-      } else {
-        // Nueva columna, empezar con ascendente
-        this.sort.active = column;
-        this.sort.direction = 'asc';
-      }
-      this.sort.sortChange.emit({
-        active: this.sort.active,
-        direction: this.sort.direction,
-      });
-    }
-  }
 
-  formatearCodigo(id?: number): string {
-    if (!id) return '00000';
-    return id.toString().padStart(5, '0');
-  }
 
-  abrirNuevoProveedor(): void {
-    const dialogRef = this.dialog.open(FormularioDialogComponent, {
-      width: '600px',
-      disableClose: true,
-      data: ProveedoresConfig.formulario(false),
-    });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result?.accion === 'guardar') {
-        this.guardarProveedor(result.datos);
-      }
-    });
-  }
 
   private configurarExportacion(): ConfiguracionExportacion<Proveedor> {
     return {
-      entidades: this.dataSource.data,
+      entidades: this.proveedores,
       nombreArchivo: 'proveedores',
       nombreEntidad: 'Proveedores',
       columnas: [
@@ -363,9 +263,10 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
       filtrosActivos: this.obtenerFiltrosActivos(),
       metadatos: {
         cantidadTotal: this.proveedores.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.proveedores.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
+        empresa: 'Texfina'
       },
     };
   }
@@ -425,13 +326,8 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private obtenerFiltrosActivos(): any {
-    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
-    const filtrosColumna = this.filtrosColumnaForm.value;
-
-    return {
-      busquedaGeneral: filtroGeneral || null,
-      ...filtrosColumna,
-    };
+    // TODO: Implementar obtención de filtros activos de la tabla
+    return {};
   }
 
   exportarExcel(): void {
@@ -455,148 +351,186 @@ export class ProveedoresComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cargaMasiva(): void {
+    const configuracion = this.configurarCargaMasiva();
+    
+    const dialogData: CargaMasivaDialogData = {
+      configuracion,
+      onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(configuracion),
+      onProcesarArchivo: (archivo: File) => this.procesarArchivoCargaMasiva(archivo, configuracion)
+    };
+
     const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
       width: '600px',
-      disableClose: true,
-      data: {
-        configuracion: this.configurarCargaMasiva(),
-        onDescargarPlantilla: () => this.descargarPlantillaCargaMasiva(),
-        onProcesarArchivo: (archivo: File) =>
-          this.procesarArchivoCargaMasiva(archivo),
-      },
+      data: dialogData,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(resultado => {
+      if (resultado) {
+        // Se procesó el archivo exitosamente, recargar datos
+        this.cargarProveedores();
+      }
     });
   }
 
-  descargarPlantillaCargaMasiva(): void {
+  private descargarPlantillaCargaMasiva(configuracion: ConfiguracionCargaMasiva<Proveedor>): void {
     try {
-      const config = this.configurarCargaMasiva();
-      this.cargaMasivaService.generarPlantilla(config);
+      this.cargaMasivaService.generarPlantilla(configuracion);
     } catch (error) {
-      console.error('Error al generar plantilla:', error);
+      console.error('Error al descargar plantilla:', error);
+      throw error;
     }
   }
 
-  async procesarArchivoCargaMasiva(archivo: File): Promise<void> {
+  private async procesarArchivoCargaMasiva(archivo: File, configuracion: ConfiguracionCargaMasiva<Proveedor>): Promise<void> {
     try {
-      const config = this.configurarCargaMasiva();
-      const resultado = await this.cargaMasivaService.procesarArchivo(
-        archivo,
-        config
-      );
+      // Procesar archivo
+      const resultado = await this.cargaMasivaService.procesarArchivo(archivo, configuracion);
 
-      if (resultado.exitosa) {
-        await this.guardarProveedoresMasivos(resultado.entidadesValidas);
-        console.log(
-          `✅ ${resultado.registrosValidos} registros procesados exitosamente`
-        );
-        this.cargarProveedores();
-      } else {
-        console.log('❌ Errores en el archivo:', resultado.errores);
+      if (!resultado.exitosa) {
+        const mensajeError = `Error al procesar archivo:\n${resultado.errores.map(e => `Fila ${e.fila}: ${e.mensaje}`).join('\n')}`;
+        throw new Error(mensajeError);
       }
+
+      // Si hay entidades válidas, crearlas en lotes
+      if (resultado.entidadesValidas.length > 0) {
+        const promesasCreacion = resultado.entidadesValidas.map(proveedor => 
+          this.materialService.crearProveedor(proveedor).toPromise()
+        );
+
+        await Promise.all(promesasCreacion);
+
+        console.log(`✅ Carga masiva completada: ${resultado.registrosValidos} proveedores creados`);
+        
+        if (resultado.registrosInvalidos > 0) {
+          console.warn(`⚠️  ${resultado.registrosInvalidos} registros fueron omitidos por errores`);
+        }
+      } else {
+        throw new Error('No se encontraron registros válidos para procesar');
+      }
+
     } catch (error) {
-      console.error('Error al procesar archivo:', error);
+      console.error('Error en carga masiva:', error);
+      throw error;
     }
   }
 
-  private async guardarProveedoresMasivos(
-    proveedores: Proveedor[]
-  ): Promise<void> {
-    for (const proveedor of proveedores) {
-      await this.materialService.crearProveedor(proveedor).toPromise();
-    }
-  }
 
   toggleDropdownExport(): void {
     this.dropdownExportAbierto = !this.dropdownExportAbierto;
   }
 
-  async guardarProveedor(datos: any): Promise<any> {
-    try {
-      const resultado = await this.materialService
-        .crearProveedor(datos)
-        .toPromise();
-      this.cargarProveedores();
-      return resultado;
-    } catch (error) {
-      console.error('Error al guardar proveedor:', error);
-      throw error;
+  // ============================================================================
+  // MANEJADORES DE EVENTOS
+  // ============================================================================
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-export')) {
+      this.dropdownExportAbierto = false;
     }
   }
 
-  async actualizarProveedor(id: number, datos: any): Promise<any> {
-    try {
-      const proveedorActualizado = { ...datos, id_proveedor: id };
-      const resultado = await this.materialService
-        .actualizarProveedor(proveedorActualizado)
-        .toPromise();
-      this.cargarProveedores();
-      return resultado;
-    } catch (error) {
-      console.error('Error al actualizar proveedor:', error);
-      throw error;
-    }
+  private crear(proveedorData: any): void {
+    this.materialService.crearProveedor(proveedorData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado: any) => {
+          console.log('Proveedor creado:', resultado);
+          this.cargarProveedores();
+        },
+        error: (error: any) => {
+          console.error('Error al crear proveedor:', error);
+        }
+      });
+  }
+
+  private actualizar(id: number, proveedorData: any): void {
+    const proveedorCompleto = { ...proveedorData, id_proveedor: id };
+    this.materialService.actualizarProveedor(proveedorCompleto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado: any) => {
+          console.log('Proveedor actualizado:', resultado);
+          this.cargarProveedores();
+        },
+        error: (error: any) => {
+          console.error('Error al actualizar proveedor:', error);
+        }
+      });
   }
 
   agregar(): void {
+    const config = ProveedoresConfig.formulario(false);
+    
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
-      disableClose: true,
-      data: ProveedoresConfig.formulario(false),
+      data: config,
+      disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado?.accion === 'guardar') {
-        this.guardarProveedor(resultado.datos);
+    dialogRef.afterClosed().subscribe(resultado => {
+      if (resultado && resultado.accion === 'guardar') {
+        this.crear(resultado.datos);
       }
     });
   }
 
   editar(proveedor: Proveedor): void {
+    const config = ProveedoresConfig.formulario(true, proveedor);
+    
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
-      disableClose: true,
-      data: ProveedoresConfig.formulario(true, proveedor),
+      data: config,
+      disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado?.accion === 'guardar' && proveedor.id_proveedor) {
-        this.actualizarProveedor(proveedor.id_proveedor, resultado.datos);
+    dialogRef.afterClosed().subscribe(resultado => {
+      if (resultado && resultado.accion === 'guardar') {
+        this.actualizar(proveedor.id_proveedor!, resultado.datos);
       }
     });
   }
 
   verDetalle(proveedor: Proveedor): void {
-    this.dialog.open(DetalleDialogComponent, {
+    const config = ProveedoresConfig.detalle(proveedor);
+    
+    const dialogRef = this.dialog.open(DetalleDialogComponent, {
       width: '800px',
-      disableClose: true,
-      data: ProveedoresConfig.detalle(proveedor),
+      data: config,
+      disableClose: true
     });
   }
 
   eliminar(proveedor: Proveedor): void {
     const empresa = proveedor.empresa || `Proveedor ${proveedor.id_proveedor}`;
     const config = ProveedoresConfig.eliminarProveedor(empresa);
-
+    
     const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
-      width: '400px',
-      disableClose: true,
-      data: { config },
+      width: '500px',
+      data: config,
+      disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe((confirmado) => {
-      if (confirmado && proveedor.id_proveedor) {
-        this.materialService
-          .eliminarProveedor(proveedor.id_proveedor)
-          .subscribe({
-            next: () => {
-              console.log('✅ Proveedor eliminado exitosamente');
-              this.cargarProveedores();
-            },
-            error: (error: any) => {
-              console.error('❌ Error al eliminar proveedor:', error);
-            },
-          });
+    dialogRef.afterClosed().subscribe(confirmado => {
+      if (confirmado) {
+        this.ejecutarEliminacion(proveedor.id_proveedor!);
       }
     });
+  }
+
+  private ejecutarEliminacion(id: number): void {
+    this.materialService.eliminarProveedor(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado: any) => {
+          console.log('Proveedor eliminado:', resultado);
+          this.cargarProveedores();
+        },
+        error: (error: any) => {
+          console.error('Error al eliminar proveedor:', error);
+        }
+      });
   }
 }

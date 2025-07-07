@@ -11,9 +11,7 @@
         </p>
       </div>
       <div class="header-actions">
-        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
-          Carga Masiva
-        </button>
+        <!-- Solo dropdown de exportar -->
         <div class="dropdown-export">
           <button
             class="btn-texfina btn-neutral dropdown-trigger"
@@ -30,278 +28,28 @@
             </button>
           </div>
         </div>
-        <button class="btn-texfina btn-primary" (click)="agregar()">
-          Agregar Proveedor
-        </button>
       </div>
     </div>
 
-    <!-- Filtro General -->
-    <div class="filters-card">
-      <div class="filters-content">
-        <form [formGroup]="filtroGeneralForm" class="filters-form">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <input
-                  class="simple-input"
-                  formControlName="busquedaGeneral"
-                  placeholder="Buscar en empresa, RUC, contacto, dirección..."
-                  type="text"
-                />
-                <button
-                  class="btn-limpiar"
-                  type="button"
-                  (click)="limpiarFiltroGeneral()"
-                  matTooltip="Limpiar búsqueda"
-                >
-                  Limpiar
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Tabla de proveedores -->
-    <div class="table-card">
-      <div class="table-with-headers">
-        <!-- Encabezados de columnas con filtros integrados -->
-        <div class="column-headers">
-          <!-- Fila de títulos -->
-          <div class="header-row header-titles">
-            <div class="header-col empresa-col" (click)="sortData('empresa')">
-              <span>Empresa</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col ruc-col" (click)="sortData('ruc')">
-              <span>RUC</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col contacto-col" (click)="sortData('contacto')">
-              <span>Contacto</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col direccion-col"
-              (click)="sortData('direccion')"
-            >
-              <span>Dirección</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col acciones-col">
-              <span>ACCIONES</span>
-            </div>
-          </div>
-
-          <!-- Fila de filtros por columna -->
-          <div
-            class="header-row header-filters"
-            *ngIf="filtrosColumnaHabilitados"
-            [formGroup]="filtrosColumnaForm"
-          >
-            <div class="header-col empresa-col">
-              <input
-                class="column-filter-input"
-                formControlName="empresa"
-                placeholder="Empresa..."
-                type="text"
-              />
-            </div>
-            <div class="header-col ruc-col">
-              <input
-                class="column-filter-input"
-                formControlName="ruc"
-                placeholder="RUC..."
-                type="text"
-              />
-            </div>
-            <div class="header-col contacto-col">
-              <input
-                class="column-filter-input"
-                formControlName="contacto"
-                placeholder="Contacto..."
-                type="text"
-              />
-            </div>
-            <div class="header-col direccion-col">
-              <input
-                class="column-filter-input"
-                formControlName="direccion"
-                placeholder="Dirección..."
-                type="text"
-              />
-            </div>
-            <div class="header-col acciones-col">
-              <button
-                class="btn-clear-column-filters"
-                type="button"
-                (click)="limpiarFiltrosColumna()"
-                matTooltip="Limpiar filtros de columna"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <!-- Estado de error -->
-          <div *ngIf="hasError" class="error-state">
-            <mat-icon class="error-icon">error_outline</mat-icon>
-            <h3 class="error-title text-texfina text-primary">
-              Error al cargar datos
-            </h3>
-            <p class="error-subtitle text-texfina text-muted">
-              {{ errorMessage }}
-            </p>
-            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
-              <mat-icon>refresh</mat-icon>
-              Reintentar
-            </button>
-          </div>
-
-          <!-- Estado vacío (sin datos) -->
-          <div *ngIf="isEmpty" class="empty-state">
-            <mat-icon class="empty-icon">business</mat-icon>
-            <h3 class="empty-title text-texfina text-primary">
-              No hay proveedores registrados
-            </h3>
-            <p class="empty-subtitle text-texfina text-muted">
-              Comienza agregando tu primer proveedor para gestionar el
-              directorio
-            </p>
-            <button class="btn-texfina btn-primary" (click)="agregar()">
-              <mat-icon>add</mat-icon>
-              Agregar Primer Proveedor
-            </button>
-          </div>
-
-          <!-- Estado filtrado vacío -->
-          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
-            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
-            <h3 class="filtered-empty-title text-texfina text-primary">
-              No se encontraron resultados
-            </h3>
-            <p class="filtered-empty-subtitle text-texfina text-muted">
-              Intenta ajustar los filtros o limpiar la búsqueda
-            </p>
-          </div>
-
-          <!-- Tabla siempre visible (con skeleton o datos) -->
-          <table mat-table [dataSource]="dataSource" matSort class="data-table">
-            <!-- Columna Empresa -->
-            <ng-container matColumnDef="empresa">
-              <td mat-cell *matCellDef="let proveedor" class="table-cell">
-                <div class="proveedor-cell">
-                  <div class="proveedor-name text-texfina font-medium">
-                    {{ proveedor.empresa || "-" }}
-                  </div>
-                  <div class="proveedor-code text-texfina text-muted">
-                    ID: {{ formatearCodigo(proveedor.id_proveedor) }}
-                  </div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Columna RUC -->
-            <ng-container matColumnDef="ruc">
-              <td mat-cell *matCellDef="let proveedor" class="table-cell">
-                <span class="badge-texfina badge-neutral">
-                  {{ proveedor.ruc || "-" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Contacto -->
-            <ng-container matColumnDef="contacto">
-              <td mat-cell *matCellDef="let proveedor" class="table-cell">
-                <span class="text-texfina text-secondary">
-                  {{ proveedor.contacto || "-" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Dirección -->
-            <ng-container matColumnDef="direccion">
-              <td mat-cell *matCellDef="let proveedor" class="table-cell">
-                <span class="text-texfina text-secondary">
-                  {{ proveedor.direccion || "-" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Acciones -->
-            <ng-container matColumnDef="acciones">
-              <td
-                mat-cell
-                *matCellDef="let proveedor"
-                class="table-cell actions-cell"
-              >
-                <div class="action-buttons">
-                  <button
-                    class="btn-action btn-view"
-                    (click)="verDetalle(proveedor)"
-                    matTooltip="Ver detalle"
-                  >
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                  <button
-                    class="btn-action btn-edit"
-                    (click)="editar(proveedor)"
-                    matTooltip="Editar"
-                  >
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Filas de datos reales -->
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-          </table>
-
-          <!-- Skeleton superpuesto mientras carga -->
-          <div *ngIf="isLoading" class="skeleton-overlay">
-            <table class="skeleton-table">
-              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5, 6]">
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                  <div class="skeleton-line skeleton-subtext"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-actions"></div>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Paginación -->
-      <div class="table-footer">
-        <div class="pagination-info">
-          <span class="text-texfina text-muted">Página 1 de 10</span>
-        </div>
-        <div class="pagination-controls">
-          <button class="pagination-button" disabled>
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button class="pagination-button">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
-      </div>
+    <!-- Componente de tabla con PrimeNG -->
+    <div class="table-container">
+      <app-prime-data-table
+        [data]="proveedores"
+        [columns]="columns"
+        [actions]="actions"
+        [buttons]="buttons"
+        [globalFilterFields]="globalFilterFields"
+        [state]="tableState"
+        [loading]="tableState.loading"
+        [error]="tableState.error"
+        [errorMessage]="tableState.errorMessage || ''"
+        (actionClick)="onActionClick($event)"
+        (buttonClick)="onButtonClick($event)"
+        (retryClicked)="recargarDatos()"
+        emptyTitle="No hay proveedores registrados"
+        emptySubtitle="Comienza agregando tu primer proveedor para gestionar el directorio"
+        emptyActionText="Agregar Primer Proveedor"
+      ></app-prime-data-table>
     </div>
   </div>
 </div>

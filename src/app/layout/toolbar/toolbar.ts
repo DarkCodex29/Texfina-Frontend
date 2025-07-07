@@ -14,8 +14,6 @@ import { Subject } from 'rxjs';
 
 import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
-import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { MenuItem } from 'primeng/api';
 
 import { AuthService } from '../../core/auth/auth.service';
 import {
@@ -35,7 +33,6 @@ import { UserMenuComponent } from '../../shared/components/user-menu/user-menu.c
     RouterModule,
     ToolbarModule,
     ButtonModule,
-    BreadcrumbModule,
     NotificationsComponent,
     UserMenuComponent,
   ],
@@ -49,8 +46,6 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   currentUser: Usuario | null = null;
   alertas: AlertaDashboard[] = [];
   alertasCount = 0;
-  breadcrumbItems: MenuItem[] = [];
-  home: MenuItem = { icon: 'pi pi-home', routerLink: '/dashboard' };
 
   private destroy$ = new Subject<void>();
 
@@ -66,11 +61,9 @@ export class ToolbarComponent implements OnInit, OnDestroy {
       )
       .subscribe((event: NavigationEnd) => {
         this.updateTitle(event.url);
-        this.updateBreadcrumb(event.url);
       });
 
     this.updateTitle(this.router.url);
-    this.updateBreadcrumb(this.router.url);
   }
 
   ngOnInit(): void {
@@ -111,48 +104,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     this.title = routeMap[url] || 'Texfina';
   }
 
-  private updateBreadcrumb(url: string): void {
-    this.breadcrumbItems = [];
 
-    const pathSegments = url.split('/').filter((segment) => segment);
-
-    if (pathSegments.length > 1) {
-      const section = pathSegments[1];
-
-      const sectionMap: { [key: string]: { label: string; parent?: string } } =
-        {
-          insumos: { label: 'Insumos', parent: 'Maestros' },
-          proveedores: { label: 'Proveedores', parent: 'Maestros' },
-          almacenes: { label: 'Almacenes', parent: 'Maestros' },
-          clases: { label: 'Clases', parent: 'Maestros' },
-          unidades: { label: 'Unidades', parent: 'Maestros' },
-          lotes: { label: 'Lotes', parent: 'Maestros' },
-          recetas: { label: 'Recetas', parent: 'Maestros' },
-          ingresos: { label: 'Ingresos', parent: 'Movimientos' },
-          consumos: { label: 'Consumos', parent: 'Movimientos' },
-          stock: { label: 'Stock', parent: 'Consultas' },
-          reportes: { label: 'Reportes', parent: 'Consultas' },
-          usuarios: { label: 'Usuarios', parent: 'Administración' },
-          logs: { label: 'Logs', parent: 'Administración' },
-          auditoria: { label: 'Auditoría', parent: 'Administración' },
-          roles: { label: 'Roles y Permisos', parent: 'Administración' },
-          configuracion: { label: 'Configuración', parent: 'Administración' },
-        };
-
-      if (sectionMap[section]) {
-        if (sectionMap[section].parent) {
-          this.breadcrumbItems.push({
-            label: sectionMap[section].parent,
-            styleClass: 'breadcrumb-parent',
-          });
-        }
-        this.breadcrumbItems.push({
-          label: sectionMap[section].label,
-          styleClass: 'breadcrumb-current',
-        });
-      }
-    }
-  }
 
   private cargarAlertas(): void {
     this.dashboardService.getAlertasDashboard().subscribe({
