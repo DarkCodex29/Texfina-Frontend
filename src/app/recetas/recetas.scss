@@ -1,46 +1,8 @@
 // ============================================================================
-// RECETAS - SISTEMA DE COLORES TEXFINA OBLIGATORIO
+// RECETAS - MIGRADO A PRIME DATA TABLE
 // ============================================================================
 
-:root {
-  --texfina-primary: #bd2126;
-  --texfina-secondary: #121e66;
-  --texfina-neutral: #989594;
-  --texfina-success: #16a34a;
-  --texfina-border-light: #e5e7eb;
-  --texfina-text-primary: #111827;
-  --texfina-text-muted: #6b7280;
-  --texfina-primary-bg: #fef2f2;
-  --texfina-secondary-bg: #f1f5f9;
-  --texfina-neutral-bg: #f8fafc;
-
-  --texfina-spacing-xs: clamp(0.125rem, 0.5vw, 0.25rem);
-  --texfina-spacing-sm: clamp(0.25rem, 1vw, 0.5rem);
-  --texfina-spacing-md: clamp(0.5rem, 1.5vw, 0.75rem);
-  --texfina-spacing-lg: clamp(0.75rem, 2vw, 1rem);
-  --texfina-spacing-xl: clamp(1rem, 2.5vw, 1.25rem);
-  --texfina-spacing-2xl: clamp(1.25rem, 3vw, 1.5rem);
-
-  --spacing-xs: clamp(0.125rem, 0.5vw, 0.25rem);
-  --spacing-sm: clamp(0.25rem, 1vw, 0.5rem);
-  --spacing-md: clamp(0.5rem, 1.5vw, 0.75rem);
-  --spacing-lg: clamp(0.75rem, 2vw, 1rem);
-  --spacing-xl: clamp(1rem, 2.5vw, 1.25rem);
-
-  --texfina-radius-sm: 4px;
-  --texfina-radius-md: 8px;
-  --texfina-radius-lg: 12px;
-  --texfina-font-size-xs: 12px;
-  --texfina-font-size-sm: 14px;
-  --texfina-font-size-base: 16px;
-  --texfina-font-size-lg: 18px;
-  --texfina-font-size-xl: 20px;
-  --texfina-font-size-2xl: 24px;
-  --texfina-bg-primary: #ffffff;
-  --texfina-bg-secondary: #f9fafb;
-  --texfina-bg-tertiary: #f3f4f6;
-  --texfina-border-medium: #d1d5db;
-}
+/* Usando estilos globales de Texfina - sin estilos locales que interfieran */
 
 // ============================================================================
 // DROPDOWN EXPORTAR OBLIGATORIO CON RESPONSIVE
@@ -114,211 +76,56 @@
 }
 
 // ============================================================================
-// FILTROS - ALTURA NORMALIZADA
+// HEADER ACTIONS RESPONSIVE OBLIGATORIO
 // ============================================================================
 
-.filters-card {
-  background: var(--surface-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-
-  .filters-header {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    user-select: none;
-    border-bottom: 1px solid var(--border-color);
-
-    .filters-title {
-      gap: var(--spacing-sm);
-      color: var(--text-primary);
-      font-size: var(--font-size-lg);
-    }
-  }
-
-  .filters-content {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: var(--background-subtle);
-  }
-
-  .simple-input {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border: 1px solid var(--border-color);
-    background: var(--surface-color);
-    color: var(--text-primary);
-
-    &:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px var(--primary-color-alpha);
-    }
-  }
-}
-
-// ============================================================================
-// FILTROS CARD OBLIGATORIO
-// ============================================================================
-
-.filters-card {
-  .filters-content {
-    padding: var(--spacing-md) var(--spacing-lg) !important;
-
-    @media (max-width: 768px) {
-      padding: var(--spacing-sm) var(--spacing-md) !important;
-    }
-  }
-
-  .simple-input {
-    height: 44px !important;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    padding-right: calc(var(--spacing-md) + 80px) !important;
-
-    @media (max-width: 768px) {
-      height: 40px !important;
-      padding: var(--spacing-xs) var(--spacing-sm) !important;
-      padding-right: calc(var(--spacing-sm) + 70px) !important;
-    }
-  }
-
-  .btn-limpiar {
-    height: calc(100% - 8px) !important;
-    padding: var(--spacing-xs) var(--spacing-sm) !important;
-
-    @media (max-width: 768px) {
-      height: calc(100% - 6px) !important;
-      padding: var(--spacing-xs) !important;
-    }
-  }
-}
-
-// ============================================================================
-// ESTILOS ESPECÍFICOS DE RECETAS
-// ============================================================================
-
-.receta-cell {
-  .receta-name {
-    font-weight: 600;
-    line-height: 1.2;
-    color: var(--texfina-text-primary);
-  }
-
-  .receta-class {
-    font-size: var(--texfina-font-size-xs);
-    line-height: 1.2;
-    margin-top: 2px;
-    color: var(--texfina-text-muted);
-  }
-}
-
-.btn-action {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--texfina-radius-md);
-  border: none;
-  cursor: pointer;
+.header-actions {
   display: flex;
+  gap: var(--texfina-spacing-md);
   align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  flex-wrap: nowrap;
 
-  &.btn-view {
-    background-color: var(--texfina-secondary-bg);
-    color: var(--texfina-secondary);
-
-    &:hover {
-      background-color: var(--texfina-secondary);
-      color: white;
-    }
-  }
-
-  &.btn-edit {
-    background-color: #dcfce7;
-    color: var(--texfina-success);
-
-    &:hover {
-      background-color: var(--texfina-success);
-      color: white;
-    }
-  }
-}
-
-// ============================================================================
-// FILTROS POR COLUMNA
-// ============================================================================
-
-.header-filters {
-  background: var(--texfina-bg-tertiary);
-  border-top: 1px solid var(--texfina-border-light);
-  padding: var(--texfina-spacing-sm) 0;
-}
-
-.column-filter-input {
-  width: 100%;
-  border: 1px solid var(--texfina-border-light);
-  border-radius: var(--texfina-radius-sm);
-  background: var(--texfina-bg-primary);
-  padding: var(--texfina-spacing-sm) 12px;
-  margin: 0 4px;
-  font-size: var(--texfina-font-size-xs);
-  color: var(--texfina-text-primary);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-secondary);
-    box-shadow: 0 0 0 2px rgba(18, 30, 102, 0.1);
-  }
-
-  &::placeholder {
-    color: var(--text-muted);
-    font-size: var(--texfina-font-size-xs);
-  }
-}
-
-.btn-clear-column-filters {
-  min-width: 140px !important;
-  height: 40px !important;
-  border-radius: var(--texfina-radius-md) !important;
-  border: 2px solid var(--texfina-primary) !important;
-  background: var(--texfina-bg-primary) !important;
-  color: var(--texfina-primary) !important;
-  cursor: pointer;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
-  font-weight: 500;
-  font-size: var(--texfina-font-size-xs);
-  padding: 0 16px;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: var(--texfina-primary) !important;
-    color: white !important;
-  }
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-primary);
-    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
-  }
-
+  // MÓVIL: Reorganizar botones
   @media (max-width: 768px) {
-    width: 100% !important;
-    min-width: auto !important;
+    flex-direction: column;
+    gap: var(--texfina-spacing-sm);
+    width: 100%;
+
+    .btn-texfina {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .dropdown-export {
+      width: 100%;
+
+      .dropdown-trigger {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  // MÓVIL PEQUEÑO: Stack vertical
+  @media (max-width: 480px) {
+    gap: var(--texfina-spacing-xs);
+
+    .btn-texfina {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
   }
 }
 
-/* COMPONENTE RECETAS SCSS - ALINEADO CON REGLA DE ORO TEXFINA */
-/* Utilidades - para centrar texto y elementos */
-.text-center {
-  text-align: center;
-}
-.flex-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
+.page-header {
+  // MÓVIL: Header en columna
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-lg);
+    align-items: stretch;
+
+    .header-content {
+      text-align: center;
+    }
+  }
 }

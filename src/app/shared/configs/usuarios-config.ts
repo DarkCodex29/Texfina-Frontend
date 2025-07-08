@@ -7,6 +7,10 @@ import {
   CampoDetalle,
 } from '../dialogs/detalle-dialog/detalle-dialog.component';
 import { ConfiguracionConfirmacion } from '../dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import {
+  TableColumn,
+  TableAction,
+} from '../components/prime-data-table/prime-data-table.component';
 
 export class UsuariosConfig {
   static getConfiguracionFormulario(
@@ -169,5 +173,93 @@ export class UsuariosConfig {
       textoBotonConfirmar: 'Eliminar',
       textoBotonCancelar: 'Cancelar',
     };
+  }
+
+  static getTableColumns(): TableColumn[] {
+    return [
+      {
+        key: 'id_usuario',
+        title: 'ID',
+        sortable: true,
+        filterable: true,
+        width: '80px',
+        type: 'badge',
+        align: 'center',
+        visible: true,
+      },
+      {
+        key: 'username',
+        title: 'Usuario',
+        sortable: true,
+        filterable: true,
+        width: '200px',
+        type: 'text',
+        align: 'left',
+        visible: true,
+      },
+      {
+        key: 'email',
+        title: 'Email',
+        sortable: true,
+        filterable: true,
+        width: '250px',
+        type: 'text',
+        align: 'left',
+        visible: true,
+      },
+      {
+        key: 'id_rol',
+        title: 'Rol',
+        sortable: true,
+        filterable: true,
+        width: '150px',
+        type: 'badge',
+        align: 'center',
+        visible: true,
+      },
+      {
+        key: 'activo',
+        title: 'Estado',
+        sortable: true,
+        filterable: true,
+        width: '120px',
+        type: 'badge',
+        align: 'center',
+        visible: true,
+      },
+      {
+        key: 'last_login',
+        title: 'Último Acceso',
+        sortable: true,
+        filterable: true,
+        width: '150px',
+        type: 'date',
+        align: 'center',
+        visible: true,
+      },
+    ];
+  }
+
+  static getTableActions(): TableAction[] {
+    return [
+      {
+        action: 'view',
+        tooltip: 'Ver Detalles',
+        icon: 'pi pi-eye',
+        color: 'primary',
+      },
+      {
+        action: 'edit',
+        tooltip: 'Editar',
+        icon: 'pi pi-pencil',
+        color: 'success',
+      },
+      {
+        action: 'delete',
+        tooltip: 'Eliminar',
+        icon: 'pi pi-trash',
+        color: 'danger',
+      },
+    ];
   }
 }

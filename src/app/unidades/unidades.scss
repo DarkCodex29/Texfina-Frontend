@@ -2,23 +2,7 @@
 // UNIDADES - MIGRADO A PRIME DATA TABLE
 // ============================================================================
 
-:host {
-  --texfina-primary: #bd2126;
-  --texfina-secondary: #121e66;
-  --texfina-neutral: #989594;
-  --texfina-success: #16a34a;
-  --texfina-border-light: #e5e7eb;
-  --texfina-text-primary: #111827;
-  --texfina-text-muted: #6b7280;
-  --texfina-primary-bg: #fef2f2;
-  --texfina-secondary-bg: #f1f5f9;
-  --texfina-neutral-bg: #f8fafc;
-}
-
-.page-container {
-  min-height: 100vh;
-  background-color: var(--color-background);
-}
+/* Usando estilos globales de Texfina - sin estilos locales que interfieran */
 
 // ============================================================================
 // DROPDOWN EXPORTAR OBLIGATORIO CON RESPONSIVE

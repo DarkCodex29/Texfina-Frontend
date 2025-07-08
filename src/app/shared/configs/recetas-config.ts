@@ -1,6 +1,20 @@
+import {
+  CampoFormulario,
+  ConfiguracionFormulario,
+} from '../dialogs/formulario-dialog/formulario-dialog.component';
+import {
+  CampoDetalle,
+  ConfiguracionDetalle,
+} from '../dialogs/detalle-dialog/detalle-dialog.component';
+import {
+  TableColumn,
+  TableAction,
+} from '../components/prime-data-table/prime-data-table.component';
+
 export interface Receta {
   id_receta?: number;
   nombre: string;
+  descripcion?: string;
   detalles?: RecetaDetalle[];
   created_at?: Date;
   updated_at?: Date;
@@ -17,6 +31,139 @@ export interface RecetaDetalle {
     id_insumo?: number;
     nombre?: string;
   };
+}
+
+export class RecetasConfig {
+  static getConfiguracionFormulario(
+    esEdicion: boolean,
+    datosIniciales?: any
+  ): ConfiguracionFormulario {
+    return {
+      titulo: {
+        agregar: 'Registrar Receta',
+        editar: 'Editar Receta',
+      },
+      entidad: 'Receta',
+      entidadArticulo: 'una receta',
+      esEdicion: esEdicion,
+      datosIniciales: datosIniciales,
+      filas: [
+        [
+          {
+            key: 'nombre',
+            label: 'Nombre de la Receta',
+            tipo: 'text',
+            placeholder: 'Ej: Mezcla Base Texfina',
+            maxLength: 200,
+            obligatorio: true,
+          },
+        ],
+        [
+          {
+            key: 'descripcion',
+            label: 'Descripción',
+            tipo: 'textarea',
+            placeholder: 'Descripción opcional de la receta...',
+            maxLength: 500,
+            obligatorio: false,
+          },
+        ],
+      ],
+    };
+  }
+
+  static getConfiguracionDetalle(datos: any): ConfiguracionDetalle {
+    return {
+      entidad: 'Receta',
+      entidadArticulo: 'de la receta',
+      datos: datos,
+      filas: [
+        [
+          {
+            key: 'id_receta',
+            label: 'Código',
+            tipo: 'text',
+            ancho: 'normal',
+          },
+          {
+            key: 'nombre',
+            label: 'Nombre',
+            tipo: 'text',
+            ancho: 'normal',
+          },
+        ],
+        [
+          {
+            key: 'descripcion',
+            label: 'Descripción',
+            tipo: 'textarea',
+            ancho: 'completo',
+          },
+        ],
+      ],
+    };
+  }
+
+  static getTableColumns(): TableColumn[] {
+    return [
+      {
+        key: 'id_receta',
+        title: 'Código',
+        sortable: true,
+        filterable: true,
+        width: '120px',
+        type: 'badge',
+        align: 'center',
+        visible: true,
+      },
+      {
+        key: 'nombre',
+        title: 'Nombre',
+        sortable: true,
+        filterable: true,
+        type: 'description',
+        align: 'left',
+        visible: true,
+      },
+      {
+        key: 'ingredientes',
+        title: 'Ingredientes',
+        sortable: false,
+        filterable: false,
+        width: '130px',
+        type: 'number',
+        align: 'center',
+        visible: true,
+      },
+      {
+        key: 'estado',
+        title: 'Estado',
+        sortable: false,
+        filterable: true,
+        width: '120px',
+        type: 'badge',
+        align: 'center',
+        visible: true,
+      },
+    ];
+  }
+
+  static getTableActions(): TableAction[] {
+    return [
+      {
+        icon: 'pi pi-eye',
+        tooltip: 'Ver detalle',
+        action: 'view',
+        color: 'secondary',
+      },
+      {
+        icon: 'pi pi-pencil',
+        tooltip: 'Editar',
+        action: 'edit',
+        color: 'primary',
+      },
+    ];
+  }
 }
 
 export const RECETAS_CONFIG = {

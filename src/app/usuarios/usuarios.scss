@@ -1,539 +1,92 @@
-/* ===== LAYOUT OVERRIDES ELIMINADOS USUARIOS ===== */
-/* Se eliminan definiciones locales de .page-container, .page-content, .page-header y .header-actions */
-
-// Variables CSS específicas de Texfina
-:root {
-  --texfina-primary: #bd2126;
-  --texfina-secondary: #121e66;
-  --texfina-neutral: #989594;
-  --texfina-success: #16a34a;
-  --texfina-border-light: #e5e7eb;
-  --texfina-text-primary: #111827;
-  --texfina-text-muted: #6b7280;
-  --texfina-primary-bg: #fef2f2;
-  --texfina-secondary-bg: #f1f5f9;
-  --texfina-neutral-bg: #f8fafc;
-  --texfina-spacing-xs: 0.25rem;
-  --texfina-spacing-sm: 0.5rem;
-  --texfina-spacing-md: 0.75rem;
-  --texfina-spacing-lg: 1rem;
-  --texfina-spacing-xl: 1.5rem;
-  --texfina-spacing-xxl: 2rem;
-  --texfina-radius-sm: 0.25rem;
-  --texfina-radius-md: 0.375rem;
-  --texfina-radius-lg: 0.5rem;
-  --texfina-font-size-xs: 0.75rem;
-  --texfina-font-size-sm: 0.875rem;
-  --texfina-font-size-md: 1rem;
-  --texfina-font-size-lg: 1.125rem;
-  --texfina-font-size-xl: 1.25rem;
-  --texfina-font-size-xxl: 1.5rem;
-}
-
-// Estructura principal de página
-.page-container {
-  padding: var(--texfina-spacing-lg) !important;
-  background-color: var(--texfina-bg-secondary) !important;
-}
-
-.page-content {
-  padding: 0 !important;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--texfina-spacing-lg) !important;
-  background-color: var(--texfina-bg-primary) !important;
-  border: 1px solid var(--texfina-border-light) !important;
-  box-shadow: var(--texfina-shadow-md) !important;
-  border-radius: var(--texfina-radius-lg) !important;
-  margin-bottom: var(--texfina-spacing-lg) !important;
-  align-items: center !important;
-}
-
-.page-title {
-  font-size: var(--texfina-font-size-3xl) !important;
-  margin: 0 !important;
-  /* color eliminado para respetar clases de título */
-}
-
-.page-subtitle {
-  margin: 0;
-  font-size: var(--texfina-font-size-md);
-  color: var(--texfina-text-muted);
-}
-
-// Header actions
-.header-actions {
-  display: flex !important;
-  gap: var(--texfina-spacing-md) !important;
-  align-items: center !important;
-}
-
-// Estilos de botones Texfina
-.btn-texfina {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--texfina-spacing-sm);
-  padding: 12px var(--texfina-spacing-xl);
-  border-radius: var(--texfina-radius-md);
-  font-size: var(--texfina-font-size-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  border: none;
-  outline: none;
-
-  &.btn-primary {
-    background: var(--texfina-primary);
-    color: white;
-
-    &:hover {
-      background: #a01d22;
-    }
-  }
-
-  &.btn-secondary {
-    background: var(--texfina-secondary);
-    color: white;
-
-    &:hover {
-      background: #0f1a5a;
-    }
-  }
-
-  &.btn-neutral {
-    background: var(--texfina-neutral);
-    color: white;
-
-    &:hover {
-      background: #7a7876;
-    }
-  }
-
-  &.btn-success {
-    background: var(--texfina-success);
-    color: white;
-
-    &:hover {
-      background: #059330;
-    }
-  }
-}
-
-/* COMPONENTE USUARIOS SCSS - ALINEADO CON REGLA DE ORO TEXFINA */
-/* Utilidades - para centrar texto y elementos */
-.text-center {
-  text-align: center;
-}
-.flex-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-
 // ============================================================================
-// FILTROS - ALTURA NORMALIZADA
+// USUARIOS - MIGRADO A PRIME DATA TABLE
 // ============================================================================
 
-.filters-card {
-  .filters-content {
-    padding: var(--spacing-md) var(--spacing-lg) !important;
-
-    @media (max-width: 768px) {
-      padding: var(--spacing-sm) var(--spacing-md) !important;
-    }
-  }
-
-  .simple-input {
-    height: 44px !important;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    padding-right: calc(var(--spacing-md) + 80px) !important;
-
-    @media (max-width: 768px) {
-      height: 40px !important;
-      padding: var(--spacing-xs) var(--spacing-sm) !important;
-      padding-right: calc(var(--spacing-sm) + 70px) !important;
-    }
-  }
-
-  .btn-limpiar {
-    height: calc(100% - 8px) !important;
-    padding: var(--spacing-xs) var(--spacing-sm) !important;
-
-    @media (max-width: 768px) {
-      height: calc(100% - 6px) !important;
-      padding: var(--spacing-xs) !important;
-    }
-  }
-}
+/* Usando estilos globales de Texfina - sin estilos locales que interfieran */
 
 // ============================================================================
-// HEADER DE TABLA - CORREGIR ALINEAMIENTO PARA 7 COLUMNAS
+// DROPDOWN EXPORTAR OBLIGATORIO CON RESPONSIVE
 // ============================================================================
 
-.table-with-headers {
-  .column-headers {
-    .header-row {
-      display: grid;
-      grid-template-columns:
-        minmax(80px, 0.8fr) /* id */
-        minmax(120px, 1.2fr) /* username */
-        minmax(180px, 1.8fr) /* email */
-        minmax(120px, 1.1fr) /* rol */
-        minmax(100px, 1fr) /* tipo */
-        minmax(90px, 0.9fr) /* estado */
-        minmax(120px, 1fr); /* acciones */
-      gap: 8px;
-      align-items: center;
-
-      @media (max-width: 1200px) {
-        grid-template-columns: 0.8fr 1.2fr 1.6fr 1.1fr 1fr 0.9fr 1fr;
-      }
-
-      @media (max-width: 768px) {
-        grid-template-columns: 0.6fr 1fr 1.4fr 1fr 0.8fr 0.7fr 1fr;
-        gap: 4px;
-      }
-    }
-  }
-}
-
-.data-table {
-  .mat-mdc-row {
-    display: grid !important;
-    grid-template-columns:
-      minmax(80px, 0.8fr) /* id */
-      minmax(120px, 1.2fr) /* username */
-      minmax(180px, 1.8fr) /* email */
-      minmax(120px, 1.1fr) /* rol */
-      minmax(100px, 1fr) /* tipo */
-      minmax(90px, 0.9fr) /* estado */
-      minmax(120px, 1fr); /* acciones */
-    gap: 8px;
-    align-items: center;
-
-    @media (max-width: 1200px) {
-      grid-template-columns: 0.8fr 1.2fr 1.6fr 1.1fr 1fr 0.9fr 1fr;
-    }
-
-    @media (max-width: 768px) {
-      grid-template-columns: 0.6fr 1fr 1.4fr 1fr 0.8fr 0.7fr 1fr;
-      gap: 4px;
-    }
-  }
-
-  .mat-mdc-cell {
-    border: none !important;
-    padding: var(--spacing-sm) var(--spacing-xs) !important;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @media (max-width: 768px) {
-      font-size: 13px;
-      padding: var(--spacing-xs) 2px !important;
-    }
-  }
-}
-
-// ============================================================================
-// CELDAS ESPECÍFICAS DE USUARIOS
-// ============================================================================
-
-.usuario-cell {
-  .usuario-name {
-    font-weight: 600;
-    color: var(--texfina-text-primary);
-    font-size: 14px;
-  }
-
-  @media (max-width: 768px) {
-    .usuario-name {
-      font-size: 12px;
-    }
-  }
-}
-
-.email-cell {
-  color: var(--texfina-text-muted);
-  font-size: 13px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  @media (max-width: 768px) {
-    font-size: 11px;
-  }
-}
-
-.tipo-cell {
-  color: var(--texfina-text-muted);
-  font-size: 13px;
-
-  @media (max-width: 768px) {
-    font-size: 11px;
-  }
-}
-
-// ============================================================================
-// BADGES DE ESTADO
-// ============================================================================
-
-.badge-texfina {
+.dropdown-export {
+  position: relative;
   display: inline-block;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  text-align: center;
-  white-space: nowrap;
 
-  &.badge-neutral {
-    background: var(--texfina-neutral-bg);
-    color: var(--texfina-neutral);
+  .dropdown-trigger {
+    cursor: pointer;
   }
 
-  &.badge-secondary {
-    background: var(--texfina-secondary-bg);
-    color: var(--texfina-secondary);
-  }
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid var(--texfina-border-light);
+    border-radius: var(--texfina-radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    min-width: 160px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
 
-  &.badge-success {
-    background: #d1fae5;
-    color: #065f46;
-  }
-
-  &.badge-error {
-    background: #fee2e2;
-    color: #991b1b;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 10px;
-    padding: 2px 6px;
-  }
-}
-
-// ============================================================================
-// BOTONES DE ACCIÓN
-// ============================================================================
-
-.action-buttons {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-
-  @media (max-width: 768px) {
-    gap: 2px;
-  }
-}
-
-.btn-action {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-
-  &.btn-view {
-    background-color: var(--texfina-secondary-bg);
-    color: var(--texfina-secondary);
-
-    &:hover {
-      background-color: var(--texfina-secondary);
-      color: white;
+    &.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
     }
-  }
 
-  &.btn-edit {
-    background-color: var(--texfina-success-bg, #d1fae5);
-    color: var(--texfina-success);
-
-    &:hover {
-      background-color: var(--texfina-success);
-      color: white;
-    }
-  }
-
-  &.btn-delete {
-    background-color: #fee2e2;
-    color: #dc2626;
-
-    &:hover {
-      background-color: #dc2626;
-      color: white;
-    }
-  }
-
-  @media (max-width: 768px) {
-    width: 28px;
-    height: 28px;
-
-    mat-icon {
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
       font-size: 14px;
-      width: 14px;
-      height: 14px;
+      color: var(--texfina-text-primary);
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: var(--texfina-secondary-bg);
+        color: var(--texfina-secondary);
+      }
+
+      &:first-child {
+        border-radius: var(--texfina-radius-md) var(--texfina-radius-md) 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 0 var(--texfina-radius-md) var(--texfina-radius-md);
+      }
+    }
+  }
+
+  // MÓVIL: Dropdown de ancho completo
+  @media (max-width: 768px) {
+    .dropdown-menu {
+      left: 0;
+      right: 0;
+      min-width: 100%;
+      width: 100%;
     }
   }
 }
 
 // ============================================================================
-// FILTROS POR COLUMNA
+// HEADER ACTIONS RESPONSIVE OBLIGATORIO
 // ============================================================================
 
-.header-filters {
-  background: var(--texfina-bg-muted, #f8fafc);
-  border-top: 1px solid var(--texfina-border, #e5e7eb);
-  padding: 8px 0;
-}
-
-.column-filter-input {
-  width: 100%;
-  border: 1px solid var(--texfina-border, #e5e7eb);
-  border-radius: 6px;
-  background: white;
-  padding: 6px 8px;
-  margin: 0 4px;
-  font-size: 12px;
-  color: var(--texfina-text-primary);
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-secondary);
-    box-shadow: 0 0 0 2px rgba(18, 30, 102, 0.1);
-  }
-
-  &::placeholder {
-    color: var(--texfina-text-muted);
-    font-size: 11px;
-  }
-
-  @media (max-width: 768px) {
-    padding: 4px 6px;
-    font-size: 11px;
-    margin: 0 2px;
-  }
-}
-
-.btn-clear-column-filters {
-  min-width: 120px !important;
-  height: 40px !important;
-  border-radius: 8px !important;
-  border: 2px solid var(--texfina-primary) !important;
-  background: linear-gradient(135deg, white, #fef7f7) !important;
-  color: var(--texfina-primary) !important;
-  cursor: pointer;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 2px 4px rgba(189, 33, 38, 0.1);
-  font-weight: 500;
-  font-size: 12px;
-  padding: 0 16px;
-  white-space: nowrap;
-
-  &:focus {
-    outline: none;
-    border-color: var(--texfina-primary);
-    box-shadow: 0 0 0 3px rgba(189, 33, 38, 0.1);
-  }
-
-  @media (max-width: 768px) {
-    width: 100% !important;
-    min-width: auto !important;
-    font-size: 11px;
-    height: 36px !important;
-  }
-}
-
-// Estados de la tabla
-.error-state,
-.empty-state,
-.filtered-empty-state {
+.header-actions {
   display: flex;
-  flex-direction: column;
+  gap: var(--texfina-spacing-md);
   align-items: center;
-  justify-content: center;
-  padding: var(--texfina-spacing-xxl);
-  text-align: center;
+  flex-wrap: nowrap;
 
-  .error-icon,
-  .empty-icon,
-  .filtered-empty-icon {
-    font-size: 64px;
-    color: var(--texfina-text-muted);
-    margin-bottom: var(--texfina-spacing-lg);
-  }
-
-  .error-title,
-  .empty-title,
-  .filtered-empty-title {
-    margin: 0 0 var(--texfina-spacing-sm) 0;
-    font-size: var(--texfina-font-size-xl);
-    font-weight: 600;
-  }
-
-  .error-subtitle,
-  .empty-subtitle,
-  .filtered-empty-subtitle {
-    margin: 0 0 var(--texfina-spacing-lg) 0;
-    font-size: var(--texfina-font-size-md);
-    color: var(--texfina-text-muted);
-  }
-}
-
-.pagination-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--texfina-spacing-md) var(--texfina-spacing-lg);
-  background-color: var(--texfina-bg-secondary);
-  border-top: 1px solid var(--texfina-border-light);
-
-  .pagination-info {
-    font-size: var(--texfina-font-size-sm);
-    font-weight: 500;
-  }
-
-  .pagination-buttons {
-    display: flex;
-    gap: var(--texfina-spacing-xs);
-  }
-}
-
-// Responsive design
-@media (max-width: 768px) {
-  .page-content {
-    padding: var(--texfina-spacing-lg);
-  }
-
-  .page-header {
-    flex-direction: column;
-    gap: var(--texfina-spacing-lg);
-    align-items: stretch;
-
-    .header-content {
-      text-align: center;
-    }
-  }
-
-  .header-actions {
+  // MÓVIL: Reorganizar botones
+  @media (max-width: 768px) {
     flex-direction: column;
     gap: var(--texfina-spacing-sm);
     width: 100%;
@@ -550,68 +103,11 @@
         width: 100%;
         justify-content: center;
       }
-
-      .dropdown-menu {
-        left: 0;
-        right: 0;
-        min-width: 100%;
-        width: 100%;
-      }
     }
   }
 
-  .data-table {
-    .mat-column-email,
-    .mat-column-id_tipo_usuario,
-    .mat-column-last_login {
-      display: none;
-    }
-  }
-
-  .filtros-row {
-    flex-direction: column;
-
-    .filtro-field {
-      min-width: 100%;
-    }
-
-    .filtro-buttons {
-      width: 100%;
-      justify-content: center;
-      margin-bottom: 0;
-    }
-  }
-
-  .table-with-headers {
-    .table-container {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-
-      &::-webkit-scrollbar {
-        height: 6px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--texfina-primary);
-        border-radius: 10px;
-      }
-    }
-
-    .column-headers,
-    .data-table {
-      min-width: 950px;
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .header-actions {
+  // MÓVIL PEQUEÑO: Stack vertical
+  @media (max-width: 480px) {
     gap: var(--texfina-spacing-xs);
 
     .btn-texfina {
@@ -619,55 +115,17 @@
       font-size: 13px;
     }
   }
-
-  .btn-action {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    padding: 0 !important;
-
-    mat-icon {
-      font-size: 16px !important;
-      width: 16px !important;
-      height: 16px !important;
-    }
-  }
-
-  .action-buttons {
-    gap: 4px !important;
-  }
-}
-
-/* === OVERRIDES FINALES PARA UNIFICAR LAYOUT TEXFINA === */
-.page-container {
-  padding: var(--texfina-spacing-lg) !important;
-  background-color: var(--texfina-bg-secondary) !important;
-}
-
-.page-content {
-  padding: 0 !important;
 }
 
 .page-header {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--texfina-spacing-lg) !important;
-  background-color: var(--texfina-bg-primary) !important;
-  border: 1px solid var(--texfina-border-light) !important;
-  box-shadow: var(--texfina-shadow-md) !important;
-  border-radius: var(--texfina-radius-lg) !important;
-  margin-bottom: var(--texfina-spacing-lg) !important;
-  align-items: center !important;
-}
+  // MÓVIL: Header en columna
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--texfina-spacing-lg);
+    align-items: stretch;
 
-.page-title {
-  font-size: var(--texfina-font-size-3xl) !important;
-  margin: 0 !important;
-  /* color eliminado para respetar clases de título */
-}
-
-.header-actions {
-  display: flex !important;
-  gap: var(--texfina-spacing-md) !important;
-  align-items: center !important;
+    .header-content {
+      text-align: center;
+    }
+  }
 }

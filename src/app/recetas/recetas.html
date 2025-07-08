@@ -7,303 +7,51 @@
         <h1 class="page-title text-texfina text-primary">Recetas</h1>
       </div>
       <div class="header-actions">
-        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
-          Carga Masiva
-        </button>
+        <!-- Dropdown de Exportar -->
         <div class="dropdown-export">
           <button
             class="btn-texfina btn-neutral dropdown-trigger"
             (click)="toggleDropdownExport()"
+            [class.active]="dropdownExportAbierto"
+            matTooltip="Exportar listado de recetas"
           >
             Exportar
           </button>
-          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+
+          <div
+            class="dropdown-menu"
+            [class.show]="dropdownExportAbierto"
+            (click)="$event.stopPropagation()"
+          >
             <button class="dropdown-item" (click)="exportarExcel()">
-              Exportar a Excel
+              <span>Exportar a Excel</span>
             </button>
             <button class="dropdown-item" (click)="exportarPDF()">
-              Exportar a PDF
+              <span>Exportar a PDF</span>
             </button>
           </div>
         </div>
-        <button class="btn-texfina btn-primary" (click)="agregar()">
-          Agregar Receta
-        </button>
       </div>
     </div>
 
-    <!-- Filtro General -->
-    <div class="filters-card">
-      <div class="filters-content">
-        <form [formGroup]="filtroGeneralForm" class="filters-form">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <input
-                  class="simple-input"
-                  formControlName="busquedaGeneral"
-                  placeholder="Buscar en código, nombre..."
-                  type="text"
-                />
-                <button
-                  class="btn-limpiar"
-                  type="button"
-                  (click)="limpiarFiltroGeneral()"
-                  matTooltip="Limpiar búsqueda"
-                >
-                  Limpiar
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Tabla de recetas -->
+    <!-- Tabla de recetas con PrimeDataTable -->
     <div class="table-card">
-      <div class="table-with-headers">
-        <!-- Encabezados de columnas con filtros integrados -->
-        <div class="column-headers">
-          <!-- Fila de títulos -->
-          <div class="header-row header-titles">
-            <div class="header-col id-col" (click)="sortData('id_receta')">
-              <span>Código Receta</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col nombre-col" (click)="sortData('nombre')">
-              <span>Nombre</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div
-              class="header-col ingredientes-col"
-              (click)="sortData('ingredientes')"
-            >
-              <span>Ingredientes</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col estado-col" (click)="sortData('estado')">
-              <span>Estado</span>
-              <mat-icon class="sort-icon">unfold_more</mat-icon>
-            </div>
-            <div class="header-col acciones-col">
-              <span>ACCIONES</span>
-            </div>
-          </div>
-
-          <!-- Fila de filtros por columna -->
-          <div
-            class="header-row header-filters"
-            *ngIf="filtrosColumnaHabilitados"
-            [formGroup]="filtrosColumnaForm"
-          >
-            <div class="header-col id-col">
-              <input
-                class="column-filter-input"
-                formControlName="codigoReceta"
-                placeholder="Código..."
-                type="text"
-              />
-            </div>
-            <div class="header-col nombre-col">
-              <input
-                class="column-filter-input"
-                formControlName="nombre"
-                placeholder="Nombre..."
-                type="text"
-              />
-            </div>
-            <div class="header-col ingredientes-col">
-              <input
-                class="column-filter-input"
-                formControlName="ingredientes"
-                placeholder="Nº ingredientes..."
-                type="number"
-                step="1"
-              />
-            </div>
-            <div class="header-col estado-col">
-              <input
-                class="column-filter-input"
-                formControlName="estado"
-                placeholder="Estado..."
-                type="text"
-              />
-            </div>
-            <div class="header-col acciones-col">
-              <button
-                class="btn-clear-column-filters"
-                type="button"
-                (click)="limpiarFiltrosColumna()"
-                matTooltip="Limpiar filtros de columna"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <!-- Estado de error -->
-          <div *ngIf="hasError" class="error-state">
-            <mat-icon class="error-icon">error_outline</mat-icon>
-            <h3 class="error-title text-texfina text-primary">
-              Error al cargar datos
-            </h3>
-            <p class="error-subtitle text-texfina text-muted">
-              {{ errorMessage }}
-            </p>
-            <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
-              <mat-icon>refresh</mat-icon>
-              Reintentar
-            </button>
-          </div>
-
-          <!-- Estado vacío (sin datos) -->
-          <div *ngIf="isEmpty" class="empty-state">
-            <mat-icon class="empty-icon">receipt</mat-icon>
-            <h3 class="empty-title text-texfina text-primary">
-              No hay recetas registradas
-            </h3>
-            <p class="empty-subtitle text-texfina text-muted">
-              Comienza agregando tu primera receta para gestionar formulaciones
-            </p>
-            <button class="btn-texfina btn-primary" (click)="agregar()">
-              <mat-icon>add</mat-icon>
-              Agregar Primera Receta
-            </button>
-          </div>
-
-          <!-- Estado filtrado vacío -->
-          <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
-            <mat-icon class="filtered-empty-icon">search_off</mat-icon>
-            <h3 class="filtered-empty-title text-texfina text-primary">
-              No se encontraron resultados
-            </h3>
-            <p class="filtered-empty-subtitle text-texfina text-muted">
-              Intenta ajustar los filtros o limpiar la búsqueda
-            </p>
-          </div>
-
-          <!-- Tabla siempre visible (con skeleton o datos) -->
-          <table mat-table [dataSource]="dataSource" matSort class="data-table">
-            <!-- Columna Código Receta -->
-            <ng-container matColumnDef="id_receta">
-              <td mat-cell *matCellDef="let receta" class="table-cell">
-                <span class="badge-texfina badge-neutral">
-                  {{ formatearCodigo(receta.id_receta) || "-" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Nombre -->
-            <ng-container matColumnDef="nombre">
-              <td mat-cell *matCellDef="let receta" class="table-cell">
-                <div class="receta-cell">
-                  <div class="receta-name text-texfina font-medium">
-                    {{ receta.nombre }}
-                  </div>
-                  <div class="receta-class text-texfina text-muted">
-                    {{ receta.descripcion || "Sin descripción" }}
-                  </div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Columna Ingredientes -->
-            <ng-container matColumnDef="ingredientes">
-              <td mat-cell *matCellDef="let receta" class="table-cell">
-                <span class="text-texfina text-secondary">
-                  {{ getIngredientesCount(receta) || "-" }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Estado -->
-            <ng-container matColumnDef="estado">
-              <td mat-cell *matCellDef="let receta" class="table-cell">
-                <span
-                  class="badge-texfina"
-                  [ngClass]="{
-                    'badge-success': getEstadoReceta(receta) === 'Activa',
-                    'badge-warning': getEstadoReceta(receta) === 'Vacía'
-                  }"
-                >
-                  {{ getEstadoReceta(receta) }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Columna Acciones -->
-            <ng-container matColumnDef="acciones">
-              <td
-                mat-cell
-                *matCellDef="let receta"
-                class="table-cell actions-cell"
-              >
-                <div class="action-buttons">
-                  <button
-                    class="btn-action btn-view"
-                    (click)="verDetalle(receta)"
-                    matTooltip="Ver detalle"
-                  >
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                  <button
-                    class="btn-action btn-edit"
-                    (click)="editar(receta)"
-                    matTooltip="Editar"
-                  >
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Filas de datos reales -->
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-          </table>
-
-          <!-- Skeleton superpuesto mientras carga -->
-          <div *ngIf="isLoading" class="skeleton-overlay">
-            <table class="skeleton-table">
-              <tr class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5, 6]">
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                  <div class="skeleton-line skeleton-subtext"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-text"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-badge"></div>
-                </td>
-                <td class="table-cell">
-                  <div class="skeleton-line skeleton-actions"></div>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Paginación -->
-      <div class="table-footer">
-        <div class="pagination-info">
-          <span class="text-texfina text-muted">Página 1 de 10</span>
-        </div>
-        <div class="pagination-controls">
-          <button class="pagination-button" disabled>
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button class="pagination-button">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
-      </div>
+      <app-prime-data-table
+        [columns]="columns"
+        [actions]="actions"
+        [data]="recetas"
+        [loading]="isLoading"
+        [error]="hasError"
+        [errorMessage]="errorMessage"
+        [emptyTitle]="'No hay recetas registradas'"
+        [emptySubtitle]="'Comienza agregando tu primera receta para gestionar formulaciones'"
+        [emptyIcon]="'receipt'"
+        [emptyActionText]="'Agregar Primera Receta'"
+        [buttons]="tableButtons"
+        (actionClick)="onActionClick($event)"
+        (addNewClicked)="agregar()"
+        (buttonClick)="onButtonClick($event)"
+      ></app-prime-data-table>
     </div>
   </div>
 </div>

@@ -616,7 +616,7 @@
   ::ng-deep {
     .p-paginator {
       background: #ffffff;
-      border: 1px solid #e5e7eb;
+      border: none !important;
       border-top: 1px solid #e5e7eb;
       padding: 0.75rem 1rem;
       display: flex;
@@ -756,6 +756,8 @@
   .prime-table-card {
     ::ng-deep {
       .p-paginator {
+        border: none !important;
+        border-top: 1px solid #e5e7eb;
         padding: 0.5rem;
         flex-direction: column;
         gap: 0.5rem;

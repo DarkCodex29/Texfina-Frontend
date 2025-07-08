@@ -1,16 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSortModule } from '@angular/material/sort';
 
 import { MaterialService } from '../services/material.service';
 import {
@@ -29,23 +22,23 @@ import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle
 import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
 import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
 import { UsuariosConfig } from '../shared/configs/usuarios-config';
+import {
+  PrimeDataTableComponent,
+  TableColumn,
+  TableAction,
+  TableButtonConfig,
+} from '../shared/components/prime-data-table/prime-data-table.component';
 
 @Component({
   selector: 'app-usuarios',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatTableModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
+    MatDialogModule,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatDialogModule,
-    MatSortModule,
+    PrimeDataTableComponent,
   ],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.scss',
@@ -54,67 +47,61 @@ export class UsuariosComponent implements OnInit {
   usuarios: Usuario[] = [];
   roles: Rol[] = [];
   tiposUsuario: TipoUsuario[] = [];
-  dataSource = new MatTableDataSource<Usuario>([]);
-
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosColumnaHabilitados = false;
+  
   dropdownExportAbierto = false;
-
   hasError = false;
   errorMessage = '';
-  isEmpty = false;
-  isFilteredEmpty = false;
+  isLoading = false;
 
-  displayedColumns: string[] = [
-    'id_usuario',
-    'username',
-    'email',
-    'id_rol',
-    'id_tipo_usuario',
-    'activo',
-    'acciones',
-  ];
+  columns: TableColumn[] = [];
+  actions: TableAction[] = [];
+  tableButtons: TableButtonConfig[] = [];
 
   constructor(
-    private fb: FormBuilder,
     private materialService: MaterialService,
     private dialog: MatDialog,
     private exportacionService: ExportacionService,
     private cargaMasivaService: CargaMasivaService
   ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
-    this.filtrosColumnaForm = this.fb.group({
-      idUsuario: [''],
-      username: [''],
-      email: [''],
-      idRol: [''],
-      idTipoUsuario: [''],
-      activo: [''],
-      fechaDesde: [''],
-    });
+    this.initializeTable();
   }
 
   ngOnInit(): void {
     this.cargarDatos();
-    this.configurarFiltros();
+  }
+
+  private initializeTable(): void {
+    this.columns = UsuariosConfig.getTableColumns();
+    this.actions = UsuariosConfig.getTableActions();
+    this.tableButtons = [
+      {
+        action: 'add',
+        label: 'Agregar Usuario',
+        icon: 'add',
+        color: 'primary',
+      },
+      {
+        action: 'bulk-upload',
+        label: 'Carga Masiva',
+        icon: 'upload',
+        color: 'secondary',
+      },
+    ];
   }
 
   cargarDatos(): void {
+    this.isLoading = true;
     this.hasError = false;
+    
     this.materialService.getUsuarios().subscribe({
       next: (usuarios) => {
         this.usuarios = usuarios;
-        this.dataSource.data = usuarios;
-        this.isEmpty = usuarios.length === 0;
-        this.isFilteredEmpty = false;
+        this.isLoading = false;
       },
       error: (error) => {
         this.hasError = true;
         this.errorMessage = 'Error al cargar los usuarios. Intente nuevamente.';
+        this.isLoading = false;
         console.error('Error al cargar usuarios:', error);
       },
     });
@@ -128,89 +115,29 @@ export class UsuariosComponent implements OnInit {
     });
   }
 
-  configurarFiltros(): void {
-    this.filtroGeneralForm
-      .get('busquedaGeneral')
-      ?.valueChanges.subscribe((valor) => {
-        this.aplicarFiltroGeneral(valor);
-      });
-
-    this.filtrosColumnaForm.valueChanges.subscribe(() => {
-      this.aplicarFiltrosColumna();
-    });
+  onActionClick(event: { action: string; item: Usuario }): void {
+    switch (event.action) {
+      case 'view':
+        this.verDetalle(event.item);
+        break;
+      case 'edit':
+        this.editar(event.item);
+        break;
+      case 'delete':
+        this.eliminar(event.item);
+        break;
+    }
   }
 
-  aplicarFiltroGeneral(busqueda: string): void {
-    if (!busqueda) {
-      this.dataSource.data = this.usuarios;
-      this.isFilteredEmpty = false;
-      return;
+  onButtonClick(action: string): void {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk-upload':
+        this.cargaMasiva();
+        break;
     }
-
-    const filtrados = this.usuarios.filter(
-      (usuario) =>
-        usuario.id_usuario?.toString().includes(busqueda.toLowerCase()) ||
-        usuario.username?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        usuario.email?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        this.obtenerNombreRol(usuario.id_rol)
-          .toLowerCase()
-          .includes(busqueda.toLowerCase())
-    );
-
-    this.dataSource.data = filtrados;
-    this.isFilteredEmpty = filtrados.length === 0 && this.usuarios.length > 0;
-  }
-
-  aplicarFiltrosColumna(): void {
-    const filtros = this.filtrosColumnaForm.value;
-    let filtrados = this.usuarios;
-
-    if (filtros.idUsuario) {
-      filtrados = filtrados.filter((u) =>
-        u.id_usuario?.toString().includes(filtros.idUsuario)
-      );
-    }
-    if (filtros.username) {
-      filtrados = filtrados.filter((u) =>
-        u.username?.toLowerCase().includes(filtros.username.toLowerCase())
-      );
-    }
-    if (filtros.email) {
-      filtrados = filtrados.filter((u) =>
-        u.email?.toLowerCase().includes(filtros.email.toLowerCase())
-      );
-    }
-    if (filtros.idRol) {
-      filtrados = filtrados.filter((u) => u.id_rol === filtros.idRol);
-    }
-    if (filtros.idTipoUsuario) {
-      filtrados = filtrados.filter(
-        (u) => u.id_tipo_usuario === parseInt(filtros.idTipoUsuario)
-      );
-    }
-    if (filtros.activo !== '') {
-      filtrados = filtrados.filter(
-        (u) => u.activo === (filtros.activo === 'true')
-      );
-    }
-
-    this.dataSource.data = filtrados;
-    this.isFilteredEmpty = filtrados.length === 0 && this.usuarios.length > 0;
-  }
-
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.reset();
-    this.dataSource.data = this.usuarios;
-    this.isFilteredEmpty = false;
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
-    this.aplicarFiltrosColumna();
-  }
-
-  sortData(column: string): void {
-    console.log('Ordenar por:', column);
   }
 
   formatearCodigo(id?: number): string {
@@ -250,30 +177,10 @@ export class UsuariosComponent implements OnInit {
     });
   }
 
-  obtenerFiltrosActivos(): string[] {
-    const filtros: string[] = [];
-    const general = this.filtroGeneralForm.get('busquedaGeneral')?.value;
-    const columna = this.filtrosColumnaForm.value;
-
-    if (general) filtros.push(`Búsqueda: "${general}"`);
-    if (columna.idUsuario) filtros.push(`ID: ${columna.idUsuario}`);
-    if (columna.username) filtros.push(`Usuario: ${columna.username}`);
-    if (columna.email) filtros.push(`Email: ${columna.email}`);
-    if (columna.idRol)
-      filtros.push(`Rol: ${this.obtenerNombreRol(columna.idRol)}`);
-    if (columna.idTipoUsuario)
-      filtros.push(`Tipo: ${this.obtenerNombreTipo(columna.idTipoUsuario)}`);
-    if (columna.activo !== '')
-      filtros.push(
-        `Estado: ${columna.activo === 'true' ? 'Activo' : 'Inactivo'}`
-      );
-
-    return filtros;
-  }
 
   private configurarExportacion(): ConfiguracionExportacion<Usuario> {
     return {
-      entidades: this.dataSource.data,
+      entidades: this.usuarios,
       nombreArchivo: 'usuarios',
       nombreEntidad: 'Usuarios',
       columnas: [
@@ -286,10 +193,10 @@ export class UsuariosComponent implements OnInit {
         { campo: 'created_at', titulo: 'Fecha Creación', formato: 'fecha' },
         { campo: 'last_login', titulo: 'Último Acceso', formato: 'fecha' },
       ],
-      filtrosActivos: this.obtenerFiltrosActivos(),
+      filtrosActivos: [],
       metadatos: {
         cantidadTotal: this.usuarios.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.usuarios.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
       },

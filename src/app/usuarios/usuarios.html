@@ -5,282 +5,51 @@
         <h1 class="page-title text-texfina text-primary">Usuarios</h1>
       </div>
       <div class="header-actions">
-        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
-          Carga Masiva
-        </button>
+        <!-- Dropdown de Exportar -->
         <div class="dropdown-export">
           <button
             class="btn-texfina btn-neutral dropdown-trigger"
             (click)="toggleDropdownExport()"
+            [class.active]="dropdownExportAbierto"
+            matTooltip="Exportar listado de usuarios"
           >
             Exportar
           </button>
-          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+
+          <div
+            class="dropdown-menu"
+            [class.show]="dropdownExportAbierto"
+            (click)="$event.stopPropagation()"
+          >
             <button class="dropdown-item" (click)="exportarExcel()">
-              Exportar a Excel
+              <span>Exportar a Excel</span>
             </button>
             <button class="dropdown-item" (click)="exportarPDF()">
-              Exportar a PDF
-            </button>
-          </div>
-        </div>
-        <button class="btn-texfina btn-primary" (click)="agregar()">
-          Agregar Usuario
-        </button>
-      </div>
-    </div>
-
-    <div class="filters-card">
-      <div class="filters-content">
-        <form [formGroup]="filtroGeneralForm" class="filters-form">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <div class="simple-input-wrapper">
-                <input
-                  class="simple-input"
-                  formControlName="busquedaGeneral"
-                  placeholder="Buscar en ID, usuario, email, rol..."
-                  type="text"
-                />
-                <button
-                  class="btn-limpiar"
-                  type="button"
-                  (click)="limpiarFiltroGeneral()"
-                  matTooltip="Limpiar búsqueda"
-                >
-                  Limpiar
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div class="table-card table-with-headers">
-      <div class="column-headers">
-        <div class="header-row header-titles">
-          <div class="header-col id-col" (click)="sortData('id_usuario')">
-            <span>ID</span>
-          </div>
-          <div class="header-col username-col" (click)="sortData('username')">
-            <span>Usuario</span>
-          </div>
-          <div class="header-col email-col" (click)="sortData('email')">
-            <span>Email</span>
-          </div>
-          <div class="header-col rol-col" (click)="sortData('id_rol')">
-            <span>Rol</span>
-          </div>
-          <div
-            class="header-col tipo-col"
-            (click)="sortData('id_tipo_usuario')"
-          >
-            <span>Tipo</span>
-          </div>
-          <div class="header-col estado-col" (click)="sortData('activo')">
-            <span>Estado</span>
-          </div>
-          <div class="header-col acciones-col">
-            <span>ACCIONES</span>
-          </div>
-        </div>
-
-        <div
-          class="header-row header-filters"
-          *ngIf="filtrosColumnaHabilitados"
-          [formGroup]="filtrosColumnaForm"
-        >
-          <div class="header-col id-col">
-            <input
-              class="column-filter-input"
-              formControlName="idUsuario"
-              placeholder="ID..."
-              type="text"
-            />
-          </div>
-          <div class="header-col username-col">
-            <input
-              class="column-filter-input"
-              formControlName="username"
-              placeholder="Usuario..."
-              type="text"
-            />
-          </div>
-          <div class="header-col email-col">
-            <input
-              class="column-filter-input"
-              formControlName="email"
-              placeholder="Email..."
-              type="text"
-            />
-          </div>
-          <div class="header-col rol-col">
-            <select class="column-filter-input" formControlName="idRol">
-              <option value="">Todos</option>
-              <option value="ADMIN">Administrador</option>
-              <option value="SUPERVISOR">Supervisor</option>
-              <option value="OPERARIO">Operario</option>
-              <option value="CONSULTOR">Consultor</option>
-            </select>
-          </div>
-          <div class="header-col tipo-col">
-            <select class="column-filter-input" formControlName="idTipoUsuario">
-              <option value="">Todos</option>
-              <option value="1">Regular</option>
-              <option value="2">Temporal</option>
-              <option value="3">Externo</option>
-            </select>
-          </div>
-          <div class="header-col estado-col">
-            <select class="column-filter-input" formControlName="activo">
-              <option value="">Todos</option>
-              <option value="true">Activo</option>
-              <option value="false">Inactivo</option>
-            </select>
-          </div>
-          <div class="header-col acciones-col">
-            <button
-              class="btn-clear-column-filters"
-              type="button"
-              (click)="limpiarFiltrosColumna()"
-              matTooltip="Limpiar filtros de columna"
-            >
-              Limpiar filtros
+              <span>Exportar a PDF</span>
             </button>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="table-container">
-        <div *ngIf="hasError" class="error-state">
-          <h3 class="error-title text-texfina text-primary">
-            Error al cargar datos
-          </h3>
-          <p class="error-subtitle text-texfina text-muted">
-            {{ errorMessage }}
-          </p>
-          <button class="btn-texfina btn-primary" (click)="reintentarCarga()">
-            Reintentar
-          </button>
-        </div>
-
-        <div *ngIf="isEmpty" class="empty-state">
-          <h3 class="empty-title text-texfina text-primary">
-            No hay usuarios registrados
-          </h3>
-          <p class="empty-subtitle text-texfina text-muted">
-            Comienza agregando tu primer usuario para gestionar el sistema
-          </p>
-          <button class="btn-texfina btn-primary" (click)="agregar()">
-            Agregar Primer Usuario
-          </button>
-        </div>
-
-        <div *ngIf="isFilteredEmpty" class="filtered-empty-state">
-          <h3 class="filtered-empty-title text-texfina text-primary">
-            No se encontraron resultados
-          </h3>
-          <p class="filtered-empty-subtitle text-texfina text-muted">
-            Intenta ajustar los filtros o limpiar la búsqueda
-          </p>
-          <button
-            class="btn-texfina btn-secondary"
-            (click)="limpiarFiltroGeneral()"
-          >
-            Limpiar Filtros
-          </button>
-        </div>
-
-        <table
-          mat-table
-          [dataSource]="dataSource"
-          matSort
-          class="data-table"
-          *ngIf="!hasError && !isEmpty && !isFilteredEmpty"
-        >
-          <ng-container matColumnDef="id_usuario">
-            <td mat-cell *matCellDef="let usuario" class="table-cell">
-              <span class="badge-texfina badge-neutral"
-                >{{ formatearCodigo(usuario.id_usuario) }}</span
-              >
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="username">
-            <td mat-cell *matCellDef="let usuario" class="table-cell">
-              <div class="usuario-cell">
-                <div class="usuario-name">
-                  {{ formatearTexto(usuario.username) }}
-                </div>
-              </div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="email">
-            <td mat-cell *matCellDef="let usuario" class="table-cell">
-              <div class="email-cell">{{ formatearTexto(usuario.email) }}</div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="id_rol">
-            <td mat-cell *matCellDef="let usuario" class="table-cell">
-              <span class="badge-texfina badge-secondary"
-                >{{ obtenerNombreRol(usuario.id_rol) }}</span
-              >
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="id_tipo_usuario">
-            <td mat-cell *matCellDef="let usuario" class="table-cell">
-              <div class="tipo-cell">
-                {{ obtenerNombreTipo(usuario.id_tipo_usuario) }}
-              </div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="activo">
-            <td mat-cell *matCellDef="let usuario" class="table-cell">
-              <span
-                class="badge-texfina"
-                [ngClass]="usuario.activo ? 'badge-success' : 'badge-error'"
-              >
-                {{ usuario.activo ? 'Activo' : 'Inactivo' }}
-              </span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="acciones">
-            <td mat-cell *matCellDef="let usuario" class="table-cell">
-              <div class="action-buttons">
-                <button
-                  class="btn-action btn-view"
-                  (click)="verDetalle(usuario)"
-                  matTooltip="Ver detalle"
-                >
-                  <mat-icon>visibility</mat-icon>
-                </button>
-                <button
-                  class="btn-action btn-edit"
-                  (click)="editar(usuario)"
-                  matTooltip="Editar usuario"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  class="btn-action btn-delete"
-                  (click)="eliminar(usuario)"
-                  matTooltip="Eliminar usuario"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
-
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
-      </div>
+    <!-- Tabla de usuarios con PrimeDataTable -->
+    <div class="table-card">
+      <app-prime-data-table
+        [columns]="columns"
+        [actions]="actions"
+        [data]="usuarios"
+        [loading]="isLoading"
+        [error]="hasError"
+        [errorMessage]="errorMessage"
+        [emptyTitle]="'No hay usuarios registrados'"
+        [emptySubtitle]="'Comienza agregando tu primer usuario para gestionar el sistema'"
+        [emptyIcon]="'person'"
+        [emptyActionText]="'Agregar Primer Usuario'"
+        [buttons]="tableButtons"
+        (actionClick)="onActionClick($event)"
+        (addNewClicked)="agregar()"
+        (buttonClick)="onButtonClick($event)"
+      ></app-prime-data-table>
     </div>
   </div>
 </div>
