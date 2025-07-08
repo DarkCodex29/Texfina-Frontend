@@ -5,51 +5,51 @@
         <h1 class="page-title text-texfina text-primary">Roles</h1>
       </div>
       <div class="header-actions">
-        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
-          Carga Masiva
-        </button>
+        <!-- Dropdown de Exportar -->
         <div class="dropdown-export">
           <button
             class="btn-texfina btn-neutral dropdown-trigger"
             (click)="toggleDropdownExport()"
+            [class.active]="dropdownExportAbierto"
+            matTooltip="Exportar listado de roles"
           >
             Exportar
           </button>
-          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+
+          <div
+            class="dropdown-menu"
+            [class.show]="dropdownExportAbierto"
+            (click)="$event.stopPropagation()"
+          >
             <button class="dropdown-item" (click)="exportarExcel()">
-              Exportar a Excel
+              <span>Exportar a Excel</span>
             </button>
             <button class="dropdown-item" (click)="exportarPDF()">
-              Exportar a PDF
+              <span>Exportar a PDF</span>
             </button>
           </div>
         </div>
-        <button class="btn-texfina btn-primary" (click)="agregar()">
-          Agregar Rol
-        </button>
       </div>
     </div>
 
-    <!-- PrimeNG Data Table -->
-    <app-prime-data-table
-      [columns]="tableColumns"
-      [data]="roles"
-      [actions]="tableActions"
-      [state]="tableState"
-      [showGlobalFilter]="true"
-      [showColumnFilters]="true"
-      [showPagination]="true"
-      [pageSize]="10"
-      [actionsPinned]="true"
-      emptyIcon="group"
-      emptyTitle="No hay roles registrados"
-      emptySubtitle="Los roles de usuario aparecerán aquí una vez que sean creados"
-      emptyActionText="Agregar Primer Rol"
-      (actionClick)="handleAction($event)"
-      (sortChanged)="handleSort($event)"
-      (filtersChanged)="handleFilters($event)"
-      (retryClicked)="reintentarCarga()"
-      (addNewClicked)="agregar()"
-    ></app-prime-data-table>
+    <!-- Tabla de roles con PrimeDataTable -->
+    <div class="table-card">
+      <app-prime-data-table
+        [columns]="columns"
+        [actions]="actions"
+        [data]="roles"
+        [loading]="isLoading"
+        [error]="hasError"
+        [errorMessage]="errorMessage"
+        [emptyTitle]="'No hay roles registrados'"
+        [emptySubtitle]="'Comienza agregando tu primer rol para gestionar el sistema'"
+        [emptyIcon]="'group'"
+        [emptyActionText]="'Agregar Primer Rol'"
+        [buttons]="tableButtons"
+        (actionClick)="onActionClick($event)"
+        (addNewClicked)="agregar()"
+        (buttonClick)="onButtonClick($event)"
+      ></app-prime-data-table>
+    </div>
   </div>
 </div>

@@ -1,18 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSortModule } from '@angular/material/sort';
-import { MatDialog } from '@angular/material/dialog';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { PrimeDataTableComponent, TableColumn, TableAction, TableState } from '../shared/components/prime-data-table/prime-data-table.component';
+import {
+  PrimeDataTableComponent,
+  TableColumn,
+  TableAction,
+  TableButtonConfig,
+} from '../shared/components/prime-data-table/prime-data-table.component';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -22,6 +19,10 @@ import {
   ConfiguracionCargaMasiva,
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
+import { FormularioDialogComponent } from '../shared/dialogs/formulario-dialog/formulario-dialog.component';
+import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
+import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import { RolesConfig } from '../shared/configs/roles-config';
 
 interface Rol {
   id_rol: string;
@@ -45,350 +46,142 @@ interface Estadistica {
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
+    MatDialogModule,
     MatButtonModule,
     MatIconModule,
-    MatTableModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatInputModule,
     MatTooltipModule,
-    MatSortModule,
     PrimeDataTableComponent,
   ],
   templateUrl: './roles.html',
   styleUrls: ['./roles.scss'],
 })
-export class RolesComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
-
-  // Configuración del DataTable
-  tableColumns: TableColumn[] = [
-    {
-      key: 'id_rol',
-      title: 'Código',
-      type: 'badge',
-      sortable: true,
-      filterable: true,
-      width: '120px',
-      icon: 'pi pi-hashtag'
-    },
-    {
-      key: 'nombre',
-      title: 'Rol',
-      type: 'text',
-      sortable: true,
-      filterable: true,
-      width: '200px',
-      icon: 'pi pi-user'
-    },
-    {
-      key: 'descripcion',
-      title: 'Descripción',
-      type: 'description',
-      sortable: false,
-      filterable: true,
-      width: '300px',
-      icon: 'pi pi-info-circle'
-    },
-    {
-      key: 'usuarios_count',
-      title: 'Usuarios',
-      type: 'badge',
-      sortable: true,
-      filterable: false,
-      width: '100px',
-      icon: 'pi pi-users'
-    },
-    {
-      key: 'permisos_count',
-      title: 'Permisos',
-      type: 'badge',
-      sortable: true,
-      filterable: false,
-      width: '100px',
-      icon: 'pi pi-shield'
-    },
-    {
-      key: 'activo',
-      title: 'Estado',
-      type: 'badge',
-      sortable: true,
-      filterable: true,
-      width: '100px',
-      icon: 'pi pi-circle'
-    }
-  ];
-
-  tableActions: TableAction[] = [
-    {
-      icon: 'pi pi-eye',
-      tooltip: 'Ver detalle del rol',
-      action: 'view',
-      color: 'primary'
-    },
-    {
-      icon: 'pi pi-pencil',
-      tooltip: 'Editar rol',
-      action: 'edit',
-      color: 'secondary'
-    },
-    {
-      icon: 'pi pi-shield',
-      tooltip: 'Gestionar permisos',
-      action: 'permissions',
-      color: 'warn'
-    },
-    {
-      icon: 'pi pi-trash',
-      tooltip: 'Eliminar rol',
-      action: 'delete',
-      color: 'danger'
-    }
-  ];
-
-  tableState: TableState = {
-    loading: false,
-    error: false,
-    empty: false,
-    filteredEmpty: false
-  };
-
-  displayedColumns: string[] = [
-    'codigo',
-    'rol',
-    'usuarios',
-    'permisos',
-    'estado',
-    'acciones',
-  ];
-
+export class RolesComponent implements OnInit {
   roles: Rol[] = [];
-  dataSource = new MatTableDataSource<Rol>([]);
-  estadisticas: Estadistica[] = [];
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosColumnaHabilitados = false;
+  
   dropdownExportAbierto = false;
-  isLoading = false;
   hasError = false;
   errorMessage = '';
+  isLoading = false;
+
+  columns: TableColumn[] = [];
+  actions: TableAction[] = [];
+  tableButtons: TableButtonConfig[] = [];
 
   constructor(
-    private fb: FormBuilder,
     private dialog: MatDialog,
     private exportacionService: ExportacionService,
     private cargaMasivaService: CargaMasivaService
   ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
-    this.filtrosColumnaForm = this.fb.group({
-      codigo: [''],
-      rol: [''],
-      usuarios: [''],
-      permisos: [''],
-      estado: [''],
-    });
+    this.initializeTable();
   }
 
   ngOnInit(): void {
     this.cargarDatos();
-    this.cargarEstadisticas();
-    this.configurarFiltros();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  private initializeTable(): void {
+    this.columns = RolesConfig.getTableColumns();
+    this.actions = RolesConfig.getTableActions();
+    this.tableButtons = [
+      {
+        action: 'add',
+        label: 'Agregar Rol',
+        icon: 'add',
+        color: 'primary',
+      },
+      {
+        action: 'bulk-upload',
+        label: 'Carga Masiva',
+        icon: 'upload',
+        color: 'secondary',
+      },
+    ];
   }
 
-  get isEmpty(): boolean {
-    return !this.isLoading && !this.hasError && this.roles.length === 0;
-  }
 
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.isLoading &&
-      !this.hasError &&
-      this.roles.length > 0 &&
-      this.dataSource.filteredData.length === 0
-    );
-  }
-
-  private configurarFiltros(): void {
-    this.filtroGeneralForm.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.aplicarFiltroGeneral();
-      });
-  }
-
-  private async cargarDatos(): Promise<void> {
-    this.tableState = { ...this.tableState, loading: true, error: false };
+  cargarDatos(): void {
     this.isLoading = true;
     this.hasError = false;
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       this.roles = [
         {
           id_rol: 'ADMIN',
           nombre: 'Administrador',
           descripcion: 'Administrador del sistema con acceso completo',
           activo: true,
+          usuarios_count: this.contarUsuarios('ADMIN'),
+          permisos_count: this.contarPermisos('ADMIN'),
         },
         {
           id_rol: 'SUPERVISOR',
           nombre: 'Supervisor',
           descripcion: 'Supervisor de operaciones con permisos avanzados',
           activo: true,
+          usuarios_count: this.contarUsuarios('SUPERVISOR'),
+          permisos_count: this.contarPermisos('SUPERVISOR'),
         },
         {
           id_rol: 'OPERARIO',
           nombre: 'Operario',
           descripcion: 'Operario con permisos básicos de gestión',
           activo: true,
+          usuarios_count: this.contarUsuarios('OPERARIO'),
+          permisos_count: this.contarPermisos('OPERARIO'),
         },
         {
           id_rol: 'CONSULTOR',
           nombre: 'Consultor',
           descripcion: 'Consultor con permisos de solo lectura',
           activo: false,
+          usuarios_count: this.contarUsuarios('CONSULTOR'),
+          permisos_count: this.contarPermisos('CONSULTOR'),
         },
         {
           id_rol: 'INVITADO',
           nombre: 'Invitado',
           descripcion: 'Usuario con acceso limitado temporal',
           activo: false,
+          usuarios_count: this.contarUsuarios('INVITADO'),
+          permisos_count: this.contarPermisos('INVITADO'),
         },
-      ].map((r) => ({
-        id_rol: r.id_rol || '',
-        nombre: r.nombre || '',
-        descripcion: r.descripcion || '',
-        activo: r.activo ?? false,
-        usuarios_count: this.contarUsuarios(r.id_rol),
-        permisos_count: this.contarPermisos(r.id_rol),
-      }));
-      this.dataSource.data = [...this.roles];
-      this.tableState = { 
-        ...this.tableState, 
-        loading: false, 
-        empty: this.roles.length === 0,
-        filteredEmpty: false
-      };
+      ];
       this.isLoading = false;
     } catch (error) {
       this.hasError = true;
       this.errorMessage = 'Error al cargar los roles del sistema';
-      this.tableState = { ...this.tableState, loading: false, error: true };
       this.isLoading = false;
     }
   }
 
-  cargarEstadisticas(): void {
-    this.estadisticas = [
-      {
-        nombre: 'Total Roles',
-        valor: '5',
-        descripcion: 'Roles configurados',
-        tipo: 'info',
-        porcentaje: 25,
-      },
-      {
-        nombre: 'Roles Activos',
-        valor: '3',
-        descripcion: 'Roles habilitados',
-        tipo: 'success',
-        porcentaje: 15,
-      },
-      {
-        nombre: 'Usuarios Asignados',
-        valor: '12',
-        descripcion: 'Usuarios con rol',
-        tipo: 'info',
-        porcentaje: 8,
-      },
-      {
-        nombre: 'Permisos Total',
-        valor: '45',
-        descripcion: 'Permisos disponibles',
-        tipo: 'warning',
-      },
-    ];
-  }
-
-  aplicarFiltroGeneral(): void {
-    const filtro =
-      this.filtroGeneralForm.get('busquedaGeneral')?.value?.toLowerCase() || '';
-
-    if (!filtro.trim()) {
-      this.dataSource.data = [...this.roles];
-      return;
+  onActionClick(event: { action: string; item: Rol }): void {
+    switch (event.action) {
+      case 'view':
+        this.verDetalle(event.item);
+        break;
+      case 'edit':
+        this.editar(event.item);
+        break;
+      case 'permissions':
+        this.gestionarPermisos(event.item);
+        break;
+      case 'delete':
+        this.eliminar(event.item);
+        break;
     }
-
-    this.dataSource.data = this.roles.filter(
-      (rol) =>
-        rol.nombre.toLowerCase().includes(filtro) ||
-        rol.descripcion.toLowerCase().includes(filtro) ||
-        rol.id_rol.toLowerCase().includes(filtro) ||
-        this.getEstadoTexto(rol.activo).toLowerCase().includes(filtro)
-    );
   }
 
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.get('busquedaGeneral')?.setValue('');
+  onButtonClick(action: string): void {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk-upload':
+        this.cargaMasiva();
+        break;
+    }
   }
 
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset({
-      codigo: '',
-      rol: '',
-      usuarios: '',
-      permisos: '',
-      estado: '',
-    });
-    this.dataSource.data = [...this.roles];
-  }
-
-  formatearTexto(texto?: string): string {
-    return texto && texto.trim() ? texto : '-';
-  }
-
-  formatearCodigo(codigo?: string): string {
-    if (!codigo) return 'SIN-COD';
-    return codigo.toUpperCase();
-  }
-
-  getEstadoTexto(activo: boolean): string {
-    return activo ? 'Activo' : 'Inactivo';
-  }
-
-  getEstadoBadgeClass(activo: boolean): string {
-    return activo ? 'badge-success' : 'badge-error';
-  }
-
-  getCardClass(tipo: string): string {
-    const clases: { [key: string]: string } = {
-      info: 'card-info',
-      success: 'card-success',
-      warning: 'card-warning',
-      error: 'card-error',
-    };
-    return clases[tipo] || '';
-  }
-
-  getTrendClass(tipo: string): string {
-    const clases: { [key: string]: string } = {
-      info: 'trend-up',
-      success: 'trend-up',
-      warning: 'trend-stable',
-      error: 'trend-down',
-    };
-    return clases[tipo] || '';
-  }
 
   contarUsuarios(rolId: string): number {
     const conteos: { [key: string]: number } = {
@@ -412,191 +205,64 @@ export class RolesComponent implements OnInit, OnDestroy {
     return conteos[rolId] || 0;
   }
 
-  sortData(column: string): void {
-    console.log('Ordenando por:', column);
-  }
-
   reintentarCarga(): void {
     this.cargarDatos();
   }
 
   agregar(): void {
-    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(({ FormularioDialogComponent }) => {
-      import('../shared/configs/roles-config').then(({ RolesConfig }) => {
-        const dialogRef = this.dialog.open(FormularioDialogComponent, {
-          width: '600px',
-          disableClose: true,
-          data: {
-            configuracion: RolesConfig.getConfiguracionFormulario(false),
-          },
-        });
+    const configuracion = RolesConfig.getConfiguracionFormulario(false);
 
-        dialogRef.afterClosed().subscribe((resultado) => {
-          if (resultado && resultado.accion === 'guardar') {
-            console.log('Guardando nuevo rol:', resultado.datos);
-            this.guardarRol(resultado.datos).then(() => {
-              this.cargarDatos();
-            });
-          }
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: configuracion,
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado && resultado.accion === 'guardar') {
+        this.guardarRol(resultado.datos).then(() => {
+          this.cargarDatos();
         });
-      });
+      }
     });
   }
 
   verDetalle(rol: Rol): void {
-    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(({ DetalleDialogComponent }) => {
-      import('../shared/configs/roles-config').then(({ RolesConfig }) => {
-        const dialogRef = this.dialog.open(DetalleDialogComponent, {
-          width: '800px',
-          disableClose: true,
-          data: {
-            configuracion: RolesConfig.getConfiguracionDetalle(rol),
-          },
-        });
-      });
+    const configuracion = RolesConfig.getConfiguracionDetalle(rol);
+
+    this.dialog.open(DetalleDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: configuracion,
     });
   }
 
   editar(rol: Rol): void {
-    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(({ FormularioDialogComponent }) => {
-      import('../shared/configs/roles-config').then(({ RolesConfig }) => {
-        const dialogRef = this.dialog.open(FormularioDialogComponent, {
-          width: '600px',
-          disableClose: true,
-          data: {
-            configuracion: RolesConfig.getConfiguracionFormulario(true, rol),
-          },
-        });
+    const configuracion = RolesConfig.getConfiguracionFormulario(true, rol);
 
-        dialogRef.afterClosed().subscribe((resultado) => {
-          if (resultado && resultado.accion === 'guardar') {
-            console.log('Actualizando rol:', resultado.datos);
-            this.actualizarRol(rol.id_rol, resultado.datos).then(() => {
-              this.cargarDatos();
-            });
-          }
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: configuracion,
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado && resultado.accion === 'guardar') {
+        this.actualizarRol(rol.id_rol, resultado.datos).then(() => {
+          this.cargarDatos();
         });
-      });
+      }
     });
   }
 
   gestionarPermisos(rol: Rol): void {
-    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(({ FormularioDialogComponent }) => {
-      const dialogRef = this.dialog.open(FormularioDialogComponent, {
-        width: '800px',
-        disableClose: true,
-        data: {
-          configuracion: {
-            titulo: {
-              agregar: `Gestionar Permisos - ${rol.nombre}`,
-              editar: `Gestionar Permisos - ${rol.nombre}`,
-            },
-            entidad: 'permisos',
-            entidadArticulo: 'los',
-            esEdicion: true,
-            datosIniciales: {
-              id_rol: rol.id_rol,
-              nombre_rol: rol.nombre,
-              permisos_actuales: this.obtenerPermisosRol(rol.id_rol),
-            },
-            filas: [
-              [
-                {
-                  key: 'nombre_rol',
-                  label: 'Rol',
-                  tipo: 'text',
-                  obligatorio: false,
-                  disabled: true,
-                },
-              ],
-              [
-                {
-                  key: 'permisos_dashboard',
-                  label: 'Dashboard',
-                  tipo: 'checkbox-group',
-                  obligatorio: false,
-                  opciones: [
-                    { value: 'dashboard_view', label: 'Ver Dashboard' },
-                    { value: 'dashboard_export', label: 'Exportar Dashboard' },
-                  ],
-                },
-              ],
-              [
-                {
-                  key: 'permisos_inventario',
-                  label: 'Inventario',
-                  tipo: 'checkbox-group',
-                  obligatorio: false,
-                  opciones: [
-                    { value: 'inventario_view', label: 'Ver Inventario' },
-                    { value: 'inventario_create', label: 'Crear Materiales' },
-                    { value: 'inventario_edit', label: 'Editar Materiales' },
-                    { value: 'inventario_delete', label: 'Eliminar Materiales' },
-                    { value: 'inventario_export', label: 'Exportar Inventario' },
-                  ],
-                },
-              ],
-              [
-                {
-                  key: 'permisos_almacenes',
-                  label: 'Almacenes',
-                  tipo: 'checkbox-group',
-                  obligatorio: false,
-                  opciones: [
-                    { value: 'almacenes_view', label: 'Ver Almacenes' },
-                    { value: 'almacenes_create', label: 'Crear Almacenes' },
-                    { value: 'almacenes_edit', label: 'Editar Almacenes' },
-                    { value: 'almacenes_delete', label: 'Eliminar Almacenes' },
-                  ],
-                },
-              ],
-              [
-                {
-                  key: 'permisos_usuarios',
-                  label: 'Usuarios y Roles',
-                  tipo: 'checkbox-group',
-                  obligatorio: false,
-                  opciones: [
-                    { value: 'usuarios_view', label: 'Ver Usuarios' },
-                    { value: 'usuarios_create', label: 'Crear Usuarios' },
-                    { value: 'usuarios_edit', label: 'Editar Usuarios' },
-                    { value: 'usuarios_delete', label: 'Eliminar Usuarios' },
-                    { value: 'roles_manage', label: 'Gestionar Roles' },
-                  ],
-                },
-              ],
-              [
-                {
-                  key: 'permisos_reportes',
-                  label: 'Reportes',
-                  tipo: 'checkbox-group',
-                  obligatorio: false,
-                  opciones: [
-                    { value: 'reportes_view', label: 'Ver Reportes' },
-                    { value: 'reportes_export', label: 'Exportar Reportes' },
-                    { value: 'reportes_advanced', label: 'Reportes Avanzados' },
-                  ],
-                },
-              ],
-            ],
-          },
-        },
-      });
-
-      dialogRef.afterClosed().subscribe((resultado) => {
-        if (resultado && resultado.accion === 'guardar') {
-          console.log('Actualizando permisos del rol:', resultado.datos);
-          this.actualizarPermisosRol(rol.id_rol, resultado.datos).then(() => {
-            this.cargarDatos();
-          });
-        }
-      });
-    });
+    console.log('Gestionar permisos para el rol:', rol);
+    // TODO: Implementar gestión de permisos
   }
 
   private configurarExportacion(): ConfiguracionExportacion<Rol> {
     return {
-      entidades: this.dataSource.data.length > 0 ? this.dataSource.data : this.roles,
+      entidades: this.roles,
       nombreArchivo: 'roles_sistema',
       nombreEntidad: 'Roles del Sistema',
       columnas: [
@@ -612,10 +278,10 @@ export class RolesComponent implements OnInit, OnDestroy {
           transformar: (valor: boolean) => valor ? 'Activo' : 'Inactivo'
         },
       ],
-      filtrosActivos: this.obtenerFiltrosActivos(),
+      filtrosActivos: [],
       metadatos: {
         cantidadTotal: this.roles.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.roles.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
       },
@@ -686,7 +352,6 @@ export class RolesComponent implements OnInit, OnDestroy {
   exportarExcel(): void {
     try {
       console.log('📊 Exportando roles a Excel...');
-      console.log('🔍 Datos en dataSource:', this.dataSource.data.length);
       console.log('🔍 Roles totales:', this.roles.length);
       
       this.dropdownExportAbierto = false;
@@ -696,7 +361,7 @@ export class RolesComponent implements OnInit, OnDestroy {
       
       this.exportacionService.exportarExcel(config);
       
-      console.log(`✅ ${this.dataSource.data.length} roles exportados a Excel`);
+      console.log(`✅ ${this.roles.length} roles exportados a Excel`);
     } catch (error) {
       console.error('❌ Error al exportar Excel:', error);
     }
@@ -710,7 +375,7 @@ export class RolesComponent implements OnInit, OnDestroy {
       const config = this.configurarExportacion();
       this.exportacionService.exportarPDF(config);
       
-      console.log(`✅ ${this.dataSource.data.length} roles exportados a PDF`);
+      console.log(`✅ ${this.roles.length} roles exportados a PDF`);
     } catch (error) {
       console.error('❌ Error al exportar PDF:', error);
     }
@@ -736,147 +401,53 @@ export class RolesComponent implements OnInit, OnDestroy {
       });
   }
 
-  private obtenerFiltrosActivos(): any {
-    return {
-      busquedaGeneral:
-        this.filtroGeneralForm.get('busquedaGeneral')?.value || '',
-    };
-  }
+  async guardarRol(datos: any): Promise<any> {
+    try {
+      const nuevoRol: Rol = {
+        id_rol: datos.id_rol,
+        nombre: datos.nombre,
+        descripcion: datos.descripcion,
+        activo: datos.activo ?? true,
+      };
 
-  private async guardarRol(datosRol: any): Promise<void> {
-    console.log('💾 Guardando nuevo rol:', datosRol);
-    
-    // Simular guardado en backend
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Aquí iría la llamada al servicio real
-    // return this.rolesService.crearRol(datosRol);
-    
-    console.log('✅ Rol guardado exitosamente');
-  }
-
-  private async actualizarRol(idRol: string, datosRol: any): Promise<void> {
-    console.log('📝 Actualizando rol:', idRol, datosRol);
-    
-    // Simular actualización en backend
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Aquí iría la llamada al servicio real
-    // return this.rolesService.actualizarRol(idRol, datosRol);
-    
-    console.log('✅ Rol actualizado exitosamente');
-  }
-
-  private async eliminarRol(idRol: string): Promise<void> {
-    console.log('🗑️ Eliminando rol:', idRol);
-    
-    // Simular eliminación en backend
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Aquí iría la llamada al servicio real
-    // return this.rolesService.eliminarRol(idRol);
-    
-    console.log('✅ Rol eliminado exitosamente');
-  }
-
-  private obtenerPermisosRol(idRol: string): any {
-    // Simular obtención de permisos actuales del rol
-    const permisosPorRol: { [key: string]: any } = {
-      ADMIN: {
-        permisos_dashboard: ['dashboard_view', 'dashboard_export'],
-        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit', 'inventario_delete', 'inventario_export'],
-        permisos_almacenes: ['almacenes_view', 'almacenes_create', 'almacenes_edit', 'almacenes_delete'],
-        permisos_usuarios: ['usuarios_view', 'usuarios_create', 'usuarios_edit', 'usuarios_delete', 'roles_manage'],
-        permisos_reportes: ['reportes_view', 'reportes_export', 'reportes_advanced'],
-      },
-      SUPERVISOR: {
-        permisos_dashboard: ['dashboard_view', 'dashboard_export'],
-        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit', 'inventario_export'],
-        permisos_almacenes: ['almacenes_view', 'almacenes_create', 'almacenes_edit'],
-        permisos_usuarios: ['usuarios_view'],
-        permisos_reportes: ['reportes_view', 'reportes_export'],
-      },
-      OPERARIO: {
-        permisos_dashboard: ['dashboard_view'],
-        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit'],
-        permisos_almacenes: ['almacenes_view'],
-        permisos_usuarios: [],
-        permisos_reportes: ['reportes_view'],
-      },
-      CONSULTOR: {
-        permisos_dashboard: ['dashboard_view'],
-        permisos_inventario: ['inventario_view'],
-        permisos_almacenes: ['almacenes_view'],
-        permisos_usuarios: [],
-        permisos_reportes: ['reportes_view'],
-      },
-    };
-
-    return permisosPorRol[idRol] || {};
-  }
-
-  private async actualizarPermisosRol(idRol: string, permisos: any): Promise<void> {
-    console.log('🔒 Actualizando permisos del rol:', idRol, permisos);
-    
-    // Simular actualización en backend
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Aquí iría la llamada al servicio real
-    // return this.rolesService.actualizarPermisos(idRol, permisos);
-    
-    console.log('✅ Permisos actualizados exitosamente');
-  }
-
-  eliminar(rol: Rol): void {
-    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(({ ConfirmacionDialogComponent }) => {
-      import('../shared/configs/roles-config').then(({ RolesConfig }) => {
-        const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
-          width: '400px',
-          disableClose: true,
-          data: RolesConfig.eliminarRol(rol),
-        });
-
-        dialogRef.afterClosed().subscribe((confirmado) => {
-          if (confirmado) {
-            console.log('Eliminando rol:', rol);
-            this.eliminarRol(rol.id_rol).then(() => {
-              this.cargarDatos();
-            });
-          }
-        });
-      });
-    });
-  }
-
-  // Métodos para el DataTable
-  handleAction(event: {action: string, item: any}) {
-    switch (event.action) {
-      case 'view':
-        this.verDetalle(event.item);
-        break;
-      case 'edit':
-        this.editar(event.item);
-        break;
-      case 'permissions':
-        this.gestionarPermisos(event.item);
-        break;
-      case 'delete':
-        this.eliminar(event.item);
-        break;
+      console.log('Rol a crear:', nuevoRol);
+      return Promise.resolve(nuevoRol);
+    } catch (error) {
+      console.error('Error al crear rol:', error);
+      throw error;
     }
   }
 
-  handleSort(event: {column: string, direction: 'asc' | 'desc'}) {
-    console.log('Ordenar:', event);
-    this.sortData(event.column);
+  async actualizarRol(id: string, datos: any): Promise<any> {
+    try {
+      const rolActualizado: Rol = {
+        id_rol: id,
+        nombre: datos.nombre,
+        descripcion: datos.descripcion,
+        activo: datos.activo,
+      };
+
+      console.log('Rol a actualizar:', rolActualizado);
+      return Promise.resolve(rolActualizado);
+    } catch (error) {
+      console.error('Error al actualizar rol:', error);
+      throw error;
+    }
   }
 
-  handleFilters(filters: any) {
-    console.log('Filtros aplicados:', filters);
-    // Los filtros ya se aplican automáticamente en el DataTable
-    this.tableState = {
-      ...this.tableState,
-      filteredEmpty: this.dataSource.data.length === 0 && this.roles.length > 0
-    };
+  eliminar(rol: Rol): void {
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '400px',
+      disableClose: true,
+      data: RolesConfig.eliminarRol(rol),
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado && rol.id_rol) {
+        console.log('Eliminar rol:', rol);
+        this.cargarDatos();
+      }
+    });
   }
+
 }

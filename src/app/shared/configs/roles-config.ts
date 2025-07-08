@@ -7,6 +7,10 @@ import {
   CampoDetalle,
 } from '../dialogs/detalle-dialog/detalle-dialog.component';
 import { ConfiguracionConfirmacion } from '../dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import {
+  TableColumn,
+  TableAction,
+} from '../components/prime-data-table/prime-data-table.component';
 
 export class RolesConfig {
   static getConfiguracionFormulario(
@@ -132,5 +136,99 @@ Los usuarios asignados a este rol perderán sus permisos hasta que se les asigne
       textoBotonConfirmar: 'Eliminar Rol',
       textoBotonCancelar: 'Cancelar',
     };
+  }
+
+  static getTableColumns(): TableColumn[] {
+    return [
+      {
+        key: 'id_rol',
+        title: 'Código',
+        sortable: true,
+        filterable: true,
+        width: '120px',
+        type: 'badge',
+        align: 'center',
+        visible: true,
+      },
+      {
+        key: 'nombre',
+        title: 'Rol',
+        sortable: true,
+        filterable: true,
+        width: '200px',
+        type: 'text',
+        align: 'left',
+        visible: true,
+      },
+      {
+        key: 'descripcion',
+        title: 'Descripción',
+        sortable: false,
+        filterable: true,
+        width: '300px',
+        type: 'text',
+        align: 'left',
+        visible: true,
+      },
+      {
+        key: 'usuarios_count',
+        title: 'Usuarios',
+        sortable: true,
+        filterable: false,
+        width: '100px',
+        type: 'badge',
+        align: 'center',
+        visible: true,
+      },
+      {
+        key: 'permisos_count',
+        title: 'Permisos',
+        sortable: true,
+        filterable: false,
+        width: '100px',
+        type: 'badge',
+        align: 'center',
+        visible: true,
+      },
+      {
+        key: 'activo',
+        title: 'Estado',
+        sortable: true,
+        filterable: true,
+        width: '100px',
+        type: 'badge',
+        align: 'center',
+        visible: true,
+      },
+    ];
+  }
+
+  static getTableActions(): TableAction[] {
+    return [
+      {
+        action: 'view',
+        tooltip: 'Ver Detalles',
+        icon: 'pi pi-eye',
+        color: 'primary',
+      },
+      {
+        action: 'edit',
+        tooltip: 'Editar',
+        icon: 'pi pi-pencil',
+        color: 'success',
+      },
+      {
+        action: 'permissions',
+        tooltip: 'Gestionar Permisos',
+        icon: 'pi pi-shield',
+        color: 'warn',
+      },
+      {
+        action: 'delete',
+        tooltip: 'Eliminar',
+        icon: 'pi pi-trash',
+        color: 'danger',
+      },
+    ];
   }
 }
