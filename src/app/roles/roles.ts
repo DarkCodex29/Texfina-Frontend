@@ -256,8 +256,115 @@ export class RolesComponent implements OnInit {
   }
 
   gestionarPermisos(rol: Rol): void {
-    console.log('Gestionar permisos para el rol:', rol);
-    // TODO: Implementar gestión de permisos
+    const configuracion = {
+      titulo: {
+        agregar: `Gestionar Permisos - ${rol.nombre}`,
+        editar: `Gestionar Permisos - ${rol.nombre}`,
+      },
+      entidad: 'permisos',
+      entidadArticulo: 'los',
+      esEdicion: true,
+      datosIniciales: {
+        id_rol: rol.id_rol,
+        nombre_rol: rol.nombre,
+        ...this.obtenerPermisosRol(rol.id_rol),
+      },
+      filas: [
+        [
+          {
+            key: 'nombre_rol',
+            label: 'Rol',
+            tipo: 'text',
+            obligatorio: false,
+            disabled: true,
+          },
+        ],
+        [
+          {
+            key: 'permisos_dashboard',
+            label: 'Dashboard',
+            tipo: 'checkbox-group',
+            obligatorio: false,
+            opciones: [
+              { value: 'dashboard_view', label: 'Ver Dashboard' },
+              { value: 'dashboard_export', label: 'Exportar Dashboard' },
+            ],
+          },
+        ],
+        [
+          {
+            key: 'permisos_inventario',
+            label: 'Inventario',
+            tipo: 'checkbox-group',
+            obligatorio: false,
+            opciones: [
+              { value: 'inventario_view', label: 'Ver Inventario' },
+              { value: 'inventario_create', label: 'Crear Materiales' },
+              { value: 'inventario_edit', label: 'Editar Materiales' },
+              { value: 'inventario_delete', label: 'Eliminar Materiales' },
+              { value: 'inventario_export', label: 'Exportar Inventario' },
+            ],
+          },
+        ],
+        [
+          {
+            key: 'permisos_almacenes',
+            label: 'Almacenes',
+            tipo: 'checkbox-group',
+            obligatorio: false,
+            opciones: [
+              { value: 'almacenes_view', label: 'Ver Almacenes' },
+              { value: 'almacenes_create', label: 'Crear Almacenes' },
+              { value: 'almacenes_edit', label: 'Editar Almacenes' },
+              { value: 'almacenes_delete', label: 'Eliminar Almacenes' },
+            ],
+          },
+        ],
+        [
+          {
+            key: 'permisos_usuarios',
+            label: 'Usuarios y Roles',
+            tipo: 'checkbox-group',
+            obligatorio: false,
+            opciones: [
+              { value: 'usuarios_view', label: 'Ver Usuarios' },
+              { value: 'usuarios_create', label: 'Crear Usuarios' },
+              { value: 'usuarios_edit', label: 'Editar Usuarios' },
+              { value: 'usuarios_delete', label: 'Eliminar Usuarios' },
+              { value: 'roles_manage', label: 'Gestionar Roles' },
+            ],
+          },
+        ],
+        [
+          {
+            key: 'permisos_reportes',
+            label: 'Reportes',
+            tipo: 'checkbox-group',
+            obligatorio: false,
+            opciones: [
+              { value: 'reportes_view', label: 'Ver Reportes' },
+              { value: 'reportes_export', label: 'Exportar Reportes' },
+              { value: 'reportes_advanced', label: 'Reportes Avanzados' },
+            ],
+          },
+        ],
+      ],
+    };
+
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '800px',
+      disableClose: true,
+      data: configuracion,
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado && resultado.accion === 'guardar') {
+        console.log('Actualizando permisos del rol:', resultado.datos);
+        this.actualizarPermisosRol(rol.id_rol, resultado.datos).then(() => {
+          this.cargarDatos();
+        });
+      }
+    });
   }
 
   private configurarExportacion(): ConfiguracionExportacion<Rol> {
@@ -450,4 +557,63 @@ export class RolesComponent implements OnInit {
     });
   }
 
+  private obtenerPermisosRol(idRol: string): any {
+    // Simular obtención de permisos actuales del rol
+    const permisosPorRol: { [key: string]: any } = {
+      ADMIN: {
+        permisos_dashboard: ['dashboard_view', 'dashboard_export'],
+        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit', 'inventario_delete', 'inventario_export'],
+        permisos_almacenes: ['almacenes_view', 'almacenes_create', 'almacenes_edit', 'almacenes_delete'],
+        permisos_usuarios: ['usuarios_view', 'usuarios_create', 'usuarios_edit', 'usuarios_delete', 'roles_manage'],
+        permisos_reportes: ['reportes_view', 'reportes_export', 'reportes_advanced'],
+      },
+      SUPERVISOR: {
+        permisos_dashboard: ['dashboard_view', 'dashboard_export'],
+        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit', 'inventario_export'],
+        permisos_almacenes: ['almacenes_view', 'almacenes_create', 'almacenes_edit'],
+        permisos_usuarios: ['usuarios_view'],
+        permisos_reportes: ['reportes_view', 'reportes_export'],
+      },
+      OPERARIO: {
+        permisos_dashboard: ['dashboard_view'],
+        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit'],
+        permisos_almacenes: ['almacenes_view'],
+        permisos_usuarios: [],
+        permisos_reportes: ['reportes_view'],
+      },
+      CONSULTOR: {
+        permisos_dashboard: ['dashboard_view'],
+        permisos_inventario: ['inventario_view'],
+        permisos_almacenes: ['almacenes_view'],
+        permisos_usuarios: [],
+        permisos_reportes: ['reportes_view'],
+      },
+      INVITADO: {
+        permisos_dashboard: [],
+        permisos_inventario: [],
+        permisos_almacenes: [],
+        permisos_usuarios: [],
+        permisos_reportes: [],
+      },
+    };
+
+    return permisosPorRol[idRol] || {};
+  }
+
+  private async actualizarPermisosRol(idRol: string, permisos: any): Promise<void> {
+    try {
+      console.log('🔒 Actualizando permisos del rol:', idRol, permisos);
+      
+      // Simular actualización en backend
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Aquí iría la llamada al servicio real
+      // return this.rolesService.actualizarPermisos(idRol, permisos);
+      
+      console.log('✅ Permisos actualizados exitosamente');
+    } catch (error) {
+      console.error('Error al actualizar permisos:', error);
+      throw error;
+    }
+  }
 }

@@ -17,7 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
 export interface CampoFormulario {
   key: string;
   label: string;
-  tipo: 'text' | 'number' | 'select' | 'textarea' | 'date';
+  tipo: 'text' | 'number' | 'select' | 'textarea' | 'date' | 'checkbox-group';
   placeholder?: string;
   maxLength?: number;
   step?: number;
@@ -25,6 +25,7 @@ export interface CampoFormulario {
   obligatorio?: boolean;
   ancho?: 'normal' | 'completo';
   opciones?: { value: any; label: string }[];
+  disabled?: boolean;
 }
 
 export interface ConfiguracionFormulario {
@@ -84,7 +85,13 @@ export class FormularioDialogComponent implements OnInit {
           validators.push(Validators.maxLength(campo.maxLength));
         }
 
-        controles[campo.key] = ['', validators];
+        // Para checkbox-group, inicializar como array
+        if (campo.tipo === 'checkbox-group') {
+          const valorInicial = this.config.datosIniciales?.[campo.key] || [];
+          controles[campo.key] = [valorInicial, validators];
+        } else {
+          controles[campo.key] = ['', validators];
+        }
       });
     });
 
@@ -110,5 +117,31 @@ export class FormularioDialogComponent implements OnInit {
     Object.keys(this.formulario.controls).forEach((key) => {
       this.formulario.get(key)?.markAsTouched();
     });
+  }
+
+  onCheckboxChange(event: any, fieldKey: string): void {
+    const value = event.target.value;
+    const isChecked = event.target.checked;
+    const currentValues = this.formulario.get(fieldKey)?.value || [];
+
+    if (isChecked) {
+      // Añadir valor si no existe
+      if (!currentValues.includes(value)) {
+        currentValues.push(value);
+      }
+    } else {
+      // Remover valor si existe
+      const index = currentValues.indexOf(value);
+      if (index > -1) {
+        currentValues.splice(index, 1);
+      }
+    }
+
+    this.formulario.get(fieldKey)?.setValue([...currentValues]);
+  }
+
+  isCheckboxChecked(fieldKey: string, value: string): boolean {
+    const currentValues = this.formulario.get(fieldKey)?.value || [];
+    return currentValues.includes(value);
   }
 }

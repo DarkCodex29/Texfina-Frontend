@@ -34,6 +34,7 @@
             [maxlength]="campo.maxLength || null"
             [step]="campo.step || null"
             [min]="campo.min || null"
+            [disabled]="campo.disabled || false"
           />
 
           <!-- Input de fecha -->
@@ -59,6 +60,7 @@
             *ngIf="campo.tipo === 'select'"
             class="form-select"
             [formControlName]="campo.key"
+            [disabled]="campo.disabled || false"
           >
             <option value="">{{ campo.placeholder || "Seleccionar" }}</option>
             <option
@@ -68,6 +70,32 @@
               {{ opcion.label }}
             </option>
           </select>
+
+          <!-- Checkbox Group -->
+          <div
+            *ngIf="campo.tipo === 'checkbox-group'"
+            class="checkbox-group"
+          >
+            <div
+              *ngFor="let opcion of campo.opciones"
+              class="checkbox-item"
+            >
+              <input
+                type="checkbox"
+                [id]="campo.key + '_' + opcion.value"
+                [value]="opcion.value"
+                (change)="onCheckboxChange($event, campo.key)"
+                [checked]="isCheckboxChecked(campo.key, opcion.value)"
+                class="checkbox-input"
+              />
+              <label 
+                [for]="campo.key + '_' + opcion.value"
+                class="checkbox-label"
+              >
+                {{ opcion.label }}
+              </label>
+            </div>
+          </div>
 
           <!-- Mensajes de error -->
           <div
