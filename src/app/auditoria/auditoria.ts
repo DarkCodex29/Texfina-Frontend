@@ -2,16 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { PrimeDataTableComponent, TableColumn, TableAction, TableState } from '../shared/components/prime-data-table/prime-data-table.component';
+import { PrimeDataTableComponent, TableColumn, TableAction, TableState, TableButtonConfig } from '../shared/components/prime-data-table/prime-data-table.component';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -21,6 +13,7 @@ import {
   ConfiguracionCargaMasiva,
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
+import { AuditoriaConfig } from '../shared/configs/auditoria-config';
 
 interface Auditoria {
   id_auditoria?: number;
@@ -42,99 +35,16 @@ interface Auditoria {
     CommonModule,
     MatIconModule,
     MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatTableModule,
-    MatTooltipModule,
-    MatSortModule,
-    MatPaginatorModule,
-    MatProgressSpinnerModule,
-    ReactiveFormsModule,
     PrimeDataTableComponent,
   ],
   templateUrl: './auditoria.html',
   styleUrl: './auditoria.scss',
 })
 export class AuditoriaComponent implements OnInit {
-  // Configuración del DataTable
-  tableColumns: TableColumn[] = [
-    {
-      key: 'id_auditoria',
-      title: 'ID',
-      type: 'badge',
-      sortable: true,
-      filterable: true,
-      width: '90px',
-      icon: 'pi pi-hashtag'
-    },
-    {
-      key: 'entidad',
-      title: 'Entidad',
-      type: 'text',
-      sortable: true,
-      filterable: true,
-      width: '180px',
-      icon: 'pi pi-database'
-    },
-    {
-      key: 'accion',
-      title: 'Acción',
-      type: 'badge',
-      sortable: true,
-      filterable: true,
-      width: '140px',
-      icon: 'pi pi-bolt'
-    },
-    {
-      key: 'usuario',
-      title: 'Usuario',
-      type: 'user',
-      sortable: true,
-      filterable: true,
-      width: '220px',
-      icon: 'pi pi-user'
-    },
-    {
-      key: 'fecha_hora',
-      title: 'Fecha/Hora',
-      type: 'date',
-      sortable: true,
-      filterable: true,
-      width: '160px',
-      icon: 'pi pi-calendar-clock'
-    },
-    {
-      key: 'campos_modificados',
-      title: 'Campos Modificados',
-      type: 'description',
-      sortable: false,
-      filterable: true,
-      width: '300px',
-      icon: 'pi pi-info-circle'
-    }
-  ];
-
-  tableActions: TableAction[] = [
-    {
-      icon: 'pi pi-eye',
-      tooltip: 'Ver detalle de la auditoría',
-      action: 'view',
-      color: 'primary'
-    },
-    {
-      icon: 'pi pi-compare',
-      tooltip: 'Comparar cambios',
-      action: 'compare',
-      color: 'secondary'
-    },
-    {
-      icon: 'pi pi-trash',
-      tooltip: 'Eliminar registro',
-      action: 'delete',
-      color: 'danger'
-    }
-  ];
-
+  tableColumns: TableColumn[] = AuditoriaConfig.getTableColumns();
+  tableActions: TableAction[] = AuditoriaConfig.getTableActions();
+  tableButtons: TableButtonConfig[] = AuditoriaConfig.getTableButtons();
+  
   tableState: TableState = {
     loading: false,
     error: false,
@@ -142,54 +52,21 @@ export class AuditoriaComponent implements OnInit {
     filteredEmpty: false
   };
 
-  displayedColumns: string[] = [
-    'id_auditoria',
-    'entidad',
-    'accion',
-    'usuario',
-    'fecha',
-    'campos',
-    'acciones',
-  ];
-  dataSource = new MatTableDataSource<Auditoria>();
   auditorias: Auditoria[] = [];
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosColumnaHabilitados = true;
   dropdownExportAbierto = false;
-  hasError = false;
-  errorMessage = '';
-  cargando = false;
 
   constructor(
-    private fb: FormBuilder,
     private dialog: MatDialog,
     private exportacionService: ExportacionService,
     private cargaMasivaService: CargaMasivaService
-  ) {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
-    this.filtrosColumnaForm = this.fb.group({
-      id: [''],
-      entidad: [''],
-      accion: [''],
-      usuario: [''],
-      fecha: [''],
-      campos: [''],
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cargarDatos();
-    this.configurarFiltros();
   }
 
   private cargarDatos(): void {
     this.tableState = { ...this.tableState, loading: true, error: false };
-    this.cargando = true;
-    this.hasError = false;
 
     setTimeout(() => {
       try {
@@ -330,141 +207,21 @@ export class AuditoriaComponent implements OnInit {
               '{"cantidad":175,"fecha_ultima_actualizacion":"2024-01-21T20:00:00"}',
           },
         ];
-        // Mapear alias para binding correcto
-        this.auditorias = this.auditorias.map((a) => ({
-          ...a,
-          entidad: a.tipo_entidad,
-          fecha: a.fecha_hora,
-          campos: a.campos_modificados,
-        }));
-        this.dataSource.data = [...this.auditorias];
+        
         this.tableState = { 
           ...this.tableState, 
           loading: false, 
           empty: this.auditorias.length === 0,
           filteredEmpty: false
         };
-        this.cargando = false;
       } catch (error) {
-        this.hasError = true;
-        this.errorMessage = 'Error al cargar los registros de auditoría';
         this.tableState = { ...this.tableState, loading: false, error: true };
-        this.cargando = false;
       }
     }, 1000);
   }
 
-  private configurarFiltros(): void {
-    this.filtroGeneralForm
-      .get('busquedaGeneral')
-      ?.valueChanges.subscribe((valor) => {
-        this.aplicarFiltroGeneral(valor || '');
-      });
-  }
-
-  private aplicarFiltroGeneral(valor: string): void {
-    if (!valor.trim()) {
-      this.dataSource.data = [...this.auditorias];
-      return;
-    }
-
-    const filtro = valor.toLowerCase();
-    this.dataSource.data = this.auditorias.filter(
-      (auditoria) =>
-        auditoria.tipo_entidad.toLowerCase().includes(filtro) ||
-        auditoria.id_entidad.toLowerCase().includes(filtro) ||
-        auditoria.accion.toLowerCase().includes(filtro) ||
-        auditoria.usuario.toLowerCase().includes(filtro) ||
-        auditoria.campos_modificados.toLowerCase().includes(filtro)
-    );
-  }
-
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.patchValue({ busquedaGeneral: '' });
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset();
-  }
-
-  get isEmpty(): boolean {
-    return !this.cargando && !this.hasError && this.auditorias.length === 0;
-  }
-
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.cargando &&
-      !this.hasError &&
-      this.auditorias.length > 0 &&
-      this.dataSource.data.length === 0
-    );
-  }
-
-  sortData(column: string): void {
-    console.log('Ordenar por:', column);
-  }
-
   reintentarCarga(): void {
     this.cargarDatos();
-  }
-
-  formatearCodigo(id?: number): string {
-    if (!id) return '000001';
-    return id.toString().padStart(6, '0');
-  }
-
-  formatearTexto(texto?: string): string {
-    return texto && texto.trim() ? texto : '-';
-  }
-
-  formatearAccion(accion: string): string {
-    const acciones: { [key: string]: string } = {
-      CREATE: 'Crear',
-      INSERT: 'Insertar',
-      UPDATE: 'Actualizar',
-      DELETE: 'Eliminar',
-      LOGIN: 'Acceso',
-      LOGOUT: 'Salida',
-    };
-    return acciones[accion] || accion;
-  }
-
-  formatearFecha(fecha?: Date): string {
-    if (!fecha) return '-';
-    try {
-      return new Date(fecha).toLocaleDateString('es-ES');
-    } catch {
-      return '-';
-    }
-  }
-
-  formatearHora(fecha?: Date): string {
-    if (!fecha) return '-';
-    try {
-      return new Date(fecha).toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch {
-      return '-';
-    }
-  }
-
-  formatearCampos(campos?: string): string {
-    if (!campos) return '-';
-    return campos.length > 30 ? `${campos.substring(0, 30)}...` : campos;
-  }
-
-  getAccionBadgeClass(accion: string): string {
-    const clases: { [key: string]: string } = {
-      CREATE: 'badge-create',
-      INSERT: 'badge-insert',
-      UPDATE: 'badge-update',
-      DELETE: 'badge-delete',
-      LOGIN: 'badge-login',
-      LOGOUT: 'badge-logout',
-    };
-    return clases[accion] || 'badge-neutral';
   }
 
   exportarExcel(): void {
@@ -491,7 +248,7 @@ export class AuditoriaComponent implements OnInit {
     this.dropdownExportAbierto = !this.dropdownExportAbierto;
   }
 
-  cargaMasiva(): void {
+  private cargaMasiva(): void {
     const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
       width: '600px',
       disableClose: true,
@@ -504,72 +261,69 @@ export class AuditoriaComponent implements OnInit {
     });
   }
 
-  agregar(): void {
+  private agregar(): void {
     import(
       '../shared/dialogs/formulario-dialog/formulario-dialog.component'
     ).then(({ FormularioDialogComponent }) => {
-      import('../shared/configs/auditoria-config').then(
-        ({ AuditoriaConfig }) => {
-          const dialogRef = this.dialog.open(FormularioDialogComponent, {
-            width: '600px',
-            disableClose: true,
-            data: {
-              configuracion: AuditoriaConfig.getConfiguracionFormulario(false),
-            },
-          });
+      const config = AuditoriaConfig.getConfiguracionFormulario(false);
+      const dialogRef = this.dialog.open(FormularioDialogComponent, {
+        width: '600px',
+        disableClose: true,
+        data: config,
+      });
 
-          dialogRef.afterClosed().subscribe((resultado) => {
-            if (resultado) {
-              console.log('Generando registro de auditoría:', resultado);
-              this.cargarDatos();
-            }
-          });
+      dialogRef.afterClosed().subscribe((resultado) => {
+        if (resultado?.accion === 'guardar') {
+          console.log('Generando registro de auditoría:', resultado.datos);
+          this.cargarDatos();
         }
-      );
+      });
     });
   }
 
-  verDetalle(auditoria: Auditoria): void {
+  private verDetalle(auditoria: Auditoria): void {
     import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
       ({ DetalleDialogComponent }) => {
-        import('../shared/configs/auditoria-config').then(
-          ({ AuditoriaConfig }) => {
-            const dialogRef = this.dialog.open(DetalleDialogComponent, {
-              width: '800px',
-              disableClose: true,
-              data: {
-                configuracion:
-                  AuditoriaConfig.getConfiguracionDetalle(auditoria),
-              },
-            });
-          }
-        );
+        const config = AuditoriaConfig.getConfiguracionDetalle(auditoria);
+        const dialogRef = this.dialog.open(DetalleDialogComponent, {
+          width: '800px',
+          disableClose: true,
+          data: config,
+        });
       }
     );
   }
 
-  compararCambios(auditoria: Auditoria): void {
+  private compararCambios(auditoria: Auditoria): void {
     console.log('Comparar cambios para:', auditoria);
     alert(
       `Comparando cambios para ${auditoria.tipo_entidad} ${auditoria.id_entidad}:\n\nAntes: ${auditoria.datos_anteriores}\n\nDespués: ${auditoria.datos_nuevos}`
     );
   }
 
-  eliminar(auditoria: Auditoria): void {
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar el registro de auditoría #${this.formatearCodigo(
-        auditoria.id_auditoria
-      )}?`
+  private eliminar(auditoria: Auditoria): void {
+    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(
+      ({ ConfirmacionDialogComponent }) => {
+        const config = AuditoriaConfig.eliminarAuditoria(auditoria);
+        const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+          width: '400px',
+          disableClose: true,
+          data: config,
+        });
+
+        dialogRef.afterClosed().subscribe((confirmed) => {
+          if (confirmed) {
+            console.log('Eliminar auditoría:', auditoria);
+            this.cargarDatos();
+          }
+        });
+      }
     );
-    if (confirmacion) {
-      console.log('Eliminar auditoría:', auditoria);
-      this.cargarDatos();
-    }
   }
 
   private configurarExportacion(): ConfiguracionExportacion<Auditoria> {
     return {
-      entidades: this.dataSource.data,
+      entidades: this.auditorias,
       nombreArchivo: 'auditoria_sistema',
       nombreEntidad: 'Auditoría del Sistema',
       columnas: [
@@ -586,10 +340,10 @@ export class AuditoriaComponent implements OnInit {
         },
         { campo: 'ip_address', titulo: 'IP Address', formato: 'texto' },
       ],
-      filtrosActivos: this.obtenerFiltrosActivos(),
+      filtrosActivos: {},
       metadatos: {
         cantidadTotal: this.auditorias.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.auditorias.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
       },
@@ -674,22 +428,7 @@ export class AuditoriaComponent implements OnInit {
       });
   }
 
-  private obtenerFiltrosActivos(): any {
-    const filtroGeneral = this.filtroGeneralForm.get('busquedaGeneral')?.value;
-    const filtrosColumna = this.filtrosColumnaForm.value;
 
-    return {
-      busquedaGeneral: filtroGeneral || null,
-      filtrosColumna: Object.keys(filtrosColumna).reduce((acc, key) => {
-        if (filtrosColumna[key]) {
-          acc[key] = filtrosColumna[key];
-        }
-        return acc;
-      }, {} as any),
-    };
-  }
-
-  // Métodos para el DataTable
   handleAction(event: {action: string, item: any}) {
     switch (event.action) {
       case 'view':
@@ -704,17 +443,26 @@ export class AuditoriaComponent implements OnInit {
     }
   }
 
+  handleButtonClick(action: string) {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk-upload':
+        this.cargaMasiva();
+        break;
+    }
+  }
+
   handleSort(event: {column: string, direction: 'asc' | 'desc'}) {
     console.log('Ordenar:', event);
-    this.sortData(event.column);
   }
 
   handleFilters(filters: any) {
     console.log('Filtros aplicados:', filters);
-    // Los filtros ya se aplican automáticamente en el DataTable
     this.tableState = {
       ...this.tableState,
-      filteredEmpty: this.dataSource.data.length === 0 && this.auditorias.length > 0
+      filteredEmpty: false
     };
   }
 }

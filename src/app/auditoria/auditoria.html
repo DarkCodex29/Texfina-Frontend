@@ -5,9 +5,6 @@
         <h1 class="page-title text-texfina text-primary">Auditoría</h1>
       </div>
       <div class="header-actions">
-        <button class="btn-texfina btn-secondary" (click)="cargaMasiva()">
-          Carga Masiva
-        </button>
         <div class="dropdown-export">
           <button
             class="btn-texfina btn-neutral dropdown-trigger"
@@ -27,11 +24,11 @@
       </div>
     </div>
 
-    <!-- PrimeNG Data Table -->
     <app-prime-data-table
       [columns]="tableColumns"
       [data]="auditorias"
       [actions]="tableActions"
+      [buttons]="tableButtons"
       [state]="tableState"
       [showGlobalFilter]="true"
       [showColumnFilters]="true"
@@ -43,10 +40,10 @@
       emptySubtitle="Los registros de auditoría aparecerán aquí automáticamente"
       emptyActionText="Generar Primera Auditoría"
       (actionClick)="handleAction($event)"
+      (buttonClick)="handleButtonClick($event)"
       (sortChanged)="handleSort($event)"
       (filtersChanged)="handleFilters($event)"
       (retryClicked)="reintentarCarga()"
-      (addNewClicked)="agregar()"
     ></app-prime-data-table>
   </div>
 </div>

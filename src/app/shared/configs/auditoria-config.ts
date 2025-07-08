@@ -7,8 +7,107 @@ import {
   CampoDetalle,
 } from '../dialogs/detalle-dialog/detalle-dialog.component';
 import { ConfiguracionConfirmacion } from '../dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import { TableColumn, TableAction, TableButtonConfig } from '../components/prime-data-table/prime-data-table.component';
 
 export class AuditoriaConfig {
+  static getTableColumns(): TableColumn[] {
+    return [
+      {
+        key: 'id_auditoria',
+        title: 'ID',
+        type: 'badge',
+        sortable: true,
+        filterable: true,
+        width: '90px',
+        icon: 'pi pi-hashtag'
+      },
+      {
+        key: 'tipo_entidad',
+        title: 'Entidad',
+        type: 'text',
+        sortable: true,
+        filterable: true,
+        width: '180px',
+        icon: 'pi pi-database'
+      },
+      {
+        key: 'accion',
+        title: 'Acción',
+        type: 'badge',
+        sortable: true,
+        filterable: true,
+        width: '140px',
+        icon: 'pi pi-bolt'
+      },
+      {
+        key: 'usuario',
+        title: 'Usuario',
+        type: 'user',
+        sortable: true,
+        filterable: true,
+        width: '220px',
+        icon: 'pi pi-user'
+      },
+      {
+        key: 'fecha_hora',
+        title: 'Fecha/Hora',
+        type: 'date',
+        sortable: true,
+        filterable: true,
+        width: '160px',
+        icon: 'pi pi-calendar-clock'
+      },
+      {
+        key: 'campos_modificados',
+        title: 'Campos Modificados',
+        type: 'description',
+        sortable: false,
+        filterable: true,
+        width: '300px',
+        icon: 'pi pi-info-circle'
+      }
+    ];
+  }
+
+  static getTableActions(): TableAction[] {
+    return [
+      {
+        icon: 'pi pi-eye',
+        tooltip: 'Ver detalle de la auditoría',
+        action: 'view',
+        color: 'primary'
+      },
+      {
+        icon: 'pi pi-compare',
+        tooltip: 'Comparar cambios',
+        action: 'compare',
+        color: 'secondary'
+      },
+      {
+        icon: 'pi pi-trash',
+        tooltip: 'Eliminar registro',
+        action: 'delete',
+        color: 'danger'
+      }
+    ];
+  }
+
+  static getTableButtons(): TableButtonConfig[] {
+    return [
+      {
+        label: 'Agregar',
+        icon: 'pi pi-plus',
+        action: 'add',
+        color: 'primary'
+      },
+      {
+        label: 'Carga Masiva',
+        icon: 'pi pi-upload',
+        action: 'bulk-upload',
+        color: 'secondary'
+      }
+    ];
+  }
   static getConfiguracionFormulario(
     esEdicion: boolean,
     datosIniciales?: any
@@ -25,7 +124,7 @@ export class AuditoriaConfig {
       filas: [
         [
           {
-            key: 'entidad',
+            key: 'tipo_entidad',
             label: 'Entidad',
             tipo: 'select',
             obligatorio: true,
@@ -59,8 +158,8 @@ export class AuditoriaConfig {
             placeholder: 'Usuario que realizó la acción',
           },
           {
-            key: 'ip_cliente',
-            label: 'IP Cliente',
+            key: 'ip_address',
+            label: 'IP Address',
             tipo: 'text',
             obligatorio: false,
             maxLength: 45,
@@ -106,7 +205,7 @@ export class AuditoriaConfig {
               valor ? `#${valor.toString().padStart(6, '0')}` : '-',
           },
           {
-            key: 'entidad',
+            key: 'tipo_entidad',
             label: 'Entidad',
             tipo: 'text',
             formateo: (valor) => valor || '-',
@@ -119,9 +218,12 @@ export class AuditoriaConfig {
             tipo: 'text',
             formateo: (valor) => {
               const acciones: any = {
-                INSERT: 'Crear',
+                CREATE: 'Crear',
+                INSERT: 'Insertar',
                 UPDATE: 'Actualizar',
                 DELETE: 'Eliminar',
+                LOGIN: 'Acceso',
+                LOGOUT: 'Salida',
               };
               return acciones[valor] || valor || '-';
             },
@@ -145,8 +247,8 @@ export class AuditoriaConfig {
             },
           },
           {
-            key: 'ip_cliente',
-            label: 'IP Cliente',
+            key: 'ip_address',
+            label: 'IP Address',
             tipo: 'text',
             formateo: (valor) => valor || '-',
           },
@@ -161,18 +263,34 @@ export class AuditoriaConfig {
         ],
         [
           {
-            key: 'valores_anteriores',
-            label: 'Valores Anteriores',
+            key: 'datos_anteriores',
+            label: 'Datos Anteriores',
             tipo: 'textarea',
-            formateo: (valor) => valor || '-',
+            formateo: (valor) => {
+              if (!valor || valor === '{}') return '-';
+              try {
+                const datos = JSON.parse(valor);
+                return JSON.stringify(datos, null, 2);
+              } catch {
+                return valor;
+              }
+            },
           },
         ],
         [
           {
-            key: 'valores_nuevos',
-            label: 'Valores Nuevos',
+            key: 'datos_nuevos',
+            label: 'Datos Nuevos',
             tipo: 'textarea',
-            formateo: (valor) => valor || '-',
+            formateo: (valor) => {
+              if (!valor || valor === '{}') return '-';
+              try {
+                const datos = JSON.parse(valor);
+                return JSON.stringify(datos, null, 2);
+              } catch {
+                return valor;
+              }
+            },
           },
         ],
         [

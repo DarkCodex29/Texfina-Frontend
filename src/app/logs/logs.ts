@@ -1,15 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
-import { PrimeDataTableComponent, TableColumn, TableAction, TableState } from '../shared/components/prime-data-table/prime-data-table.component';
+import { PrimeDataTableComponent, TableColumn, TableAction, TableState, TableButtonConfig } from '../shared/components/prime-data-table/prime-data-table.component';
 import {
   ExportacionService,
   ConfiguracionExportacion,
@@ -19,8 +13,7 @@ import {
   ConfiguracionCargaMasiva,
 } from '../services/carga-masiva.service';
 import { CargaMasivaDialogComponent } from '../shared/dialogs/carga-masiva-dialog/carga-masiva-dialog.component';
-import { DetalleDialogComponent } from '../shared/dialogs/detalle-dialog/detalle-dialog.component';
-import { ConfirmacionDialogComponent } from '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import { LogsConfig } from '../shared/configs/logs-config';
 
 interface LogEvento {
   id: number;
@@ -40,108 +33,18 @@ interface LogEvento {
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatTableModule,
-    MatSortModule,
     MatIconModule,
     MatButtonModule,
-    MatProgressSpinnerModule,
-    MatTooltipModule,
-    MatPaginatorModule,
     PrimeDataTableComponent,
   ],
   templateUrl: './logs.html',
   styleUrl: './logs.scss',
 })
 export class LogsComponent implements OnInit {
-  // Configuración del DataTable
-  tableColumns: TableColumn[] = [
-    {
-      key: 'id',
-      title: 'ID',
-      type: 'badge',
-      sortable: true,
-      filterable: true,
-      width: '90px',
-      icon: 'pi pi-hashtag'
-    },
-    {
-      key: 'timestamp',
-      title: 'Fecha/Hora',
-      type: 'date',
-      sortable: true,
-      filterable: true,
-      width: '160px',
-      icon: 'pi pi-calendar-clock'
-    },
-    {
-      key: 'usuario',
-      title: 'Usuario',
-      type: 'user',
-      sortable: true,
-      filterable: true,
-      width: '220px',
-      icon: 'pi pi-user'
-    },
-    {
-      key: 'accion',
-      title: 'Acción',
-      type: 'action',
-      sortable: true,
-      filterable: true,
-      width: '180px',
-      icon: 'pi pi-bolt'
-    },
-    {
-      key: 'modulo',
-      title: 'Módulo',
-      type: 'module',
-      sortable: true,
-      filterable: true,
-      width: '140px',
-      icon: 'pi pi-building'
-    },
-    {
-      key: 'ip_origen',
-      title: 'IP Origen',
-      type: 'ip',
-      sortable: true,
-      filterable: true,
-      width: '130px',
-      icon: 'pi pi-server'
-    },
-    {
-      key: 'descripcion',
-      title: 'Descripción',
-      type: 'description',
-      sortable: false,
-      filterable: true,
-      width: '300px',
-      icon: 'pi pi-info-circle'
-    }
-  ];
-
-  tableActions: TableAction[] = [
-    {
-      icon: 'pi pi-eye',
-      tooltip: 'Ver detalle del log',
-      action: 'view',
-      color: 'primary'
-    },
-    {
-      icon: 'pi pi-file-export',
-      tooltip: 'Exportar log',
-      action: 'export',
-      color: 'secondary'
-    },
-    {
-      icon: 'pi pi-trash',
-      tooltip: 'Eliminar log',
-      action: 'delete',
-      color: 'danger'
-    }
-  ];
-
+  tableColumns: TableColumn[] = LogsConfig.getTableColumns();
+  tableActions: TableAction[] = LogsConfig.getTableActions();
+  tableButtons: TableButtonConfig[] = LogsConfig.getTableButtons();
+  
   tableState: TableState = {
     loading: false,
     error: false,
@@ -149,87 +52,22 @@ export class LogsComponent implements OnInit {
     filteredEmpty: false
   };
 
-  // Propiedades existentes
-  displayedColumns: string[] = [
-    'id',
-    'timestamp',
-    'usuario',
-    'accion',
-    'modulo',
-    'ip_origen',
-    'acciones',
-  ];
-
-  dataSource = new MatTableDataSource<LogEvento>([]);
-  filtroGeneralForm: FormGroup;
-  filtrosColumnaForm: FormGroup;
-  filtrosColumnaHabilitados = false;
+  logs: LogEvento[] = [];
   dropdownExportAbierto = false;
 
-  logs: LogEvento[] = [];
-  cargando = false;
-  error: string | null = null;
-
-  private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
   private exportacionService = inject(ExportacionService);
   private cargaMasivaService = inject(CargaMasivaService);
 
-  get hasError(): boolean {
-    return !!this.error;
-  }
-
-  get isEmpty(): boolean {
-    return !this.cargando && !this.error && this.logs.length === 0;
-  }
-
-  get isFilteredEmpty(): boolean {
-    return (
-      !this.cargando &&
-      !this.error &&
-      this.logs.length > 0 &&
-      this.dataSource.data.length === 0
-    );
-  }
-
-  get errorMessage(): string {
-    return this.error || '';
-  }
-
-  constructor() {
-    this.filtroGeneralForm = this.fb.group({
-      busquedaGeneral: [''],
-    });
-
-    this.filtrosColumnaForm = this.fb.group({
-      id: [''],
-      timestamp: [''],
-      usuario: [''],
-      accion: [''],
-      modulo: [''],
-      ip_origen: [''],
-    });
-  }
+  constructor() {}
 
   ngOnInit(): void {
     this.cargarDatos();
-    this.configurarFiltros();
-  }
-
-  private configurarFiltros(): void {
-    this.filtroGeneralForm
-      .get('busquedaGeneral')
-      ?.valueChanges.subscribe(() => {
-        this.aplicarFiltroGeneral();
-      });
   }
 
   cargarDatos(): void {
     this.tableState = { ...this.tableState, loading: true, error: false };
-    this.cargando = true;
-    this.error = null;
     
-    // Simular carga con setTimeout para mostrar skeleton
     setTimeout(() => {
       this.logs = [
       {
@@ -310,94 +148,65 @@ export class LogsComponent implements OnInit {
         timestamp: '2024-01-20T18:00:00',
       },
     ];
-      this.dataSource.data = [...this.logs];
+      
       this.tableState = { 
         ...this.tableState, 
         loading: false, 
         empty: this.logs.length === 0,
         filteredEmpty: false
       };
-      this.cargando = false;
-    }, 1500); // 1.5 segundos para ver el skeleton
-  }
-
-  aplicarFiltroGeneral(): void {
-    const valor =
-      this.filtroGeneralForm.get('busquedaGeneral')?.value?.toLowerCase() || '';
-    this.dataSource.data = this.logs.filter((log) => {
-      return (
-        log.usuario?.toLowerCase().includes(valor) ||
-        log.accion?.toLowerCase().includes(valor) ||
-        log.descripcion?.toLowerCase().includes(valor) ||
-        log.modulo?.toLowerCase().includes(valor) ||
-        log.ip_origen?.toLowerCase().includes(valor)
-      );
-    });
-  }
-
-  limpiarFiltroGeneral(): void {
-    this.filtroGeneralForm.reset({ busquedaGeneral: '' });
-    this.aplicarFiltroGeneral();
-  }
-
-  limpiarFiltrosColumna(): void {
-    this.filtrosColumnaForm.reset({
-      id: '',
-      timestamp: '',
-      usuario: '',
-      accion: '',
-      modulo: '',
-      ip_origen: '',
-    });
-    this.dataSource.data = [...this.logs];
-  }
-
-  eliminar(log: LogEvento): void {
-    // Conectar con modal de confirmación existente
-    this.dialog.open(ConfirmacionDialogComponent, {
-      width: '400px',
-      data: {
-        titulo: 'Confirmar Eliminación',
-        mensaje: `¿Estás seguro de que deseas eliminar el log #${log.id}?`,
-        textoBotonConfirmar: 'Eliminar',
-        textoBotonCancelar: 'Cancelar'
-      }
-    }).afterClosed().subscribe(confirmado => {
-      if (confirmado) {
-        this.logs = this.logs.filter((l) => l.id !== log.id);
-        this.dataSource.data = [...this.logs];
-        // Actualizar estado de la tabla
-        this.tableState = {
-          ...this.tableState,
-          empty: this.logs.length === 0
-        };
-      }
-    });
-  }
-
-  sortData(sort: Sort | string): void {
-    if (typeof sort === 'string') {
-      this.dataSource.data = [...this.dataSource.data].sort((a, b) => {
-        const aValue = a[sort];
-        const bValue = b[sort];
-        if (aValue === undefined || bValue === undefined) return 0;
-        if (aValue < bValue) return -1;
-        if (aValue > bValue) return 1;
-        return 0;
-      });
-    }
+    }, 1000);
   }
 
   reintentarCarga(): void {
     this.cargarDatos();
   }
 
-  agregar(): void {
-    // Aquí iría la lógica para agregar un nuevo log
+  private eliminar(log: LogEvento): void {
+    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(
+      ({ ConfirmacionDialogComponent }) => {
+        const config = LogsConfig.eliminarLog(log);
+        const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+          width: '400px',
+          disableClose: true,
+          data: config,
+        });
+
+        dialogRef.afterClosed().subscribe((confirmed) => {
+          if (confirmed) {
+            this.logs = this.logs.filter((l) => l.id !== log.id);
+            this.tableState = {
+              ...this.tableState,
+              empty: this.logs.length === 0
+            };
+          }
+        });
+      }
+    );
   }
 
-  cargaMasiva(): void {
-    this.dialog.open(CargaMasivaDialogComponent, {
+  private agregar(): void {
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      const config = LogsConfig.getConfiguracionFormulario(false);
+      const dialogRef = this.dialog.open(FormularioDialogComponent, {
+        width: '600px',
+        disableClose: true,
+        data: config,
+      });
+
+      dialogRef.afterClosed().subscribe((resultado) => {
+        if (resultado?.accion === 'guardar') {
+          console.log('Agregando nuevo log:', resultado.datos);
+          this.cargarDatos();
+        }
+      });
+    });
+  }
+
+  private cargaMasiva(): void {
+    const dialogRef = this.dialog.open(CargaMasivaDialogComponent, {
       width: '600px',
       disableClose: true,
       data: {
@@ -425,65 +234,117 @@ export class LogsComponent implements OnInit {
     this.dropdownExportAbierto = !this.dropdownExportAbierto;
   }
 
-  verDetalle(log: LogEvento): void {
-    // Conectar con modal de detalle existente
-    this.dialog.open(DetalleDialogComponent, {
-      width: '800px',
-      data: {
-        entidad: log,
-        titulo: 'Detalle del Log',
-        campos: [
-          { label: 'ID', valor: log.id },
-          { label: 'Usuario', valor: log.usuario },
-          { label: 'Acción', valor: log.accion },
-          { label: 'Descripción', valor: log.descripcion },
-          { label: 'Módulo', valor: log.modulo },
-          { label: 'IP Origen', valor: log.ip_origen },
-          { label: 'Tabla Afectada', valor: log.tabla_afectada },
-          { label: 'Fecha/Hora', valor: log.timestamp }
-        ]
+  private verDetalle(log: LogEvento): void {
+    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
+      ({ DetalleDialogComponent }) => {
+        const config = LogsConfig.getConfiguracionDetalle(log);
+        const dialogRef = this.dialog.open(DetalleDialogComponent, {
+          width: '800px',
+          disableClose: true,
+          data: config,
+        });
       }
-    });
+    );
   }
 
 
-  formatearCodigo(id?: number): string {
-    if (!id) return '00001';
-    return id.toString().padStart(5, '0');
+  private exportarLogIndividual(log: LogEvento): void {
+    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(
+      ({ ConfirmacionDialogComponent }) => {
+        const config = {
+          titulo: 'Exportar Log Individual',
+          subtitulo: `Log #${log.id} - ${new Date(log.timestamp).toLocaleDateString('es-ES')}`,
+          mensaje: `Seleccione el formato de exportación para este log:
+
+Información del log:
+• Usuario: ${log.usuario}
+• Acción: ${log.accion}
+• Módulo: ${log.modulo}
+• IP: ${log.ip_origen}
+• Descripción: ${log.descripcion.substring(0, 50)}${log.descripcion.length > 50 ? '...' : ''}`,
+          mensajeSecundario: 'Excel: Para análisis en hojas de cálculo\nPDF: Para documentación y archivo',
+          tipo: 'info' as const,
+          textoBotonConfirmar: 'Exportar Excel',
+          textoBotonCancelar: 'Exportar PDF'
+        };
+        
+        const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+          width: '500px',
+          disableClose: true,
+          data: config,
+        });
+
+        dialogRef.afterClosed().subscribe((resultado) => {
+          if (resultado === true) {
+            this.exportarLogExcel(log);
+          } else if (resultado === false) {
+            this.exportarLogPDF(log);
+          }
+          // Si es null o undefined, se canceló
+        });
+      }
+    );
   }
 
-  formatearTexto(texto?: string): string {
-    if (typeof texto === 'string' && texto.trim().length > 0) {
-      return texto;
-    }
-    return '—';
+  private exportarLogExcel(log: LogEvento): void {
+    const config: ConfiguracionExportacion<LogEvento> = {
+      entidades: [log],
+      nombreArchivo: `log_${log.id}_${new Date(log.timestamp).toISOString().split('T')[0]}`,
+      nombreEntidad: 'Log Individual',
+      columnas: [
+        { campo: 'id', titulo: 'ID', formato: 'numero' },
+        { campo: 'timestamp', titulo: 'Fecha/Hora', formato: 'fecha' },
+        { campo: 'usuario', titulo: 'Usuario', formato: 'texto' },
+        { campo: 'accion', titulo: 'Acción', formato: 'texto' },
+        { campo: 'modulo', titulo: 'Módulo', formato: 'texto' },
+        { campo: 'ip_origen', titulo: 'IP Origen', formato: 'texto' },
+        { campo: 'descripcion', titulo: 'Descripción', formato: 'texto' },
+        { campo: 'tabla_afectada', titulo: 'Tabla Afectada', formato: 'texto' },
+      ],
+      filtrosActivos: {},
+      metadatos: {
+        cantidadTotal: 1,
+        cantidadFiltrada: 1,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+    
+    this.exportacionService.exportarExcel(config);
+    console.log('✅ Log exportado a Excel:', log);
   }
 
-  formatearFecha(fecha: string): string {
-    if (!fecha) return '—';
-    const d = new Date(fecha);
-    if (isNaN(d.getTime())) return '—';
-    return d.toLocaleDateString('es-PE', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-  }
-
-  formatearHora(fecha: string): string {
-    if (!fecha) return '—';
-    const d = new Date(fecha);
-    if (isNaN(d.getTime())) return '—';
-    return d.toLocaleTimeString('es-PE', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
+  private exportarLogPDF(log: LogEvento): void {
+    const config: ConfiguracionExportacion<LogEvento> = {
+      entidades: [log],
+      nombreArchivo: `log_${log.id}_${new Date(log.timestamp).toISOString().split('T')[0]}`,
+      nombreEntidad: 'Log Individual',
+      columnas: [
+        { campo: 'id', titulo: 'ID', formato: 'numero' },
+        { campo: 'timestamp', titulo: 'Fecha/Hora', formato: 'fecha' },
+        { campo: 'usuario', titulo: 'Usuario', formato: 'texto' },
+        { campo: 'accion', titulo: 'Acción', formato: 'texto' },
+        { campo: 'modulo', titulo: 'Módulo', formato: 'texto' },
+        { campo: 'ip_origen', titulo: 'IP Origen', formato: 'texto' },
+        { campo: 'descripcion', titulo: 'Descripción', formato: 'texto' },
+        { campo: 'tabla_afectada', titulo: 'Tabla Afectada', formato: 'texto' },
+      ],
+      filtrosActivos: {},
+      metadatos: {
+        cantidadTotal: 1,
+        cantidadFiltrada: 1,
+        fechaExportacion: new Date(),
+        usuario: 'Usuario Actual',
+      },
+    };
+    
+    this.exportacionService.exportarPDF(config);
+    console.log('✅ Log exportado a PDF:', log);
   }
 
   private configurarExportacion(): ConfiguracionExportacion<LogEvento> {
     return {
-      entidades: this.dataSource.data,
+      entidades: this.logs,
       nombreArchivo: 'logs',
       nombreEntidad: 'Logs',
       columnas: [
@@ -494,10 +355,10 @@ export class LogsComponent implements OnInit {
         { campo: 'modulo', titulo: 'Módulo', formato: 'texto' },
         { campo: 'ip_origen', titulo: 'IP Origen', formato: 'texto' },
       ],
-      filtrosActivos: this.obtenerFiltrosActivos(),
+      filtrosActivos: {},
       metadatos: {
         cantidadTotal: this.logs.length,
-        cantidadFiltrada: this.dataSource.data.length,
+        cantidadFiltrada: this.logs.length,
         fechaExportacion: new Date(),
         usuario: 'Usuario Actual',
       },
@@ -555,20 +416,26 @@ export class LogsComponent implements OnInit {
     };
   }
 
-  private descargarPlantillaCargaMasiva(): void {}
-
-  private procesarArchivoCargaMasiva(archivo: File): void {}
-
-  private obtenerFiltrosActivos(): any {
-    return {};
+  private descargarPlantillaCargaMasiva(): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService.generarPlantilla(config);
   }
 
-  exportarLogIndividual(log: LogEvento): void {
-    console.log('Exportar log individual:', log);
-    // Aquí iría la lógica para exportar un log específico
+  private procesarArchivoCargaMasiva(archivo: File): void {
+    const config = this.configurarCargaMasiva();
+    this.cargaMasivaService
+      .procesarArchivo(archivo, config)
+      .then((resultado) => {
+        console.log('Archivo procesado:', resultado);
+        if (resultado.exitosa) {
+          this.cargarDatos();
+        }
+      })
+      .catch((error) => {
+        console.error('Error al procesar archivo:', error);
+      });
   }
 
-  // Métodos para el DataTable
   handleAction(event: {action: string, item: any}) {
     switch (event.action) {
       case 'view':
@@ -583,17 +450,26 @@ export class LogsComponent implements OnInit {
     }
   }
 
+  handleButtonClick(action: string) {
+    switch (action) {
+      case 'add':
+        this.agregar();
+        break;
+      case 'bulk-upload':
+        this.cargaMasiva();
+        break;
+    }
+  }
+
   handleSort(event: {column: string, direction: 'asc' | 'desc'}) {
     console.log('Ordenar:', event);
-    this.sortData(event.column);
   }
 
   handleFilters(filters: any) {
     console.log('Filtros aplicados:', filters);
-    // Los filtros ya se aplican automáticamente en el DataTable
     this.tableState = {
       ...this.tableState,
-      filteredEmpty: this.dataSource.data.length === 0 && this.logs.length > 0
+      filteredEmpty: false
     };
   }
 }

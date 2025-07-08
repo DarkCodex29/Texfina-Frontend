@@ -7,8 +7,116 @@ import {
   CampoDetalle,
 } from '../dialogs/detalle-dialog/detalle-dialog.component';
 import { ConfiguracionConfirmacion } from '../dialogs/confirmacion-dialog/confirmacion-dialog.component';
+import { TableColumn, TableAction, TableButtonConfig } from '../components/prime-data-table/prime-data-table.component';
 
 export class LogsConfig {
+  static getTableColumns(): TableColumn[] {
+    return [
+      {
+        key: 'id',
+        title: 'ID',
+        type: 'badge',
+        sortable: true,
+        filterable: true,
+        width: '90px',
+        icon: 'pi pi-hashtag'
+      },
+      {
+        key: 'timestamp',
+        title: 'Fecha/Hora',
+        type: 'date',
+        sortable: true,
+        filterable: true,
+        width: '160px',
+        icon: 'pi pi-calendar-clock'
+      },
+      {
+        key: 'usuario',
+        title: 'Usuario',
+        type: 'user',
+        sortable: true,
+        filterable: true,
+        width: '220px',
+        icon: 'pi pi-user'
+      },
+      {
+        key: 'accion',
+        title: 'Acción',
+        type: 'action',
+        sortable: true,
+        filterable: true,
+        width: '180px',
+        icon: 'pi pi-bolt'
+      },
+      {
+        key: 'modulo',
+        title: 'Módulo',
+        type: 'module',
+        sortable: true,
+        filterable: true,
+        width: '140px',
+        icon: 'pi pi-building'
+      },
+      {
+        key: 'ip_origen',
+        title: 'IP Origen',
+        type: 'ip',
+        sortable: true,
+        filterable: true,
+        width: '130px',
+        icon: 'pi pi-server'
+      },
+      {
+        key: 'descripcion',
+        title: 'Descripción',
+        type: 'description',
+        sortable: false,
+        filterable: true,
+        width: '300px',
+        icon: 'pi pi-info-circle'
+      }
+    ];
+  }
+
+  static getTableActions(): TableAction[] {
+    return [
+      {
+        icon: 'pi pi-eye',
+        tooltip: 'Ver detalle del log',
+        action: 'view',
+        color: 'primary'
+      },
+      {
+        icon: 'pi pi-file-export',
+        tooltip: 'Exportar log',
+        action: 'export',
+        color: 'secondary'
+      },
+      {
+        icon: 'pi pi-trash',
+        tooltip: 'Eliminar log',
+        action: 'delete',
+        color: 'danger'
+      }
+    ];
+  }
+
+  static getTableButtons(): TableButtonConfig[] {
+    return [
+      {
+        label: 'Agregar',
+        icon: 'pi pi-plus',
+        action: 'add',
+        color: 'primary'
+      },
+      {
+        label: 'Carga Masiva',
+        icon: 'pi pi-upload',
+        action: 'bulk-upload',
+        color: 'secondary'
+      }
+    ];
+  }
   static getConfiguracionFormulario(
     esEdicion: boolean,
     datosIniciales?: any
@@ -89,36 +197,28 @@ export class LogsConfig {
       filas: [
         [
           {
-            key: 'id_log',
+            key: 'id',
             label: 'ID',
             tipo: 'text',
             formateo: (valor) =>
               valor ? `#${valor.toString().padStart(6, '0')}` : '-',
           },
           {
-            key: 'nivel',
-            label: 'Nivel',
+            key: 'accion',
+            label: 'Acción',
             tipo: 'text',
-            formateo: (valor) => {
-              const niveles: any = {
-                INFO: 'Información',
-                WARNING: 'Advertencia',
-                ERROR: 'Error',
-                CRITICAL: 'Crítico',
-              };
-              return niveles[valor] || valor || '-';
-            },
+            formateo: (valor) => valor || '-',
           },
         ],
         [
           {
-            key: 'categoria',
-            label: 'Categoría',
+            key: 'modulo',
+            label: 'Módulo',
             tipo: 'text',
             formateo: (valor) => valor || '-',
           },
           {
-            key: 'fecha_hora',
+            key: 'timestamp',
             label: 'Fecha y Hora',
             tipo: 'text',
             formateo: (valor) => {
@@ -130,8 +230,8 @@ export class LogsConfig {
         ],
         [
           {
-            key: 'mensaje',
-            label: 'Mensaje',
+            key: 'descripcion',
+            label: 'Descripción',
             tipo: 'textarea',
             formateo: (valor) => valor || '-',
           },
@@ -152,9 +252,9 @@ export class LogsConfig {
         ],
         [
           {
-            key: 'detalles_adicionales',
-            label: 'Detalles Adicionales',
-            tipo: 'textarea',
+            key: 'tabla_afectada',
+            label: 'Tabla Afectada',
+            tipo: 'text',
             formateo: (valor) => valor || '-',
           },
         ],
@@ -166,8 +266,8 @@ export class LogsConfig {
     return {
       titulo: 'Eliminar Log',
       subtitulo: 'Esta acción no se puede deshacer',
-      mensaje: `¿Está seguro que desea eliminar este log del ${new Date(
-        log.fecha_hora
+      mensaje: `¿Está seguro que desea eliminar el log #${log.id} del ${new Date(
+        log.timestamp
       ).toLocaleDateString('es-ES')}?`,
       tipo: 'danger',
       textoBotonConfirmar: 'Eliminar',
