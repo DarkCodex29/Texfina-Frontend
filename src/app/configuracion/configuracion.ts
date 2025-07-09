@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
 // PrimeNG imports
-import { TabsModule } from 'primeng/tabs';
+import { AccordionModule } from 'primeng/accordion';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -79,7 +79,7 @@ export interface ConfiguracionSistema {
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    TabsModule,
+    AccordionModule,
     InputTextModule,
     SelectModule,
     CheckboxModule,

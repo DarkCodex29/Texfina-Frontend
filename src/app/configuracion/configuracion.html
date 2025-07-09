@@ -16,316 +16,290 @@
       </div>
     </div>
 
-    <div class="table-card config-container">
-      <p-tabs [(value)]="activeTab" scrollable>
-        <p-tablist>
-          @for (tab of tabs; track tab.value) {
-          <p-tab [value]="tab.value" class="flex items-center gap-2">
-            <i [class]="tab.icon"></i>
-            <span>{{ tab.title }}</span>
-          </p-tab>
-          }
-        </p-tablist>
+    <div class="config-card">
+      <p-accordion>
+        <!-- Información de la Empresa -->
+        <p-accordionpanel>
+          <p-accordionheader>
+            <span class="accordion-header">
+              <i class="pi pi-building"></i>
+              <span>Información de la Empresa</span>
+            </span>
+          </p-accordionheader>
+          <p-accordioncontent>
+            <div class="form-grid">
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="empresa-nombre"
+                        [(ngModel)]="configuracion.empresa.nombre"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="empresa-nombre">Nombre de la Empresa</label>
+                    </p-floatlabel>
 
-        <p-tabpanels>
-          <!-- Tab General -->
-          <p-tabpanel value="0">
-            <div class="tab-content">
-              <!-- Información de la Empresa -->
-              <div class="config-section">
-                <div class="section-header">
-                  <h3 class="section-title">
-                    <i class="pi pi-building"></i>
-                    Información de la Empresa
-                  </h3>
-                </div>
-                <div class="config-grid">
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="empresa-nombre"
-                      [(ngModel)]="configuracion.empresa.nombre"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="empresa-nombre">Nombre de la Empresa</label>
-                  </p-floatlabel>
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="empresa-ruc"
+                        [(ngModel)]="configuracion.empresa.ruc"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="empresa-ruc">RUC</label>
+                    </p-floatlabel>
 
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="empresa-ruc"
-                      [(ngModel)]="configuracion.empresa.ruc"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="empresa-ruc">RUC</label>
-                  </p-floatlabel>
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="empresa-direccion"
+                        [(ngModel)]="configuracion.empresa.direccion"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="empresa-direccion">Dirección</label>
+                    </p-floatlabel>
 
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="empresa-direccion"
-                      [(ngModel)]="configuracion.empresa.direccion"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="empresa-direccion">Dirección</label>
-                  </p-floatlabel>
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="empresa-telefono"
+                        [(ngModel)]="configuracion.empresa.telefono"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="empresa-telefono">Teléfono</label>
+                    </p-floatlabel>
 
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="empresa-telefono"
-                      [(ngModel)]="configuracion.empresa.telefono"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="empresa-telefono">Teléfono</label>
-                  </p-floatlabel>
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="empresa-email"
+                        type="email"
+                        [(ngModel)]="configuracion.empresa.email"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="empresa-email">Email</label>
+                    </p-floatlabel>
 
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="empresa-email"
-                      type="email"
-                      [(ngModel)]="configuracion.empresa.email"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="empresa-email">Email</label>
-                  </p-floatlabel>
-
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="empresa-sitio"
-                      [(ngModel)]="configuracion.empresa.sitio_web"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="empresa-sitio">Sitio Web</label>
-                  </p-floatlabel>
-                </div>
-              </div>
-
-              <!-- Configuración del Sistema -->
-              <div class="config-section">
-                <div class="section-header">
-                  <h3 class="section-title">
-                    <i class="pi pi-cog"></i>
-                    Configuración del Sistema
-                  </h3>
-                </div>
-                <div class="config-grid">
-                  <p-floatlabel>
-                    <p-select
-                      id="zona-horaria"
-                      [options]="zonaHorariaOpciones"
-                      [(ngModel)]="configuracion.sistema.zona_horaria"
-                      (onChange)="marcarCambios()"
-                      class="w-full"
-                    ></p-select>
-                    <label for="zona-horaria">Zona Horaria</label>
-                  </p-floatlabel>
-
-                  <p-floatlabel>
-                    <p-select
-                      id="idioma"
-                      [options]="idiomaOpciones"
-                      [(ngModel)]="configuracion.sistema.idioma"
-                      (onChange)="marcarCambios()"
-                      class="w-full"
-                    ></p-select>
-                    <label for="idioma">Idioma por Defecto</label>
-                  </p-floatlabel>
-
-                  <p-floatlabel>
-                    <p-select
-                      id="formato-fecha"
-                      [options]="formatoFechaOpciones"
-                      [(ngModel)]="configuracion.sistema.formato_fecha"
-                      (onChange)="marcarCambios()"
-                      class="w-full"
-                    ></p-select>
-                    <label for="formato-fecha">Formato de Fecha</label>
-                  </p-floatlabel>
-
-                  <p-floatlabel>
-                    <p-select
-                      id="moneda"
-                      [options]="monedaOpciones"
-                      [(ngModel)]="configuracion.sistema.moneda"
-                      (onChange)="marcarCambios()"
-                      class="w-full"
-                    ></p-select>
-                    <label for="moneda">Moneda</label>
-                  </p-floatlabel>
-                </div>
-              </div>
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="empresa-sitio"
+                        [(ngModel)]="configuracion.empresa.sitio_web"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="empresa-sitio">Sitio Web</label>
+                    </p-floatlabel>
             </div>
-          </p-tabpanel>
+          </p-accordioncontent>
+        </p-accordionpanel>
 
-          <!-- Tab Inventario -->
-          <p-tabpanel value="1">
-            <div class="tab-content">
-              <div class="config-section">
-                <div class="section-header">
-                  <h3 class="section-title">
-                    <i class="pi pi-box"></i>
-                    Configuración de Inventario
-                  </h3>
-                </div>
-                <div class="config-grid">
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="stock-minimo"
-                      type="number"
-                      [(ngModel)]="configuracion.inventario.stock_minimo_defecto"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="stock-minimo">Stock Mínimo por Defecto</label>
-                  </p-floatlabel>
+        <!-- Configuración del Sistema -->
+        <p-accordionpanel>
+          <p-accordionheader>
+            <span class="accordion-header">
+              <i class="pi pi-cog"></i>
+              <span>Configuración del Sistema</span>
+            </span>
+          </p-accordionheader>
+          <p-accordioncontent>
+            <div class="form-grid">
+                    <p-floatlabel>
+                      <p-select
+                        id="zona-horaria"
+                        [options]="zonaHorariaOpciones"
+                        [(ngModel)]="configuracion.sistema.zona_horaria"
+                        (onChange)="marcarCambios()"
+                        class="w-full"
+                      ></p-select>
+                      <label for="zona-horaria">Zona Horaria</label>
+                    </p-floatlabel>
 
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="stock-maximo"
-                      type="number"
-                      [(ngModel)]="configuracion.inventario.stock_maximo_defecto"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="stock-maximo">Stock Máximo por Defecto</label>
-                  </p-floatlabel>
+                    <p-floatlabel>
+                      <p-select
+                        id="idioma"
+                        [options]="idiomaOpciones"
+                        [(ngModel)]="configuracion.sistema.idioma"
+                        (onChange)="marcarCambios()"
+                        class="w-full"
+                      ></p-select>
+                      <label for="idioma">Idioma por Defecto</label>
+                    </p-floatlabel>
 
-                  <p-floatlabel>
-                    <p-select
-                      id="metodo-valorizacion"
-                      [options]="metodoValorizacionOpciones"
-                      [(ngModel)]="configuracion.inventario.metodo_valorizacion"
-                      (onChange)="marcarCambios()"
-                      class="w-full"
-                    ></p-select>
-                    <label for="metodo-valorizacion"
-                      >Método de Valorización</label
-                    >
-                  </p-floatlabel>
-                </div>
-              </div>
+                    <p-floatlabel>
+                      <p-select
+                        id="formato-fecha"
+                        [options]="formatoFechaOpciones"
+                        [(ngModel)]="configuracion.sistema.formato_fecha"
+                        (onChange)="marcarCambios()"
+                        class="w-full"
+                      ></p-select>
+                      <label for="formato-fecha">Formato de Fecha</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel>
+                      <p-select
+                        id="moneda"
+                        [options]="monedaOpciones"
+                        [(ngModel)]="configuracion.sistema.moneda"
+                        (onChange)="marcarCambios()"
+                        class="w-full"
+                      ></p-select>
+                      <label for="moneda">Moneda</label>
+                    </p-floatlabel>
             </div>
-          </p-tabpanel>
+          </p-accordioncontent>
+        </p-accordionpanel>
 
-          <!-- Tab Usuarios -->
-          <p-tabpanel value="2">
-            <div class="tab-content">
-              <div class="config-section">
-                <div class="section-header">
-                  <h3 class="section-title">
-                    <i class="pi pi-users"></i>
-                    Configuración de Usuarios
-                  </h3>
-                </div>
-                <div class="config-grid">
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="expiracion-password"
-                      type="number"
-                      [(ngModel)]="configuracion.usuarios.dias_expiracion_password"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="expiracion-password"
-                      >Días para Expirar Contraseña</label
-                    >
-                  </p-floatlabel>
+        <!-- Configuración de Inventario -->
+        <p-accordionpanel>
+          <p-accordionheader>
+            <span class="accordion-header">
+              <i class="pi pi-box"></i>
+              <span>Configuración de Inventario</span>
+            </span>
+          </p-accordionheader>
+          <p-accordioncontent>
+            <div class="form-grid">
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="stock-minimo"
+                        type="number"
+                        [(ngModel)]="configuracion.inventario.stock_minimo_defecto"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="stock-minimo">Stock Mínimo por Defecto</label>
+                    </p-floatlabel>
 
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="max-intentos"
-                      type="number"
-                      [(ngModel)]="configuracion.usuarios.max_intentos_login"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="max-intentos">Máximo Intentos de Login</label>
-                  </p-floatlabel>
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="stock-maximo"
+                        type="number"
+                        [(ngModel)]="configuracion.inventario.stock_maximo_defecto"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="stock-maximo">Stock Máximo por Defecto</label>
+                    </p-floatlabel>
 
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="duracion-sesion"
-                      type="number"
-                      [(ngModel)]="configuracion.usuarios.duracion_sesion_horas"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="duracion-sesion"
-                      >Duración de Sesión (horas)</label
-                    >
-                  </p-floatlabel>
-                </div>
-              </div>
+                    <p-floatlabel>
+                      <p-select
+                        id="metodo-valorizacion"
+                        [options]="metodoValorizacionOpciones"
+                        [(ngModel)]="configuracion.inventario.metodo_valorizacion"
+                        (onChange)="marcarCambios()"
+                        class="w-full"
+                      ></p-select>
+                      <label for="metodo-valorizacion">Método de Valorización</label>
+                    </p-floatlabel>
             </div>
-          </p-tabpanel>
+          </p-accordioncontent>
+        </p-accordionpanel>
 
-          <!-- Tab Auditoría -->
-          <p-tabpanel value="3">
-            <div class="tab-content">
-              <div class="config-section">
-                <div class="section-header">
-                  <h3 class="section-title">
-                    <i class="pi pi-shield"></i>
-                    Configuración de Auditoría
-                  </h3>
-                </div>
-                <div class="config-grid">
-                  <p-floatlabel>
-                    <input
-                      pInputText
-                      id="retencion-logs"
-                      type="number"
-                      [(ngModel)]="configuracion.auditoria.dias_retencion_logs"
-                      (ngModelChange)="marcarCambios()"
-                      class="w-full"
-                      placeholder=" "
-                    />
-                    <label for="retencion-logs"
-                      >Días de Retención de Logs</label
-                    >
-                  </p-floatlabel>
+        <!-- Configuración de Usuarios -->
+        <p-accordionpanel>
+          <p-accordionheader>
+            <span class="accordion-header">
+              <i class="pi pi-users"></i>
+              <span>Configuración de Usuarios</span>
+            </span>
+          </p-accordionheader>
+          <p-accordioncontent>
+            <div class="form-grid">
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="expiracion-password"
+                        type="number"
+                        [(ngModel)]="configuracion.usuarios.dias_expiracion_password"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="expiracion-password">Días para Expirar Contraseña</label>
+                    </p-floatlabel>
 
-                  <p-floatlabel>
-                    <p-select
-                      id="nivel-log"
-                      [options]="nivelLogOpciones"
-                      [(ngModel)]="configuracion.auditoria.nivel_log"
-                      (onChange)="marcarCambios()"
-                      class="w-full"
-                    ></p-select>
-                    <label for="nivel-log">Nivel de Log</label>
-                  </p-floatlabel>
-                </div>
-              </div>
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="max-intentos"
+                        type="number"
+                        [(ngModel)]="configuracion.usuarios.max_intentos_login"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="max-intentos">Máximo Intentos de Login</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="duracion-sesion"
+                        type="number"
+                        [(ngModel)]="configuracion.usuarios.duracion_sesion_horas"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="duracion-sesion">Duración de Sesión (horas)</label>
+                    </p-floatlabel>
             </div>
-          </p-tabpanel>
-        </p-tabpanels>
-      </p-tabs>
+          </p-accordioncontent>
+        </p-accordionpanel>
+
+        <!-- Configuración de Auditoría -->
+        <p-accordionpanel>
+          <p-accordionheader>
+            <span class="accordion-header">
+              <i class="pi pi-shield"></i>
+              <span>Configuración de Auditoría</span>
+            </span>
+          </p-accordionheader>
+          <p-accordioncontent>
+            <div class="form-grid">
+                    <p-floatlabel>
+                      <input
+                        pInputText
+                        id="retencion-logs"
+                        type="number"
+                        [(ngModel)]="configuracion.auditoria.dias_retencion_logs"
+                        (ngModelChange)="marcarCambios()"
+                        class="w-full"
+                        placeholder=" "
+                      />
+                      <label for="retencion-logs">Días de Retención de Logs</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel>
+                      <p-select
+                        id="nivel-log"
+                        [options]="nivelLogOpciones"
+                        [(ngModel)]="configuracion.auditoria.nivel_log"
+                        (onChange)="marcarCambios()"
+                        class="w-full"
+                      ></p-select>
+                      <label for="nivel-log">Nivel de Log</label>
+                    </p-floatlabel>
+            </div>
+          </p-accordioncontent>
+        </p-accordionpanel>
+      </p-accordion>
     </div>
   </div>
 </div>
