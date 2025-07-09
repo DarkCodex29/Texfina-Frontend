@@ -687,7 +687,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
             {
               key: 'id_insumo',
               label: 'Insumo',
-              tipo: 'select' as const,
+              tipo: 'autocomplete' as const,
               obligatorio: true,
               opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
               ancho: 'normal' as const,
@@ -802,7 +802,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
             {
               key: 'id_insumo',
               label: 'Insumo',
-              tipo: 'select' as const,
+              tipo: 'autocomplete' as const,
               obligatorio: true,
               opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
               ancho: 'normal' as const,

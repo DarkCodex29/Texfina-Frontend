@@ -151,6 +151,55 @@
             </div>
           </div>
 
+          <!-- Autocomplete -->
+          <div *ngIf="campo.tipo === 'autocomplete'" class="input-container">
+            <div class="input-row">
+              <div class="autocomplete-wrapper">
+                <input
+                  class="form-input"
+                  [ngClass]="{'with-buttons': campo.conScanner}"
+                  type="text"
+                  [formControlName]="campo.key"
+                  [placeholder]="campo.placeholder || 'Escriba para buscar...'"
+                  [disabled]="campo.disabled || false"
+                  (input)="filtrarOpciones(campo.key, $any($event.target).value)"
+                />
+                
+                <!-- Dropdown de opciones -->
+                <div class="autocomplete-dropdown" *ngIf="obtenerOpcionesFiltradas(campo.key).length > 0">
+                  <div 
+                    *ngFor="let opcion of obtenerOpcionesFiltradas(campo.key)"
+                    class="autocomplete-option"
+                    (click)="seleccionarOpcion(campo.key, opcion)">
+                    {{ opcion.label }}
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Botones para autocomplete -->
+              <div class="input-buttons" *ngIf="campo.conScanner">
+                <button
+                  *ngIf="campo.conScanner"
+                  type="button"
+                  class="input-btn"
+                  [class.active]="escaneandoActivo"
+                  (click)="escaneandoActivo ? detenerScanner() : iniciarScanner(campo.key)"
+                  [disabled]="campo.disabled"
+                  matTooltip="{{ escaneandoActivo ? 'Detener scanner' : 'Escanear código' }}">
+                  <mat-icon>{{ escaneandoActivo ? 'stop' : 'qr_code_scanner' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Estado del scanner para autocomplete -->
+            <div *ngIf="campo.conScanner && escaneandoActivo" class="device-status scanner-status">
+              <div class="status-info">
+                <mat-icon class="scanning">qr_code_scanner</mat-icon>
+                <span>Esperando código de barras...</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Checkbox Group -->
           <div
             *ngIf="campo.tipo === 'checkbox-group'"

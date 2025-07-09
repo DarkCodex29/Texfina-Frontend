@@ -22,7 +22,7 @@ import { ScannerService, ScanResult } from '../../../services/scanner.service';
 export interface CampoFormulario {
   key: string;
   label: string;
-  tipo: 'text' | 'number' | 'select' | 'textarea' | 'date' | 'checkbox-group';
+  tipo: 'text' | 'number' | 'select' | 'autocomplete' | 'textarea' | 'date' | 'checkbox-group';
   placeholder?: string;
   maxLength?: number;
   step?: number;
@@ -74,6 +74,9 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
   // Estado para scanner
   escaneandoActivo = false;
   ultimoScan: ScanResult | null = null;
+  
+  // Estado para autocomplete
+  opcionesFiltradas: { [key: string]: any[] } = {};
 
   constructor(
     private fb: FormBuilder,
@@ -115,6 +118,15 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
           this.aplicarScan(scan);
         }
       });
+
+    // Inicializar opciones filtradas para autocomplete (vacías al inicio)
+    this.config.filas.forEach(fila => {
+      fila.forEach(campo => {
+        if (campo.tipo === 'autocomplete' && campo.opciones) {
+          this.opcionesFiltradas[campo.key] = [];
+        }
+      });
+    });
   }
 
   private crearFormulario(): void {
@@ -164,10 +176,20 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
 
   async capturarPeso(campo: string): Promise<void> {
     if (this.pesoActual && this.pesoActual.estable) {
+      // Convertir unidades si es necesario
+      let pesoFinal = this.pesoActual.peso;
+      
+      // Si el peso está en gramos y es mayor a 1000, convertir a kg
+      if (this.pesoActual.unidad === 'g' && pesoFinal >= 1000) {
+        pesoFinal = pesoFinal / 1000;
+      }
+      
       // Aplicar peso al campo
       this.formulario.patchValue({
-        [campo]: this.pesoActual.peso
+        [campo]: pesoFinal
       });
+      
+      console.log(`Peso aplicado al campo ${campo}: ${pesoFinal} ${this.pesoActual.unidad}`);
       
       // Detener pesado
       await this.detenerPesado();
@@ -205,9 +227,12 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
     // Buscar campo activo para scanner
     const campoScanner = this.obtenerCampoActivo('scanner');
     if (campoScanner) {
+      // Aplicar el código escaneado al campo
       this.formulario.patchValue({
         [campoScanner]: scan.codigo
       });
+      
+      console.log(`Código escaneado aplicado al campo ${campoScanner}:`, scan.codigo);
     }
     
     this.detenerScanner();
@@ -230,6 +255,46 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
       }
     }
     return null;
+  }
+
+  // Método para filtrar opciones en autocomplete
+  filtrarOpciones(campo: string, valor: string): void {
+    const campoConfig = this.obtenerCampoConfig(campo);
+    if (campoConfig && campoConfig.opciones) {
+      if (!valor || valor.trim() === '') {
+        this.opcionesFiltradas[campo] = [];
+      } else {
+        this.opcionesFiltradas[campo] = campoConfig.opciones.filter(opcion =>
+          opcion.label.toLowerCase().includes(valor.toLowerCase())
+        );
+      }
+    } else {
+      this.opcionesFiltradas[campo] = [];
+    }
+  }
+
+  private obtenerCampoConfig(key: string): CampoFormulario | null {
+    for (const fila of this.config.filas) {
+      for (const campo of fila) {
+        if (campo.key === key) {
+          return campo;
+        }
+      }
+    }
+    return null;
+  }
+
+  // Método para seleccionar una opción del autocomplete
+  seleccionarOpcion(campo: string, opcion: any): void {
+    this.formulario.patchValue({
+      [campo]: opcion.label
+    });
+    this.opcionesFiltradas[campo] = [];
+  }
+
+  // Método para obtener las opciones filtradas de forma segura
+  obtenerOpcionesFiltradas(campo: string): any[] {
+    return this.opcionesFiltradas[campo] || [];
   }
 
   onSubmit(): void {
