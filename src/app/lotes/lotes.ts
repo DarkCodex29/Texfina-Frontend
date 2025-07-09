@@ -404,7 +404,8 @@ export class LotesComponent implements OnInit, OnDestroy {
               label: 'Código Lote',
               tipo: 'text' as const,
               obligatorio: true,
-              ancho: 'normal' as const
+              ancho: 'normal' as const,
+              conScanner: true
             },
             {
               key: 'id_insumo',
@@ -517,7 +518,8 @@ export class LotesComponent implements OnInit, OnDestroy {
               label: 'Código Lote',
               tipo: 'text' as const,
               obligatorio: true,
-              ancho: 'normal' as const
+              ancho: 'normal' as const,
+              conScanner: true
             },
             {
               key: 'id_insumo',

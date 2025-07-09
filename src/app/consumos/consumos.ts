@@ -508,7 +508,8 @@ export class ConsumosComponent implements OnInit, OnDestroy {
               label: 'Cantidad',
               tipo: 'number' as const,
               obligatorio: true,
-              ancho: 'normal' as const
+              ancho: 'normal' as const,
+              conPesado: true
             },
             {
               key: 'id_unidad',
@@ -645,7 +646,8 @@ export class ConsumosComponent implements OnInit, OnDestroy {
               label: 'Cantidad',
               tipo: 'number' as const,
               obligatorio: true,
-              ancho: 'normal' as const
+              ancho: 'normal' as const,
+              conPesado: true
             },
             {
               key: 'id_unidad',

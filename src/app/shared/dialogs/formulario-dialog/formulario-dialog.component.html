@@ -25,17 +25,71 @@
           <label class="form-label">{{ campo.label }}</label>
 
           <!-- Input de texto/número -->
-          <input
-            *ngIf="campo.tipo === 'text' || campo.tipo === 'number'"
-            class="form-input"
-            [type]="campo.tipo"
-            [formControlName]="campo.key"
-            [placeholder]="campo.placeholder || ''"
-            [maxlength]="campo.maxLength || null"
-            [step]="campo.step || null"
-            [min]="campo.min || null"
-            [disabled]="campo.disabled || false"
-          />
+          <div *ngIf="campo.tipo === 'text' || campo.tipo === 'number'" class="input-container">
+            <div class="input-row">
+              <input
+                class="form-input"
+                [ngClass]="{'with-buttons': campo.conPesado || campo.conScanner}"
+                [type]="campo.tipo"
+                [formControlName]="campo.key"
+                [placeholder]="campo.placeholder || ''"
+                [maxlength]="campo.maxLength || null"
+                [step]="campo.step || null"
+                [min]="campo.min || null"
+                [disabled]="campo.disabled || false"
+              />
+              
+              <!-- Botones al lado del input -->
+              <div class="input-buttons" *ngIf="campo.conPesado || campo.conScanner">
+                <!-- Botón de pesado -->
+                <button
+                  *ngIf="campo.conPesado"
+                  type="button"
+                  class="input-btn"
+                  [class.active]="pesandoActivo"
+                  (click)="pesandoActivo ? capturarPeso(campo.key) : iniciarPesado(campo.key)"
+                  [disabled]="campo.disabled"
+                  matTooltip="{{ pesandoActivo ? 'Capturar peso' : 'Pesar' }}">
+                  <mat-icon>{{ pesandoActivo ? 'done' : 'scale' }}</mat-icon>
+                </button>
+                
+                <!-- Botón de scanner -->
+                <button
+                  *ngIf="campo.conScanner"
+                  type="button"
+                  class="input-btn"
+                  [class.active]="escaneandoActivo"
+                  (click)="escaneandoActivo ? detenerScanner() : iniciarScanner(campo.key)"
+                  [disabled]="campo.disabled"
+                  matTooltip="{{ escaneandoActivo ? 'Detener scanner' : 'Escanear código' }}">
+                  <mat-icon>{{ escaneandoActivo ? 'stop' : 'qr_code_scanner' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Estado del pesado -->
+            <div *ngIf="campo.conPesado && pesandoActivo" class="device-status peso-status">
+              <div class="status-info">
+                <mat-icon [class]="pesoActual?.estable ? 'stable' : 'unstable'">
+                  {{ pesoActual?.estable ? 'done' : 'hourglass_empty' }}
+                </mat-icon>
+                <span>
+                  {{ pesoActual ? (pesoActual.peso + ' ' + pesoActual.unidad) : 'Conectando...' }}
+                </span>
+                <span class="status-text">
+                  {{ pesoActual?.estable ? 'Estable' : 'Midiendo...' }}
+                </span>
+              </div>
+            </div>
+            
+            <!-- Estado del scanner -->
+            <div *ngIf="campo.conScanner && escaneandoActivo" class="device-status scanner-status">
+              <div class="status-info">
+                <mat-icon class="scanning">qr_code_scanner</mat-icon>
+                <span>Esperando código de barras...</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Input de fecha -->
           <input
@@ -56,20 +110,46 @@
           ></textarea>
 
           <!-- Select -->
-          <select
-            *ngIf="campo.tipo === 'select'"
-            class="form-select"
-            [formControlName]="campo.key"
-            [disabled]="campo.disabled || false"
-          >
-            <option value="">{{ campo.placeholder || "Seleccionar" }}</option>
-            <option
-              *ngFor="let opcion of campo.opciones"
-              [value]="opcion.value"
-            >
-              {{ opcion.label }}
-            </option>
-          </select>
+          <div *ngIf="campo.tipo === 'select'" class="input-container">
+            <div class="input-row">
+              <select
+                class="form-select"
+                [ngClass]="{'with-buttons': campo.conScanner}"
+                [formControlName]="campo.key"
+                [disabled]="campo.disabled || false"
+              >
+                <option value="">{{ campo.placeholder || "Seleccionar" }}</option>
+                <option
+                  *ngFor="let opcion of campo.opciones"
+                  [value]="opcion.value"
+                >
+                  {{ opcion.label }}
+                </option>
+              </select>
+              
+              <!-- Botones para select -->
+              <div class="input-buttons" *ngIf="campo.conScanner">
+                <button
+                  *ngIf="campo.conScanner"
+                  type="button"
+                  class="input-btn"
+                  [class.active]="escaneandoActivo"
+                  (click)="escaneandoActivo ? detenerScanner() : iniciarScanner(campo.key)"
+                  [disabled]="campo.disabled"
+                  matTooltip="{{ escaneandoActivo ? 'Detener scanner' : 'Escanear código' }}">
+                  <mat-icon>{{ escaneandoActivo ? 'stop' : 'qr_code_scanner' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Estado del scanner para select -->
+            <div *ngIf="campo.conScanner && escaneandoActivo" class="device-status scanner-status">
+              <div class="status-info">
+                <mat-icon class="scanning">qr_code_scanner</mat-icon>
+                <span>Esperando código de barras...</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Checkbox Group -->
           <div

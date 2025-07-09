@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -13,6 +13,11 @@ import {
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { Subject, takeUntil, firstValueFrom } from 'rxjs';
+
+import { BalanzaService, BalanzaReading } from '../../../services/balanza.service';
+import { ScannerService, ScanResult } from '../../../services/scanner.service';
 
 export interface CampoFormulario {
   key: string;
@@ -26,6 +31,8 @@ export interface CampoFormulario {
   ancho?: 'normal' | 'completo';
   opciones?: { value: any; label: string }[];
   disabled?: boolean;
+  conPesado?: boolean;
+  conScanner?: boolean;
 }
 
 export interface ConfiguracionFormulario {
@@ -49,17 +56,30 @@ export interface ConfiguracionFormulario {
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
   ],
   templateUrl: './formulario-dialog.component.html',
   styleUrls: ['./formulario-dialog.component.scss'],
 })
-export class FormularioDialogComponent implements OnInit {
+export class FormularioDialogComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  
   formulario!: FormGroup;
   config: ConfiguracionFormulario;
+  
+  // Estado para pesado
+  pesandoActivo = false;
+  pesoActual: BalanzaReading | null = null;
+  
+  // Estado para scanner
+  escaneandoActivo = false;
+  ultimoScan: ScanResult | null = null;
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<FormularioDialogComponent>,
+    private balanzaService: BalanzaService,
+    private scannerService: ScannerService,
     @Inject(MAT_DIALOG_DATA) public data: ConfiguracionFormulario
   ) {
     this.config = data;
@@ -70,6 +90,31 @@ export class FormularioDialogComponent implements OnInit {
     if (this.config.datosIniciales) {
       this.formulario.patchValue(this.config.datosIniciales);
     }
+    this.configurarSuscripciones();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private configurarSuscripciones(): void {
+    // Suscribirse a cambios de peso
+    this.balanzaService.pesoActual$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(peso => {
+        this.pesoActual = peso;
+      });
+
+    // Suscribirse a scans
+    this.scannerService.ultimoScan$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(scan => {
+        if (scan && this.escaneandoActivo) {
+          this.ultimoScan = scan;
+          this.aplicarScan(scan);
+        }
+      });
   }
 
   private crearFormulario(): void {
@@ -96,6 +141,95 @@ export class FormularioDialogComponent implements OnInit {
     });
 
     this.formulario = this.fb.group(controles);
+  }
+
+  // Métodos para pesado
+  async iniciarPesado(campo: string): Promise<void> {
+    try {
+      this.pesandoActivo = true;
+      const dispositivos = this.balanzaService.obtenerConfiguracion();
+      const config = dispositivos[0]; // Usar primera balanza
+      
+      const conectado = await firstValueFrom(this.balanzaService.conectado$);
+      if (!conectado) {
+        await this.balanzaService.conectarBalanza(config);
+      }
+      
+      await this.balanzaService.iniciarLecturaPeso(config);
+    } catch (error) {
+      console.error('Error al iniciar pesado:', error);
+      this.pesandoActivo = false;
+    }
+  }
+
+  async capturarPeso(campo: string): Promise<void> {
+    if (this.pesoActual && this.pesoActual.estable) {
+      // Aplicar peso al campo
+      this.formulario.patchValue({
+        [campo]: this.pesoActual.peso
+      });
+      
+      // Detener pesado
+      await this.detenerPesado();
+    }
+  }
+
+  async detenerPesado(): Promise<void> {
+    try {
+      await this.balanzaService.detenerLecturaPeso();
+      this.pesandoActivo = false;
+      this.pesoActual = null;
+    } catch (error) {
+      console.error('Error al detener pesado:', error);
+    }
+  }
+
+  // Métodos para scanner
+  async iniciarScanner(campo: string): Promise<void> {
+    try {
+      this.escaneandoActivo = true;
+      
+      const conectado = await firstValueFrom(this.scannerService.conectado$);
+      if (!conectado) {
+        await this.scannerService.conectarScanner();
+      }
+      
+      // El scanner escuchará automáticamente
+    } catch (error) {
+      console.error('Error al iniciar scanner:', error);
+      this.escaneandoActivo = false;
+    }
+  }
+
+  private aplicarScan(scan: ScanResult): void {
+    // Buscar campo activo para scanner
+    const campoScanner = this.obtenerCampoActivo('scanner');
+    if (campoScanner) {
+      this.formulario.patchValue({
+        [campoScanner]: scan.codigo
+      });
+    }
+    
+    this.detenerScanner();
+  }
+
+  detenerScanner(): void {
+    this.escaneandoActivo = false;
+    this.ultimoScan = null;
+  }
+
+  private obtenerCampoActivo(tipo: 'pesado' | 'scanner'): string | null {
+    for (const fila of this.config.filas) {
+      for (const campo of fila) {
+        if (tipo === 'pesado' && campo.conPesado) {
+          return campo.key;
+        }
+        if (tipo === 'scanner' && campo.conScanner) {
+          return campo.key;
+        }
+      }
+    }
+    return null;
   }
 
   onSubmit(): void {

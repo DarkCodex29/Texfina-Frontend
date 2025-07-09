@@ -690,7 +690,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
               tipo: 'select' as const,
               obligatorio: true,
               opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
-              ancho: 'normal' as const
+              ancho: 'normal' as const,
+              conScanner: true
             }
           ],
           [
@@ -804,7 +805,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
               tipo: 'select' as const,
               obligatorio: true,
               opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
-              ancho: 'normal' as const
+              ancho: 'normal' as const,
+              conScanner: true
             }
           ],
           [
