@@ -102,100 +102,116 @@
       <!-- Charts Section - NUEVOS DASHBOARDS -->
       <div class="charts-section">
         <!-- Primera fila de gráficos - DASHBOARDS PRINCIPALES -->
-        <div class="charts-row">
+        <div class="charts-row main-charts">
           <!-- Dashboard de Inventario -->
-          <div class="chart-card large">
-            <p-card>
-              <ng-template pTemplate="header">
+          <div class="chart-card inventory-card large">
+            <div class="custom-card">
+              <div class="custom-card-header inventory-header">
                 <div class="chart-header">
-                  <h3>
-                    <i class="pi pi-box"></i>
-                    Dashboard de Inventario
-                  </h3>
-                  <span class="chart-subtitle">Rotación por categoría</span>
+                  <div class="header-icon-wrapper inventory-icon">
+                    <i class="pi pi-chart-line"></i>
+                  </div>
+                  <div class="header-text">
+                    <h3>Dashboard de Inventario</h3>
+                    <span class="chart-subtitle">Tendencias y rotación de stock</span>
+                  </div>
                 </div>
-              </ng-template>
-              <div class="chart-container mixed-chart">
-                <p-chart
-                  type="bar"
-                  [data]="inventarioRotacionData"
-                  [options]="inventarioRotacionOptions"
-                  ariaLabel="Rotación de inventario por categoría"
-                ></p-chart>
               </div>
-            </p-card>
+              <div class="custom-card-body">
+                <div class="chart-container line-chart enhanced">
+                  <p-chart
+                    type="line"
+                    [data]="inventarioRotacionData"
+                    [options]="inventarioRotacionOptions"
+                    ariaLabel="Tendencia de rotación de inventario"
+                  ></p-chart>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Dashboard de Costos -->
-          <div class="chart-card">
-            <p-card>
-              <ng-template pTemplate="header">
+          <div class="chart-card costs-card">
+            <div class="custom-card">
+              <div class="custom-card-header costs-header">
                 <div class="chart-header">
-                  <h3>
-                    <i class="pi pi-dollar"></i>
-                    Dashboard de Costos
-                  </h3>
-                  <span class="chart-subtitle">Distribución por almacén</span>
+                  <div class="header-icon-wrapper costs-icon">
+                    <i class="pi pi-chart-pie"></i>
+                  </div>
+                  <div class="header-text">
+                    <h3>Dashboard de Costos</h3>
+                    <span class="chart-subtitle">Distribución por almacén</span>
+                  </div>
                 </div>
-              </ng-template>
-              <div class="chart-container pie-chart">
-                <p-chart
-                  type="doughnut"
-                  [data]="costosAlmacenData"
-                  [options]="costosAlmacenOptions"
-                  ariaLabel="Costos por almacén"
-                ></p-chart>
               </div>
-            </p-card>
+              <div class="custom-card-body">
+                <div class="chart-container pie-chart enhanced">
+                  <p-chart
+                    type="doughnut"
+                    [data]="costosAlmacenData"
+                    [options]="costosAlmacenOptions"
+                    ariaLabel="Costos por almacén"
+                  ></p-chart>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- Segunda fila de gráficos - DASHBOARDS ADICIONALES -->
-        <div class="charts-row">
+        <div class="charts-row secondary-charts">
           <!-- Dashboard de Trazabilidad -->
-          <div class="chart-card">
-            <p-card>
-              <ng-template pTemplate="header">
+          <div class="chart-card traceability-card">
+            <div class="custom-card">
+              <div class="custom-card-header traceability-header">
                 <div class="chart-header">
-                  <h3>
-                    <i class="pi pi-search"></i>
-                    Dashboard de Trazabilidad
-                  </h3>
-                  <span class="chart-subtitle">Estados de lotes</span>
+                  <div class="header-icon-wrapper traceability-icon">
+                    <i class="pi pi-chart-pie"></i>
+                  </div>
+                  <div class="header-text">
+                    <h3>Dashboard de Trazabilidad</h3>
+                    <span class="chart-subtitle">Estados de lotes</span>
+                  </div>
                 </div>
-              </ng-template>
-              <div class="chart-container polar-chart">
-                <p-chart
-                  type="polarArea"
-                  [data]="trazabilidadLotesData"
-                  [options]="trazabilidadLotesOptions"
-                  ariaLabel="Estados de lotes por trazabilidad"
-                ></p-chart>
               </div>
-            </p-card>
+              <div class="custom-card-body">
+                <div class="chart-container pie-chart enhanced">
+                  <p-chart
+                    type="pie"
+                    [data]="trazabilidadLotesData"
+                    [options]="trazabilidadLotesOptions"
+                    ariaLabel="Estados de lotes por trazabilidad"
+                  ></p-chart>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Dashboard de Desempeño -->
-          <div class="chart-card">
-            <p-card>
-              <ng-template pTemplate="header">
+          <div class="chart-card performance-card">
+            <div class="custom-card">
+              <div class="custom-card-header performance-header">
                 <div class="chart-header">
-                  <h3>
-                    <i class="pi pi-chart-line"></i>
-                    Dashboard de Desempeño
-                  </h3>
-                  <span class="chart-subtitle">Eficiencia por operación</span>
+                  <div class="header-icon-wrapper performance-icon">
+                    <i class="pi pi-chart-bar"></i>
+                  </div>
+                  <div class="header-text">
+                    <h3>Dashboard de Desempeño</h3>
+                    <span class="chart-subtitle">Eficiencia por operación</span>
+                  </div>
                 </div>
-              </ng-template>
-              <div class="chart-container bar-chart">
-                <p-chart
-                  type="bar"
-                  [data]="desempenoEficienciaData"
-                  [options]="desempenoEficienciaOptions"
-                  ariaLabel="Eficiencia de operaciones"
-                ></p-chart>
               </div>
-            </p-card>
+              <div class="custom-card-body">
+                <div class="chart-container bar-chart enhanced">
+                  <p-chart
+                    type="bar"
+                    [data]="desempenoEficienciaData"
+                    [options]="desempenoEficienciaOptions"
+                    ariaLabel="Eficiencia de operaciones"
+                  ></p-chart>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

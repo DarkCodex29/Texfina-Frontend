@@ -47,12 +47,76 @@ export class RolesConfig {
         ],
         [
           {
-            key: 'descripcion',
-            label: 'Descripción',
-            tipo: 'textarea',
-            obligatorio: true,
-            maxLength: 500,
-            placeholder: 'Describe las responsabilidades y permisos de este rol',
+            key: 'permisos_modificar',
+            label: 'Permisos de Modificación',
+            tipo: 'checkbox-group',
+            obligatorio: false,
+            opciones: [
+              { value: 'modificar_maestro', label: 'Modificar Maestro' },
+              { value: 'modificar_peso', label: 'Modificar Peso' },
+              { value: 'modificar_precios', label: 'Modificar Precios' },
+              { value: 'modificar_estado_de_lote', label: 'Modificar Estado de Lote' },
+              { value: 'modificar_qca', label: 'Modificar QCA' },
+            ],
+          },
+        ],
+        [
+          {
+            key: 'permisos_registro_ingreso',
+            label: 'Permisos de Registro e Ingreso',
+            tipo: 'checkbox-group',
+            obligatorio: false,
+            opciones: [
+              { value: 'registro_lotes', label: 'Registro de Lotes' },
+              { value: 'registro_precio_local', label: 'Precio Local' },
+              { value: 'registro_precio_importacion', label: 'Precio Importación' },
+              { value: 'apartado_pesado', label: 'Apartado Pesado' },
+              { value: 'apartado_lectura_cajas', label: 'Lectura de Cajas' },
+            ],
+          },
+        ],
+        [
+          {
+            key: 'permisos_apartados',
+            label: 'Permisos de Lectura/Apartados',
+            tipo: 'checkbox-group',
+            obligatorio: false,
+            opciones: [
+              { value: 'lectura_maestro', label: 'Lectura Maestro' },
+              { value: 'lectura_precios', label: 'Lectura Precios' },
+              { value: 'lectura_reporte', label: 'Lectura Reporte' },
+              { value: 'lectura_dashboard', label: 'Lectura Dashboard' },
+              { value: 'lectura_descarga', label: 'Lectura Descarga' },
+              { value: 'lectura_stock', label: 'Lectura Stock' },
+              { value: 'lectura_pesado', label: 'Lectura Pesado' },
+            ],
+          },
+        ],
+        [
+          {
+            key: 'permisos_historial',
+            label: 'Permisos de Historial',
+            tipo: 'checkbox-group',
+            obligatorio: false,
+            opciones: [
+              { value: 'historial_movimientos', label: 'Historial Movimientos' },
+              { value: 'historial_precios', label: 'Historial Precios' },
+              { value: 'historial_logs', label: 'Historial Logs' },
+              { value: 'historial_auditoria', label: 'Historial Auditoría' },
+              { value: 'historial_descarga', label: 'Historial Descarga' },
+            ],
+          },
+        ],
+        [
+          {
+            key: 'permisos_roles',
+            label: 'Permisos de Gestión de Roles',
+            tipo: 'checkbox-group',
+            obligatorio: false,
+            opciones: [
+              { value: 'roles_asignacion', label: 'Asignar Roles a Usuarios' },
+              { value: 'roles_modificacion', label: 'Modificar Roles y Permisos' },
+            ],
           },
         ],
         [
@@ -213,15 +277,9 @@ Los usuarios asignados a este rol perderán sus permisos hasta que se les asigne
       },
       {
         action: 'edit',
-        tooltip: 'Editar',
+        tooltip: 'Editar Rol y Permisos',
         icon: 'pi pi-pencil',
         color: 'success',
-      },
-      {
-        action: 'permissions',
-        tooltip: 'Gestionar Permisos',
-        icon: 'pi pi-shield',
-        color: 'warn',
       },
       {
         action: 'delete',

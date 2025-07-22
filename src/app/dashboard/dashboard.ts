@@ -645,26 +645,49 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private configurarDashboardInventario(): void {
     if (!this.dashboardInventario) return;
 
-    // Gráfico de Rotación por Categoría
+    // Gráfico de Línea - Tendencia de Rotación
+    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
     this.inventarioRotacionData = {
-      labels: this.dashboardInventario.rotacionPorCategoria.map(r => r.categoria),
+      labels: meses,
       datasets: [
         {
-          label: 'Rotación Promedio',
-          data: this.dashboardInventario.rotacionPorCategoria.map(r => r.rotacionPromedio),
-          backgroundColor: 'rgba(189, 33, 38, 0.8)',
+          label: 'Rotación Químicos Básicos',
+          data: [8.2, 8.5, 9.1, 8.8, 8.3, 8.5],
           borderColor: '#bd2126',
-          borderWidth: 2,
-          borderRadius: 6
+          backgroundColor: 'rgba(189, 33, 38, 0.1)',
+          borderWidth: 3,
+          pointRadius: 6,
+          pointBackgroundColor: '#bd2126',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          tension: 0.4,
+          fill: true
         },
         {
-          label: 'Días Promedio',
-          data: this.dashboardInventario.rotacionPorCategoria.map(r => r.diasPromedio),
-          backgroundColor: 'rgba(18, 30, 102, 0.8)',
-          borderColor: '#121e66',
-          borderWidth: 2,
-          borderRadius: 6,
-          yAxisID: 'y1'
+          label: 'Rotación Solventes',
+          data: [11.8, 12.1, 12.5, 12.2, 11.9, 12.1],
+          borderColor: '#16a34a',
+          backgroundColor: 'rgba(22, 163, 74, 0.1)',
+          borderWidth: 3,
+          pointRadius: 6,
+          pointBackgroundColor: '#16a34a',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          tension: 0.4,
+          fill: true
+        },
+        {
+          label: 'Rotación Reactivos',
+          data: [6.0, 6.2, 6.5, 6.1, 5.9, 6.2],
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          borderWidth: 3,
+          pointRadius: 6,
+          pointBackgroundColor: '#f59e0b',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          tension: 0.4,
+          fill: true
         }
       ]
     };
@@ -675,36 +698,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
       plugins: {
         legend: {
           position: 'top',
-          labels: { usePointStyle: true, padding: 20 }
+          labels: { 
+            usePointStyle: true, 
+            padding: 20,
+            font: { size: 12 }
+          }
         },
         tooltip: {
+          mode: 'index',
+          intersect: false,
           callbacks: {
             label: (context: any) => {
-              const item = this.dashboardInventario!.rotacionPorCategoria[context.dataIndex];
-              if (context.datasetIndex === 0) {
-                return `Rotación: ${context.parsed.y}x - Valor: ${this.formatearMoneda(item.valor)}`;
-              } else {
-                return `Días: ${context.parsed.y} días promedio`;
-              }
+              return `${context.dataset.label}: ${context.parsed.y} veces/mes`;
             }
           }
         }
       },
       scales: {
-        x: { title: { display: true, text: 'Categorías de Insumos' } },
-        y: { 
-          type: 'linear', 
-          display: true, 
-          position: 'left',
-          title: { display: true, text: 'Rotación (veces)' }
+        x: { 
+          title: { display: true, text: 'Meses' },
+          grid: { display: false }
         },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          title: { display: true, text: 'Días Promedio' },
-          grid: { drawOnChartArea: false }
+        y: { 
+          title: { display: true, text: 'Rotación (veces por mes)' },
+          beginAtZero: true,
+          grid: { color: 'rgba(0, 0, 0, 0.1)' }
         }
+      },
+      interaction: {
+        mode: 'index',
+        intersect: false
       }
     };
   }
@@ -755,19 +778,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private configurarDashboardTrazabilidad(): void {
     if (!this.dashboardTrazabilidad) return;
 
-    // Gráfico de Lotes por Estado
+    // Gráfico de Torta - Estados de Lotes
     this.trazabilidadLotesData = {
-      labels: this.dashboardTrazabilidad.lotesPorEstado.map(l => l.estado),
+      labels: ['Activos', 'Por Vencer', 'Vencidos', 'Consumidos'],
       datasets: [{
-        data: this.dashboardTrazabilidad.lotesPorEstado.map(l => l.cantidad),
+        data: [1184, 127, 52, 28],
         backgroundColor: [
-          'rgba(22, 163, 74, 0.8)', // ACTIVO - Verde
-          'rgba(245, 158, 11, 0.8)', // POR_VENCER - Amarillo
-          'rgba(189, 33, 38, 0.8)', // VENCIDO - Rojo
-          'rgba(107, 114, 128, 0.8)' // CONSUMIDO - Gris
+          '#22c55e', // ACTIVO - Verde vibrante
+          '#f59e0b', // POR_VENCER - Amarillo
+          '#ef4444', // VENCIDO - Rojo vibrante
+          '#94a3b8'  // CONSUMIDO - Gris
         ],
-        borderColor: ['#16a34a', '#f59e0b', '#bd2126', '#6b7280'],
-        borderWidth: 2
+        borderColor: '#ffffff',
+        borderWidth: 3,
+        hoverBorderWidth: 4,
+        hoverOffset: 8
       }]
     };
 
@@ -776,41 +801,37 @@ export class DashboardComponent implements OnInit, OnDestroy {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'right',
+          position: 'bottom',
           labels: {
             usePointStyle: true,
             padding: 20,
+            font: { size: 12 },
             generateLabels: (chart: any) => {
               const data = chart.data;
-              if (data.labels.length && data.datasets.length) {
-                return data.labels.map((label: string, i: number) => {
-                  const meta = chart.getDatasetMeta(0);
-                  const style = meta.controller.getStyle(i);
-                  const lote = this.dashboardTrazabilidad!.lotesPorEstado[i];
-
-                  return {
-                    text: `${label} (${lote.porcentaje}%)`,
-                    fillStyle: style.backgroundColor,
-                    strokeStyle: style.borderColor,
-                    lineWidth: style.borderWidth,
-                    pointStyle: 'circle',
-                    hidden: isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
-                    index: i
-                  };
-                });
-              }
-              return [];
+              const total = data.datasets[0].data.reduce((a: number, b: number) => a + b, 0);
+              
+              return data.labels.map((label: string, i: number) => {
+                const value = data.datasets[0].data[i];
+                const percentage = ((value / total) * 100).toFixed(1);
+                
+                return {
+                  text: `${label}: ${value} (${percentage}%)`,
+                  fillStyle: data.datasets[0].backgroundColor[i],
+                  strokeStyle: data.datasets[0].borderColor,
+                  lineWidth: 2,
+                  pointStyle: 'circle',
+                  index: i
+                };
+              });
             }
           }
         },
         tooltip: {
           callbacks: {
             label: (context: any) => {
-              const lote = this.dashboardTrazabilidad!.lotesPorEstado[context.dataIndex];
-              return [
-                `${context.label}: ${context.parsed} lotes`,
-                `Porcentaje: ${lote.porcentaje}%`
-              ];
+              const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+              const percentage = ((context.parsed / total) * 100).toFixed(1);
+              return `${context.label}: ${context.parsed} lotes (${percentage}%)`;
             }
           }
         }

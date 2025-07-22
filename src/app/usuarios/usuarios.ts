@@ -93,26 +93,272 @@ export class UsuariosComponent implements OnInit {
     this.isLoading = true;
     this.hasError = false;
     
-    this.materialService.getUsuarios().subscribe({
-      next: (usuarios) => {
-        this.usuarios = usuarios;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.hasError = true;
-        this.errorMessage = 'Error al cargar los usuarios. Intente nuevamente.';
-        this.isLoading = false;
-        console.error('Error al cargar usuarios:', error);
-      },
-    });
+    try {
+      // Cargar usuarios reales de Texfina
+      this.usuarios = [
+        {
+          id_usuario: 1,
+          username: 'jalonso',
+          email: 'jalonso@texfina.com.pe',
+          id_rol: 'JEFE_LABORATORIO',
+          id_tipo_usuario: 1,
+          activo: true,
+          created_at: new Date('2024-01-15'),
+          last_login: new Date('2024-01-20')
+        },
+        {
+          id_usuario: 2,
+          username: 'lvargas',
+          email: 'lvargas@texfina.com.pe',
+          id_rol: 'LABORATORISTA',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-16'),
+          last_login: new Date('2024-01-19')
+        },
+        {
+          id_usuario: 3,
+          username: 'mlevano',
+          email: 'mlevano@texfina.com.pe',
+          id_rol: 'LABORATORISTA',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-17'),
+          last_login: new Date('2024-01-18')
+        },
+        {
+          id_usuario: 4,
+          username: 'nacuna',
+          email: 'nacuna@texfina.com.pe',
+          id_rol: 'INGENIERIA',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-18'),
+          last_login: new Date('2024-01-17')
+        },
+        {
+          id_usuario: 5,
+          username: 'rllauca',
+          email: 'rllauca@texfina.com.pe',
+          id_rol: 'JEFE_PLANTA',
+          id_tipo_usuario: 1,
+          activo: true,
+          created_at: new Date('2024-01-10'),
+          last_login: new Date('2024-01-21')
+        },
+        {
+          id_usuario: 6,
+          username: 'ashigueto',
+          email: 'ashigueto@texfina.com.pe',
+          id_rol: 'SUPERVISOR',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-11'),
+          last_login: new Date('2024-01-20')
+        },
+        {
+          id_usuario: 7,
+          username: 'bcruz',
+          email: 'bcruz@texfina.com.pe',
+          id_rol: 'SUPERVISOR',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-12'),
+          last_login: new Date('2024-01-19')
+        },
+        {
+          id_usuario: 8,
+          username: 'hramirez',
+          email: 'hramirez@texfina.com.pe',
+          id_rol: 'JEFE_ALMACEN',
+          id_tipo_usuario: 1,
+          activo: true,
+          created_at: new Date('2024-01-13'),
+          last_login: new Date('2024-01-21')
+        },
+        {
+          id_usuario: 9,
+          username: 'dicochea',
+          email: 'dicochea@texfina.com.pe',
+          id_rol: 'SUPERVISOR',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-14'),
+          last_login: new Date('2024-01-18')
+        },
+        {
+          id_usuario: 10,
+          username: 'ebustamante',
+          email: 'ebustamante@texfina.com.pe',
+          id_rol: 'EQUIPO_TECNICO',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-15'),
+          last_login: new Date('2024-01-17')
+        },
+        {
+          id_usuario: 11,
+          username: 'hponte',
+          email: 'hponte@texfina.com.pe',
+          id_rol: 'GERENCIA',
+          id_tipo_usuario: 1,
+          activo: true,
+          created_at: new Date('2024-01-05'),
+          last_login: new Date('2024-01-21')
+        },
+        {
+          id_usuario: 12,
+          username: 'jquinteros',
+          email: 'jquinteros@texfina.com.pe',
+          id_rol: 'LABORATORISTA',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-16'),
+          last_login: new Date('2024-01-18')
+        },
+        {
+          id_usuario: 13,
+          username: 'ksantillan',
+          email: 'ksantillan@texfina.com.pe',
+          id_rol: 'JEFE_TINTORERIA',
+          id_tipo_usuario: 1,
+          activo: true,
+          created_at: new Date('2024-01-08'),
+          last_login: new Date('2024-01-20')
+        },
+        {
+          id_usuario: 14,
+          username: 'lcarranza',
+          email: 'lcarranza@texfina.com.pe',
+          id_rol: 'INGENIERIA',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-17'),
+          last_login: new Date('2024-01-19')
+        },
+        {
+          id_usuario: 15,
+          username: 'lcuri',
+          email: 'lcuri@texfina.com.pe',
+          id_rol: 'INGENIERIA',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-18'),
+          last_login: new Date('2024-01-20')
+        },
+        {
+          id_usuario: 16,
+          username: 'aquintos',
+          email: 'aquintos@texfina.com.pe',
+          id_rol: 'SUPERVISOR',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-19'),
+          last_login: new Date('2024-01-21')
+        },
+        {
+          id_usuario: 17,
+          username: 'cortiz',
+          email: 'cortiz@texfina.com.pe',
+          id_rol: 'SUPERVISOR',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-20'),
+          last_login: new Date('2024-01-18')
+        },
+        {
+          id_usuario: 18,
+          username: 'mayala',
+          email: 'mayala@texfina.com.pe',
+          id_rol: 'INGENIERIA',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-21'),
+          last_login: new Date('2024-01-19')
+        },
+        {
+          id_usuario: 19,
+          username: 'huidobro',
+          email: 'gestionacabados@texfina.com.pe',
+          id_rol: 'SUPERVISOR',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-22'),
+          last_login: new Date('2024-01-17')
+        },
+        {
+          id_usuario: 20,
+          username: 'vquillas',
+          email: 'vquillas@texfina.com.pe',
+          id_rol: 'LOGISTICA',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-23'),
+          last_login: new Date('2024-01-20')
+        },
+        {
+          id_usuario: 21,
+          username: 'xcardenas',
+          email: 'xcardenas@texfina.com.pe',
+          id_rol: 'INGENIERIA',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-24'),
+          last_login: new Date('2024-01-18')
+        },
+        {
+          id_usuario: 22,
+          username: 'jalvarez',
+          email: 'jalvarez@texfina.com.pe',
+          id_rol: 'EQUIPO_TECNICO',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-25'),
+          last_login: new Date('2024-01-19')
+        },
+        {
+          id_usuario: 23,
+          username: 'dportmann',
+          email: 'dportmann@texfina.com.pe',
+          id_rol: 'EQUIPO_TECNICO',
+          id_tipo_usuario: 2,
+          activo: true,
+          created_at: new Date('2024-01-26'),
+          last_login: new Date('2024-01-21')
+        }
+      ];
 
-    this.materialService.getRoles().subscribe((roles) => {
-      this.roles = roles;
-    });
+      // Cargar roles mock
+      this.roles = [
+        { id_rol: 'ADMIN_SISTEMAS', nombre: 'Administrador (sistemas)' },
+        { id_rol: 'GERENCIA', nombre: 'Gerencia' },
+        { id_rol: 'JEFE_PLANTA', nombre: 'Jefatura de Planta' },
+        { id_rol: 'JEFE_TINTORERIA', nombre: 'Jefatura de Tintorería' },
+        { id_rol: 'JEFE_LABORATORIO', nombre: 'Jefatura de Laboratorio' },
+        { id_rol: 'JEFE_ALMACEN', nombre: 'Jefatura de Almacén' },
+        { id_rol: 'SUPERVISOR', nombre: 'Supervisor' },
+        { id_rol: 'LABORATORISTA', nombre: 'Laboratorista/Analista de Laboratorio' },
+        { id_rol: 'INGENIERIA', nombre: 'Ingeniería' },
+        { id_rol: 'LOGISTICA', nombre: 'Compras/Ventas (Logística)' },
+        { id_rol: 'OPERARIO_ALMACEN', nombre: 'Operario de Almacén' },
+        { id_rol: 'EQUIPO_TECNICO', nombre: 'Equipo Técnico de Laboratorio' }
+      ];
 
-    this.materialService.getTiposUsuario().subscribe((tipos) => {
-      this.tiposUsuario = tipos;
-    });
+      // Cargar tipos de usuario mock
+      this.tiposUsuario = [
+        { id_tipo_usuario: 1, descripcion: 'Jefatura' },
+        { id_tipo_usuario: 2, descripcion: 'Empleado' },
+        { id_tipo_usuario: 3, descripcion: 'Operativo' }
+      ];
+
+      this.isLoading = false;
+      
+    } catch (error) {
+      this.hasError = true;
+      this.errorMessage = 'Error al cargar los usuarios. Intente nuevamente.';
+      this.isLoading = false;
+      console.error('Error al cargar usuarios:', error);
+    }
   }
 
   onActionClick(event: { action: string; item: Usuario }): void {

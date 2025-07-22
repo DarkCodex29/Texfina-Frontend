@@ -27,10 +27,15 @@ import { RolesConfig } from '../shared/configs/roles-config';
 interface Rol {
   id_rol: string;
   nombre: string;
-  descripcion: string;
+  descripcion?: string;
   activo: boolean;
   usuarios_count?: number;
   permisos_count?: number;
+  permisos?: PermisosRol;
+}
+
+interface PermisosRol {
+  [key: string]: boolean;
 }
 
 interface Estadistica {
@@ -106,45 +111,113 @@ export class RolesComponent implements OnInit {
     try {
       this.roles = [
         {
-          id_rol: 'ADMIN',
-          nombre: 'Administrador',
+          id_rol: 'ADMIN_SISTEMAS',
+          nombre: 'Administrador (sistemas)',
           descripcion: 'Administrador del sistema con acceso completo',
           activo: true,
-          usuarios_count: this.contarUsuarios('ADMIN'),
-          permisos_count: this.contarPermisos('ADMIN'),
+          usuarios_count: this.contarUsuarios('ADMIN_SISTEMAS'),
+          permisos_count: this.contarPermisos('ADMIN_SISTEMAS'),
+          permisos: this.getPermisosCompletos()
+        },
+        {
+          id_rol: 'GERENCIA',
+          nombre: 'Gerencia',
+          descripcion: 'Gerencia con acceso a reportes y dashboards',
+          activo: true,
+          usuarios_count: this.contarUsuarios('GERENCIA'),
+          permisos_count: this.contarPermisos('GERENCIA'),
+          permisos: this.getPermisosGerencia()
+        },
+        {
+          id_rol: 'JEFE_PLANTA',
+          nombre: 'Jefatura de Planta',
+          descripcion: 'Jefatura con permisos operacionales amplios',
+          activo: true,
+          usuarios_count: this.contarUsuarios('JEFE_PLANTA'),
+          permisos_count: this.contarPermisos('JEFE_PLANTA'),
+          permisos: this.getPermisosJefePlanta()
+        },
+        {
+          id_rol: 'JEFE_TINTORERIA',
+          nombre: 'Jefatura de Tintorería',
+          descripcion: 'Jefatura específica de área de tintorería',
+          activo: true,
+          usuarios_count: this.contarUsuarios('JEFE_TINTORERIA'),
+          permisos_count: this.contarPermisos('JEFE_TINTORERIA'),
+          permisos: this.getPermisosJefeTintoreria()
+        },
+        {
+          id_rol: 'JEFE_LABORATORIO',
+          nombre: 'Jefatura de Laboratorio',
+          descripcion: 'Jefatura con enfoque en control de calidad',
+          activo: true,
+          usuarios_count: this.contarUsuarios('JEFE_LABORATORIO'),
+          permisos_count: this.contarPermisos('JEFE_LABORATORIO'),
+          permisos: this.getPermisosJefeLaboratorio()
+        },
+        {
+          id_rol: 'JEFE_ALMACEN',
+          nombre: 'Jefatura de Almacén',
+          descripcion: 'Jefatura con permisos completos de almacén',
+          activo: true,
+          usuarios_count: this.contarUsuarios('JEFE_ALMACEN'),
+          permisos_count: this.contarPermisos('JEFE_ALMACEN'),
+          permisos: this.getPermisosJefeAlmacen()
         },
         {
           id_rol: 'SUPERVISOR',
           nombre: 'Supervisor',
-          descripcion: 'Supervisor de operaciones con permisos avanzados',
+          descripcion: 'Supervisor de operaciones diarias',
           activo: true,
           usuarios_count: this.contarUsuarios('SUPERVISOR'),
           permisos_count: this.contarPermisos('SUPERVISOR'),
+          permisos: this.getPermisosSupervisor()
         },
         {
-          id_rol: 'OPERARIO',
-          nombre: 'Operario',
-          descripcion: 'Operario con permisos básicos de gestión',
+          id_rol: 'LABORATORISTA',
+          nombre: 'Laboratorista/Analista de Laboratorio',
+          descripcion: 'Personal técnico de laboratorio',
           activo: true,
-          usuarios_count: this.contarUsuarios('OPERARIO'),
-          permisos_count: this.contarPermisos('OPERARIO'),
+          usuarios_count: this.contarUsuarios('LABORATORISTA'),
+          permisos_count: this.contarPermisos('LABORATORISTA'),
+          permisos: this.getPermisosLaboratorista()
         },
         {
-          id_rol: 'CONSULTOR',
-          nombre: 'Consultor',
-          descripcion: 'Consultor con permisos de solo lectura',
-          activo: false,
-          usuarios_count: this.contarUsuarios('CONSULTOR'),
-          permisos_count: this.contarPermisos('CONSULTOR'),
+          id_rol: 'INGENIERIA',
+          nombre: 'Ingeniería',
+          descripcion: 'Personal de ingeniería y desarrollo',
+          activo: true,
+          usuarios_count: this.contarUsuarios('INGENIERIA'),
+          permisos_count: this.contarPermisos('INGENIERIA'),
+          permisos: this.getPermisosIngenieria()
         },
         {
-          id_rol: 'INVITADO',
-          nombre: 'Invitado',
-          descripcion: 'Usuario con acceso limitado temporal',
-          activo: false,
-          usuarios_count: this.contarUsuarios('INVITADO'),
-          permisos_count: this.contarPermisos('INVITADO'),
+          id_rol: 'LOGISTICA',
+          nombre: 'Compras/Ventas (Logística)',
+          descripcion: 'Personal de compras y logística',
+          activo: true,
+          usuarios_count: this.contarUsuarios('LOGISTICA'),
+          permisos_count: this.contarPermisos('LOGISTICA'),
+          permisos: this.getPermisosLogistica()
         },
+        {
+          id_rol: 'OPERARIO_ALMACEN',
+          nombre: 'Operario de Almacén',
+          descripcion: 'Operario con permisos básicos de almacén',
+          activo: true,
+          usuarios_count: this.contarUsuarios('OPERARIO_ALMACEN'),
+          permisos_count: this.contarPermisos('OPERARIO_ALMACEN'),
+          permisos: this.getPermisosOperarioAlmacen()
+        },
+        {
+          id_rol: 'EQUIPO_TECNICO',
+          nombre: 'Equipo Técnico de Laboratorio',
+          descripcion: 'Equipo técnico de soporte laboratorio',
+          activo: true,
+          usuarios_count: this.contarUsuarios('EQUIPO_TECNICO'),
+          permisos_count: this.contarPermisos('EQUIPO_TECNICO'),
+          permisos: this.getPermisosEquipoTecnico()
+        }
       ];
       this.isLoading = false;
     } catch (error) {
@@ -161,9 +234,6 @@ export class RolesComponent implements OnInit {
         break;
       case 'edit':
         this.editar(event.item);
-        break;
-      case 'permissions':
-        this.gestionarPermisos(event.item);
         break;
       case 'delete':
         this.eliminar(event.item);
@@ -185,22 +255,37 @@ export class RolesComponent implements OnInit {
 
   contarUsuarios(rolId: string): number {
     const conteos: { [key: string]: number } = {
-      ADMIN: 2,
-      SUPERVISOR: 3,
-      OPERARIO: 5,
-      CONSULTOR: 2,
-      INVITADO: 0,
+      ADMIN_SISTEMAS: 0, // No hay usuarios asignados actualmente
+      GERENCIA: 1, // Humberto Ponte
+      JEFE_PLANTA: 1, // Raquel Llauca
+      JEFE_TINTORERIA: 1, // Karla Santillan
+      JEFE_LABORATORIO: 1, // Jose Alonso
+      JEFE_ALMACEN: 1, // Hugo Ramirez
+      SUPERVISOR: 6, // Alex/Alonso, Betsy, Dino, Alejando, Carlos, Huidobro
+      LABORATORISTA: 3, // Lesly, Miguel Levano, Javier
+      INGENIERIA: 5, // Nancy, Lenar, Lizet, Miguel Ayala, Xavier
+      LOGISTICA: 1, // Virginia Quilla
+      OPERARIO_ALMACEN: 0, // No hay usuarios asignados actualmente
+      EQUIPO_TECNICO: 3, // Erick, Jessica, Dennis
     };
     return conteos[rolId] || 0;
   }
 
   contarPermisos(rolId: string): number {
+    // Retornar conteo basado en tu matriz
     const conteos: { [key: string]: number } = {
-      ADMIN: 45,
-      SUPERVISOR: 32,
-      OPERARIO: 18,
-      CONSULTOR: 8,
-      INVITADO: 3,
+      ADMIN_SISTEMAS: 26, // Todos los permisos
+      GERENCIA: 18, // Según tu matriz
+      JEFE_PLANTA: 26, // Todos los permisos
+      JEFE_TINTORERIA: 26, // Todos los permisos
+      JEFE_LABORATORIO: 26, // Todos los permisos
+      JEFE_ALMACEN: 26, // Todos los permisos
+      SUPERVISOR: 26, // Todos los permisos
+      LABORATORISTA: 18, // Según tu matriz
+      INGENIERIA: 26, // Todos los permisos
+      LOGISTICA: 26, // Todos los permisos
+      OPERARIO_ALMACEN: 18, // Según tu matriz
+      EQUIPO_TECNICO: 18, // Según tu matriz
     };
     return conteos[rolId] || 0;
   }
@@ -213,7 +298,7 @@ export class RolesComponent implements OnInit {
     const configuracion = RolesConfig.getConfiguracionFormulario(false);
 
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
-      width: '600px',
+      width: '800px',
       disableClose: true,
       data: configuracion,
     });
@@ -238,10 +323,18 @@ export class RolesComponent implements OnInit {
   }
 
   editar(rol: Rol): void {
-    const configuracion = RolesConfig.getConfiguracionFormulario(true, rol);
+    // Preparar datos iniciales con permisos en formato de formulario
+    const datosIniciales = {
+      id_rol: rol.id_rol,
+      nombre: rol.nombre,
+      activo: rol.activo,
+      ...this.obtenerPermisosMatriz(rol.id_rol),
+    };
+
+    const configuracion = RolesConfig.getConfiguracionFormulario(true, datosIniciales);
 
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
-      width: '600px',
+      width: '800px',
       disableClose: true,
       data: configuracion,
     });
@@ -255,117 +348,6 @@ export class RolesComponent implements OnInit {
     });
   }
 
-  gestionarPermisos(rol: Rol): void {
-    const configuracion = {
-      titulo: {
-        agregar: `Gestionar Permisos - ${rol.nombre}`,
-        editar: `Gestionar Permisos - ${rol.nombre}`,
-      },
-      entidad: 'permisos',
-      entidadArticulo: 'los',
-      esEdicion: true,
-      datosIniciales: {
-        id_rol: rol.id_rol,
-        nombre_rol: rol.nombre,
-        ...this.obtenerPermisosRol(rol.id_rol),
-      },
-      filas: [
-        [
-          {
-            key: 'nombre_rol',
-            label: 'Rol',
-            tipo: 'text',
-            obligatorio: false,
-            disabled: true,
-          },
-        ],
-        [
-          {
-            key: 'permisos_dashboard',
-            label: 'Dashboard',
-            tipo: 'checkbox-group',
-            obligatorio: false,
-            opciones: [
-              { value: 'dashboard_view', label: 'Ver Dashboard' },
-              { value: 'dashboard_export', label: 'Exportar Dashboard' },
-            ],
-          },
-        ],
-        [
-          {
-            key: 'permisos_inventario',
-            label: 'Inventario',
-            tipo: 'checkbox-group',
-            obligatorio: false,
-            opciones: [
-              { value: 'inventario_view', label: 'Ver Inventario' },
-              { value: 'inventario_create', label: 'Crear Materiales' },
-              { value: 'inventario_edit', label: 'Editar Materiales' },
-              { value: 'inventario_delete', label: 'Eliminar Materiales' },
-              { value: 'inventario_export', label: 'Exportar Inventario' },
-            ],
-          },
-        ],
-        [
-          {
-            key: 'permisos_almacenes',
-            label: 'Almacenes',
-            tipo: 'checkbox-group',
-            obligatorio: false,
-            opciones: [
-              { value: 'almacenes_view', label: 'Ver Almacenes' },
-              { value: 'almacenes_create', label: 'Crear Almacenes' },
-              { value: 'almacenes_edit', label: 'Editar Almacenes' },
-              { value: 'almacenes_delete', label: 'Eliminar Almacenes' },
-            ],
-          },
-        ],
-        [
-          {
-            key: 'permisos_usuarios',
-            label: 'Usuarios y Roles',
-            tipo: 'checkbox-group',
-            obligatorio: false,
-            opciones: [
-              { value: 'usuarios_view', label: 'Ver Usuarios' },
-              { value: 'usuarios_create', label: 'Crear Usuarios' },
-              { value: 'usuarios_edit', label: 'Editar Usuarios' },
-              { value: 'usuarios_delete', label: 'Eliminar Usuarios' },
-              { value: 'roles_manage', label: 'Gestionar Roles' },
-            ],
-          },
-        ],
-        [
-          {
-            key: 'permisos_reportes',
-            label: 'Reportes',
-            tipo: 'checkbox-group',
-            obligatorio: false,
-            opciones: [
-              { value: 'reportes_view', label: 'Ver Reportes' },
-              { value: 'reportes_export', label: 'Exportar Reportes' },
-              { value: 'reportes_advanced', label: 'Reportes Avanzados' },
-            ],
-          },
-        ],
-      ],
-    };
-
-    const dialogRef = this.dialog.open(FormularioDialogComponent, {
-      width: '800px',
-      disableClose: true,
-      data: configuracion,
-    });
-
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado && resultado.accion === 'guardar') {
-        console.log('Actualizando permisos del rol:', resultado.datos);
-        this.actualizarPermisosRol(rol.id_rol, resultado.datos).then(() => {
-          this.cargarDatos();
-        });
-      }
-    });
-  }
 
   private configurarExportacion(): ConfiguracionExportacion<Rol> {
     return {
@@ -513,8 +495,8 @@ export class RolesComponent implements OnInit {
       const nuevoRol: Rol = {
         id_rol: datos.id_rol,
         nombre: datos.nombre,
-        descripcion: datos.descripcion,
         activo: datos.activo ?? true,
+        permisos: this.convertirPermisosFormularioAEstructura(datos)
       };
 
       console.log('Rol a crear:', nuevoRol);
@@ -530,8 +512,8 @@ export class RolesComponent implements OnInit {
       const rolActualizado: Rol = {
         id_rol: id,
         nombre: datos.nombre,
-        descripcion: datos.descripcion,
         activo: datos.activo,
+        permisos: this.convertirPermisosFormularioAEstructura(datos)
       };
 
       console.log('Rol a actualizar:', rolActualizado);
@@ -557,47 +539,61 @@ export class RolesComponent implements OnInit {
     });
   }
 
-  private obtenerPermisosRol(idRol: string): any {
-    // Simular obtención de permisos actuales del rol
-    const permisosPorRol: { [key: string]: any } = {
-      ADMIN: {
-        permisos_dashboard: ['dashboard_view', 'dashboard_export'],
-        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit', 'inventario_delete', 'inventario_export'],
-        permisos_almacenes: ['almacenes_view', 'almacenes_create', 'almacenes_edit', 'almacenes_delete'],
-        permisos_usuarios: ['usuarios_view', 'usuarios_create', 'usuarios_edit', 'usuarios_delete', 'roles_manage'],
-        permisos_reportes: ['reportes_view', 'reportes_export', 'reportes_advanced'],
-      },
-      SUPERVISOR: {
-        permisos_dashboard: ['dashboard_view', 'dashboard_export'],
-        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit', 'inventario_export'],
-        permisos_almacenes: ['almacenes_view', 'almacenes_create', 'almacenes_edit'],
-        permisos_usuarios: ['usuarios_view'],
-        permisos_reportes: ['reportes_view', 'reportes_export'],
-      },
-      OPERARIO: {
-        permisos_dashboard: ['dashboard_view'],
-        permisos_inventario: ['inventario_view', 'inventario_create', 'inventario_edit'],
-        permisos_almacenes: ['almacenes_view'],
-        permisos_usuarios: [],
-        permisos_reportes: ['reportes_view'],
-      },
-      CONSULTOR: {
-        permisos_dashboard: ['dashboard_view'],
-        permisos_inventario: ['inventario_view'],
-        permisos_almacenes: ['almacenes_view'],
-        permisos_usuarios: [],
-        permisos_reportes: ['reportes_view'],
-      },
-      INVITADO: {
-        permisos_dashboard: [],
-        permisos_inventario: [],
-        permisos_almacenes: [],
-        permisos_usuarios: [],
-        permisos_reportes: [],
-      },
+  private obtenerPermisosMatriz(idRol: string): any {
+    const rol = this.roles.find(r => r.id_rol === idRol);
+    if (!rol?.permisos) return {};
+    
+    const permisos = rol.permisos;
+    return {
+      // Modificar
+      permisos_modificar: Object.keys(permisos).filter(key => 
+        key.startsWith('modificar_') && permisos[key]
+      ),
+      // Registro/Ingreso
+      permisos_registro_ingreso: Object.keys(permisos).filter(key => 
+        (key.startsWith('registro_') || key.startsWith('apartado_')) && permisos[key]
+      ),
+      // Apartados/Lectura
+      permisos_apartados: Object.keys(permisos).filter(key => 
+        key.startsWith('lectura_') && permisos[key]
+      ),
+      // Historial
+      permisos_historial: Object.keys(permisos).filter(key => 
+        key.startsWith('historial_') && permisos[key]
+      ),
+      // Roles
+      permisos_roles: Object.keys(permisos).filter(key => 
+        key.startsWith('roles_') && permisos[key]
+      )
     };
+  }
 
-    return permisosPorRol[idRol] || {};
+  private convertirPermisosFormularioAEstructura(datos: any): PermisosRol {
+    const resultado: PermisosRol = {};
+    
+    // Combinar todos los arrays de permisos en un objeto plano
+    const todosLosPermisos = [
+      ...(datos.permisos_modificar || []),
+      ...(datos.permisos_registro_ingreso || []),
+      ...(datos.permisos_apartados || []),
+      ...(datos.permisos_historial || []),
+      ...(datos.permisos_roles || [])
+    ];
+    
+    // Establecer todos los permisos disponibles como false inicialmente
+    const permisosDisponibles = [
+      'modificar_maestro', 'modificar_peso', 'modificar_precios', 'modificar_estado_de_lote', 'modificar_qca',
+      'registro_lotes', 'registro_precio_local', 'registro_precio_importacion', 'apartado_pesado', 'apartado_lectura_cajas',
+      'lectura_maestro', 'lectura_precios', 'lectura_reporte', 'lectura_dashboard', 'lectura_descarga', 'lectura_stock', 'lectura_pesado',
+      'historial_movimientos', 'historial_precios', 'historial_logs', 'historial_auditoria', 'historial_descarga',
+      'roles_asignacion', 'roles_modificacion'
+    ];
+    
+    permisosDisponibles.forEach(permiso => {
+      resultado[permiso] = todosLosPermisos.includes(permiso);
+    });
+    
+    return resultado;
   }
 
   private async actualizarPermisosRol(idRol: string, permisos: any): Promise<void> {
@@ -615,5 +611,181 @@ export class RolesComponent implements OnInit {
       console.error('Error al actualizar permisos:', error);
       throw error;
     }
+  }
+
+  // Métodos de permisos por rol basados en tu matriz
+  private getPermisosCompletos(): PermisosRol {
+    // Administrador (sistemas) - todos los permisos
+    return {
+      modificar_maestro: true,
+      modificar_peso: true,
+      modificar_precios: true,
+      modificar_estado_de_lote: true,
+      modificar_qca: true,
+      registro_lotes: true,
+      registro_precio_local: true,
+      registro_precio_importacion: true,
+      apartado_pesado: true,
+      apartado_lectura_cajas: true,
+      lectura_maestro: true,
+      lectura_precios: true,
+      lectura_reporte: true,
+      lectura_dashboard: true,
+      lectura_descarga: true,
+      lectura_stock: true,
+      lectura_pesado: true,
+      historial_movimientos: true,
+      historial_precios: true,
+      historial_logs: true,
+      historial_auditoria: true,
+      historial_descarga: true,
+      roles_asignacion: true,
+      roles_modificacion: true
+    };
+  }
+
+  private getPermisosGerencia(): PermisosRol {
+    return {
+      modificar_maestro: true,
+      modificar_peso: true,
+      modificar_precios: true,
+      modificar_estado_de_lote: false,
+      modificar_qca: true,
+      registro_lotes: false,
+      registro_precio_local: true,
+      registro_precio_importacion: true,
+      apartado_pesado: false,
+      apartado_lectura_cajas: false,
+      lectura_maestro: true,
+      lectura_precios: true,
+      lectura_reporte: true,
+      lectura_dashboard: true,
+      lectura_descarga: true,
+      lectura_stock: true,
+      lectura_pesado: false,
+      historial_movimientos: true,
+      historial_precios: true,
+      historial_logs: true,
+      historial_auditoria: true,
+      historial_descarga: true,
+      roles_asignacion: true,
+      roles_modificacion: true
+    };
+  }
+
+  private getPermisosJefePlanta(): PermisosRol {
+    // Todos los permisos
+    return this.getPermisosCompletos();
+  }
+
+  private getPermisosJefeTintoreria(): PermisosRol {
+    return this.getPermisosCompletos();
+  }
+
+  private getPermisosJefeLaboratorio(): PermisosRol {
+    return this.getPermisosCompletos();
+  }
+
+  private getPermisosJefeAlmacen(): PermisosRol {
+    return this.getPermisosCompletos();
+  }
+
+  private getPermisosSupervisor(): PermisosRol {
+    return this.getPermisosCompletos();
+  }
+
+  private getPermisosLaboratorista(): PermisosRol {
+    return {
+      modificar_maestro: false,
+      modificar_peso: true,
+      modificar_precios: false,
+      modificar_estado_de_lote: true,
+      modificar_qca: true,
+      registro_lotes: false,
+      registro_precio_local: false,
+      registro_precio_importacion: false,
+      apartado_pesado: true,
+      apartado_lectura_cajas: true,
+      lectura_maestro: true,
+      lectura_precios: true,
+      lectura_reporte: true,
+      lectura_dashboard: true,
+      lectura_descarga: true,
+      lectura_stock: true,
+      lectura_pesado: true,
+      historial_movimientos: true,
+      historial_precios: false,
+      historial_logs: true,
+      historial_auditoria: true,
+      historial_descarga: true,
+      roles_asignacion: true,
+      roles_modificacion: false
+    };
+  }
+
+  private getPermisosIngenieria(): PermisosRol {
+    return this.getPermisosCompletos();
+  }
+
+  private getPermisosLogistica(): PermisosRol {
+    return this.getPermisosCompletos();
+  }
+
+  private getPermisosOperarioAlmacen(): PermisosRol {
+    return {
+      modificar_maestro: false,
+      modificar_peso: true,
+      modificar_precios: false,
+      modificar_estado_de_lote: true,
+      modificar_qca: true,
+      registro_lotes: true,
+      registro_precio_local: false,
+      registro_precio_importacion: false,
+      apartado_pesado: true,
+      apartado_lectura_cajas: true,
+      lectura_maestro: true,
+      lectura_precios: true,
+      lectura_reporte: true,
+      lectura_dashboard: true,
+      lectura_descarga: true,
+      lectura_stock: true,
+      lectura_pesado: true,
+      historial_movimientos: true,
+      historial_precios: false,
+      historial_logs: true,
+      historial_auditoria: true,
+      historial_descarga: true,
+      roles_asignacion: true,
+      roles_modificacion: false
+    };
+  }
+
+  private getPermisosEquipoTecnico(): PermisosRol {
+    return {
+      modificar_maestro: false,
+      modificar_peso: true,
+      modificar_precios: false,
+      modificar_estado_de_lote: true,
+      modificar_qca: true,
+      registro_lotes: true,
+      registro_precio_local: false,
+      registro_precio_importacion: false,
+      apartado_pesado: true,
+      apartado_lectura_cajas: true,
+      lectura_maestro: true,
+      lectura_precios: true,
+      lectura_reporte: true,
+      lectura_dashboard: true,
+      lectura_descarga: true,
+      lectura_stock: true,
+      lectura_pesado: true,
+      historial_movimientos: true,
+      historial_precios: false,
+      historial_logs: true,
+      historial_auditoria: true,
+      historial_descarga: true,
+      roles_asignacion: true,
+      roles_modificacion: false
+    };
   }
 }

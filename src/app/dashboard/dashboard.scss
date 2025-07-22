@@ -1151,7 +1151,7 @@
 }
 
 // ============================================================================
-// CHARTS DASHBOARD - MODERN ANALYTICS LAYOUT
+// ENHANCED CHARTS DASHBOARD - PREMIUM ANALYTICS LAYOUT
 // ============================================================================
 
 .charts-section {
@@ -1168,180 +1168,435 @@
 
 .charts-row {
   display: grid;
-  gap: var(--texfina-spacing-lg);
-  margin-bottom: var(--texfina-spacing-md);
+  gap: var(--texfina-spacing-xl);
+  margin-bottom: var(--texfina-spacing-xl);
+  
+  &.main-charts {
+    grid-template-columns: 2fr 1fr;
+    align-items: stretch;
 
-  // Primera fila: Pie chart + Line chart (2 columnas)
-  &:nth-child(1) {
-    grid-template-columns: 1fr 2fr;
-
-    @media (max-width: 1200px) {
+    @media (max-width: 1400px) {
       grid-template-columns: 1fr;
+      gap: var(--texfina-spacing-lg);
     }
   }
 
-  // Segunda fila: Bar chart + Horizontal bar chart (2 columnas iguales)
-  &:nth-child(2) {
+  &.secondary-charts {
     grid-template-columns: 1fr 1fr;
-
+    
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
-    }
-  }
-
-  // Tercera fila: Polar chart + Alerts panel (2 columnas iguales)
-  &:nth-child(3) {
-    grid-template-columns: 1fr 1fr;
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
+      gap: var(--texfina-spacing-lg);
     }
   }
 
   @media (max-width: 768px) {
+    gap: var(--texfina-spacing-lg);
+    margin-bottom: var(--texfina-spacing-lg);
+  }
+
+  @media (max-width: 480px) {
     gap: var(--texfina-spacing-md);
-    margin-bottom: var(--texfina-spacing-sm);
+    margin-bottom: var(--texfina-spacing-md);
+  }
+}
+
+// ============================================================================
+// SPECIFIC CARD THEMES
+// ============================================================================
+
+.inventory-card {
+  .custom-card {
+    &::before {
+      background: linear-gradient(90deg, var(--texfina-primary), #a91e24, var(--texfina-primary));
+    }
+
+    &:hover {
+      border-color: rgba(189, 33, 38, 0.3);
+    }
+  }
+
+  .inventory-header {
+    background: linear-gradient(135deg, #fef2f2 0%, #fef7f7 100%);
+  }
+}
+
+.costs-card {
+  .custom-card {
+    &::before {
+      background: linear-gradient(90deg, #f59e0b, #d97706, #f59e0b);
+    }
+
+    &:hover {
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+  }
+
+  .costs-header {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef9e7 100%);
+  }
+}
+
+.traceability-card {
+  .custom-card {
+    &::before {
+      background: linear-gradient(90deg, var(--texfina-success), #16a34a, var(--texfina-success));
+    }
+
+    &:hover {
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+  }
+
+  .traceability-header {
+    background: linear-gradient(135deg, #f0fdf4 0%, #f7fef7 100%);
+  }
+}
+
+.performance-card {
+  .custom-card {
+    &::before {
+      background: linear-gradient(90deg, var(--texfina-secondary), #1e40af, var(--texfina-secondary));
+    }
+
+    &:hover {
+      border-color: rgba(18, 30, 102, 0.3);
+    }
+  }
+
+  .performance-header {
+    background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
   }
 }
 
 .chart-card {
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px) scale(1.01);
+    z-index: 10;
   }
 
   &.large {
-    min-height: 400px;
+    min-height: 450px;
+  }
+}
+
+// ============================================================================
+// CUSTOM CARD DESIGN - REPLACEMENT FOR PRIMENG CARDS
+// ============================================================================
+
+.custom-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(145deg, #ffffff, #f8fafb);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  border-radius: 20px;
+  box-shadow: 
+    0 4px 25px rgba(0, 0, 0, 0.06),
+    0 2px 10px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      var(--texfina-primary) 0%,
+      var(--texfina-secondary) 50%,
+      #16a34a 100%
+    );
+    transition: all 0.3s ease;
   }
 
-  // PrimeNG Card overrides
-  ::ng-deep p-card {
-    height: 100%;
+  &:hover {
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.12),
+      0 4px 20px rgba(0, 0, 0, 0.06);
+    border-color: rgba(189, 33, 38, 0.2);
 
-    .p-card {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      background: linear-gradient(135deg, white, #fafbfc);
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      transition: all 0.3s ease;
-
-      &:hover {
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-      }
-
-      .p-card-header {
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-        padding: var(--texfina-spacing-lg) var(--texfina-spacing-xl);
-        position: relative;
-
-        &::before {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background: linear-gradient(
-            90deg,
-            var(--texfina-primary),
-            var(--texfina-secondary)
-          );
-        }
-      }
-
-      .p-card-body {
-        flex: 1;
-        padding: var(--texfina-spacing-lg) var(--texfina-spacing-xl);
-        display: flex;
-        flex-direction: column;
-
-        .p-card-content {
-          flex: 1;
-          padding: 0;
-        }
-      }
+    &::before {
+      height: 4px;
     }
   }
+}
+
+.custom-card-header {
+  padding: var(--texfina-spacing-xl) var(--texfina-spacing-2xl);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  position: relative;
+  backdrop-filter: blur(10px);
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(189, 33, 38, 0.3) 50%,
+      transparent 100%
+    );
+  }
+}
+
+.custom-card-body {
+  flex: 1;
+  padding: var(--texfina-spacing-xl) var(--texfina-spacing-2xl);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(145deg, #ffffff 0%, #fefefe 100%);
 }
 
 .chart-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--texfina-spacing-md);
 
-  h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--texfina-text-primary);
-    letter-spacing: -0.3px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .header-text {
+    flex: 1;
+    min-width: 0;
 
-    i {
-      color: var(--texfina-primary);
+    h3 {
+      margin: 0 0 4px 0;
       font-size: 20px;
+      font-weight: 800;
+      color: var(--texfina-text-primary);
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 0; // No gap since icon is separate now
+
+      @media (max-width: 768px) {
+        font-size: 18px;
+      }
+
+      @media (max-width: 480px) {
+        font-size: 16px;
+      }
     }
 
-    @media (max-width: 768px) {
-      font-size: 16px;
+    .chart-subtitle {
+      color: var(--texfina-text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.85;
+      line-height: 1.4;
+      margin: 0;
 
-      i {
-        font-size: 18px;
+      @media (max-width: 768px) {
+        font-size: 12px;
       }
     }
   }
 
-  .chart-subtitle {
-    color: var(--texfina-text-muted);
-    font-size: 12px;
-    font-weight: 500;
-    opacity: 0.8;
+  @media (max-width: 768px) {
+    gap: var(--texfina-spacing-sm);
+  }
+}
+
+// ============================================================================
+// ENHANCED HEADER ICONS
+// ============================================================================
+
+.header-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  margin-right: var(--texfina-spacing-lg);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    border-radius: 50%;
+    animation: rotate 8s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+
+  i {
+    font-size: 28px;
+    color: white;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+
+    i {
+      transform: scale(1.1);
+    }
   }
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+
+    i {
+      font-size: 24px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    width: 44px;
+    height: 44px;
+    margin-right: var(--texfina-spacing-md);
+
+    i {
+      font-size: 22px;
+    }
   }
 }
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// Specific icon themes
+.inventory-icon {
+  background: linear-gradient(135deg, var(--texfina-primary), #a91e24);
+  box-shadow: 0 4px 16px rgba(189, 33, 38, 0.3);
+}
+
+.costs-icon {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+}
+
+.traceability-icon {
+  background: linear-gradient(135deg, var(--texfina-success), #16a34a);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+}
+
+.performance-icon {
+  background: linear-gradient(135deg, var(--texfina-secondary), #1e40af);
+  box-shadow: 0 4px 16px rgba(18, 30, 102, 0.3);
+}
+
 
 .chart-container {
   position: relative;
   width: 100%;
-  height: 300px;
-  padding: var(--texfina-spacing-md) 0;
+  height: 340px;
+  padding: var(--texfina-spacing-lg) var(--texfina-spacing-md);
+  background: linear-gradient(135deg, #fefefe 0%, #f9fafb 100%);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+
+  &.enhanced {
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(189, 33, 38, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(18, 30, 102, 0.03) 0%, transparent 50%),
+      linear-gradient(135deg, #fefefe 0%, #f9fafb 100%);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+      border-radius: 12px;
+      pointer-events: none;
+    }
+  }
 
   &.pie-chart,
   &.polar-chart {
-    height: 280px;
+    height: 320px;
+    
+    &.enhanced {
+      background: 
+        radial-gradient(circle at center, rgba(189, 33, 38, 0.02) 0%, transparent 60%),
+        linear-gradient(135deg, #fefefe 0%, #f9fafb 100%);
+    }
   }
 
   &.line-chart {
-    height: 320px;
+    height: 360px;
   }
 
   &.bar-chart,
   &.horizontal-bar-chart {
-    height: 300px;
+    height: 340px;
   }
 
-  // Chart.js global overrides for Texfina theme
+  &.mixed-chart {
+    height: 380px;
+  }
+
+  // Enhanced Chart.js styling
   ::ng-deep canvas {
     border-radius: 8px;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.04));
+    
+    &:hover {
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
+    }
   }
 
   @media (max-width: 768px) {
-    height: 250px;
-    padding: var(--texfina-spacing-sm) 0;
+    height: 280px;
+    padding: var(--texfina-spacing-md) var(--texfina-spacing-sm);
+
+    &.pie-chart,
+    &.polar-chart {
+      height: 260px;
+    }
+
+    &.line-chart {
+      height: 300px;
+    }
+
+    &.mixed-chart {
+      height: 320px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    height: 240px;
+    padding: var(--texfina-spacing-sm);
 
     &.pie-chart,
     &.polar-chart {
@@ -1351,18 +1606,9 @@
     &.line-chart {
       height: 260px;
     }
-  }
 
-  @media (max-width: 480px) {
-    height: 200px;
-
-    &.pie-chart,
-    &.polar-chart {
-      height: 180px;
-    }
-
-    &.line-chart {
-      height: 220px;
+    &.mixed-chart {
+      height: 280px;
     }
   }
 }
