@@ -14,9 +14,9 @@
 
   <!-- Navigation Menu -->
   <nav class="sidebar-nav" (click)="onNavClick($event)">
-    <!-- Principal -->
+    <!-- Seguimiento -->
     <div class="nav-section">
-      <h3 class="section-title">Principal</h3>
+      <h3 class="section-title">Seguimiento</h3>
       <ul class="nav-list">
         <li>
           <a
@@ -39,12 +39,59 @@
             <span>Reportes</span>
           </a>
         </li>
+        <li>
+          <a
+            routerLink="/dashboard/stock"
+            routerLinkActive="active"
+            class="nav-link"
+          >
+            <i class="pi pi-database"></i>
+            <span>Stock</span>
+          </a>
+        </li>
       </ul>
     </div>
 
-    <!-- Inventario -->
+    <!-- Pesado/Movimientos -->
     <div class="nav-section">
-      <h3 class="section-title">Inventario</h3>
+      <h3 class="section-title">Pesado/Movimientos</h3>
+      <ul class="nav-list">
+        <li>
+          <a
+            routerLink="/dashboard/ingresos"
+            routerLinkActive="active"
+            class="nav-link"
+          >
+            <i class="pi pi-arrow-down"></i>
+            <span>Ingresos</span>
+          </a>
+        </li>
+        <li>
+          <a
+            routerLink="/dashboard/movimientos"
+            routerLinkActive="active"
+            class="nav-link"
+          >
+            <i class="pi pi-arrow-right-arrow-left"></i>
+            <span>Movimientos</span>
+          </a>
+        </li>
+        <li>
+          <a
+            routerLink="/dashboard/pesado"
+            routerLinkActive="active"
+            class="nav-link"
+          >
+            <i class="pi pi-chart-bar"></i>
+            <span>Pesado</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Maestros -->
+    <div class="nav-section">
+      <h3 class="section-title">Maestros</h3>
       <ul class="nav-list">
         <li>
           <a
@@ -58,16 +105,6 @@
         </li>
         <li>
           <a
-            routerLink="/dashboard/stock"
-            routerLinkActive="active"
-            class="nav-link"
-          >
-            <i class="pi pi-database"></i>
-            <span>Stock</span>
-          </a>
-        </li>
-        <li>
-          <a
             routerLink="/dashboard/lotes"
             routerLinkActive="active"
             class="nav-link"
@@ -76,33 +113,6 @@
             <span>Lotes</span>
           </a>
         </li>
-        <li>
-          <a
-            routerLink="/dashboard/ingresos"
-            routerLinkActive="active"
-            class="nav-link"
-          >
-            <i class="pi pi-arrow-down"></i>
-            <span>Ingresos</span>
-          </a>
-        </li>
-        <li>
-          <a
-            routerLink="/dashboard/consumos"
-            routerLinkActive="active"
-            class="nav-link"
-          >
-            <i class="pi pi-arrow-up"></i>
-            <span>Consumos</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Catálogos -->
-    <div class="nav-section">
-      <h3 class="section-title">Catálogos</h3>
-      <ul class="nav-list">
         <li>
           <a
             routerLink="/dashboard/proveedores"
@@ -198,16 +208,6 @@
           >
             <i class="pi pi-file"></i>
             <span>Logs</span>
-          </a>
-        </li>
-        <li>
-          <a
-            routerLink="/dashboard/configuracion"
-            routerLinkActive="active"
-            class="nav-link"
-          >
-            <i class="pi pi-cog"></i>
-            <span>Configuración</span>
           </a>
         </li>
       </ul>

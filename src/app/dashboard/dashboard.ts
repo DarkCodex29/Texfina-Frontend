@@ -21,6 +21,10 @@ import {
   EstadisticaAlmacen,
   TopInsumo,
   MetricaConsumo,
+  DashboardInventario,
+  DashboardCostos,
+  DashboardTrazabilidad,
+  DashboardDesempeno,
 } from '../services/dashboard.service';
 
 @Component({
@@ -55,21 +59,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
   insumosStockBajo: TopInsumo[] = [];
   metricasConsumo: MetricaConsumo[] = [];
 
-  // Chart data y options
-  inventarioChartData: any = {};
-  inventarioChartOptions: any = {};
+  // Nuevos dashboards
+  dashboardInventario: DashboardInventario | null = null;
+  dashboardCostos: DashboardCostos | null = null;
+  dashboardTrazabilidad: DashboardTrazabilidad | null = null;
+  dashboardDesempeno: DashboardDesempeno | null = null;
 
-  stockTendenciaData: any = {};
-  stockTendenciaOptions: any = {};
-
-  movimientosBarData: any = {};
-  movimientosBarOptions: any = {};
-
-  proveedoresData: any = {};
-  proveedoresOptions: any = {};
-
-  consumosPorTipoData: any = {};
-  consumosPorTipoOptions: any = {};
+  // Chart data para nuevos dashboards
+  inventarioRotacionData: any = {};
+  inventarioRotacionOptions: any = {};
+  
+  costosAlmacenData: any = {};
+  costosAlmacenOptions: any = {};
+  
+  trazabilidadLotesData: any = {};
+  trazabilidadLotesOptions: any = {};
+  
+  desempenoEficienciaData: any = {};
+  desempenoEficienciaOptions: any = {};
 
   constructor(private readonly dashboardService: DashboardService) {}
 
@@ -132,6 +139,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
           return of(this.getConsumoSimulado());
         })
       ),
+      dashboardInventario: this.dashboardService.getDashboardInventario().pipe(
+        catchError((error) => {
+          console.error('Error al cargar dashboard inventario:', error);
+          return of(this.getDashboardInventarioSimulado());
+        })
+      ),
+      dashboardCostos: this.dashboardService.getDashboardCostos().pipe(
+        catchError((error) => {
+          console.error('Error al cargar dashboard costos:', error);
+          return of(this.getDashboardCostosSimulado());
+        })
+      ),
+      dashboardTrazabilidad: this.dashboardService.getDashboardTrazabilidad().pipe(
+        catchError((error) => {
+          console.error('Error al cargar dashboard trazabilidad:', error);
+          return of(this.getDashboardTrazabilidadSimulado());
+        })
+      ),
+      dashboardDesempeno: this.dashboardService.getDashboardDesempeno().pipe(
+        catchError((error) => {
+          console.error('Error al cargar dashboard desempeno:', error);
+          return of(this.getDashboardDesempenoSimulado());
+        })
+      ),
     });
 
     dashboardData$
@@ -150,9 +181,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.topInsumos = data.topInsumos || [];
           this.insumosStockBajo = data.insumosStockBajo || [];
           this.metricasConsumo = data.metricasConsumo || [];
+          this.dashboardInventario = data.dashboardInventario;
+          this.dashboardCostos = data.dashboardCostos;
+          this.dashboardTrazabilidad = data.dashboardTrazabilidad;
+          this.dashboardDesempeno = data.dashboardDesempeno;
 
           // Configurar gráficos después de cargar los datos
           this.configurarGraficos();
+          this.configurarNuevosDashboards();
 
           console.log('Dashboard cargado:', {
             resumen: this.resumen,
@@ -458,345 +494,284 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   // ============================================================================
+  // DATOS SIMULADOS PARA NUEVOS DASHBOARDS
+  // ============================================================================
+
+  private getDashboardInventarioSimulado(): DashboardInventario {
+    return {
+      rotacionPorCategoria: [
+        { categoria: 'Químicos Básicos', rotacionPromedio: 8.5, diasPromedio: 45, valor: 125000 },
+        { categoria: 'Reactivos Especiales', rotacionPromedio: 6.2, diasPromedio: 62, valor: 89000 },
+        { categoria: 'Solventes', rotacionPromedio: 12.1, diasPromedio: 30, valor: 156000 },
+        { categoria: 'Sales Metálicas', rotacionPromedio: 4.8, diasPromedio: 78, valor: 67000 },
+        { categoria: 'Ácidos', rotacionPromedio: 9.3, diasPromedio: 39, valor: 98000 }
+      ],
+      stockOptimo: [
+        { insumo: 'Ácido Sulfúrico', stockActual: 450, stockOptimo: 380, diferencia: 70, estado: 'SOBRE_STOCK' },
+        { insumo: 'Acetato de Sodio', stockActual: 15, stockOptimo: 80, diferencia: -65, estado: 'BAJO_STOCK' },
+        { insumo: 'Hidróxido de Sodio', stockActual: 320, stockOptimo: 310, diferencia: 10, estado: 'OPTIMO' },
+        { insumo: 'Sulfato de Cobre', stockActual: 185, stockOptimo: 200, diferencia: -15, estado: 'BAJO_STOCK' }
+      ],
+      analisisABC: [
+        { categoria: 'A', porcentajeInsumos: 20, porcentajeValor: 80, cantidad: 249 },
+        { categoria: 'B', porcentajeInsumos: 30, porcentajeValor: 15, cantidad: 374 },
+        { categoria: 'C', porcentajeInsumos: 50, porcentajeValor: 5, cantidad: 624 }
+      ],
+      prediccionDemanda: [
+        { mes: 'Ene', demandaReal: 125, demandaPrediccion: 128, precision: 97.6 },
+        { mes: 'Feb', demandaReal: 142, demandaPrediccion: 138, precision: 97.2 },
+        { mes: 'Mar', demandaReal: 156, demandaPrediccion: 159, precision: 98.1 },
+        { mes: 'Abr', demandaReal: 134, demandaPrediccion: 131, precision: 97.8 },
+        { mes: 'May', demandaReal: 167, demandaPrediccion: 165, precision: 98.8 },
+        { mes: 'Jun', demandaReal: 178, demandaPrediccion: 172, precision: 96.6 }
+      ]
+    };
+  }
+
+  private getDashboardCostosSimulado(): DashboardCostos {
+    return {
+      costoPorAlmacen: [
+        { almacen: 'Principal', costoTotal: 285640, costoPromedio: 835, participacion: 58.9 },
+        { almacen: 'Secundario', costoTotal: 124890, costoPromedio: 668, participacion: 25.7 },
+        { almacen: 'Emergencia', costoTotal: 45680, costoPromedio: 481, participacion: 9.4 },
+        { almacen: 'Temporal', costoTotal: 29539, costoPromedio: 434, participacion: 6.0 }
+      ],
+      tendenciaCostos: [
+        { mes: 'Jul', costoTotal: 445000, costoPromedio: 378, variacion: 2.3 },
+        { mes: 'Ago', costoTotal: 467000, costoPromedio: 388, variacion: 4.9 },
+        { mes: 'Sep', costoTotal: 485000, costoPromedio: 389, variacion: 3.9 },
+        { mes: 'Oct', costoTotal: 472000, costoPromedio: 386, variacion: -2.7 },
+        { mes: 'Nov', costoTotal: 458000, costoPromedio: 383, variacion: -3.0 },
+        { mes: 'Dic', costoTotal: 485750, costoPromedio: 390, variacion: 6.1 }
+      ],
+      analisisProveedores: [
+        { proveedor: 'QuimiCorp S.A.', totalCompras: 125000, precioPromedio: 285, confiabilidad: 98.5, ranking: 1 },
+        { proveedor: 'Industrias Lima', totalCompras: 98000, precioPromedio: 312, confiabilidad: 95.2, ranking: 2 },
+        { proveedor: 'Solventes Perú', totalCompras: 87000, precioPromedio: 298, confiabilidad: 97.1, ranking: 3 },
+        { proveedor: 'Reactivos Unidos', totalCompras: 72000, precioPromedio: 334, confiabilidad: 93.8, ranking: 4 }
+      ],
+      variacionPrecios: [
+        { insumo: 'Ácido Sulfúrico', precioAnterior: 150.0, precioActual: 152.5, variacion: 1.67, tendencia: 'SUBE' },
+        { insumo: 'Acetato de Sodio', precioAnterior: 2550.0, precioActual: 2480.0, variacion: -2.75, tendencia: 'BAJA' },
+        { insumo: 'Hidróxido de Sodio', precioAnterior: 151.85, precioActual: 151.85, variacion: 0, tendencia: 'ESTABLE' },
+        { insumo: 'Sulfato de Cobre', precioAnterior: 172.3, precioActual: 175.8, variacion: 2.03, tendencia: 'SUBE' }
+      ]
+    };
+  }
+
+  private getDashboardTrazabilidadSimulado(): DashboardTrazabilidad {
+    return {
+      lotesPorEstado: [
+        { estado: 'ACTIVO', cantidad: 1184, porcentaje: 85.2 },
+        { estado: 'POR_VENCER', cantidad: 127, porcentaje: 9.1 },
+        { estado: 'VENCIDO', cantidad: 52, porcentaje: 3.7 },
+        { estado: 'CONSUMIDO', cantidad: 28, porcentaje: 2.0 }
+      ],
+      tiempoVidaPromedio: [
+        { categoria: 'Químicos Básicos', promedioVida: 365, lotesMenores30: 15, lotesMayores90: 285 },
+        { categoria: 'Reactivos Especiales', promedioVida: 180, lotesMenores30: 45, lotesMayores90: 98 },
+        { categoria: 'Solventes', promedioVida: 730, lotesMenores30: 8, lotesMayores90: 187 },
+        { categoria: 'Sales Metálicas', promedioVida: 545, lotesMenores30: 12, lotesMayores90: 156 }
+      ],
+      alertasVencimiento: [
+        { lote: 'L-2024-001', insumo: 'Acetato de Sodio', fechaVencimiento: new Date('2024-12-30'), diasRestantes: 8, gravedad: 'CRITICO' },
+        { lote: 'L-2024-015', insumo: 'Sulfato de Cobre', fechaVencimiento: new Date('2025-01-15'), diasRestantes: 24, gravedad: 'ALERTA' },
+        { lote: 'L-2024-032', insumo: 'Permanganato K', fechaVencimiento: new Date('2025-02-10'), diasRestantes: 50, gravedad: 'ATENCION' }
+      ],
+      historialMovimientos: [
+        { fecha: new Date('2024-12-15'), tipo: 'INGRESO', cantidad: 125, responsable: 'Juan Pérez' },
+        { fecha: new Date('2024-12-14'), tipo: 'SALIDA', cantidad: 89, responsable: 'María García' },
+        { fecha: new Date('2024-12-13'), tipo: 'TRANSFERENCIA', cantidad: 45, responsable: 'Carlos López' },
+        { fecha: new Date('2024-12-12'), tipo: 'AJUSTE', cantidad: 12, responsable: 'Ana Martínez' }
+      ]
+    };
+  }
+
+  private getDashboardDesempenoSimulado(): DashboardDesempeno {
+    return {
+      eficienciaOperaciones: [
+        { operacion: 'Recepción', eficiencia: 94.5, tiempo: 45, errores: 3, mejora: 2.1 },
+        { operacion: 'Almacenamiento', eficiencia: 89.2, tiempo: 78, errores: 8, mejora: -1.5 },
+        { operacion: 'Despacho', eficiencia: 96.8, tiempo: 32, errores: 1, mejora: 4.2 },
+        { operacion: 'Inventario', eficiencia: 87.3, tiempo: 125, errores: 12, mejora: -0.8 }
+      ],
+      tiemposProceso: [
+        { proceso: 'Ingreso Insumos', tiempoPromedio: 45, tiempoOptimo: 35, variacion: 28.6 },
+        { proceso: 'Control Calidad', tiempoPromedio: 78, tiempoOptimo: 60, variacion: 30.0 },
+        { proceso: 'Ubicación Stock', tiempoPromedio: 32, tiempoOptimo: 25, variacion: 28.0 },
+        { proceso: 'Preparación Pedido', tiempoPromedio: 125, tiempoOptimo: 90, variacion: 38.9 }
+      ],
+      productividad: [
+        { mes: 'Jul', operacionesCompletadas: 1245, tiempoTotal: 8760, productividad: 85.2 },
+        { mes: 'Ago', operacionesCompletadas: 1389, tiempoTotal: 8760, productividad: 89.7 },
+        { mes: 'Sep', operacionesCompletadas: 1456, tiempoTotal: 8640, productividad: 92.1 },
+        { mes: 'Oct', operacionesCompletadas: 1324, tiempoTotal: 8760, productividad: 87.5 },
+        { mes: 'Nov', operacionesCompletadas: 1398, tiempoTotal: 8640, productividad: 90.3 },
+        { mes: 'Dic', operacionesCompletadas: 1487, tiempoTotal: 8760, productividad: 93.8 }
+      ],
+      utilizacionRecursos: [
+        { recurso: 'Personal Almacén', utilizacion: 87.5, capacidad: 100, eficiencia: 92.3 },
+        { recurso: 'Montacargas', utilizacion: 78.2, capacidad: 100, eficiencia: 89.1 },
+        { recurso: 'Espacio Almacén', utilizacion: 82.7, capacidad: 100, eficiencia: 94.5 },
+        { recurso: 'Sistemas TI', utilizacion: 95.8, capacidad: 100, eficiencia: 97.2 }
+      ]
+    };
+  }
+
+  // ============================================================================
   // CONFIGURACIÓN DE GRÁFICOS
   // ============================================================================
 
   private configurarGraficos(): void {
-    this.configurarGraficoInventario();
-    this.configurarGraficoTendenciaStock();
-    this.configurarGraficoMovimientos();
-    this.configurarGraficoProveedores();
-    this.configurarGraficoConsumosPorTipo();
+    // Método mantenido por compatibilidad - los gráficos ahora están en configurarNuevosDashboards
   }
 
-  private configurarGraficoInventario(): void {
-    const texfinaColors = [
-      '#bd2126', // Texfina Primary Red
-      '#121e66', // Texfina Secondary Blue
-      '#16a34a', // Success Green
-      '#f59e0b', // Warning Orange
-      '#8b5cf6', // Purple
-      '#06b6d4', // Cyan
-      '#ef4444', // Red variant
-      '#10b981', // Emerald
-    ];
 
-    this.inventarioChartData = {
-      labels: this.estadisticasAlmacenes.map((a) => a.nombre),
-      datasets: [
-        {
-          data: this.estadisticasAlmacenes.map((a) => a.cantidadInsumos),
-          backgroundColor: texfinaColors,
-          borderWidth: 2,
-          borderColor: '#ffffff',
-          hoverBorderWidth: 3,
-          hoverBorderColor: '#ffffff',
-          hoverBackgroundColor: texfinaColors.map((color) => color + '90'), // Add transparency on hover
-        },
-      ],
-    };
 
-    this.inventarioChartOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            usePointStyle: true,
-            padding: 20,
-            font: {
-              size: 12,
-              family: 'Segoe UI',
-            },
-          },
-        },
-        tooltip: {
-          callbacks: {
-            label: (context: any) => {
-              const almacen = this.estadisticasAlmacenes[context.dataIndex];
-              return [
-                `${context.label}: ${context.parsed} insumos`,
-                `Valor: ${this.formatearMoneda(almacen.valorInventario)}`,
-                `Ocupación: ${almacen.ocupacion}%`,
-              ];
-            },
-          },
-        },
-      },
-    };
+
+
+
+  // ============================================================================
+  // CONFIGURACIÓN DE NUEVOS DASHBOARDS
+  // ============================================================================
+
+  private configurarNuevosDashboards(): void {
+    this.configurarDashboardInventario();
+    this.configurarDashboardCostos();
+    this.configurarDashboardTrazabilidad();
+    this.configurarDashboardDesempeno();
   }
 
-  private configurarGraficoTendenciaStock(): void {
-    // Simular datos de tendencia de los últimos 6 meses
-    const meses = ['Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    const stockData = [1180, 1205, 1247, 1224, 1198, 1247];
-    const valorData = [445000, 467000, 485000, 472000, 458000, 485750];
+  private configurarDashboardInventario(): void {
+    if (!this.dashboardInventario) return;
 
-    this.stockTendenciaData = {
-      labels: meses,
+    // Gráfico de Rotación por Categoría
+    this.inventarioRotacionData = {
+      labels: this.dashboardInventario.rotacionPorCategoria.map(r => r.categoria),
       datasets: [
         {
-          type: 'line',
-          label: 'Cantidad de Insumos',
-          data: stockData,
+          label: 'Rotación Promedio',
+          data: this.dashboardInventario.rotacionPorCategoria.map(r => r.rotacionPromedio),
+          backgroundColor: 'rgba(189, 33, 38, 0.8)',
           borderColor: '#bd2126',
-          backgroundColor: 'rgba(189, 33, 38, 0.1)',
-          borderWidth: 4,
-          pointBackgroundColor: '#bd2126',
-          pointBorderColor: '#ffffff',
-          pointBorderWidth: 3,
-          pointRadius: 8,
-          pointHoverRadius: 10,
-          tension: 0.4,
-          fill: true,
-          yAxisID: 'y',
+          borderWidth: 2,
+          borderRadius: 6
         },
         {
-          type: 'bar',
-          label: 'Valor de Inventario (S/)',
-          data: valorData,
-          backgroundColor: 'rgba(18, 30, 102, 0.7)',
+          label: 'Días Promedio',
+          data: this.dashboardInventario.rotacionPorCategoria.map(r => r.diasPromedio),
+          backgroundColor: 'rgba(18, 30, 102, 0.8)',
           borderColor: '#121e66',
           borderWidth: 2,
           borderRadius: 6,
-          yAxisID: 'y1',
-        },
-      ],
+          yAxisID: 'y1'
+        }
+      ]
     };
 
-    this.stockTendenciaOptions = {
+    this.inventarioRotacionOptions = {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: {
-        mode: 'index',
-        intersect: false,
-      },
       plugins: {
         legend: {
           position: 'top',
-          labels: {
-            usePointStyle: true,
-            padding: 20,
-          },
+          labels: { usePointStyle: true, padding: 20 }
         },
         tooltip: {
           callbacks: {
             label: (context: any) => {
+              const item = this.dashboardInventario!.rotacionPorCategoria[context.dataIndex];
               if (context.datasetIndex === 0) {
-                return `${context.dataset.label}: ${context.parsed.y} insumos`;
+                return `Rotación: ${context.parsed.y}x - Valor: ${this.formatearMoneda(item.valor)}`;
               } else {
-                return `${context.dataset.label}: ${this.formatearMoneda(
-                  context.parsed.y
-                )}`;
+                return `Días: ${context.parsed.y} días promedio`;
               }
-            },
-          },
-        },
+            }
+          }
+        }
       },
       scales: {
-        x: {
-          display: true,
-          title: {
-            display: true,
-            text: 'Mes',
-          },
-        },
-        y: {
-          type: 'linear',
-          display: true,
+        x: { title: { display: true, text: 'Categorías de Insumos' } },
+        y: { 
+          type: 'linear', 
+          display: true, 
           position: 'left',
-          title: {
-            display: true,
-            text: 'Cantidad de Insumos',
-          },
+          title: { display: true, text: 'Rotación (veces)' }
         },
         y1: {
           type: 'linear',
           display: true,
           position: 'right',
-          title: {
-            display: true,
-            text: 'Valor (S/)',
-          },
-          grid: {
-            drawOnChartArea: false,
-          },
-        },
-      },
+          title: { display: true, text: 'Días Promedio' },
+          grid: { drawOnChartArea: false }
+        }
+      }
     };
   }
 
-  private configurarGraficoMovimientos(): void {
-    const meses = ['Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  private configurarDashboardCostos(): void {
+    if (!this.dashboardCostos) return;
 
-    this.movimientosBarData = {
-      labels: meses,
-      datasets: [
-        {
-          label: 'Ingresos',
-          data: [85, 92, 78, 115, 88, 102],
-          backgroundColor: 'rgba(22, 163, 74, 0.8)',
-          borderColor: '#16a34a',
-          borderWidth: 2,
-          borderRadius: 6,
-          borderSkipped: false,
-        },
-        {
-          label: 'Salidas',
-          data: [72, 88, 95, 68, 94, 79],
-          backgroundColor: 'rgba(189, 33, 38, 0.8)',
-          borderColor: '#bd2126',
-          borderWidth: 2,
-          borderRadius: 6,
-          borderSkipped: false,
-        },
-        {
-          label: 'Transferencias',
-          data: [23, 31, 18, 42, 28, 35],
-          backgroundColor: 'rgba(245, 158, 11, 0.8)',
-          borderColor: '#f59e0b',
-          borderWidth: 2,
-          borderRadius: 6,
-          borderSkipped: false,
-        },
-      ],
+    // Gráfico de Costos por Almacén
+    this.costosAlmacenData = {
+      labels: this.dashboardCostos.costoPorAlmacen.map(c => c.almacen),
+      datasets: [{
+        data: this.dashboardCostos.costoPorAlmacen.map(c => c.costoTotal),
+        backgroundColor: [
+          'rgba(189, 33, 38, 0.9)',
+          'rgba(18, 30, 102, 0.9)',
+          'rgba(22, 163, 74, 0.9)',
+          'rgba(245, 158, 11, 0.9)'
+        ],
+        borderColor: ['#bd2126', '#121e66', '#16a34a', '#f59e0b'],
+        borderWidth: 2
+      }]
     };
 
-    this.movimientosBarOptions = {
+    this.costosAlmacenOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'top',
-          labels: {
-            usePointStyle: true,
-            padding: 20,
-          },
+          position: 'bottom',
+          labels: { usePointStyle: true, padding: 20 }
         },
         tooltip: {
           callbacks: {
             label: (context: any) => {
-              return `${context.dataset.label}: ${context.parsed.y} movimientos`;
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          title: {
-            display: true,
-            text: 'Mes',
-          },
-        },
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Cantidad de Movimientos',
-          },
-        },
-      },
+              const almacen = this.dashboardCostos!.costoPorAlmacen[context.dataIndex];
+              return [
+                `${context.label}: ${this.formatearMoneda(context.parsed)}`,
+                `Promedio: ${this.formatearMoneda(almacen.costoPromedio)}`,
+                `Participación: ${almacen.participacion}%`
+              ];
+            }
+          }
+        }
+      }
     };
   }
 
-  private configurarGraficoProveedores(): void {
-    // Simular datos de proveedores top
-    const proveedoresTop = [
-      { nombre: 'QuimiCorp S.A.', valor: 125000 },
-      { nombre: 'Industrias Lima', valor: 98000 },
-      { nombre: 'Solventes Perú', valor: 87000 },
-      { nombre: 'Reactivos Unidos', valor: 72000 },
-      { nombre: 'Chemicals Express', valor: 65000 },
-    ];
+  private configurarDashboardTrazabilidad(): void {
+    if (!this.dashboardTrazabilidad) return;
 
-    this.proveedoresData = {
-      labels: proveedoresTop.map((p) => p.nombre),
-      datasets: [
-        {
-          label: 'Valor de Compras (S/)',
-          data: proveedoresTop.map((p) => p.valor),
-          backgroundColor: [
-            'rgba(189, 33, 38, 0.9)', // Texfina Primary Red
-            'rgba(18, 30, 102, 0.9)', // Texfina Secondary Blue
-            'rgba(22, 163, 74, 0.9)', // Success Green
-            'rgba(245, 158, 11, 0.9)', // Warning Orange
-            'rgba(139, 92, 246, 0.9)', // Purple
-          ],
-          borderColor: ['#bd2126', '#121e66', '#16a34a', '#f59e0b', '#8b5cf6'],
-          borderWidth: 2,
-          borderRadius: 8,
-        },
-      ],
+    // Gráfico de Lotes por Estado
+    this.trazabilidadLotesData = {
+      labels: this.dashboardTrazabilidad.lotesPorEstado.map(l => l.estado),
+      datasets: [{
+        data: this.dashboardTrazabilidad.lotesPorEstado.map(l => l.cantidad),
+        backgroundColor: [
+          'rgba(22, 163, 74, 0.8)', // ACTIVO - Verde
+          'rgba(245, 158, 11, 0.8)', // POR_VENCER - Amarillo
+          'rgba(189, 33, 38, 0.8)', // VENCIDO - Rojo
+          'rgba(107, 114, 128, 0.8)' // CONSUMIDO - Gris
+        ],
+        borderColor: ['#16a34a', '#f59e0b', '#bd2126', '#6b7280'],
+        borderWidth: 2
+      }]
     };
 
-    this.proveedoresOptions = {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false,
-        },
-        tooltip: {
-          callbacks: {
-            label: (context: any) => {
-              return `${context.label}: ${this.formatearMoneda(
-                context.parsed.x
-              )}`;
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Valor de Compras (S/)',
-          },
-          ticks: {
-            callback: (value: any) => this.formatearMoneda(value),
-          },
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Proveedores',
-          },
-        },
-      },
-    };
-  }
-
-  private configurarGraficoConsumosPorTipo(): void {
-    this.consumosPorTipoData = {
-      labels: this.metricasConsumo.map((m) => m.area),
-      datasets: [
-        {
-          data: this.metricasConsumo.map((m) => m.consumoMensual),
-          backgroundColor: [
-            'rgba(189, 33, 38, 0.8)', // Texfina Primary Red
-            'rgba(18, 30, 102, 0.8)', // Texfina Secondary Blue
-            'rgba(22, 163, 74, 0.8)', // Success Green
-            'rgba(245, 158, 11, 0.8)', // Warning Orange
-            'rgba(139, 92, 246, 0.8)', // Purple
-            'rgba(6, 182, 212, 0.8)', // Cyan
-          ],
-          borderWidth: 3,
-          borderColor: [
-            '#bd2126',
-            '#121e66',
-            '#16a34a',
-            '#f59e0b',
-            '#8b5cf6',
-            '#06b6d4',
-          ],
-        },
-      ],
-    };
-
-    this.consumosPorTipoOptions = {
+    this.trazabilidadLotesOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -811,41 +786,92 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 return data.labels.map((label: string, i: number) => {
                   const meta = chart.getDatasetMeta(0);
                   const style = meta.controller.getStyle(i);
-                  const metrica = this.metricasConsumo[i];
+                  const lote = this.dashboardTrazabilidad!.lotesPorEstado[i];
 
                   return {
-                    text: `${label} (${this.formatearMoneda(
-                      metrica.consumoMensual
-                    )})`,
+                    text: `${label} (${lote.porcentaje}%)`,
                     fillStyle: style.backgroundColor,
                     strokeStyle: style.borderColor,
                     lineWidth: style.borderWidth,
                     pointStyle: 'circle',
-                    hidden:
-                      isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
-                    index: i,
+                    hidden: isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
+                    index: i
                   };
                 });
               }
               return [];
-            },
-          },
+            }
+          }
         },
         tooltip: {
           callbacks: {
             label: (context: any) => {
-              const metrica = this.metricasConsumo[context.dataIndex];
+              const lote = this.dashboardTrazabilidad!.lotesPorEstado[context.dataIndex];
               return [
-                `${context.label}: ${this.formatearMoneda(context.parsed)}`,
-                `Tendencia: ${metrica.tendencia}`,
-                `Variación: ${metrica.porcentajeDiferencia > 0 ? '+' : ''}${
-                  metrica.porcentajeDiferencia
-                }%`,
+                `${context.label}: ${context.parsed} lotes`,
+                `Porcentaje: ${lote.porcentaje}%`
               ];
-            },
-          },
-        },
+            }
+          }
+        }
+      }
+    };
+  }
+
+  private configurarDashboardDesempeno(): void {
+    if (!this.dashboardDesempeno) return;
+
+    // Gráfico de Eficiencia por Operación
+    this.desempenoEficienciaData = {
+      labels: this.dashboardDesempeno.eficienciaOperaciones.map(e => e.operacion),
+      datasets: [{
+        label: 'Eficiencia (%)',
+        data: this.dashboardDesempeno.eficienciaOperaciones.map(e => e.eficiencia),
+        backgroundColor: this.dashboardDesempeno.eficienciaOperaciones.map(e => 
+          e.eficiencia >= 95 ? 'rgba(22, 163, 74, 0.8)' :
+          e.eficiencia >= 90 ? 'rgba(245, 158, 11, 0.8)' :
+          'rgba(189, 33, 38, 0.8)'
+        ),
+        borderColor: this.dashboardDesempeno.eficienciaOperaciones.map(e => 
+          e.eficiencia >= 95 ? '#16a34a' :
+          e.eficiencia >= 90 ? '#f59e0b' :
+          '#bd2126'
+        ),
+        borderWidth: 2,
+        borderRadius: 6
+      }]
+    };
+
+    this.desempenoEficienciaOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (context: any) => {
+              const operacion = this.dashboardDesempeno!.eficienciaOperaciones[context.dataIndex];
+              return [
+                `Eficiencia: ${context.parsed.y}%`,
+                `Tiempo: ${operacion.tiempo} min`,
+                `Errores: ${operacion.errores}`,
+                `Mejora: ${operacion.mejora > 0 ? '+' : ''}${operacion.mejora}%`
+              ];
+            }
+          }
+        }
       },
+      scales: {
+        x: { title: { display: true, text: 'Operaciones' } },
+        y: {
+          beginAtZero: true,
+          max: 100,
+          title: { display: true, text: 'Eficiencia (%)' },
+          ticks: {
+            callback: (value: any) => `${value}%`
+          }
+        }
+      }
     };
   }
 }

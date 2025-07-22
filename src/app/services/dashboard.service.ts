@@ -62,6 +62,154 @@ export interface MetricaConsumo {
   porcentajeDiferencia: number;
 }
 
+// ==========================================
+// NUEVAS INTERFACES PARA 4 DASHBOARDS
+// ==========================================
+
+export interface DashboardInventario {
+  rotacionPorCategoria: RotacionCategoria[];
+  stockOptimo: StockOptimo[];
+  analisisABC: AnalisisABC[];
+  prediccionDemanda: PrediccionDemanda[];
+}
+
+export interface RotacionCategoria {
+  categoria: string;
+  rotacionPromedio: number;
+  diasPromedio: number;
+  valor: number;
+}
+
+export interface StockOptimo {
+  insumo: string;
+  stockActual: number;
+  stockOptimo: number;
+  diferencia: number;
+  estado: 'SOBRE_STOCK' | 'BAJO_STOCK' | 'OPTIMO';
+}
+
+export interface AnalisisABC {
+  categoria: 'A' | 'B' | 'C';
+  porcentajeInsumos: number;
+  porcentajeValor: number;
+  cantidad: number;
+}
+
+export interface PrediccionDemanda {
+  mes: string;
+  demandaReal: number;
+  demandaPrediccion: number;
+  precision: number;
+}
+
+export interface DashboardCostos {
+  costoPorAlmacen: CostoAlmacen[];
+  tendenciaCostos: TendenciaCosto[];
+  analisisProveedores: AnalisisProveedor[];
+  variacionPrecios: VariacionPrecio[];
+}
+
+export interface CostoAlmacen {
+  almacen: string;
+  costoTotal: number;
+  costoPromedio: number;
+  participacion: number;
+}
+
+export interface TendenciaCosto {
+  mes: string;
+  costoTotal: number;
+  costoPromedio: number;
+  variacion: number;
+}
+
+export interface AnalisisProveedor {
+  proveedor: string;
+  totalCompras: number;
+  precioPromedio: number;
+  confiabilidad: number;
+  ranking: number;
+}
+
+export interface VariacionPrecio {
+  insumo: string;
+  precioAnterior: number;
+  precioActual: number;
+  variacion: number;
+  tendencia: 'SUBE' | 'BAJA' | 'ESTABLE';
+}
+
+export interface DashboardTrazabilidad {
+  lotesPorEstado: LoteEstado[];
+  tiempoVidaPromedio: TiempoVida[];
+  alertasVencimiento: AlertaVencimiento[];
+  historialMovimientos: HistorialMovimiento[];
+}
+
+export interface LoteEstado {
+  estado: 'ACTIVO' | 'POR_VENCER' | 'VENCIDO' | 'CONSUMIDO';
+  cantidad: number;
+  porcentaje: number;
+}
+
+export interface TiempoVida {
+  categoria: string;
+  promedioVida: number;
+  lotesMenores30: number;
+  lotesMayores90: number;
+}
+
+export interface AlertaVencimiento {
+  lote: string;
+  insumo: string;
+  fechaVencimiento: Date;
+  diasRestantes: number;
+  gravedad: 'CRITICO' | 'ALERTA' | 'ATENCION';
+}
+
+export interface HistorialMovimiento {
+  fecha: Date;
+  tipo: 'INGRESO' | 'SALIDA' | 'TRANSFERENCIA' | 'AJUSTE';
+  cantidad: number;
+  responsable: string;
+}
+
+export interface DashboardDesempeno {
+  eficienciaOperaciones: EficienciaOperacion[];
+  tiemposProceso: TiempoProceso[];
+  productividad: Productividad[];
+  utilizacionRecursos: UtilizacionRecurso[];
+}
+
+export interface EficienciaOperacion {
+  operacion: string;
+  eficiencia: number;
+  tiempo: number;
+  errores: number;
+  mejora: number;
+}
+
+export interface TiempoProceso {
+  proceso: string;
+  tiempoPromedio: number;
+  tiempoOptimo: number;
+  variacion: number;
+}
+
+export interface Productividad {
+  mes: string;
+  operacionesCompletadas: number;
+  tiempoTotal: number;
+  productividad: number;
+}
+
+export interface UtilizacionRecurso {
+  recurso: string;
+  utilizacion: number;
+  capacidad: number;
+  eficiencia: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -124,5 +272,25 @@ export class DashboardService {
     return this.http.get<any[]>(
       `${environment.apiUrl}/api/proveedores/top?limite=${limite}`
     );
+  }
+
+  // ==========================================
+  // MÉTODOS PARA NUEVOS DASHBOARDS
+  // ==========================================
+
+  getDashboardInventario(): Observable<DashboardInventario> {
+    return this.http.get<DashboardInventario>(`${this.apiUrl}/inventario`);
+  }
+
+  getDashboardCostos(): Observable<DashboardCostos> {
+    return this.http.get<DashboardCostos>(`${this.apiUrl}/costos`);
+  }
+
+  getDashboardTrazabilidad(): Observable<DashboardTrazabilidad> {
+    return this.http.get<DashboardTrazabilidad>(`${this.apiUrl}/trazabilidad`);
+  }
+
+  getDashboardDesempeno(): Observable<DashboardDesempeno> {
+    return this.http.get<DashboardDesempeno>(`${this.apiUrl}/desempeno`);
   }
 }

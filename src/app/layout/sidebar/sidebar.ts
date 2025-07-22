@@ -30,11 +30,10 @@ export class SidebarComponent {
 
   // Estado de las secciones del menú
   sections = {
-    principal: true,
-    inventario: true,
-    catalogos: true,
-    administracion: false,
-    movimientos: false
+    seguimiento: true,
+    pesadoMovimientos: true,
+    maestros: true,
+    administracion: false
   };
 
   closeCallback(event: any) {

@@ -139,10 +139,10 @@ export class ConsumosComponent implements OnInit, OnDestroy {
 
   buttons: TableButtonConfig[] = [
     {
-      action: 'add',
-      label: 'Agregar Consumo',
-      icon: 'pi pi-plus',
-      color: 'primary'
+      action: 'pesar',
+      label: 'Iniciar Pesado',
+      icon: 'pi pi-chart-bar',
+      color: 'success'
     },
     {
       action: 'bulk',
@@ -172,31 +172,6 @@ export class ConsumosComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onActionClick(event: { action: string; item: any }): void {
-    const { action, item } = event;
-    switch (action) {
-      case 'view':
-        this.verDetalle(item);
-        break;
-      case 'edit':
-        this.editar(item);
-        break;
-      case 'delete':
-        this.eliminar(item);
-        break;
-    }
-  }
-
-  onButtonClick(action: string): void {
-    switch (action) {
-      case 'add':
-        this.agregar();
-        break;
-      case 'bulk':
-        this.cargaMasiva();
-        break;
-    }
-  }
 
   private updateTableStates(): void {
     this.tableState.empty = this.consumos.length === 0;
@@ -610,114 +585,6 @@ export class ConsumosComponent implements OnInit, OnDestroy {
     );
   }
 
-  agregar(): void {
-    import(
-      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
-    ).then(({ FormularioDialogComponent }) => {
-      const config = {
-        titulo: {
-          agregar: 'Agregar Consumo',
-          editar: 'Editar Consumo'
-        },
-        entidad: 'Consumo',
-        entidadArticulo: 'el consumo',
-        esEdicion: false,
-        filas: [
-          [
-            {
-              key: 'fecha',
-              label: 'Fecha',
-              tipo: 'date' as const,
-              obligatorio: true,
-              ancho: 'normal' as const
-            },
-            {
-              key: 'id_insumo',
-              label: 'Insumo',
-              tipo: 'select' as const,
-              obligatorio: true,
-              opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
-              ancho: 'normal' as const
-            }
-          ],
-          [
-            {
-              key: 'cantidad_consumida',
-              label: 'Cantidad',
-              tipo: 'number' as const,
-              obligatorio: true,
-              ancho: 'normal' as const,
-              conPesado: true
-            },
-            {
-              key: 'id_unidad',
-              label: 'Unidad',
-              tipo: 'text' as const,
-              ancho: 'normal' as const
-            }
-          ],
-          [
-            {
-              key: 'area_consumo',
-              label: 'Área de Consumo',
-              tipo: 'text' as const,
-              obligatorio: true,
-              ancho: 'normal' as const
-            },
-            {
-              key: 'id_lote',
-              label: 'Lote',
-              tipo: 'select' as const,
-              opciones: this.lotes.map(l => ({ value: l.id_lote!, label: l.lote! })),
-              ancho: 'normal' as const
-            }
-          ],
-          [
-            {
-              key: 'motivo_consumo',
-              label: 'Motivo',
-              tipo: 'text' as const,
-              obligatorio: true,
-              ancho: 'normal' as const
-            },
-            {
-              key: 'estado',
-              label: 'Estado',
-              tipo: 'select' as const,
-              obligatorio: true,
-              opciones: [
-                { value: 'PENDIENTE', label: 'Pendiente' },
-                { value: 'CONFIRMADO', label: 'Confirmado' },
-                { value: 'ANULADO', label: 'Anulado' }
-              ],
-              ancho: 'normal' as const
-            }
-          ],
-          [
-            {
-              key: 'observaciones',
-              label: 'Observaciones',
-              tipo: 'textarea' as const,
-              ancho: 'completo' as const
-            }
-          ]
-        ]
-      };
-      
-      const dialogRef = this.dialog.open(FormularioDialogComponent, {
-        width: '800px',
-        disableClose: true,
-        data: config,
-      });
-
-      dialogRef.afterClosed().subscribe((resultado) => {
-        if (resultado?.accion === 'guardar') {
-          console.log('Creando consumo:', resultado.datos);
-          this.cargarDatos();
-        }
-      });
-    });
-  }
 
   private configurarExportacion(): ConfiguracionExportacion<Consumo> {
     return {
@@ -825,6 +692,165 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         this.cargarDatos();
       }
     });
+  }
+
+  onActionClick(event: any): void {
+    const action = typeof event === 'string' ? event : event.action;
+    const item = typeof event === 'string' ? null : (event.data || event.item);
+    
+    switch (action) {
+      case 'view':
+        this.verDetalle(item);
+        break;
+      case 'edit':
+        this.editar(item);
+        break;
+      case 'delete':
+        this.eliminar(item);
+        break;
+    }
+  }
+
+  onButtonClick(event: any): void {
+    const action = typeof event === 'string' ? event : event.action;
+    
+    switch (action) {
+      case 'pesar':
+        this.iniciarPesado();
+        break;
+      case 'bulk':
+        this.cargaMasiva();
+        break;
+    }
+  }
+
+  iniciarPesado(): void {
+    // TODO: Implementar diálogo de pesado con integración de balanza y escaneo QR
+    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(
+      ({ FormularioDialogComponent }) => {
+        const config = {
+          titulo: {
+            agregar: 'Iniciar Pesado de Insumo',
+            editar: 'Editar Pesado'
+          },
+          entidad: 'Pesado',
+          entidadArticulo: 'el pesado',
+          esEdicion: false,
+          datosIniciales: {},
+          filas: [
+            [
+              {
+                key: 'qca_codigo',
+                label: 'Código QCA',
+                tipo: 'text' as const,
+                placeholder: 'Escanear código QR...',
+                obligatorio: true,
+                conScanner: true,
+                ancho: 'completo' as const
+              }
+            ],
+            [
+              {
+                key: 'id_insumo',
+                label: 'Insumo',
+                tipo: 'select' as const,
+                placeholder: 'Seleccionar insumo',
+                obligatorio: true,
+                opciones: this.insumos.map(insumo => ({
+                  value: insumo.id_insumo,
+                  label: insumo.nombre
+                })),
+                ancho: 'normal' as const
+              },
+              {
+                key: 'id_lote',
+                label: 'Lote',
+                tipo: 'select' as const,
+                placeholder: 'Seleccionar lote',
+                obligatorio: true,
+                opciones: this.lotes.map(lote => ({
+                  value: lote.id_lote,
+                  label: lote.lote
+                })),
+                ancho: 'normal' as const
+              }
+            ],
+            [
+              {
+                key: 'cantidad_solicitada',
+                label: 'Cantidad Solicitada',
+                tipo: 'number' as const,
+                placeholder: '0.00',
+                obligatorio: true,
+                step: 0.01,
+                min: 0.01,
+                ancho: 'normal' as const
+              },
+              {
+                key: 'cantidad_pesada',
+                label: 'Cantidad Pesada (kg)',
+                tipo: 'number' as const,
+                placeholder: 'Usar balanza...',
+                obligatorio: true,
+                conPesado: true,
+                step: 0.001,
+                min: 0.001,
+                ancho: 'normal' as const
+              }
+            ],
+            [
+              {
+                key: 'area_consumo',
+                label: 'Área de Consumo',
+                tipo: 'select' as const,
+                placeholder: 'Seleccionar área',
+                obligatorio: true,
+                opciones: [
+                  { value: 'Teñido Línea A', label: 'Teñido Línea A' },
+                  { value: 'Teñido Línea B', label: 'Teñido Línea B' },
+                  { value: 'Teñido Línea C', label: 'Teñido Línea C' },
+                  { value: 'Acabados', label: 'Acabados' },
+                  { value: 'Control de Calidad', label: 'Control de Calidad' }
+                ],
+                ancho: 'normal' as const
+              },
+              {
+                key: 'operador',
+                label: 'Operador',
+                tipo: 'text' as const,
+                placeholder: 'Nombre del operador',
+                obligatorio: true,
+                ancho: 'normal' as const
+              }
+            ],
+            [
+              {
+                key: 'observaciones',
+                label: 'Observaciones',
+                tipo: 'textarea' as const,
+                placeholder: 'Observaciones del pesado...',
+                obligatorio: false,
+                ancho: 'completo' as const
+              }
+            ]
+          ]
+        };
+
+        const dialogRef = this.dialog.open(FormularioDialogComponent, {
+          width: '900px',
+          disableClose: true,
+          data: config,
+        });
+
+        dialogRef.afterClosed().subscribe((resultado) => {
+          if (resultado && resultado.accion === 'guardar') {
+            console.log('Pesado registrado:', resultado.datos);
+            // TODO: Integrar con API para guardar el pesado
+            this.cargarDatos();
+          }
+        });
+      }
+    );
   }
 
   toggleDropdownExport(): void {

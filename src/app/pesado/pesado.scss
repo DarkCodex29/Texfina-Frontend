@@ -1,0 +1,78 @@
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+.page-container {
+  @include page-container;
+}
+
+.page-header {
+  @include page-header;
+}
+
+.table-container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// Dropdown styles
+.dropdown-export {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid var(--texfina-border-light);
+  border-radius: var(--texfina-radius-md);
+  box-shadow: var(--texfina-shadow-lg);
+  min-width: 160px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  
+  &.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  text-align: left;
+  color: var(--texfina-text-primary);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: var(--texfina-bg-secondary);
+  }
+  
+  &:first-child {
+    border-top-left-radius: var(--texfina-radius-md);
+    border-top-right-radius: var(--texfina-radius-md);
+  }
+  
+  &:last-child {
+    border-bottom-left-radius: var(--texfina-radius-md);
+    border-bottom-right-radius: var(--texfina-radius-md);
+  }
+}

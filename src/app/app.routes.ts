@@ -87,13 +87,6 @@ export const routes: Routes = [
           import('./roles/roles').then((m) => m.RolesComponent),
       },
       {
-        path: 'configuracion',
-        loadComponent: () =>
-          import('./configuracion/configuracion').then(
-            (m) => m.ConfiguracionComponent
-          ),
-      },
-      {
         path: 'consumos',
         loadComponent: () =>
           import('./consumos/consumos').then((m) => m.ConsumosComponent),
@@ -107,6 +100,16 @@ export const routes: Routes = [
         path: 'reportes',
         loadComponent: () =>
           import('./reportes/reportes').then((m) => m.ReportesComponent),
+      },
+      {
+        path: 'movimientos',
+        loadComponent: () =>
+          import('./movimientos/movimientos').then((m) => m.MovimientosComponent),
+      },
+      {
+        path: 'pesado',
+        loadComponent: () =>
+          import('./pesado/pesado').then((m) => m.PesadoComponent),
       },
     ],
   },

@@ -34,197 +34,165 @@
 
     <!-- Dashboard Content -->
     <div *ngIf="!isLoading && !hasError" class="dashboard-content">
-      <!-- KPIs Row -->
-      <div class="kpis-section">
-        <div class="kpis-grid">
-          <div class="kpi-card primary">
-            <div class="kpi-icon">
-              <i class="pi pi-box"></i>
+      <!-- Quick Access Section -->
+      <div class="quick-access-section">
+        <div class="quick-access-grid">
+          <div class="quick-access-card" routerLink="ingresos">
+            <div class="quick-access-icon">
+              <i class="pi pi-plus-circle"></i>
             </div>
-            <div class="kpi-content">
-              <div class="kpi-value">
-                {{ formatearNumero(resumen?.totalInsumos) }}
-              </div>
-              <div class="kpi-label">Total Insumos</div>
-              <div class="kpi-trend positive">
-                <i class="pi pi-arrow-up"></i>
-                +3.2% vs mes anterior
-              </div>
+            <div class="quick-access-content">
+              <h4>Ingresos</h4>
+              <p>Registrar nuevos insumos</p>
             </div>
           </div>
 
-          <div class="kpi-card success">
-            <div class="kpi-icon">
-              <i class="pi pi-dollar"></i>
+          <div class="quick-access-card" routerLink="movimientos">
+            <div class="quick-access-icon">
+              <i class="pi pi-arrows-alt"></i>
             </div>
-            <div class="kpi-content">
-              <div class="kpi-value">
-                {{ formatearMoneda(resumen?.valorInventario) }}
-              </div>
-              <div class="kpi-label">Valor Inventario</div>
-              <div class="kpi-trend positive">
-                <i class="pi pi-arrow-up"></i>
-                +5.8% vs mes anterior
-              </div>
+            <div class="quick-access-content">
+              <h4>Movimientos</h4>
+              <p>Transferencias entre almacenes</p>
             </div>
           </div>
 
-          <div class="kpi-card warning">
-            <div class="kpi-icon">
-              <i class="pi pi-exclamation-triangle"></i>
+          <div class="quick-access-card" routerLink="pesado">
+            <div class="quick-access-icon">
+              <i class="pi pi-compass"></i>
             </div>
-            <div class="kpi-content">
-              <div class="kpi-value">
-                {{ formatearNumero(resumen?.stockCritico) }}
-              </div>
-              <div class="kpi-label">Stock Crítico</div>
-              <div class="kpi-trend negative">
-                <i class="pi pi-arrow-down"></i>
-                -12% vs mes anterior
-              </div>
+            <div class="quick-access-content">
+              <h4>Pesado</h4>
+              <p>Operaciones de pesaje</p>
             </div>
           </div>
 
-          <div class="kpi-card info">
-            <div class="kpi-icon">
-              <i class="pi pi-users"></i>
+          <div class="quick-access-card" routerLink="consumos">
+            <div class="quick-access-icon">
+              <i class="pi pi-qrcode"></i>
             </div>
-            <div class="kpi-content">
-              <div class="kpi-value">
-                {{ formatearNumero(resumen?.totalProveedores) }}
-              </div>
-              <div class="kpi-label">Proveedores Activos</div>
-              <div class="kpi-trend stable">
-                <i class="pi pi-minus"></i>
-                Sin cambios
-              </div>
+            <div class="quick-access-content">
+              <h4>Escaneado</h4>
+              <p>Consumos con código QR</p>
+            </div>
+          </div>
+
+          <div class="quick-access-card" routerLink="stock">
+            <div class="quick-access-icon">
+              <i class="pi pi-chart-bar"></i>
+            </div>
+            <div class="quick-access-content">
+              <h4>Stock</h4>
+              <p>Consultar inventario actual</p>
+            </div>
+          </div>
+
+          <div class="quick-access-card" routerLink="reportes">
+            <div class="quick-access-icon">
+              <i class="pi pi-file-pdf"></i>
+            </div>
+            <div class="quick-access-content">
+              <h4>Reportes</h4>
+              <p>Generar informes y análisis</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Charts Section -->
+      <!-- Charts Section - NUEVOS DASHBOARDS -->
       <div class="charts-section">
-        <!-- Primera fila de gráficos -->
+        <!-- Primera fila de gráficos - DASHBOARDS PRINCIPALES -->
         <div class="charts-row">
-          <!-- Gráfico de Inventario por Almacén -->
-          <div class="chart-card">
-            <p-card>
-              <ng-template pTemplate="header">
-                <div class="chart-header">
-                  <h3>
-                    <i class="pi pi-chart-pie"></i>
-                    Distribución de Inventario
-                  </h3>
-                  <span class="chart-subtitle">Por almacén</span>
-                </div>
-              </ng-template>
-              <div class="chart-container pie-chart">
-                <p-chart
-                  type="doughnut"
-                  [data]="inventarioChartData"
-                  [options]="inventarioChartOptions"
-                  ariaLabel="Distribución de inventario por almacén"
-                ></p-chart>
-              </div>
-            </p-card>
-          </div>
-
-          <!-- Gráfico de Tendencia de Stock -->
+          <!-- Dashboard de Inventario -->
           <div class="chart-card large">
             <p-card>
               <ng-template pTemplate="header">
                 <div class="chart-header">
                   <h3>
-                    <i class="pi pi-chart-line"></i>
-                    Tendencia de Stock
+                    <i class="pi pi-box"></i>
+                    Dashboard de Inventario
                   </h3>
-                  <span class="chart-subtitle">Últimos 6 meses</span>
+                  <span class="chart-subtitle">Rotación por categoría</span>
                 </div>
               </ng-template>
-              <div class="chart-container line-chart">
+              <div class="chart-container mixed-chart">
                 <p-chart
-                  type="line"
-                  [data]="stockTendenciaData"
-                  [options]="stockTendenciaOptions"
-                  ariaLabel="Tendencia de stock en los últimos meses"
+                  type="bar"
+                  [data]="inventarioRotacionData"
+                  [options]="inventarioRotacionOptions"
+                  ariaLabel="Rotación de inventario por categoría"
+                ></p-chart>
+              </div>
+            </p-card>
+          </div>
+
+          <!-- Dashboard de Costos -->
+          <div class="chart-card">
+            <p-card>
+              <ng-template pTemplate="header">
+                <div class="chart-header">
+                  <h3>
+                    <i class="pi pi-dollar"></i>
+                    Dashboard de Costos
+                  </h3>
+                  <span class="chart-subtitle">Distribución por almacén</span>
+                </div>
+              </ng-template>
+              <div class="chart-container pie-chart">
+                <p-chart
+                  type="doughnut"
+                  [data]="costosAlmacenData"
+                  [options]="costosAlmacenOptions"
+                  ariaLabel="Costos por almacén"
                 ></p-chart>
               </div>
             </p-card>
           </div>
         </div>
 
-        <!-- Segunda fila de gráficos -->
+        <!-- Segunda fila de gráficos - DASHBOARDS ADICIONALES -->
         <div class="charts-row">
-          <!-- Gráfico de Movimientos -->
+          <!-- Dashboard de Trazabilidad -->
           <div class="chart-card">
             <p-card>
               <ng-template pTemplate="header">
                 <div class="chart-header">
                   <h3>
-                    <i class="pi pi-chart-bar"></i>
-                    Movimientos Mensuales
+                    <i class="pi pi-search"></i>
+                    Dashboard de Trazabilidad
                   </h3>
-                  <span class="chart-subtitle"
-                    >Ingresos, salidas y transferencias</span
-                  >
-                </div>
-              </ng-template>
-              <div class="chart-container bar-chart">
-                <p-chart
-                  type="bar"
-                  [data]="movimientosBarData"
-                  [options]="movimientosBarOptions"
-                  ariaLabel="Movimientos mensuales de inventario"
-                ></p-chart>
-              </div>
-            </p-card>
-          </div>
-
-          <!-- Gráfico de Top Proveedores -->
-          <div class="chart-card">
-            <p-card>
-              <ng-template pTemplate="header">
-                <div class="chart-header">
-                  <h3>
-                    <i class="pi pi-building"></i>
-                    Top Proveedores
-                  </h3>
-                  <span class="chart-subtitle">Por valor de compras</span>
-                </div>
-              </ng-template>
-              <div class="chart-container horizontal-bar-chart">
-                <p-chart
-                  type="bar"
-                  [data]="proveedoresData"
-                  [options]="proveedoresOptions"
-                  ariaLabel="Top proveedores por valor de compras"
-                ></p-chart>
-              </div>
-            </p-card>
-          </div>
-        </div>
-
-        <!-- Tercera fila de gráficos -->
-        <div class="charts-row">
-          <!-- Gráfico de Consumos por Área -->
-          <div class="chart-card">
-            <p-card>
-              <ng-template pTemplate="header">
-                <div class="chart-header">
-                  <h3>
-                    <i class="pi pi-chart-pie"></i>
-                    Consumos por Área
-                  </h3>
-                  <span class="chart-subtitle">Distribución mensual</span>
+                  <span class="chart-subtitle">Estados de lotes</span>
                 </div>
               </ng-template>
               <div class="chart-container polar-chart">
                 <p-chart
                   type="polarArea"
-                  [data]="consumosPorTipoData"
-                  [options]="consumosPorTipoOptions"
-                  ariaLabel="Consumos por área de trabajo"
+                  [data]="trazabilidadLotesData"
+                  [options]="trazabilidadLotesOptions"
+                  ariaLabel="Estados de lotes por trazabilidad"
+                ></p-chart>
+              </div>
+            </p-card>
+          </div>
+
+          <!-- Dashboard de Desempeño -->
+          <div class="chart-card">
+            <p-card>
+              <ng-template pTemplate="header">
+                <div class="chart-header">
+                  <h3>
+                    <i class="pi pi-chart-line"></i>
+                    Dashboard de Desempeño
+                  </h3>
+                  <span class="chart-subtitle">Eficiencia por operación</span>
+                </div>
+              </ng-template>
+              <div class="chart-container bar-chart">
+                <p-chart
+                  type="bar"
+                  [data]="desempenoEficienciaData"
+                  [options]="desempenoEficienciaOptions"
+                  ariaLabel="Eficiencia de operaciones"
                 ></p-chart>
               </div>
             </p-card>

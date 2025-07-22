@@ -1,13 +1,42 @@
 @use "sass:map";
 @use "variables" as *;
 
-$breakpoints: (
-  xs: 480px,
-  sm: 768px,
-  md: 1024px,
-  lg: 1280px,
-  xl: 1536px,
-);
+// Layout mixins
+@mixin page-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  padding: var(--texfina-spacing-lg);
+  background-color: var(--texfina-bg-secondary);
+  overflow: hidden;
+  font-family: var(--texfina-font-family);
+
+  @include respond-to-max(sm) {
+    padding: 8px;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+}
+
+@mixin page-header {
+  @include flex-between;
+  margin-bottom: var(--texfina-spacing-lg);
+  flex-shrink: 0;
+  background-color: var(--texfina-bg-primary);
+  padding: var(--texfina-spacing-lg);
+  border-radius: var(--texfina-radius-lg);
+  box-shadow: var(--texfina-shadow-md);
+  border: 1px solid var(--texfina-border-light);
+
+  @include respond-to-max(sm) {
+    padding: 12px;
+    margin-bottom: 12px;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
 
 @mixin respond-to($breakpoint) {
   @if map.has-key($breakpoints, $breakpoint) {

@@ -1,0 +1,46 @@
+<div class="page-container">
+  <div class="page-content">
+    <!-- Header de la página -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title text-texfina text-primary">Pesado</h1>
+      </div>
+      <div class="header-actions">
+        <div class="dropdown-export">
+          <button
+            class="btn-texfina btn-neutral dropdown-trigger"
+            (click)="toggleDropdownExport()"
+          >
+            Exportar
+          </button>
+          <div class="dropdown-menu" [class.show]="dropdownExportAbierto">
+            <button class="dropdown-item" (click)="exportarExcel()">
+              Exportar a Excel
+            </button>
+            <button class="dropdown-item" (click)="exportarPDF()">
+              Exportar a PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="table-card">
+      <app-prime-data-table
+        [data]="data"
+        [columns]="columns"
+        [actions]="actions"
+        [buttons]="buttons"
+        [globalFilterFields]="globalFilterFields"
+        [state]="tableState"
+        emptyIcon="scale"
+        emptyTitle="No hay pesados registrados"
+        emptySubtitle="Comienza registrando tu primer pesado con balanza"
+        (actionClick)="onActionClick($event)"
+        (buttonClick)="onButtonClick($event)"
+        (retryClicked)="recargarDatos()"
+      ></app-prime-data-table>
+    </div>
+  </div>
+</div>

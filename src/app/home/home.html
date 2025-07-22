@@ -1,9 +1,38 @@
 <div class="home-root">
   <div class="home-content">
-    <h1 class="home-title">Bienvenido</h1>
+    <h1 class="home-title">Sistema de Gestión de Inventario</h1>
 
     <div class="logo-container">
       <img src="assets/logo.svg" alt="Texfina Logo" class="texfina-logo" />
+    </div>
+
+    <div class="quick-access-section">
+      <h2 class="section-title">Accesos Rápidos</h2>
+      <div class="quick-access-grid">
+        <a routerLink="/dashboard/ingresos" class="quick-access-card">
+          <i class="pi pi-arrow-down card-icon"></i>
+          <span class="card-title">Ingresos</span>
+          <span class="card-description">Registrar entrada de materiales</span>
+        </a>
+        
+        <a routerLink="/dashboard/movimientos" class="quick-access-card">
+          <i class="pi pi-arrow-right-arrow-left card-icon"></i>
+          <span class="card-title">Movimientos</span>
+          <span class="card-description">Trasladar entre almacenes</span>
+        </a>
+        
+        <a routerLink="/dashboard/pesado" class="quick-access-card">
+          <i class="pi pi-chart-bar card-icon"></i>
+          <span class="card-title">Pesado</span>
+          <span class="card-description">Pesar materiales con balanza</span>
+        </a>
+        
+        <a routerLink="/dashboard/stock" class="quick-access-card">
+          <i class="pi pi-qrcode card-icon"></i>
+          <span class="card-title">Escaneado</span>
+          <span class="card-description">Consultar stock por QR</span>
+        </a>
+      </div>
     </div>
 
     <div class="ebim-section">

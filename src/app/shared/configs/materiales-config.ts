@@ -56,31 +56,21 @@ export class MaterialesConfig {
         [
           {
             key: 'presentacion',
-            label: 'Presentación',
-            tipo: 'text',
-            placeholder: 'Ej: Rollo de 50kg',
-            maxLength: 100,
+            label: 'Presentación Predeterminada',
+            tipo: 'select',
+            placeholder: 'Seleccionar presentación',
             obligatorio: false,
-          },
-          {
-            key: 'peso_unitario',
-            label: 'Peso Unitario (kg)',
-            tipo: 'number',
-            placeholder: '0.00',
-            step: 0.01,
-            min: 0,
-            obligatorio: false,
-          },
-        ],
-        [
-          {
-            key: 'precio_unitario',
-            label: 'Precio Unitario (S/)',
-            tipo: 'number',
-            placeholder: '0.00',
-            step: 0.01,
-            min: 0,
-            obligatorio: false,
+            opciones: [
+              { value: 'Bolsa 25kg', label: 'Bolsa de 25 kg' },
+              { value: 'Bolsa 50kg', label: 'Bolsa de 50 kg' },
+              { value: 'Saco 25kg', label: 'Saco de 25 kg' },
+              { value: 'Saco 50kg', label: 'Saco de 50 kg' },
+              { value: 'Tambor 200L', label: 'Tambor de 200 L' },
+              { value: 'Bidón 20L', label: 'Bidón de 20 L' },
+              { value: 'Caja 12 unidades', label: 'Caja de 12 unidades' },
+              { value: 'Pallet 1000kg', label: 'Pallet de 1000 kg' },
+              { value: 'Granel', label: 'A granel' }
+            ],
             ancho: 'completo',
           },
         ],
@@ -125,25 +115,10 @@ export class MaterialesConfig {
         [
           {
             key: 'presentacion',
-            label: 'Presentación',
+            label: 'Presentación Predeterminada',
             tipo: 'text',
-            ancho: 'normal',
-          },
-          {
-            key: 'peso_unitario',
-            label: 'Peso Unitario',
-            tipo: 'number',
-            ancho: 'normal',
-            formateo: (valor) => valor ? `${valor} kg` : '-',
-          },
-        ],
-        [
-          {
-            key: 'precio_unitario',
-            label: 'Precio Unitario',
-            tipo: 'number',
             ancho: 'completo',
-            formateo: (valor) => valor ? `S/ ${valor.toFixed(2)}` : '-',
+            formateo: (valor) => valor || 'No especificada',
           },
         ],
       ],
