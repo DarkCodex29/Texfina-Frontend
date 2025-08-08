@@ -280,11 +280,77 @@ export class MaterialesComponent implements OnInit, OnDestroy {
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe(resultado => {
+    dialogRef.afterClosed().subscribe(async resultado => {
       if (resultado && resultado.accion === 'guardar') {
-        this.crear(resultado.datos);
+        // Verificar si seleccionó crear nuevo proveedor
+        if (resultado.datos.id_proveedor === 'NUEVO') {
+          await this.abrirFormularioNuevoProveedor(resultado.datos);
+        } else {
+          this.crear(resultado.datos);
+        }
       }
     });
+  }
+  
+  private async abrirFormularioNuevoProveedor(datosInsumo: any): Promise<void> {
+    // Importar dinámicamente la configuración de proveedores
+    const { ProveedoresConfig } = await import('../shared/configs/proveedores-config');
+    const configProveedor = ProveedoresConfig.formulario(false);
+    
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '700px',
+      data: {
+        ...configProveedor,
+        titulo: {
+          agregar: 'Registrar Nuevo Proveedor',
+          editar: 'Editar Proveedor'
+        },
+        mensajeAdicional: 'Complete los datos del nuevo proveedor para continuar con el registro del insumo.'
+      },
+      disableClose: true
+    });
+    
+    dialogRef.afterClosed().subscribe(async resultadoProveedor => {
+      if (resultadoProveedor && resultadoProveedor.accion === 'guardar') {
+        // Crear el proveedor primero
+        this.materialService.crearProveedor(resultadoProveedor.datos)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (nuevoProveedor: any) => {
+              console.log('Proveedor creado:', nuevoProveedor);
+              // Ahora crear el insumo con el ID del nuevo proveedor
+              datosInsumo.id_proveedor = nuevoProveedor.id_proveedor;
+              this.crear(datosInsumo);
+            },
+            error: (error: any) => {
+              console.error('Error al crear proveedor:', error);
+              // Mostrar mensaje de error
+              this.mostrarMensajeError('No se pudo crear el proveedor. Por favor, intente nuevamente.');
+            }
+          });
+      } else {
+        // El usuario canceló, volver a abrir el formulario del insumo
+        await this.agregar();
+      }
+    });
+  }
+  
+  private mostrarMensajeError(mensaje: string): void {
+    // Usar el dialog de confirmación como mensaje de error
+    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(
+      ({ ConfirmacionDialogComponent }) => {
+        this.dialog.open(ConfirmacionDialogComponent, {
+          width: '500px',
+          data: {
+            tipo: 'danger',
+            titulo: 'Error',
+            mensaje: mensaje,
+            textoBotonConfirmar: 'Entendido',
+            ocultarCancelar: true
+          }
+        });
+      }
+    );
   }
 
   async editar(material: Insumo): Promise<void> {
@@ -543,23 +609,40 @@ export class MaterialesComponent implements OnInit, OnDestroy {
 
   private async cargarOpcionesFormulario(config: any): Promise<void> {
     try {
-      // Cargar clases y unidades en paralelo
-      const [clases, unidades] = await Promise.all([
+      // Cargar clases, proveedores y unidades en paralelo
+      const [clases, proveedores, unidades] = await Promise.all([
         this.materialService.getClases().toPromise(),
+        this.materialService.getProveedores().toPromise(),
         this.materialService.getUnidades().toPromise()
       ]);
 
-      // Buscar campos de clase y unidad y asignar opciones
+      // Buscar campos y asignar opciones
       config.filas.forEach((fila: any[]) => {
         fila.forEach((campo: any) => {
-          if (campo.key === 'clase_id') {
+          if (campo.key === 'id_clase') {
             campo.opciones = clases?.map((clase: any) => ({
-              value: clase.id,
-              label: clase.nombre
+              value: clase.id_clase,
+              label: clase.descripcion_completa || `${clase.id_clase} - ${clase.familia} ${clase.sub_familia}`,
+              descripcion: `${clase.familia} ${clase.sub_familia}`
             })) || [];
-          } else if (campo.key === 'unidad_id') {
+          } else if (campo.key === 'id_proveedor') {
+            campo.opciones = proveedores?.map((proveedor: any) => ({
+              value: proveedor.id_proveedor,
+              label: proveedor.empresa,
+              descripcion: `RUC: ${proveedor.ruc} - ${proveedor.contacto || 'Sin contacto'}`,
+              email: proveedor.email,
+              telefono: proveedor.telefono
+            })) || [];
+            // Agregar opción para nuevo proveedor
+            campo.opciones.push({
+              value: 'NUEVO',
+              label: '+ Registrar nuevo proveedor',
+              descripcion: 'Crear un nuevo proveedor en el sistema',
+              esNuevo: true
+            });
+          } else if (campo.key === 'id_unidad') {
             campo.opciones = unidades?.map((unidad: any) => ({
-              value: unidad.id,
+              value: unidad.id_unidad,
               label: unidad.nombre
             })) || [];
           }
