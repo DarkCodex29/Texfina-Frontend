@@ -274,25 +274,32 @@ export class MaterialesComponent implements OnInit, OnDestroy {
     // Cargar opciones dinámicamente
     await this.cargarOpcionesFormulario(config);
     
+    // Configurar callbacks para los botones de agregar
+    config.filas.forEach((fila: any[]) => {
+      fila.forEach((campo: any) => {
+        if (campo.key === 'id_proveedor' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoProveedor();
+        }
+        if (campo.key === 'id_clase' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevaClase();
+        }
+      });
+    });
+    
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '800px',
       data: config,
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe(async resultado => {
+    dialogRef.afterClosed().subscribe(resultado => {
       if (resultado && resultado.accion === 'guardar') {
-        // Verificar si seleccionó crear nuevo proveedor
-        if (resultado.datos.id_proveedor === 'NUEVO') {
-          await this.abrirFormularioNuevoProveedor(resultado.datos);
-        } else {
-          this.crear(resultado.datos);
-        }
+        this.crear(resultado.datos);
       }
     });
   }
   
-  private async abrirFormularioNuevoProveedor(datosInsumo: any): Promise<void> {
+  private async abrirFormularioNuevoProveedor(): Promise<void> {
     // Importar dinámicamente la configuración de proveedores
     const { ProveedoresConfig } = await import('../shared/configs/proveedores-config');
     const configProveedor = ProveedoresConfig.formulario(false);
@@ -305,34 +312,48 @@ export class MaterialesComponent implements OnInit, OnDestroy {
           agregar: 'Registrar Nuevo Proveedor',
           editar: 'Editar Proveedor'
         },
-        mensajeAdicional: 'Complete los datos del nuevo proveedor para continuar con el registro del insumo.'
+        mensajeAdicional: 'Complete los datos del nuevo proveedor. Una vez registrado, podrá seleccionarlo en el formulario de insumos.'
       },
       disableClose: true
     });
     
-    dialogRef.afterClosed().subscribe(async resultadoProveedor => {
+    dialogRef.afterClosed().subscribe(resultadoProveedor => {
       if (resultadoProveedor && resultadoProveedor.accion === 'guardar') {
-        // Crear el proveedor primero
+        // Crear el proveedor
         this.materialService.crearProveedor(resultadoProveedor.datos)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: (nuevoProveedor: any) => {
-              console.log('Proveedor creado:', nuevoProveedor);
-              // Ahora crear el insumo con el ID del nuevo proveedor
-              datosInsumo.id_proveedor = nuevoProveedor.id_proveedor;
-              this.crear(datosInsumo);
+              console.log('Proveedor creado exitosamente:', nuevoProveedor);
+              // Mostrar mensaje de éxito
+              this.mostrarMensajeExito(`Proveedor "${nuevoProveedor.empresa}" registrado exitosamente. Ya puede seleccionarlo en el formulario.`);
+              // Recargar las opciones del formulario si está abierto
+              // El formulario se actualizará cuando se vuelva a abrir
             },
             error: (error: any) => {
               console.error('Error al crear proveedor:', error);
-              // Mostrar mensaje de error
               this.mostrarMensajeError('No se pudo crear el proveedor. Por favor, intente nuevamente.');
             }
           });
-      } else {
-        // El usuario canceló, volver a abrir el formulario del insumo
-        await this.agregar();
       }
     });
+  }
+  
+  private mostrarMensajeExito(mensaje: string): void {
+    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(
+      ({ ConfirmacionDialogComponent }) => {
+        this.dialog.open(ConfirmacionDialogComponent, {
+          width: '500px',
+          data: {
+            tipo: 'success',
+            titulo: 'Éxito',
+            mensaje: mensaje,
+            textoBotonConfirmar: 'Entendido',
+            ocultarCancelar: true
+          }
+        });
+      }
+    );
   }
   
   private mostrarMensajeError(mensaje: string): void {
@@ -352,12 +373,64 @@ export class MaterialesComponent implements OnInit, OnDestroy {
       }
     );
   }
+  
+  private async abrirFormularioNuevaClase(): Promise<void> {
+    // Importar dinámicamente la configuración de clases
+    const { ClasesConfig } = await import('../shared/configs/clases-config');
+    const configClase = ClasesConfig.getConfiguracionFormulario(false);
+    
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '700px',
+      data: {
+        ...configClase,
+        titulo: {
+          agregar: 'Registrar Nueva Clase',
+          editar: 'Editar Clase'
+        },
+        mensajeAdicional: 'Complete los datos de la nueva clase. Una vez registrada, podrá seleccionarla en el formulario de insumos.'
+      },
+      disableClose: true
+    });
+    
+    dialogRef.afterClosed().subscribe(resultadoClase => {
+      if (resultadoClase && resultadoClase.accion === 'guardar') {
+        // Crear la clase
+        this.materialService.crearClase(resultadoClase.datos)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (nuevaClase: any) => {
+              console.log('Clase creada exitosamente:', nuevaClase);
+              // Mostrar mensaje de éxito
+              this.mostrarMensajeExito(`Clase "${nuevaClase.id_clase}" registrada exitosamente. Ya puede seleccionarla en el formulario.`);
+              // Recargar las opciones del formulario si está abierto
+              // El formulario se actualizará cuando se vuelva a abrir
+            },
+            error: (error: any) => {
+              console.error('Error al crear clase:', error);
+              this.mostrarMensajeError('No se pudo crear la clase. Por favor, intente nuevamente.');
+            }
+          });
+      }
+    });
+  }
 
   async editar(material: Insumo): Promise<void> {
     const config = MaterialesConfig.formulario(true, material);
     
     // Cargar opciones dinámicamente
     await this.cargarOpcionesFormulario(config);
+    
+    // Configurar callbacks para los botones de agregar
+    config.filas.forEach((fila: any[]) => {
+      fila.forEach((campo: any) => {
+        if (campo.key === 'id_proveedor' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoProveedor();
+        }
+        if (campo.key === 'id_clase' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevaClase();
+        }
+      });
+    });
     
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '800px',
@@ -633,13 +706,15 @@ export class MaterialesComponent implements OnInit, OnDestroy {
               email: proveedor.email,
               telefono: proveedor.telefono
             })) || [];
-            // Agregar opción para nuevo proveedor
-            campo.opciones.push({
-              value: 'NUEVO',
-              label: '+ Registrar nuevo proveedor',
-              descripcion: 'Crear un nuevo proveedor en el sistema',
-              esNuevo: true
-            });
+            
+            // Si no hay proveedores, agregar mensaje informativo
+            if (!campo.opciones || campo.opciones.length === 0) {
+              campo.opciones = [{
+                value: '',
+                label: 'No hay proveedores registrados',
+                descripcion: 'Registre proveedores en Maestros > Proveedores'
+              }];
+            }
           } else if (campo.key === 'id_unidad') {
             campo.opciones = unidades?.map((unidad: any) => ({
               value: unidad.id_unidad,

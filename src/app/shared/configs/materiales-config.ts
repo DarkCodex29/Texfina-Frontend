@@ -43,14 +43,16 @@ export class MaterialesConfig {
             placeholder: 'Buscar y seleccionar clase...',
             obligatorio: true,
             opciones: [], // Se cargarán dinámicamente
+            conBotonAgregar: true,
           },
           {
             key: 'id_proveedor',
-            label: 'Proveedor',
+            label: 'Proveedor *',
             tipo: 'select',
-            placeholder: 'Buscar y seleccionar proveedor...',
+            placeholder: 'Seleccionar proveedor',
             obligatorio: true,
             opciones: [], // Se cargarán dinámicamente
+            conBotonAgregar: true,
           },
         ],
         [

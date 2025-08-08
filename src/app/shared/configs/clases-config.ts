@@ -23,34 +23,45 @@ export class ClasesConfig {
       esEdicion: esEdicion,
       datosIniciales: datosIniciales,
       filas: [
-        // Primera fila: ID Clase y Familia
+        // Primera fila: ID Clase
         [
           {
             key: 'id_clase',
             label: 'Código de Clase',
             tipo: 'text',
-            placeholder: 'Ej: ALG',
-            maxLength: 10,
+            placeholder: 'Ej: CC, CA, CD',
+            maxLength: 5,
             obligatorio: true,
           },
+        ],
+        // Segunda fila: Familia y Subfamilia
+        [
           {
             key: 'familia',
             label: 'Familia',
             tipo: 'text',
-            placeholder: 'Ej: Algodón',
+            placeholder: 'Ej: COLORANTE',
             maxLength: 100,
             obligatorio: true,
           },
-        ],
-        // Segunda fila: Subfamilia
-        [
           {
             key: 'sub_familia',
             label: 'Subfamilia',
             tipo: 'text',
-            placeholder: 'Ej: Algodón Peinado',
+            placeholder: 'Ej: CATIONICO',
             maxLength: 100,
             obligatorio: true,
+          },
+        ],
+        // Tercera fila: Descripción completa
+        [
+          {
+            key: 'descripcion_completa',
+            label: 'Descripción Completa',
+            tipo: 'text',
+            placeholder: 'Ej: CC - COLORANTE CATIÓNICO',
+            maxLength: 200,
+            obligatorio: false,
             ancho: 'completo',
           },
         ],

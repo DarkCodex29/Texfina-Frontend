@@ -114,7 +114,7 @@
             <div class="input-row">
               <select
                 class="form-select"
-                [ngClass]="{'with-buttons': campo.conScanner}"
+                [ngClass]="{'with-buttons': campo.conScanner || campo.conBotonAgregar}"
                 [formControlName]="campo.key"
                 [disabled]="campo.disabled || false"
               >
@@ -128,7 +128,7 @@
               </select>
               
               <!-- Botones para select -->
-              <div class="input-buttons" *ngIf="campo.conScanner">
+              <div class="input-buttons" *ngIf="campo.conScanner || campo.conBotonAgregar">
                 <button
                   *ngIf="campo.conScanner"
                   type="button"
@@ -138,6 +138,17 @@
                   [disabled]="campo.disabled"
                   matTooltip="{{ escaneandoActivo ? 'Detener scanner' : 'Escanear código' }}">
                   <mat-icon>{{ escaneandoActivo ? 'stop' : 'qr_code_scanner' }}</mat-icon>
+                </button>
+                
+                <!-- Botón para agregar nuevo -->
+                <button
+                  *ngIf="campo.conBotonAgregar"
+                  type="button"
+                  class="input-btn add-btn"
+                  (click)="campo.onAgregar ? campo.onAgregar() : null"
+                  [disabled]="campo.disabled"
+                  matTooltip="Agregar nuevo">
+                  <mat-icon>add</mat-icon>
                 </button>
               </div>
             </div>

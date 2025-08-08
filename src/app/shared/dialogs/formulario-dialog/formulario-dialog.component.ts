@@ -33,6 +33,8 @@ export interface CampoFormulario {
   disabled?: boolean;
   conPesado?: boolean;
   conScanner?: boolean;
+  conBotonAgregar?: boolean; // Para mostrar botón de agregar nuevo
+  onAgregar?: () => void; // Callback cuando se hace clic en agregar
 }
 
 export interface ConfiguracionFormulario {
