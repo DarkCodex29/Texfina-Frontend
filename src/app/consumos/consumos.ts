@@ -42,7 +42,7 @@ import {
 })
 export class ConsumosComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  
+
   dropdownExportAbierto = false;
   consumos: Consumo[] = [];
   insumos: Insumo[] = [];
@@ -52,7 +52,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
     loading: false,
     error: false,
     empty: false,
-    filteredEmpty: false
+    filteredEmpty: false,
   };
 
   columns: TableColumn[] = [
@@ -62,7 +62,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       sortable: true,
       filterable: false,
       width: '120px',
-      type: 'date'
+      type: 'date',
     },
     {
       key: 'id_insumo',
@@ -70,7 +70,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       sortable: true,
       filterable: true,
       width: '200px',
-      type: 'text'
+      type: 'text',
     },
     {
       key: 'area_consumo',
@@ -78,7 +78,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       sortable: true,
       filterable: true,
       width: '150px',
-      type: 'text'
+      type: 'text',
     },
     {
       key: 'cantidad',
@@ -86,7 +86,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       sortable: true,
       filterable: false,
       width: '120px',
-      type: 'number'
+      type: 'number',
     },
     {
       key: 'id_lote',
@@ -94,7 +94,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       sortable: true,
       filterable: true,
       width: '120px',
-      type: 'text'
+      type: 'text',
     },
     {
       key: 'motivo_consumo',
@@ -102,7 +102,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       sortable: true,
       filterable: true,
       width: '150px',
-      type: 'text'
+      type: 'text',
     },
     {
       key: 'estado',
@@ -110,8 +110,8 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       sortable: true,
       filterable: true,
       width: '120px',
-      type: 'badge'
-    }
+      type: 'badge',
+    },
   ];
 
   actions: TableAction[] = [
@@ -119,22 +119,22 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       action: 'view',
       tooltip: 'Ver Detalle',
       icon: 'pi pi-eye',
-      color: 'secondary'
+      color: 'secondary',
     },
     {
       action: 'edit',
       tooltip: 'Editar',
       icon: 'pi pi-pencil',
       color: 'primary',
-      condition: (item: Consumo) => item.estado !== 'CONFIRMADO'
+      condition: (item: Consumo) => item.estado !== 'CONFIRMADO',
     },
     {
       action: 'delete',
       tooltip: 'Eliminar',
       icon: 'pi pi-trash',
       color: 'danger',
-      condition: (item: Consumo) => item.estado !== 'CONFIRMADO'
-    }
+      condition: (item: Consumo) => item.estado !== 'CONFIRMADO',
+    },
   ];
 
   buttons: TableButtonConfig[] = [
@@ -142,14 +142,14 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       action: 'pesar',
       label: 'Iniciar Pesado',
       icon: 'pi pi-chart-bar',
-      color: 'success'
+      color: 'success',
     },
     {
       action: 'bulk',
       label: 'Carga Masiva',
       icon: 'pi pi-upload',
-      color: 'secondary'
-    }
+      color: 'secondary',
+    },
   ];
 
   globalFilterFields: string[] = ['area_consumo', 'motivo_consumo', 'estado'];
@@ -171,7 +171,6 @@ export class ConsumosComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
 
   private updateTableStates(): void {
     this.tableState.empty = this.consumos.length === 0;
@@ -212,7 +211,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         motivo_consumo: 'Producción diaria',
         usuario_registro: 'Juan Pérez',
         observaciones: 'Consumo normal',
-        estado: 'CONFIRMADO'
+        estado: 'CONFIRMADO',
       },
       {
         id_consumo: 2,
@@ -225,7 +224,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         motivo_consumo: 'Producción especial',
         usuario_registro: 'María García',
         observaciones: 'Para pedido especial',
-        estado: 'PENDIENTE'
+        estado: 'PENDIENTE',
       },
       {
         id_consumo: 3,
@@ -238,7 +237,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         motivo_consumo: 'Pruebas',
         usuario_registro: 'Carlos López',
         observaciones: 'Pruebas de calidad',
-        estado: 'ANULADO'
+        estado: 'ANULADO',
       },
       {
         id_consumo: 4,
@@ -251,7 +250,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         motivo_consumo: 'Producción diaria',
         usuario_registro: 'Ana Martínez',
         observaciones: 'Uso normal',
-        estado: 'CONFIRMADO'
+        estado: 'CONFIRMADO',
       },
       {
         id_consumo: 5,
@@ -264,8 +263,8 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         motivo_consumo: 'Productos premium',
         usuario_registro: 'Luis Rodríguez',
         observaciones: 'Para línea premium',
-        estado: 'PENDIENTE'
-      }
+        estado: 'PENDIENTE',
+      },
     ];
 
     console.log('✅ Datos mock cargados:', this.consumos.length, 'consumos');
@@ -277,7 +276,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       { id_insumo: 2, nombre: 'Azúcar Blanca', id_fox: 'A001' },
       { id_insumo: 3, nombre: 'Mantequilla Sin Sal', id_fox: 'M001' },
       { id_insumo: 4, nombre: 'Levadura Seca', id_fox: 'L001' },
-      { id_insumo: 5, nombre: 'Chocolate Negro 70%', id_fox: 'C001' }
+      { id_insumo: 5, nombre: 'Chocolate Negro 70%', id_fox: 'C001' },
     ];
   }
 
@@ -292,7 +291,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         stock_actual: 850,
         fecha_expiracion: new Date('2024-06-15'),
         precio_total: 2500,
-        estado_lote: 'ACTIVO'
+        estado_lote: 'ACTIVO',
       },
       {
         id_lote: 2,
@@ -303,7 +302,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         stock_actual: 75,
         fecha_expiracion: new Date('2024-03-20'),
         precio_total: 900,
-        estado_lote: 'BAJO'
+        estado_lote: 'BAJO',
       },
       {
         id_lote: 3,
@@ -314,7 +313,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         stock_actual: 0,
         fecha_expiracion: new Date('2024-01-10'),
         precio_total: 1700,
-        estado_lote: 'AGOTADO'
+        estado_lote: 'AGOTADO',
       },
       {
         id_lote: 4,
@@ -325,7 +324,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         stock_actual: 280,
         fecha_expiracion: new Date('2025-12-31'),
         precio_total: 150,
-        estado_lote: 'ACTIVO'
+        estado_lote: 'ACTIVO',
       },
       {
         id_lote: 5,
@@ -336,8 +335,8 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         stock_actual: 95,
         fecha_expiracion: new Date('2024-08-15'),
         precio_total: 1200,
-        estado_lote: 'ACTIVO'
-      }
+        estado_lote: 'ACTIVO',
+      },
     ];
   }
 
@@ -392,10 +391,12 @@ export class ConsumosComponent implements OnInit, OnDestroy {
   }
 
   formatearCantidad(cantidad?: number): string {
-    return cantidad?.toLocaleString('es-ES', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }) || '0';
+    return (
+      cantidad?.toLocaleString('es-ES', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }) || '0'
+    );
   }
 
   verDetalle(consumo: Consumo): void {
@@ -406,9 +407,9 @@ export class ConsumosComponent implements OnInit, OnDestroy {
           id_insumo: this.getInsumoNombre(consumo.id_insumo),
           id_lote: this.getLoteNombre(consumo.id_lote),
           fecha: this.formatearFecha(consumo.fecha),
-          cantidad: this.formatearNumero(consumo.cantidad)
+          cantidad: this.formatearNumero(consumo.cantidad),
         };
-        
+
         const config = {
           entidad: 'Consumo',
           entidadArticulo: 'el consumo',
@@ -416,27 +417,39 @@ export class ConsumosComponent implements OnInit, OnDestroy {
           filas: [
             [
               { key: 'fecha', label: 'Fecha', tipo: 'text' as const },
-              { key: 'id_insumo', label: 'Insumo', tipo: 'text' as const }
+              { key: 'id_insumo', label: 'Insumo', tipo: 'text' as const },
             ],
             [
-              { key: 'cantidad_consumida', label: 'Cantidad', tipo: 'text' as const },
-              { key: 'id_unidad', label: 'Unidad', tipo: 'text' as const }
+              {
+                key: 'cantidad_consumida',
+                label: 'Cantidad',
+                tipo: 'text' as const,
+              },
+              { key: 'id_unidad', label: 'Unidad', tipo: 'text' as const },
             ],
             [
               { key: 'area_consumo', label: 'Área', tipo: 'text' as const },
-              { key: 'id_lote', label: 'Lote', tipo: 'text' as const }
+              { key: 'id_lote', label: 'Lote', tipo: 'text' as const },
             ],
             [
               { key: 'motivo_consumo', label: 'Motivo', tipo: 'text' as const },
-              { key: 'estado', label: 'Estado', tipo: 'text' as const }
+              { key: 'estado', label: 'Estado', tipo: 'text' as const },
             ],
             [
-              { key: 'usuario_registro', label: 'Usuario', tipo: 'text' as const },
-              { key: 'observaciones', label: 'Observaciones', tipo: 'text' as const }
-            ]
-          ]
+              {
+                key: 'usuario_registro',
+                label: 'Usuario',
+                tipo: 'text' as const,
+              },
+              {
+                key: 'observaciones',
+                label: 'Observaciones',
+                tipo: 'text' as const,
+              },
+            ],
+          ],
         };
-        
+
         const dialogRef = this.dialog.open(DetalleDialogComponent, {
           width: '800px',
           disableClose: true,
@@ -453,7 +466,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
       const config = {
         titulo: {
           agregar: 'Agregar Consumo',
-          editar: 'Editar Consumo'
+          editar: 'Editar Consumo',
         },
         entidad: 'Consumo',
         entidadArticulo: 'el consumo',
@@ -466,16 +479,19 @@ export class ConsumosComponent implements OnInit, OnDestroy {
               label: 'Fecha',
               tipo: 'date' as const,
               obligatorio: true,
-              ancho: 'normal' as const
+              ancho: 'normal' as const,
             },
             {
               key: 'id_insumo',
               label: 'Insumo',
               tipo: 'select' as const,
               obligatorio: true,
-              opciones: this.insumos.map(i => ({ value: i.id_insumo!, label: i.nombre })),
-              ancho: 'normal' as const
-            }
+              opciones: this.insumos.map((i) => ({
+                value: i.id_insumo!,
+                label: i.nombre,
+              })),
+              ancho: 'normal' as const,
+            },
           ],
           [
             {
@@ -484,14 +500,14 @@ export class ConsumosComponent implements OnInit, OnDestroy {
               tipo: 'number' as const,
               obligatorio: true,
               ancho: 'normal' as const,
-              conPesado: true
+              conPesado: true,
             },
             {
               key: 'id_unidad',
               label: 'Unidad',
               tipo: 'text' as const,
-              ancho: 'normal' as const
-            }
+              ancho: 'normal' as const,
+            },
           ],
           [
             {
@@ -499,15 +515,18 @@ export class ConsumosComponent implements OnInit, OnDestroy {
               label: 'Área de Consumo',
               tipo: 'text' as const,
               obligatorio: true,
-              ancho: 'normal' as const
+              ancho: 'normal' as const,
             },
             {
               key: 'id_lote',
               label: 'Lote',
               tipo: 'select' as const,
-              opciones: this.lotes.map(l => ({ value: l.id_lote!, label: l.lote! })),
-              ancho: 'normal' as const
-            }
+              opciones: this.lotes.map((l) => ({
+                value: l.id_lote!,
+                label: l.lote!,
+              })),
+              ancho: 'normal' as const,
+            },
           ],
           [
             {
@@ -515,7 +534,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
               label: 'Motivo',
               tipo: 'text' as const,
               obligatorio: true,
-              ancho: 'normal' as const
+              ancho: 'normal' as const,
             },
             {
               key: 'estado',
@@ -525,22 +544,22 @@ export class ConsumosComponent implements OnInit, OnDestroy {
               opciones: [
                 { value: 'PENDIENTE', label: 'Pendiente' },
                 { value: 'CONFIRMADO', label: 'Confirmado' },
-                { value: 'ANULADO', label: 'Anulado' }
+                { value: 'ANULADO', label: 'Anulado' },
               ],
-              ancho: 'normal' as const
-            }
+              ancho: 'normal' as const,
+            },
           ],
           [
             {
               key: 'observaciones',
               label: 'Observaciones',
               tipo: 'textarea' as const,
-              ancho: 'completo' as const
-            }
-          ]
-        ]
+              ancho: 'completo' as const,
+            },
+          ],
+        ],
       };
-      
+
       const dialogRef = this.dialog.open(FormularioDialogComponent, {
         width: '800px',
         disableClose: true,
@@ -557,34 +576,36 @@ export class ConsumosComponent implements OnInit, OnDestroy {
   }
 
   eliminar(consumo: Consumo): void {
-    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(
-      ({ ConfirmacionDialogComponent }) => {
-        const config = {
-          titulo: 'Eliminar Consumo',
-          subtitulo: 'Esta acción no se puede deshacer',
-          mensaje: `¿Está seguro que desea eliminar el consumo de "${this.getInsumoNombre(consumo.id_insumo)}"?`,
-          mensajeSecundario: 'Todos los datos relacionados con este consumo se perderán permanentemente.',
-          tipo: 'danger' as const,
-          textoBotonConfirmar: 'Eliminar',
-          textoBotonCancelar: 'Cancelar'
-        };
-        
-        const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
-          width: '500px',
-          disableClose: true,
-          data: config,
-        });
-        
-        dialogRef.afterClosed().subscribe((confirmado) => {
-          if (confirmado && consumo.id_consumo) {
-            console.log('Eliminar consumo:', consumo);
-            this.cargarDatos();
-          }
-        });
-      }
-    );
-  }
+    import(
+      '../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component'
+    ).then(({ ConfirmacionDialogComponent }) => {
+      const config = {
+        titulo: 'Eliminar Consumo',
+        subtitulo: 'Esta acción no se puede deshacer',
+        mensaje: `¿Está seguro que desea eliminar el consumo de "${this.getInsumoNombre(
+          consumo.id_insumo
+        )}"?`,
+        mensajeSecundario:
+          'Todos los datos relacionados con este consumo se perderán permanentemente.',
+        tipo: 'danger' as const,
+        textoBotonConfirmar: 'Eliminar',
+        textoBotonCancelar: 'Cancelar',
+      };
 
+      const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+        width: '500px',
+        disableClose: true,
+        data: config,
+      });
+
+      dialogRef.afterClosed().subscribe((confirmado) => {
+        if (confirmado && consumo.id_consumo) {
+          console.log('Eliminar consumo:', consumo);
+          this.cargarDatos();
+        }
+      });
+    });
+  }
 
   private configurarExportacion(): ConfiguracionExportacion<Consumo> {
     return {
@@ -668,7 +689,8 @@ export class ConsumosComponent implements OnInit, OnDestroy {
         },
         {
           campo: 'estado',
-          validador: (valor) => !valor || ['PENDIENTE', 'CONFIRMADO', 'ANULADO'].includes(valor),
+          validador: (valor) =>
+            !valor || ['PENDIENTE', 'CONFIRMADO', 'ANULADO'].includes(valor),
           mensajeError: 'El estado debe ser PENDIENTE, CONFIRMADO o ANULADO',
         },
       ],
@@ -696,8 +718,8 @@ export class ConsumosComponent implements OnInit, OnDestroy {
 
   onActionClick(event: any): void {
     const action = typeof event === 'string' ? event : event.action;
-    const item = typeof event === 'string' ? null : (event.data || event.item);
-    
+    const item = typeof event === 'string' ? null : event.data || event.item;
+
     switch (action) {
       case 'view':
         this.verDetalle(item);
@@ -713,7 +735,7 @@ export class ConsumosComponent implements OnInit, OnDestroy {
 
   onButtonClick(event: any): void {
     const action = typeof event === 'string' ? event : event.action;
-    
+
     switch (action) {
       case 'pesar':
         this.iniciarPesado();
@@ -726,131 +748,131 @@ export class ConsumosComponent implements OnInit, OnDestroy {
 
   iniciarPesado(): void {
     // TODO: Implementar diálogo de pesado con integración de balanza y escaneo QR
-    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(
-      ({ FormularioDialogComponent }) => {
-        const config = {
-          titulo: {
-            agregar: 'Iniciar Pesado de Insumo',
-            editar: 'Editar Pesado'
-          },
-          entidad: 'Pesado',
-          entidadArticulo: 'el pesado',
-          esEdicion: false,
-          datosIniciales: {},
-          filas: [
-            [
-              {
-                key: 'qca_codigo',
-                label: 'Código QCA',
-                tipo: 'text' as const,
-                placeholder: 'Escanear código QR...',
-                obligatorio: true,
-                conScanner: true,
-                ancho: 'completo' as const
-              }
-            ],
-            [
-              {
-                key: 'id_insumo',
-                label: 'Insumo',
-                tipo: 'select' as const,
-                placeholder: 'Seleccionar insumo',
-                obligatorio: true,
-                opciones: this.insumos.map(insumo => ({
-                  value: insumo.id_insumo,
-                  label: insumo.nombre
-                })),
-                ancho: 'normal' as const
-              },
-              {
-                key: 'id_lote',
-                label: 'Lote',
-                tipo: 'select' as const,
-                placeholder: 'Seleccionar lote',
-                obligatorio: true,
-                opciones: this.lotes.map(lote => ({
-                  value: lote.id_lote,
-                  label: lote.lote
-                })),
-                ancho: 'normal' as const
-              }
-            ],
-            [
-              {
-                key: 'cantidad_solicitada',
-                label: 'Cantidad Solicitada',
-                tipo: 'number' as const,
-                placeholder: '0.00',
-                obligatorio: true,
-                step: 0.01,
-                min: 0.01,
-                ancho: 'normal' as const
-              },
-              {
-                key: 'cantidad_pesada',
-                label: 'Cantidad Pesada (kg)',
-                tipo: 'number' as const,
-                placeholder: 'Usar balanza...',
-                obligatorio: true,
-                conPesado: true,
-                step: 0.001,
-                min: 0.001,
-                ancho: 'normal' as const
-              }
-            ],
-            [
-              {
-                key: 'area_consumo',
-                label: 'Área de Consumo',
-                tipo: 'select' as const,
-                placeholder: 'Seleccionar área',
-                obligatorio: true,
-                opciones: [
-                  { value: 'Teñido Línea A', label: 'Teñido Línea A' },
-                  { value: 'Teñido Línea B', label: 'Teñido Línea B' },
-                  { value: 'Teñido Línea C', label: 'Teñido Línea C' },
-                  { value: 'Acabados', label: 'Acabados' },
-                  { value: 'Control de Calidad', label: 'Control de Calidad' }
-                ],
-                ancho: 'normal' as const
-              },
-              {
-                key: 'operador',
-                label: 'Operador',
-                tipo: 'text' as const,
-                placeholder: 'Nombre del operador',
-                obligatorio: true,
-                ancho: 'normal' as const
-              }
-            ],
-            [
-              {
-                key: 'observaciones',
-                label: 'Observaciones',
-                tipo: 'textarea' as const,
-                placeholder: 'Observaciones del pesado...',
-                obligatorio: false,
-                ancho: 'completo' as const
-              }
-            ]
-          ]
-        };
+    import(
+      '../shared/dialogs/formulario-dialog/formulario-dialog.component'
+    ).then(({ FormularioDialogComponent }) => {
+      const config = {
+        titulo: {
+          agregar: 'Iniciar Pesado de Insumo',
+          editar: 'Editar Pesado',
+        },
+        entidad: 'Pesado',
+        entidadArticulo: 'el pesado',
+        esEdicion: false,
+        datosIniciales: {},
+        filas: [
+          [
+            {
+              key: 'qca_codigo',
+              label: 'Código QCA',
+              tipo: 'text' as const,
+              placeholder: 'Escanear código QR...',
+              obligatorio: true,
+              conScanner: true,
+              ancho: 'completo' as const,
+            },
+          ],
+          [
+            {
+              key: 'id_insumo',
+              label: 'Insumo',
+              tipo: 'select' as const,
+              placeholder: 'Seleccionar insumo',
+              obligatorio: true,
+              opciones: this.insumos.map((insumo) => ({
+                value: insumo.id_insumo,
+                label: insumo.nombre,
+              })),
+              ancho: 'normal' as const,
+            },
+            {
+              key: 'id_lote',
+              label: 'Lote',
+              tipo: 'select' as const,
+              placeholder: 'Seleccionar lote',
+              obligatorio: true,
+              opciones: this.lotes.map((lote) => ({
+                value: lote.id_lote,
+                label: lote.lote,
+              })),
+              ancho: 'normal' as const,
+            },
+          ],
+          [
+            {
+              key: 'cantidad_solicitada',
+              label: 'Cantidad Solicitada',
+              tipo: 'number' as const,
+              placeholder: '0.00',
+              obligatorio: true,
+              step: 0.01,
+              min: 0.01,
+              ancho: 'normal' as const,
+            },
+            {
+              key: 'cantidad_pesada',
+              label: 'Cantidad Pesada (kg)',
+              tipo: 'number' as const,
+              placeholder: 'Usar balanza...',
+              obligatorio: true,
+              conPesado: true,
+              step: 0.001,
+              min: 0.001,
+              ancho: 'normal' as const,
+            },
+          ],
+          [
+            {
+              key: 'area_consumo',
+              label: 'Área de Consumo',
+              tipo: 'select' as const,
+              placeholder: 'Seleccionar área',
+              obligatorio: true,
+              opciones: [
+                { value: 'Teñido Línea A', label: 'Teñido Línea A' },
+                { value: 'Teñido Línea B', label: 'Teñido Línea B' },
+                { value: 'Teñido Línea C', label: 'Teñido Línea C' },
+                { value: 'Acabados', label: 'Acabados' },
+                { value: 'Control de Calidad', label: 'Control de Calidad' },
+              ],
+              ancho: 'normal' as const,
+            },
+            {
+              key: 'operador',
+              label: 'Operador',
+              tipo: 'text' as const,
+              placeholder: 'Nombre del operador',
+              obligatorio: true,
+              ancho: 'normal' as const,
+            },
+          ],
+          [
+            {
+              key: 'observaciones',
+              label: 'Observaciones',
+              tipo: 'textarea' as const,
+              placeholder: 'Observaciones del pesado...',
+              obligatorio: false,
+              ancho: 'completo' as const,
+            },
+          ],
+        ],
+      };
 
-        const dialogRef = this.dialog.open(FormularioDialogComponent, {
-          width: '900px',
-          disableClose: true,
-          data: config,
-        });
+      const dialogRef = this.dialog.open(FormularioDialogComponent, {
+        width: '900px',
+        disableClose: true,
+        data: config,
+      });
 
-        dialogRef.afterClosed().subscribe((resultado) => {
-          if (resultado && resultado.accion === 'guardar') {
-            console.log('Pesado registrado:', resultado.datos);
-            // TODO: Integrar con API para guardar el pesado
-            this.cargarDatos();
-          }
-        });
-      }
-    );
+      dialogRef.afterClosed().subscribe((resultado) => {
+        if (resultado && resultado.accion === 'guardar') {
+          console.log('Pesado registrado:', resultado.datos);
+          // TODO: Integrar con API para guardar el pesado
+          this.cargarDatos();
+        }
+      });
+    });
   }
 
   toggleDropdownExport(): void {

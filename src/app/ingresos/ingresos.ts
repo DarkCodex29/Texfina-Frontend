@@ -728,10 +728,24 @@ export class IngresosComponent implements OnInit, OnDestroy {
           [
             {
               key: 'precio_unitario_historico',
-              label: 'Precio Unitario',
+              label: 'Precio Unitario (S/.)',
               tipo: 'number' as const,
+              step: 0.01,
+              min: 0,
+              placeholder: '0.00',
               ancho: 'normal' as const
             },
+            {
+              key: 'peso_unitario',
+              label: 'Peso Unitario (kg)',
+              tipo: 'number' as const,
+              step: 0.001,
+              min: 0,
+              placeholder: '0.000',
+              ancho: 'normal' as const
+            }
+          ],
+          [
             {
               key: 'estado',
               label: 'Estado',
@@ -742,7 +756,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
                 { value: 'PROCESADO', label: 'Procesado' },
                 { value: 'ANULADO', label: 'Anulado' }
               ],
-              ancho: 'normal' as const
+              ancho: 'completo' as const
             }
           ],
           [
@@ -843,10 +857,24 @@ export class IngresosComponent implements OnInit, OnDestroy {
           [
             {
               key: 'precio_unitario_historico',
-              label: 'Precio Unitario',
+              label: 'Precio Unitario (S/.)',
               tipo: 'number' as const,
+              step: 0.01,
+              min: 0,
+              placeholder: '0.00',
               ancho: 'normal' as const
             },
+            {
+              key: 'peso_unitario',
+              label: 'Peso Unitario (kg)',
+              tipo: 'number' as const,
+              step: 0.001,
+              min: 0,
+              placeholder: '0.000',
+              ancho: 'normal' as const
+            }
+          ],
+          [
             {
               key: 'estado',
               label: 'Estado',
@@ -857,7 +885,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
                 { value: 'PROCESADO', label: 'Procesado' },
                 { value: 'ANULADO', label: 'Anulado' }
               ],
-              ancho: 'normal' as const
+              ancho: 'completo' as const
             }
           ],
           [
