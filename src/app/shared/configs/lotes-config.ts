@@ -39,6 +39,7 @@ export const LOTES_CONFIG = {
     { valor: 'AGOTADO', nombre: 'Agotado', color: '#dc2626' },
     { valor: 'VENCIDO', nombre: 'Vencido', color: '#ea580c' },
     { valor: 'RESERVADO', nombre: 'Reservado', color: '#ca8a04' },
+    { valor: 'CONCESIONADO', nombre: 'Concesionado', color: '#2563eb' },
     { valor: 'INACTIVO', nombre: 'Inactivo', color: '#6b7280' },
   ],
   FORMATEO: {

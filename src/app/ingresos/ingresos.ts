@@ -134,7 +134,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   buttons: TableButtonConfig[] = [
     {
       action: 'add',
-      label: 'Agregar Ingreso',
+      label: 'Registrar Lote',
       icon: 'pi pi-plus',
       color: 'primary'
     },
@@ -669,12 +669,13 @@ export class IngresosComponent implements OnInit, OnDestroy {
     ).then(({ FormularioDialogComponent }) => {
       const config = {
         titulo: {
-          agregar: 'Agregar Ingreso',
-          editar: 'Editar Ingreso'
+          agregar: 'Registrar Lote',
+          editar: 'Editar Lote'
         },
         entidad: 'Ingreso',
         entidadArticulo: 'el ingreso',
         esEdicion: false,
+        datosIniciales: { estado: 'PENDIENTE' },
         filas: [
           [
             {
@@ -705,7 +706,18 @@ export class IngresosComponent implements OnInit, OnDestroy {
             {
               key: 'presentacion',
               label: 'Presentación',
-              tipo: 'text' as const,
+              tipo: 'select' as const,
+              opciones: [
+                { value: 'Bolsa 25kg', label: 'Bolsa de 25 kg' },
+                { value: 'Bolsa 50kg', label: 'Bolsa de 50 kg' },
+                { value: 'Saco 25kg', label: 'Saco de 25 kg' },
+                { value: 'Saco 50kg', label: 'Saco de 50 kg' },
+                { value: 'Tambor 200L', label: 'Tambor de 200 L' },
+                { value: 'Bidón 20L', label: 'Bidón de 20 L' },
+                { value: 'Caja 12 unidades', label: 'Caja de 12 unidades' },
+                { value: 'Pallet 1000kg', label: 'Pallet de 1000 kg' },
+                { value: 'Granel', label: 'A granel' }
+              ],
               ancho: 'normal' as const
             }
           ],
@@ -718,10 +730,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
               ancho: 'normal' as const
             },
             {
-              key: 'id_lote',
-              label: 'Lote',
-              tipo: 'select' as const,
-              opciones: this.lotes.map(l => ({ value: l.id_lote!, label: l.lote! })),
+              key: 'lote',
+              label: 'Código de Lote',
+              tipo: 'text' as const,
+              placeholder: 'Ej: LT-2024-001',
+              obligatorio: true,
               ancho: 'normal' as const
             }
           ],
@@ -797,8 +810,8 @@ export class IngresosComponent implements OnInit, OnDestroy {
     ).then(({ FormularioDialogComponent }) => {
       const config = {
         titulo: {
-          agregar: 'Agregar Ingreso',
-          editar: 'Editar Ingreso'
+          agregar: 'Registrar Lote',
+          editar: 'Editar Lote'
         },
         entidad: 'Ingreso',
         entidadArticulo: 'el ingreso',
@@ -834,7 +847,18 @@ export class IngresosComponent implements OnInit, OnDestroy {
             {
               key: 'presentacion',
               label: 'Presentación',
-              tipo: 'text' as const,
+              tipo: 'select' as const,
+              opciones: [
+                { value: 'Bolsa 25kg', label: 'Bolsa de 25 kg' },
+                { value: 'Bolsa 50kg', label: 'Bolsa de 50 kg' },
+                { value: 'Saco 25kg', label: 'Saco de 25 kg' },
+                { value: 'Saco 50kg', label: 'Saco de 50 kg' },
+                { value: 'Tambor 200L', label: 'Tambor de 200 L' },
+                { value: 'Bidón 20L', label: 'Bidón de 20 L' },
+                { value: 'Caja 12 unidades', label: 'Caja de 12 unidades' },
+                { value: 'Pallet 1000kg', label: 'Pallet de 1000 kg' },
+                { value: 'Granel', label: 'A granel' }
+              ],
               ancho: 'normal' as const
             }
           ],
@@ -847,10 +871,11 @@ export class IngresosComponent implements OnInit, OnDestroy {
               ancho: 'normal' as const
             },
             {
-              key: 'id_lote',
-              label: 'Lote',
-              tipo: 'select' as const,
-              opciones: this.lotes.map(l => ({ value: l.id_lote!, label: l.lote! })),
+              key: 'lote',
+              label: 'Código de Lote',
+              tipo: 'text' as const,
+              placeholder: 'Ej: LT-2024-001',
+              obligatorio: true,
               ancho: 'normal' as const
             }
           ],

@@ -122,7 +122,7 @@ export class MaterialesComponent implements OnInit, OnDestroy {
   ];
   buttons: TableButtonConfig[] = [
     {
-      label: 'Agregar Material',
+      label: 'Registro de Insumo',
       icon: 'pi pi-plus',
       action: 'add',
       color: 'primary'
