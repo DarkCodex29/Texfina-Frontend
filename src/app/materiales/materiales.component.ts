@@ -66,7 +66,14 @@ export class MaterialesComponent implements OnInit, OnDestroy {
   columns: TableColumn[] = [
     {
       key: 'id_fox',
-      title: 'Código Fox',
+      title: 'ID Fox',
+      sortable: true,
+      filterable: true,
+      width: '100px'
+    },
+    {
+      key: 'codigo_insumo',
+      title: 'Código',
       sortable: true,
       filterable: true,
       width: '120px'
@@ -76,28 +83,58 @@ export class MaterialesComponent implements OnInit, OnDestroy {
       title: 'Nombre',
       sortable: true,
       filterable: true,
-      width: '300px'
+      width: '250px'
     },
     {
-      key: 'clase.nombre',
-      title: 'Clase',
+      key: 'familia',
+      title: 'Familia',
       sortable: true,
       filterable: true,
-      width: '150px'
+      width: '120px'
+    },
+    {
+      key: 'subfamilia',
+      title: 'Subfamilia',
+      sortable: true,
+      filterable: true,
+      width: '120px'
     },
     {
       key: 'unidad.nombre',
       title: 'Unidad',
       sortable: true,
       filterable: true,
-      width: '100px'
+      width: '80px'
     },
     {
       key: 'presentacion',
       title: 'Presentación',
       sortable: true,
       filterable: true,
+      width: '120px'
+    },
+    {
+      key: 'proveedor_principal.empresa',
+      title: 'Proveedor',
+      sortable: true,
+      filterable: true,
       width: '150px'
+    },
+    {
+      key: 'created_at',
+      title: 'F. Registro',
+      sortable: true,
+      filterable: false,
+      width: '100px',
+      type: 'date'
+    },
+    {
+      key: 'updated_at',
+      title: 'F. Modificación',
+      sortable: true,
+      filterable: false,
+      width: '100px',
+      type: 'date'
     }
   ];
   actions: TableAction[] = [

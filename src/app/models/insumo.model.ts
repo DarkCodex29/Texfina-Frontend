@@ -7,6 +7,7 @@ export interface Clase {
   id_clase: string;
   familia: string;
   sub_familia: string;
+  descripcion_completa?: string; // Concatenación familia-subfamilia
 }
 
 export interface Unidad {
@@ -37,6 +38,7 @@ export interface Usuario {
   id_usuario?: number;
   username: string; // UNIQUE NOT NULL
   email?: string;
+  telefono?: string; // NVARCHAR(50)
   password_hash?: string;
   id_rol?: string;
   id_tipo_usuario?: number;
@@ -96,6 +98,8 @@ export interface Proveedor {
   empresa?: string; // NVARCHAR(200)
   ruc?: string; // NVARCHAR(20)
   contacto?: string; // NVARCHAR(200)
+  email?: string; // NVARCHAR(200)
+  telefono?: string; // NVARCHAR(50)
   direccion?: string; // NVARCHAR(500)
   created_at?: Date; // DATETIME2 DEFAULT GETDATE()
   updated_at?: Date; // DATETIME2 DEFAULT GETDATE()
@@ -104,13 +108,17 @@ export interface Proveedor {
 // ===== INSUMOS Y MATERIALES =====
 export interface Insumo {
   id_insumo?: number;
+  codigo_insumo?: string; // Código concatenado (id_clase + id_insumo)
   id_fox?: string; // NVARCHAR(50)
   nombre: string; // NVARCHAR(200) NOT NULL
   id_clase?: string;
+  familia?: string; // Para mostrar en tabla
+  subfamilia?: string; // Para mostrar en tabla
   peso_unitario?: number; // FLOAT
   id_unidad?: string;
   presentacion?: string; // NVARCHAR(100)
   precio_unitario?: number; // FLOAT
+  precio_unitario_ultimo?: number; // Último precio del último lote
   created_at?: Date; // DATETIME2 DEFAULT GETDATE()
   updated_at?: Date; // DATETIME2 DEFAULT GETDATE()
 
@@ -118,6 +126,7 @@ export interface Insumo {
   clase?: Clase;
   unidad?: Unidad;
   proveedores?: InsumoProveedor[];
+  proveedor_principal?: Proveedor; // Para mostrar en tabla
   lotes?: Lote[];
 }
 
@@ -142,7 +151,9 @@ export interface Lote {
   stock_actual: number; // FLOAT - NOT NULL
   fecha_expiracion?: Date; // DATE - Puede ser NULL
   precio_total: number; // FLOAT - NOT NULL
+  precio_unitario?: number; // Precio unitario del lote
   estado_lote: string; // NVARCHAR(50) - NOT NULL
+  tipo_lote?: 'MUESTRA' | 'PRODUCCION'; // Nuevo campo
 
   // Relaciones
   insumo?: Insumo;
@@ -277,6 +288,9 @@ export interface EstadoLote {
   ACTIVO: 'ACTIVO';
   AGOTADO: 'AGOTADO';
   VENCIDO: 'VENCIDO';
+  APROBADO: 'APROBADO';
+  CONCESIONADO: 'CONCESIONADO';
+  RECHAZADO: 'RECHAZADO';
 }
 
 export interface EstadoIngreso {
