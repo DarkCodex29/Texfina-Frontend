@@ -29,6 +29,7 @@ export interface Reporte {
   estado: 'GENERANDO' | 'COMPLETADO' | 'ERROR';
   tamano_archivo: number;
   ruta_archivo?: string;
+  tipo_lote?: 'MUESTRA' | 'PRODUCCION';
 }
 
 export interface KPI {
@@ -56,7 +57,9 @@ export class ReportesComponent implements OnInit, OnDestroy {
 
   dropdownExportAbierto = false;
   reportes: Reporte[] = [];
+  reportesOriginal: Reporte[] = [];
   kpis: KPI[] = [];
+  tipoLoteFiltro: string = '';
 
   tableState: TableState = {
     loading: false,
@@ -225,7 +228,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
 
   private cargarDatosMock() {
     console.log('🔄 Cargando datos mock de reportes...');
-    this.reportes = [
+    this.reportesOriginal = [
       {
         id_reporte: 1,
         tipo_reporte: 'Inventario General',
@@ -235,6 +238,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
         estado: 'COMPLETADO',
         tamano_archivo: 2048576,
         ruta_archivo: '/reportes/inventario_general_20240115.xlsx',
+        tipo_lote: 'PRODUCCION',
       },
       {
         id_reporte: 2,
@@ -245,6 +249,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
         estado: 'COMPLETADO',
         tamano_archivo: 1534000,
         ruta_archivo: '/reportes/valorizacion_inventario_20240114.xlsx',
+        tipo_lote: 'PRODUCCION',
       },
       {
         id_reporte: 3,
@@ -255,6 +260,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
         estado: 'COMPLETADO',
         tamano_archivo: 1875000,
         ruta_archivo: '/reportes/kardex_qca_20240113.xlsx',
+        tipo_lote: 'MUESTRA',
       },
       {
         id_reporte: 4,
@@ -265,6 +271,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
         estado: 'COMPLETADO',
         tamano_archivo: 987654,
         ruta_archivo: '/reportes/stock_critico_20240112.xlsx',
+        tipo_lote: 'PRODUCCION',
       },
       {
         id_reporte: 5,
@@ -275,6 +282,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
         estado: 'COMPLETADO',
         tamano_archivo: 1345678,
         ruta_archivo: '/reportes/consumo_qca_20240111.xlsx',
+        tipo_lote: 'MUESTRA',
       },
       {
         id_reporte: 6,
@@ -305,8 +313,24 @@ export class ReportesComponent implements OnInit, OnDestroy {
         tamano_archivo: 0,
       }
     ];
+    this.reportes = [...this.reportesOriginal];
     console.log('✅ Datos mock cargados:', this.reportes.length, 'reportes');
     console.log('📊 Datos de reportes:', this.reportes);
+  }
+  
+  filtrarPorTipoLote(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    this.tipoLoteFiltro = selectElement.value;
+    
+    if (this.tipoLoteFiltro) {
+      this.reportes = this.reportesOriginal.filter(
+        reporte => reporte.tipo_lote === this.tipoLoteFiltro
+      );
+    } else {
+      this.reportes = [...this.reportesOriginal];
+    }
+    
+    this.updateTableStates();
   }
 
   cargarKPIs(): void {

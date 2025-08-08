@@ -6,6 +6,13 @@
         <h1 class="page-title text-texfina text-primary">Reportes</h1>
       </div>
       <div class="header-actions">
+        <!-- Filtro de Tipo de Lote -->
+        <select class="select-texfina" (change)="filtrarPorTipoLote($event)">
+          <option value="">Todos los Lotes</option>
+          <option value="PRODUCCION">Producción</option>
+          <option value="MUESTRA">Muestra</option>
+        </select>
+        
         <!-- Dropdown de Exportar -->
         <div class="dropdown-export">
           <button

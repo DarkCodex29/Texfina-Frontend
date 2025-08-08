@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
+import { INSUMOS_MOCK_DATA, obtenerUltimoPrecioUnitario, generarDescripcionClase } from '../data/insumos-mock';
 import {
   Insumo,
   Proveedor,
@@ -373,7 +374,7 @@ export class MaterialService {
         catchError(() => of(this.getMaterialesMock()))
       );
     }
-    return of(this.getMaterialesMock());
+    return of(this.getMaterialesMockEnriched());
   }
 
   private getMaterialesMock(): Insumo[] {
@@ -717,6 +718,38 @@ export class MaterialService {
     }));
   }
 
+  private getMaterialesMockEnriched(): Insumo[] {
+    // Usar los datos importados del archivo mock
+    const lotes = this.getLotesMock();
+    const proveedores = this.getProveedoresMock();
+    
+    return INSUMOS_MOCK_DATA.map((insumo) => {
+      // Obtener el último precio unitario del último lote
+      const ultimoPrecio = obtenerUltimoPrecioUnitario(insumo.id_insumo || 0, lotes);
+      
+      // Generar descripción completa de clase
+      const descripcionClase = insumo.familia && insumo.subfamilia
+        ? generarDescripcionClase(insumo.familia, insumo.subfamilia)
+        : undefined;
+      
+      // Asignar proveedor principal (simulado)
+      const proveedorPrincipal = proveedores[Math.floor(Math.random() * proveedores.length)];
+      
+      return {
+        ...insumo,
+        precio_unitario_ultimo: ultimoPrecio,
+        proveedor_principal: proveedorPrincipal,
+        unidad: this.unidadesMock.find((u) => u.id_unidad === insumo.id_unidad),
+        clase: {
+          id_clase: insumo.id_clase || '',
+          familia: insumo.familia || '',
+          sub_familia: insumo.subfamilia || '',
+          descripcion_completa: descripcionClase
+        }
+      } as Insumo;
+    });
+  }
+
   // ===== LOTES =====
   getLotes(): Observable<Lote[]> {
     if (this.useApi) {
@@ -739,7 +772,9 @@ export class MaterialService {
         stock_actual: 35,
         fecha_expiracion: new Date('2025-06-14'),
         precio_total: 4500,
-        estado_lote: 'ACTIVO',
+        precio_unitario: 90,
+        estado_lote: 'APROBADO',
+        tipo_lote: 'PRODUCCION',
       },
       {
         id_lote: 2,
@@ -750,7 +785,9 @@ export class MaterialService {
         stock_actual: 18,
         fecha_expiracion: new Date('2025-12-19'),
         precio_total: 3200,
-        estado_lote: 'ACTIVO',
+        precio_unitario: 128,
+        estado_lote: 'APROBADO',
+        tipo_lote: 'PRODUCCION',
       },
       {
         id_lote: 3,
@@ -761,7 +798,9 @@ export class MaterialService {
         stock_actual: 8,
         fecha_expiracion: new Date('2026-03-09'),
         precio_total: 2850,
-        estado_lote: 'ACTIVO',
+        precio_unitario: 95,
+        estado_lote: 'CONCESIONADO',
+        tipo_lote: 'MUESTRA',
       },
       {
         id_lote: 4,
@@ -772,7 +811,9 @@ export class MaterialService {
         stock_actual: 0,
         fecha_expiracion: new Date('2025-08-29'),
         precio_total: 3600,
+        precio_unitario: 90,
         estado_lote: 'AGOTADO',
+        tipo_lote: 'PRODUCCION',
       },
       {
         id_lote: 5,
@@ -805,7 +846,9 @@ export class MaterialService {
         stock_actual: 5,
         fecha_expiracion: new Date('2024-02-09'),
         precio_total: 4950,
-        estado_lote: 'VENCIDO',
+        precio_unitario: 110,
+        estado_lote: 'RECHAZADO',
+        tipo_lote: 'MUESTRA',
       },
       {
         id_lote: 8,
