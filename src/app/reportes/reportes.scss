@@ -1095,6 +1095,95 @@
   }
 }
 
+// ===== DROPDOWN DE EXPORTACIÓN =====
+.dropdown-export {
+  position: relative;
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: white;
+    border: 2px solid var(--texfina-border-light);
+    border-radius: var(--texfina-radius-md);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    min-width: 180px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+
+    &.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      color: var(--texfina-text-primary);
+      font-size: var(--texfina-font-size-sm);
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+
+      &:hover {
+        background: var(--texfina-bg-secondary);
+        color: var(--texfina-secondary);
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px solid var(--texfina-border-light);
+      }
+
+      span {
+        flex: 1;
+      }
+    }
+  }
+}
+
+// ===== SELECT DE FILTRO =====
+.select-texfina {
+  padding: 10px 16px;
+  padding-right: 36px;
+  border: 2px solid var(--texfina-border-light);
+  background: var(--texfina-bg-primary);
+  color: var(--texfina-text-primary);
+  border-radius: var(--texfina-radius-md);
+  font-size: var(--texfina-font-size-sm);
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  min-width: 180px;
+
+  &:hover {
+    border-color: var(--texfina-secondary);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--texfina-secondary);
+    box-shadow: 0 0 0 3px rgba(18, 30, 102, 0.1);
+  }
+
+  option {
+    padding: 8px;
+  }
+}
+
 // ===== RESPONSIVE PARA REPORTES =====
 
 // Mejoras específicas para la tabla de reportes en móvil
