@@ -57,6 +57,7 @@ export class UsuariosConfig {
               { value: 'OPERARIO', label: 'Operario' },
               { value: 'CONSULTOR', label: 'Consultor' },
             ],
+            conBotonAgregar: true,
           },
           {
             key: 'id_tipo_usuario',
@@ -68,6 +69,7 @@ export class UsuariosConfig {
               { value: 2, label: 'Usuario Temporal' },
               { value: 3, label: 'Usuario Externo' },
             ],
+            conBotonAgregar: true,
           },
         ],
       ],

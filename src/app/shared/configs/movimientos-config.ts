@@ -59,7 +59,8 @@ export class MovimientosConfig {
             placeholder: 'Buscar insumo...',
             obligatorio: true,
             opciones: [], // Se cargarán dinámicamente
-            ancho: 'normal'
+            ancho: 'normal',
+            conBotonAgregar: true
           },
           {
             key: 'id_lote',
@@ -68,7 +69,8 @@ export class MovimientosConfig {
             placeholder: 'Seleccionar lote',
             obligatorio: true,
             opciones: [], // Se cargarán dinámicamente
-            ancho: 'normal'
+            ancho: 'normal',
+            conBotonAgregar: true
           }
         ],
         [
@@ -104,7 +106,8 @@ export class MovimientosConfig {
               { value: 'Almacén Tránsito', label: 'Almacén Tránsito' },
               { value: 'Almacén Químicos', label: 'Almacén Químicos' }
             ],
-            ancho: 'normal'
+            ancho: 'normal',
+            conBotonAgregar: true
           },
           {
             key: 'almacenDestino',
@@ -118,7 +121,8 @@ export class MovimientosConfig {
               { value: 'Almacén Tránsito', label: 'Almacén Tránsito' },
               { value: 'Almacén Químicos', label: 'Almacén Químicos' }
             ],
-            ancho: 'normal'
+            ancho: 'normal',
+            conBotonAgregar: true
           }
         ],
         [

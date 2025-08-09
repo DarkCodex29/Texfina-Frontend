@@ -425,6 +425,54 @@
         color: white;
       }
     }
+    
+    &.scan-btn {
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
+      }
+      
+      &:hover {
+        background: var(--texfina-info);
+        border-color: var(--texfina-info);
+        color: white;
+      }
+      
+      &.active {
+        background: var(--texfina-info);
+        border-color: var(--texfina-info);
+        color: white;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+    }
+    
+    &.balance-btn {
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
+      }
+      
+      &:hover {
+        background: var(--texfina-warning);
+        border-color: var(--texfina-warning);
+        color: white;
+      }
+      
+      &.active {
+        background: var(--texfina-warning);
+        border-color: var(--texfina-warning);
+        color: white;
+        
+        &.stable {
+          background: var(--texfina-success);
+          border-color: var(--texfina-success);
+        }
+      }
+    }
 
     mat-icon {
       font-size: 20px;

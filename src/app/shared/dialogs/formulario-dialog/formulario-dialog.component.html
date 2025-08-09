@@ -45,8 +45,9 @@
                 <button
                   *ngIf="campo.conPesado"
                   type="button"
-                  class="input-btn"
+                  class="input-btn balance-btn"
                   [class.active]="pesandoActivo"
+                  [class.stable]="pesandoActivo && pesoActual?.estable"
                   (click)="pesandoActivo ? capturarPeso(campo.key) : iniciarPesado(campo.key)"
                   [disabled]="campo.disabled"
                   matTooltip="{{ pesandoActivo ? 'Capturar peso' : 'Pesar' }}">
@@ -57,7 +58,7 @@
                 <button
                   *ngIf="campo.conScanner"
                   type="button"
-                  class="input-btn"
+                  class="input-btn scan-btn"
                   [class.active]="escaneandoActivo"
                   (click)="escaneandoActivo ? detenerScanner() : iniciarScanner(campo.key)"
                   [disabled]="campo.disabled"
@@ -132,7 +133,7 @@
                 <button
                   *ngIf="campo.conScanner"
                   type="button"
-                  class="input-btn"
+                  class="input-btn scan-btn"
                   [class.active]="escaneandoActivo"
                   (click)="escaneandoActivo ? detenerScanner() : iniciarScanner(campo.key)"
                   [disabled]="campo.disabled"
@@ -192,7 +193,7 @@
                 <button
                   *ngIf="campo.conScanner"
                   type="button"
-                  class="input-btn"
+                  class="input-btn scan-btn"
                   [class.active]="escaneandoActivo"
                   (click)="escaneandoActivo ? detenerScanner() : iniciarScanner(campo.key)"
                   [disabled]="campo.disabled"

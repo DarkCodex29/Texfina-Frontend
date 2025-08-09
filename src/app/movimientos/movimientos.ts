@@ -224,6 +224,24 @@ export class MovimientosComponent implements OnInit {
   editarMovimiento(movimiento: any): void {
     const config = MovimientosConfig.formulario(true, movimiento);
     
+    // Configurar callbacks para los botones de agregar
+    config.filas.forEach((fila: any[]) => {
+      fila.forEach((campo: any) => {
+        if (campo.key === 'id_insumo' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoInsumo();
+        }
+        if (campo.key === 'id_lote' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoLote();
+        }
+        if (campo.key === 'almacenOrigen' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoAlmacen('origen');
+        }
+        if (campo.key === 'almacenDestino' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoAlmacen('destino');
+        }
+      });
+    });
+    
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '900px',
       disableClose: true,
@@ -260,6 +278,24 @@ export class MovimientosComponent implements OnInit {
   nuevoMovimiento(): void {
     const config = MovimientosConfig.formulario(false);
     
+    // Configurar callbacks para los botones de agregar
+    config.filas.forEach((fila: any[]) => {
+      fila.forEach((campo: any) => {
+        if (campo.key === 'id_insumo' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoInsumo();
+        }
+        if (campo.key === 'id_lote' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoLote();
+        }
+        if (campo.key === 'almacenOrigen' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoAlmacen('origen');
+        }
+        if (campo.key === 'almacenDestino' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoAlmacen('destino');
+        }
+      });
+    });
+    
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '900px',
       disableClose: true,
@@ -271,6 +307,142 @@ export class MovimientosComponent implements OnInit {
         console.log('Nuevo movimiento creado:', resultado.datos);
         // TODO: Integrar con API para crear
         this.loadData(); // Recargar datos
+      }
+    });
+  }
+  
+  private async abrirFormularioNuevoInsumo(): Promise<void> {
+    const { MaterialesConfig } = await import('../shared/configs/materiales-config');
+    const configInsumo = MaterialesConfig.formulario(false);
+    
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '800px',
+      data: {
+        ...configInsumo,
+        titulo: {
+          agregar: 'Registrar Nuevo Insumo',
+          editar: 'Editar Insumo'
+        },
+        mensajeAdicional: 'Complete los datos del nuevo insumo. Una vez registrado, podrá seleccionarlo en el formulario de movimientos.'
+      },
+      disableClose: true
+    });
+    
+    dialogRef.afterClosed().subscribe(resultadoInsumo => {
+      if (resultadoInsumo && resultadoInsumo.accion === 'guardar') {
+        console.log('Insumo creado exitosamente:', resultadoInsumo.datos);
+        this.mostrarMensajeExito(`Insumo "${resultadoInsumo.datos.nombre}" registrado exitosamente.`);
+      }
+    });
+  }
+  
+  private async abrirFormularioNuevoLote(): Promise<void> {
+    // Configuración directa para Lote ya que no existe método formulario en LotesConfig
+    const configLote = {
+      titulo: {
+        agregar: 'Registrar Nuevo Lote',
+        editar: 'Editar Lote'
+      },
+      entidad: 'Lote',
+      entidadArticulo: 'el lote',
+      esEdicion: false,
+      filas: [
+        [
+          {
+            key: 'numero_lote',
+            label: 'Número de Lote',
+            tipo: 'text',
+            placeholder: 'Ej: LOT-2024-001',
+            obligatorio: true,
+            maxLength: 50
+          },
+          {
+            key: 'fecha_vencimiento',
+            label: 'Fecha de Vencimiento',
+            tipo: 'date',
+            obligatorio: false
+          }
+        ],
+        [
+          {
+            key: 'cantidad',
+            label: 'Cantidad',
+            tipo: 'number',
+            placeholder: '0',
+            obligatorio: true,
+            min: 0
+          },
+          {
+            key: 'unidad',
+            label: 'Unidad',
+            tipo: 'select',
+            obligatorio: true,
+            opciones: [
+              { value: 'KG', label: 'Kilogramos (KG)' },
+              { value: 'G', label: 'Gramos (G)' },
+              { value: 'L', label: 'Litros (L)' },
+              { value: 'ML', label: 'Mililitros (ML)' }
+            ]
+          }
+        ]
+      ]
+    };
+    
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '700px',
+      data: {
+        ...configLote,
+        titulo: {
+          agregar: 'Registrar Nuevo Lote',
+          editar: 'Editar Lote'
+        },
+        mensajeAdicional: 'Complete los datos del nuevo lote. Una vez registrado, podrá seleccionarlo en el formulario de movimientos.'
+      },
+      disableClose: true
+    });
+    
+    dialogRef.afterClosed().subscribe(resultadoLote => {
+      if (resultadoLote && resultadoLote.accion === 'guardar') {
+        console.log('Lote creado exitosamente:', resultadoLote.datos);
+        this.mostrarMensajeExito(`Lote "${resultadoLote.datos.numero_lote}" registrado exitosamente.`);
+      }
+    });
+  }
+  
+  private async abrirFormularioNuevoAlmacen(tipo: string): Promise<void> {
+    const { AlmacenesConfig } = await import('../shared/configs/almacenes-config');
+    const configAlmacen = AlmacenesConfig.getConfiguracionFormulario(false);
+    
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '700px',
+      data: {
+        ...configAlmacen,
+        titulo: {
+          agregar: 'Registrar Nuevo Almacén',
+          editar: 'Editar Almacén'
+        },
+        mensajeAdicional: `Complete los datos del nuevo almacén. Una vez registrado, podrá seleccionarlo como almacén ${tipo}.`
+      },
+      disableClose: true
+    });
+    
+    dialogRef.afterClosed().subscribe(resultadoAlmacen => {
+      if (resultadoAlmacen && resultadoAlmacen.accion === 'guardar') {
+        console.log('Almacén creado exitosamente:', resultadoAlmacen.datos);
+        this.mostrarMensajeExito(`Almacén "${resultadoAlmacen.datos.nombre}" registrado exitosamente.`);
+      }
+    });
+  }
+  
+  private mostrarMensajeExito(mensaje: string): void {
+    this.dialog.open(ConfirmacionDialogComponent, {
+      width: '500px',
+      data: {
+        tipo: 'success',
+        titulo: 'Éxito',
+        mensaje: mensaje,
+        textoBotonConfirmar: 'Entendido',
+        ocultarCancelar: true
       }
     });
   }

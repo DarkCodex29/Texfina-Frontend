@@ -82,6 +82,7 @@ export class MaterialesConfig {
             obligatorio: true,
             opciones: [], // Se cargarán dinámicamente
             ancho: 'normal',
+            conBotonAgregar: true,
           },
           {
             key: 'presentacion',

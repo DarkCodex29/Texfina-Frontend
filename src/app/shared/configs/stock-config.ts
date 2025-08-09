@@ -52,6 +52,7 @@ export class StockConfig {
               { value: 'Cámara Fría', label: 'Cámara Fría' },
               { value: 'Almacén Especiales', label: 'Almacén Especiales' },
             ],
+            conBotonAgregar: true,
           },
           {
             key: 'clase',
@@ -65,6 +66,7 @@ export class StockConfig {
               { value: 'Chocolatería', label: 'Chocolatería' },
               { value: 'Condimentos', label: 'Condimentos' },
             ],
+            conBotonAgregar: true,
           },
         ],
         [
@@ -87,6 +89,7 @@ export class StockConfig {
               { value: 'LT', label: 'Litros (LT)' },
               { value: 'UN', label: 'Unidades (UN)' },
             ],
+            conBotonAgregar: true,
           },
         ],
         [

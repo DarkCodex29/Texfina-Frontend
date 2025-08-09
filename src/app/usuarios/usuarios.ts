@@ -560,6 +560,18 @@ export class UsuariosComponent implements OnInit {
 
   agregar(): void {
     const configuracion = UsuariosConfig.getConfiguracionFormulario(false);
+    
+    // Configurar callbacks para los botones de agregar
+    configuracion.filas.forEach((fila: any[]) => {
+      fila.forEach((campo: any) => {
+        if (campo.key === 'id_rol' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoRol();
+        }
+        if (campo.key === 'id_tipo_usuario' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoTipoUsuario();
+        }
+      });
+    });
 
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',
@@ -575,12 +587,116 @@ export class UsuariosComponent implements OnInit {
       }
     });
   }
+  
+  private async abrirFormularioNuevoRol(): Promise<void> {
+    const { RolesConfig } = await import('../shared/configs/roles-config');
+    const configRol = RolesConfig.getConfiguracionFormulario(false);
+    
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '600px',
+      data: {
+        ...configRol,
+        titulo: {
+          agregar: 'Registrar Nuevo Rol',
+          editar: 'Editar Rol'
+        },
+        mensajeAdicional: 'Complete los datos del nuevo rol. Una vez registrado, podrá seleccionarlo en el formulario de usuarios.'
+      },
+      disableClose: true
+    });
+    
+    dialogRef.afterClosed().subscribe(resultadoRol => {
+      if (resultadoRol && resultadoRol.accion === 'guardar') {
+        console.log('Rol creado exitosamente:', resultadoRol.datos);
+        this.mostrarMensajeExito(`Rol "${resultadoRol.datos.nombre}" registrado exitosamente.`);
+        // Actualizar la lista de roles
+        this.cargarDatos();
+      }
+    });
+  }
+  
+  private async abrirFormularioNuevoTipoUsuario(): Promise<void> {
+    // Configuración directa para Tipo de Usuario
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '600px',
+      data: {
+        titulo: {
+          agregar: 'Registrar Nuevo Tipo de Usuario',
+          editar: 'Editar Tipo de Usuario'
+        },
+        entidad: 'Tipo de Usuario',
+        entidadArticulo: 'el tipo de usuario',
+        esEdicion: false,
+        mensajeAdicional: 'Complete los datos del nuevo tipo de usuario.',
+        filas: [
+          [
+            {
+              key: 'descripcion',
+              label: 'Descripción',
+              tipo: 'text',
+              placeholder: 'Ej: Administrador, Supervisor, etc.',
+              obligatorio: true,
+              maxLength: 100
+            }
+          ],
+          [
+            {
+              key: 'nivel_acceso',
+              label: 'Nivel de Acceso',
+              tipo: 'select',
+              obligatorio: true,
+              opciones: [
+                { value: 1, label: 'Alto - Acceso completo' },
+                { value: 2, label: 'Medio - Acceso moderado' },
+                { value: 3, label: 'Bajo - Acceso limitado' }
+              ]
+            }
+          ]
+        ]
+      },
+      disableClose: true
+    });
+    
+    dialogRef.afterClosed().subscribe(resultadoTipo => {
+      if (resultadoTipo && resultadoTipo.accion === 'guardar') {
+        console.log('Tipo de Usuario creado exitosamente:', resultadoTipo.datos);
+        this.mostrarMensajeExito(`Tipo de Usuario "${resultadoTipo.datos.descripcion}" registrado exitosamente.`);
+        // Actualizar la lista de tipos de usuario
+        this.cargarDatos();
+      }
+    });
+  }
+  
+  private mostrarMensajeExito(mensaje: string): void {
+    this.dialog.open(ConfirmacionDialogComponent, {
+      width: '500px',
+      data: {
+        tipo: 'success',
+        titulo: 'Éxito',
+        mensaje: mensaje,
+        textoBotonConfirmar: 'Entendido',
+        ocultarCancelar: true
+      }
+    });
+  }
 
   editar(usuario: Usuario): void {
     const configuracion = UsuariosConfig.getConfiguracionFormulario(
       true,
       usuario
     );
+    
+    // Configurar callbacks para los botones de agregar
+    configuracion.filas.forEach((fila: any[]) => {
+      fila.forEach((campo: any) => {
+        if (campo.key === 'id_rol' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoRol();
+        }
+        if (campo.key === 'id_tipo_usuario' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevoTipoUsuario();
+        }
+      });
+    });
 
     const dialogRef = this.dialog.open(FormularioDialogComponent, {
       width: '600px',

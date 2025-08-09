@@ -283,6 +283,9 @@ export class MaterialesComponent implements OnInit, OnDestroy {
         if (campo.key === 'id_clase' && campo.conBotonAgregar) {
           campo.onAgregar = () => this.abrirFormularioNuevaClase();
         }
+        if (campo.key === 'id_unidad' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevaUnidad();
+        }
       });
     });
     
@@ -374,6 +377,44 @@ export class MaterialesComponent implements OnInit, OnDestroy {
     );
   }
   
+  private async abrirFormularioNuevaUnidad(): Promise<void> {
+    // Importar dinámicamente la configuración de unidades
+    const { UnidadesConfig } = await import('../shared/configs/unidades-config');
+    const configUnidad = UnidadesConfig.getConfiguracionFormulario(false);
+    
+    const dialogRef = this.dialog.open(FormularioDialogComponent, {
+      width: '600px',
+      data: {
+        ...configUnidad,
+        titulo: {
+          agregar: 'Registrar Nueva Unidad',
+          editar: 'Editar Unidad'
+        },
+        mensajeAdicional: 'Complete los datos de la nueva unidad de medida. Una vez registrada, podrá seleccionarla en el formulario de insumos.'
+      },
+      disableClose: true
+    });
+    
+    dialogRef.afterClosed().subscribe(resultadoUnidad => {
+      if (resultadoUnidad && resultadoUnidad.accion === 'guardar') {
+        // Crear la unidad
+        this.materialService.crearUnidad(resultadoUnidad.datos)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (nuevaUnidad: any) => {
+              console.log('Unidad creada exitosamente:', nuevaUnidad);
+              // Mostrar mensaje de éxito
+              this.mostrarMensajeExito(`Unidad "${nuevaUnidad.nombre}" registrada exitosamente. Ya puede seleccionarla en el formulario.`);
+            },
+            error: (error: any) => {
+              console.error('Error al crear unidad:', error);
+              this.mostrarMensajeError('No se pudo crear la unidad. Por favor, intente nuevamente.');
+            }
+          });
+      }
+    });
+  }
+  
   private async abrirFormularioNuevaClase(): Promise<void> {
     // Importar dinámicamente la configuración de clases
     const { ClasesConfig } = await import('../shared/configs/clases-config');
@@ -428,6 +469,9 @@ export class MaterialesComponent implements OnInit, OnDestroy {
         }
         if (campo.key === 'id_clase' && campo.conBotonAgregar) {
           campo.onAgregar = () => this.abrirFormularioNuevaClase();
+        }
+        if (campo.key === 'id_unidad' && campo.conBotonAgregar) {
+          campo.onAgregar = () => this.abrirFormularioNuevaUnidad();
         }
       });
     });

@@ -463,10 +463,27 @@ export class StockComponent implements OnInit, OnDestroy {
       '../shared/dialogs/formulario-dialog/formulario-dialog.component'
     ).then(({ FormularioDialogComponent }) => {
       import('../shared/configs/stock-config').then(({ StockConfig }) => {
+        const config = StockConfig.getConfiguracionFormulario(true, stock);
+        
+        // Configurar callbacks para los botones de agregar
+        config.filas.forEach((fila: any[]) => {
+          fila.forEach((campo: any) => {
+            if (campo.key === 'nombre_almacen' && campo.conBotonAgregar) {
+              campo.onAgregar = () => this.abrirFormularioNuevoAlmacen();
+            }
+            if (campo.key === 'clase' && campo.conBotonAgregar) {
+              campo.onAgregar = () => this.abrirFormularioNuevaClase();
+            }
+            if (campo.key === 'unidad' && campo.conBotonAgregar) {
+              campo.onAgregar = () => this.abrirFormularioNuevaUnidad();
+            }
+          });
+        });
+        
         const dialogRef = this.dialog.open(FormularioDialogComponent, {
           width: '600px',
           disableClose: true,
-          data: StockConfig.getConfiguracionFormulario(true, stock),
+          data: config,
         });
 
         dialogRef.afterClosed().subscribe((resultado) => {
@@ -513,10 +530,27 @@ export class StockComponent implements OnInit, OnDestroy {
       '../shared/dialogs/formulario-dialog/formulario-dialog.component'
     ).then(({ FormularioDialogComponent }) => {
       import('../shared/configs/stock-config').then(({ StockConfig }) => {
+        const config = StockConfig.getConfiguracionFormulario(false);
+        
+        // Configurar callbacks para los botones de agregar
+        config.filas.forEach((fila: any[]) => {
+          fila.forEach((campo: any) => {
+            if (campo.key === 'nombre_almacen' && campo.conBotonAgregar) {
+              campo.onAgregar = () => this.abrirFormularioNuevoAlmacen();
+            }
+            if (campo.key === 'clase' && campo.conBotonAgregar) {
+              campo.onAgregar = () => this.abrirFormularioNuevaClase();
+            }
+            if (campo.key === 'unidad' && campo.conBotonAgregar) {
+              campo.onAgregar = () => this.abrirFormularioNuevaUnidad();
+            }
+          });
+        });
+        
         const dialogRef = this.dialog.open(FormularioDialogComponent, {
           width: '600px',
           disableClose: true,
-          data: StockConfig.getConfiguracionFormulario(false),
+          data: config,
         });
 
         dialogRef.afterClosed().subscribe((resultado) => {
@@ -527,6 +561,110 @@ export class StockComponent implements OnInit, OnDestroy {
         });
       });
     });
+  }
+  
+  private async abrirFormularioNuevoAlmacen(): Promise<void> {
+    const { AlmacenesConfig } = await import('../shared/configs/almacenes-config');
+    const configAlmacen = AlmacenesConfig.getConfiguracionFormulario(false);
+    
+    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(
+      ({ FormularioDialogComponent }) => {
+        const dialogRef = this.dialog.open(FormularioDialogComponent, {
+          width: '700px',
+          data: {
+            ...configAlmacen,
+            titulo: {
+              agregar: 'Registrar Nuevo Almacén',
+              editar: 'Editar Almacén'
+            },
+            mensajeAdicional: 'Complete los datos del nuevo almacén. Una vez registrado, podrá seleccionarlo en el formulario de stock.'
+          },
+          disableClose: true
+        });
+        
+        dialogRef.afterClosed().subscribe(resultadoAlmacen => {
+          if (resultadoAlmacen && resultadoAlmacen.accion === 'guardar') {
+            console.log('Almacén creado exitosamente:', resultadoAlmacen.datos);
+            this.mostrarMensajeExito(`Almacén "${resultadoAlmacen.datos.nombre}" registrado exitosamente.`);
+          }
+        });
+      }
+    );
+  }
+  
+  private async abrirFormularioNuevaClase(): Promise<void> {
+    const { ClasesConfig } = await import('../shared/configs/clases-config');
+    const configClase = ClasesConfig.getConfiguracionFormulario(false);
+    
+    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(
+      ({ FormularioDialogComponent }) => {
+        const dialogRef = this.dialog.open(FormularioDialogComponent, {
+          width: '700px',
+          data: {
+            ...configClase,
+            titulo: {
+              agregar: 'Registrar Nueva Clase',
+              editar: 'Editar Clase'
+            },
+            mensajeAdicional: 'Complete los datos de la nueva clase. Una vez registrada, podrá seleccionarla en el formulario de stock.'
+          },
+          disableClose: true
+        });
+        
+        dialogRef.afterClosed().subscribe(resultadoClase => {
+          if (resultadoClase && resultadoClase.accion === 'guardar') {
+            console.log('Clase creada exitosamente:', resultadoClase.datos);
+            this.mostrarMensajeExito(`Clase "${resultadoClase.datos.id_clase}" registrada exitosamente.`);
+          }
+        });
+      }
+    );
+  }
+  
+  private async abrirFormularioNuevaUnidad(): Promise<void> {
+    const { UnidadesConfig } = await import('../shared/configs/unidades-config');
+    const configUnidad = UnidadesConfig.getConfiguracionFormulario(false);
+    
+    import('../shared/dialogs/formulario-dialog/formulario-dialog.component').then(
+      ({ FormularioDialogComponent }) => {
+        const dialogRef = this.dialog.open(FormularioDialogComponent, {
+          width: '600px',
+          data: {
+            ...configUnidad,
+            titulo: {
+              agregar: 'Registrar Nueva Unidad',
+              editar: 'Editar Unidad'
+            },
+            mensajeAdicional: 'Complete los datos de la nueva unidad de medida. Una vez registrada, podrá seleccionarla en el formulario de stock.'
+          },
+          disableClose: true
+        });
+        
+        dialogRef.afterClosed().subscribe(resultadoUnidad => {
+          if (resultadoUnidad && resultadoUnidad.accion === 'guardar') {
+            console.log('Unidad creada exitosamente:', resultadoUnidad.datos);
+            this.mostrarMensajeExito(`Unidad "${resultadoUnidad.datos.nombre}" registrada exitosamente.`);
+          }
+        });
+      }
+    );
+  }
+  
+  private mostrarMensajeExito(mensaje: string): void {
+    import('../shared/dialogs/confirmacion-dialog/confirmacion-dialog.component').then(
+      ({ ConfirmacionDialogComponent }) => {
+        this.dialog.open(ConfirmacionDialogComponent, {
+          width: '500px',
+          data: {
+            tipo: 'success',
+            titulo: 'Éxito',
+            mensaje: mensaje,
+            textoBotonConfirmar: 'Entendido',
+            ocultarCancelar: true
+          }
+        });
+      }
+    );
   }
 
   private configurarExportacion(): ConfiguracionExportacion<Stock> {

@@ -53,7 +53,8 @@ export class PesadoConfig {
             placeholder: 'Buscar insumo...',
             obligatorio: true,
             opciones: [], // Se cargarán dinámicamente
-            ancho: 'normal'
+            ancho: 'normal',
+            conBotonAgregar: true
           },
           {
             key: 'id_lote',
@@ -62,7 +63,8 @@ export class PesadoConfig {
             placeholder: 'Seleccionar lote',
             obligatorio: true,
             opciones: [], // Se cargarán dinámicamente
-            ancho: 'normal'
+            ancho: 'normal',
+            conBotonAgregar: true
           }
         ],
         [
@@ -136,7 +138,8 @@ export class PesadoConfig {
               { value: 'Control de Calidad', label: 'Control de Calidad' },
               { value: 'Preparación', label: 'Preparación' }
             ],
-            ancho: 'normal'
+            ancho: 'normal',
+            conBotonAgregar: true
           }
         ],
         [
