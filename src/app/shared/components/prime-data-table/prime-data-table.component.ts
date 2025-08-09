@@ -405,7 +405,7 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
   visibleColumns: TableColumn[] = [];
   hasActions: boolean = false;
   globalFilterValue: string = '';
-  columnFiltersVisible: boolean = false;
+  columnFiltersVisible: boolean = false; // Se puede cambiar a true para mostrar filtros por defecto
   displayedColumnsCount: number = 0;
 
   // Propiedades de paginación
@@ -479,6 +479,12 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
 
   toggleColumnFilters() {
     this.columnFiltersVisible = !this.columnFiltersVisible;
+    // Forzar detección de cambios para que se muestren los filtros
+    if (this.columnFiltersVisible) {
+      console.log('Filtros de columna activados con F3');
+    } else {
+      console.log('Filtros de columna desactivados');
+    }
   }
 
   onGlobalFilter(event: any) {
@@ -489,7 +495,10 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onColumnFilter(event: any, field: string) {
-    // PrimeNG maneja los filtros automáticamente
+    const value = event.target.value;
+    if (this.table) {
+      this.table.filter(value, field, 'contains');
+    }
   }
 
   clearAllFilters() {

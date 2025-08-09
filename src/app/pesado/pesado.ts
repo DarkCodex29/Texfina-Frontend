@@ -37,18 +37,18 @@ export class PesadoComponent implements OnInit {
   };
 
   columns: TableColumn[] = [
-    { key: 'fecha', title: 'Fecha', type: 'date' },
-    { key: 'vale', title: 'N° Vale' },
-    { key: 'qca', title: 'QCA' },
-    { key: 'insumoNombre', title: 'Insumo' },
-    { key: 'lote', title: 'Lote' },
-    { key: 'cantidadSolicitada', title: 'Cant. Solicitada', type: 'number' },
-    { key: 'cantidadPesada', title: 'Cant. Pesada', type: 'number' },
-    { key: 'unidad', title: 'Unidad' },
-    { key: 'balanza', title: 'Balanza' },
-    { key: 'operador', title: 'Operador' },
-    { key: 'area', title: 'Área' },
-    { key: 'estado', title: 'Estado' }
+    { key: 'fecha', title: 'Fecha', type: 'date', sortable: true, filterable: false },
+    { key: 'vale', title: 'N° Vale', sortable: true, filterable: true },
+    { key: 'qca', title: 'QCA', sortable: true, filterable: true },
+    { key: 'insumoNombre', title: 'Insumo', sortable: true, filterable: true },
+    { key: 'lote', title: 'Lote', sortable: true, filterable: true },
+    { key: 'cantidadSolicitada', title: 'Cant. Solicitada', type: 'number', sortable: true, filterable: false },
+    { key: 'cantidadPesada', title: 'Cant. Pesada', type: 'number', sortable: true, filterable: false },
+    { key: 'unidad', title: 'Unidad', sortable: true, filterable: true },
+    { key: 'balanza', title: 'Balanza', sortable: true, filterable: true },
+    { key: 'operador', title: 'Operador', sortable: true, filterable: true },
+    { key: 'area', title: 'Área', sortable: true, filterable: true },
+    { key: 'estado', title: 'Estado', sortable: true, filterable: true }
   ];
 
   actions: TableAction[] = [

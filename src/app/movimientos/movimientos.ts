@@ -36,17 +36,17 @@ export class MovimientosComponent implements OnInit {
   };
 
   columns: TableColumn[] = [
-    { key: 'fecha', title: 'Fecha', type: 'date' },
-    { key: 'tipoMovimiento', title: 'Tipo Movimiento' },
-    { key: 'qca', title: 'QCA' },
-    { key: 'insumoNombre', title: 'Insumo' },
-    { key: 'lote', title: 'Lote' },
-    { key: 'cantidad', title: 'Cantidad', type: 'number' },
-    { key: 'unidad', title: 'Unidad' },
-    { key: 'almacenOrigen', title: 'Almacén Origen' },
-    { key: 'almacenDestino', title: 'Almacén Destino' },
-    { key: 'responsable', title: 'Responsable' },
-    { key: 'estado', title: 'Estado' }
+    { key: 'fecha', title: 'Fecha', type: 'date', sortable: true, filterable: false },
+    { key: 'tipoMovimiento', title: 'Tipo Movimiento', sortable: true, filterable: true },
+    { key: 'qca', title: 'QCA', sortable: true, filterable: true },
+    { key: 'insumoNombre', title: 'Insumo', sortable: true, filterable: true },
+    { key: 'lote', title: 'Lote', sortable: true, filterable: true },
+    { key: 'cantidad', title: 'Cantidad', type: 'number', sortable: true, filterable: false },
+    { key: 'unidad', title: 'Unidad', sortable: true, filterable: true },
+    { key: 'almacenOrigen', title: 'Almacén Origen', sortable: true, filterable: true },
+    { key: 'almacenDestino', title: 'Almacén Destino', sortable: true, filterable: true },
+    { key: 'responsable', title: 'Responsable', sortable: true, filterable: true },
+    { key: 'estado', title: 'Estado', sortable: true, filterable: true }
   ];
 
   actions: TableAction[] = [
