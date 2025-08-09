@@ -254,7 +254,7 @@ export class UsuariosConfig {
         action: 'edit',
         tooltip: 'Editar',
         icon: 'pi pi-pencil',
-        color: 'success',
+        color: 'secondary',
       },
       {
         action: 'delete',

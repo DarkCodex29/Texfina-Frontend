@@ -154,13 +154,13 @@ export class RecetasConfig {
         icon: 'pi pi-eye',
         tooltip: 'Ver detalle',
         action: 'view',
-        color: 'secondary',
+        color: 'primary',
       },
       {
         icon: 'pi pi-pencil',
         tooltip: 'Editar',
         action: 'edit',
-        color: 'primary',
+        color: 'secondary',
       },
     ];
   }

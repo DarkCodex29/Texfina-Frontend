@@ -122,6 +122,27 @@ html {
 }
 
 /* =================================================================== */
+/* ESPACIADO GLOBAL PARA ICONOS EN BOTONES */
+/* =================================================================== */
+button, .btn, .p-button, .btn-texfina, [type="button"] {
+  // Asegurar espaciado entre icono y texto
+  i, .pi, .mat-icon, .material-icons {
+    &:not(:last-child) {
+      margin-right: 8px !important;
+    }
+    vertical-align: middle;
+    font-size: 16px;
+  }
+  
+  // Para botones que solo tienen icono (sin texto)
+  &.icon-only, &[aria-label]:not(:has(span)) {
+    i, .pi, .mat-icon, .material-icons {
+      margin-right: 0 !important;
+    }
+  }
+}
+
+/* =================================================================== */
 /* FIX GLOBAL PARA DROPDOWN EN TABLAS - EVITAR RECORTE */
 /* =================================================================== */
 

@@ -2,6 +2,20 @@
 
 .btn-texfina {
   @include button-base;
+  
+  // Asegurar espaciado correcto entre icono y texto
+  i, .pi {
+    margin-right: 8px !important;
+    font-size: 16px;
+    vertical-align: middle;
+  }
+  
+  // Para botones sin texto (solo icono)
+  &.icon-only {
+    i, .pi {
+      margin-right: 0 !important;
+    }
+  }
 
   &.btn-primary {
     background-color: var(--texfina-secondary);

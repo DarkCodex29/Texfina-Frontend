@@ -166,6 +166,22 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    
+    // Asegurar espaciado en botones
+    button {
+      i, .pi {
+        margin-right: 8px !important;
+        font-size: 16px;
+        vertical-align: middle;
+      }
+      
+      // Si el botón solo tiene icono
+      &.icon-only {
+        i, .pi {
+          margin-right: 0 !important;
+        }
+      }
+    }
   }
 }
 
@@ -277,140 +293,139 @@
   }
 }
 
-/* Action Buttons - IMPROVED VISIBILITY */
+/* Action Buttons - CLEAN ICON-ONLY DESIGN */
 .action-buttons {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   justify-content: center;
   align-items: center;
 
   ::ng-deep {
     .p-button {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      border: 1px solid transparent;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
       transition: all 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
       position: relative;
-      overflow: hidden;
-
-      &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
-        border-radius: 8px;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-      }
 
       .p-button-icon {
-        font-size: 14px;
-        font-weight: 600;
-        position: relative;
-        z-index: 1;
+        font-size: 18px;
+        transition: all 0.2s ease;
       }
 
-      &.p-button-text.p-button-secondary {
-        color: #6b7280;
-        background: rgba(107, 114, 128, 0.1);
-        border-color: rgba(107, 114, 128, 0.2);
-
-        &:hover {
-          background: rgba(107, 114, 128, 0.15) !important;
-          border-color: rgba(107, 114, 128, 0.3) !important;
-          transform: scale(1.05);
-          box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
-          color: #4b5563 !important;
-
-          &::before {
-            opacity: 1;
-          }
-        }
-
-        &:active {
-          transform: scale(0.95);
-        }
-      }
-
-      &.p-button-text.p-button-primary {
-        color: var(--texfina-primary);
-        background: rgba(189, 33, 38, 0.1);
-        border-color: rgba(189, 33, 38, 0.2);
-
-        &:hover {
-          background: rgba(189, 33, 38, 0.15) !important;
-          border-color: rgba(189, 33, 38, 0.3) !important;
-          transform: scale(1.05);
-          box-shadow: 0 2px 8px rgba(189, 33, 38, 0.25);
-          color: #a91e24 !important;
-
-          &::before {
-            opacity: 1;
-          }
-        }
-
-        &:active {
-          transform: scale(0.95);
-        }
-      }
-
-      &.p-button-text.p-button-warn {
-        color: #dc2626;
-        background: rgba(220, 38, 38, 0.1);
-        border-color: rgba(220, 38, 38, 0.2);
-
-        &:hover {
-          background: rgba(220, 38, 38, 0.15) !important;
-          border-color: rgba(220, 38, 38, 0.3) !important;
-          transform: scale(1.05);
-          box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
-          color: #b91c1c !important;
-
-          &::before {
-            opacity: 1;
-          }
-        }
-
-        &:active {
-          transform: scale(0.95);
-        }
-      }
-
-      // Success/Info variants for completeness
-      &.p-button-text.p-button-success {
-        color: #16a34a;
-        background: rgba(22, 163, 74, 0.1);
-        border-color: rgba(22, 163, 74, 0.2);
-
-        &:hover {
-          background: rgba(22, 163, 74, 0.15) !important;
-          border-color: rgba(22, 163, 74, 0.3) !important;
-          transform: scale(1.05);
-          box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
-          color: #15803d !important;
-
-          &::before {
-            opacity: 1;
-          }
-        }
-      }
-
+      // Botón Ver - Azul celeste
       &.p-button-text.p-button-info {
-        color: #0ea5e9;
-        background: rgba(14, 165, 233, 0.1);
-        border-color: rgba(14, 165, 233, 0.2);
+        color: #3b82f6;
 
         &:hover {
-          background: rgba(14, 165, 233, 0.15) !important;
-          border-color: rgba(14, 165, 233, 0.3) !important;
-          transform: scale(1.05);
-          box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
-          color: #0284c7 !important;
-
-          &::before {
-            opacity: 1;
+          background: rgba(59, 130, 246, 0.1) !important;
+          transform: scale(1.15);
+          
+          .p-button-icon {
+            color: #2563eb;
           }
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      // Botón Editar - Negro/Gris oscuro
+      &.p-button-text.p-button-secondary {
+        color: #374151;
+
+        &:hover {
+          background: rgba(55, 65, 81, 0.1) !important;
+          transform: scale(1.15);
+          
+          .p-button-icon {
+            color: #111827;
+          }
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      // Botón Eliminar - Rojo
+      &.p-button-text.p-button-danger,
+      &.p-button-text.p-button-warn {
+        color: #ef4444;
+
+        &:hover {
+          background: rgba(239, 68, 68, 0.1) !important;
+          transform: scale(1.15);
+          
+          .p-button-icon {
+            color: #dc2626;
+          }
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      // Botón Principal/Primary - Para otras acciones
+      &.p-button-text.p-button-primary {
+        color: #6366f1;
+
+        &:hover {
+          background: rgba(99, 102, 241, 0.1) !important;
+          transform: scale(1.15);
+          
+          .p-button-icon {
+            color: #4f46e5;
+          }
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      // Botón Success - Verde (si se usa)
+      &.p-button-text.p-button-success {
+        color: #10b981;
+
+        &:hover {
+          background: rgba(16, 185, 129, 0.1) !important;
+          transform: scale(1.15);
+          
+          .p-button-icon {
+            color: #059669;
+          }
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      // Remover focus outline
+      &:focus {
+        outline: none;
+        box-shadow: none !important;
+      }
+
+      // Estado disabled
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        
+        &:hover {
+          transform: none;
+          background: transparent !important;
         }
       }
     }

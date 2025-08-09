@@ -105,13 +105,13 @@ export class LotesComponent implements OnInit, OnDestroy {
       action: 'view',
       tooltip: 'Ver Detalle',
       icon: 'pi pi-eye',
-      color: 'secondary'
+      color: 'primary'
     },
     {
       action: 'edit',
       tooltip: 'Editar',
       icon: 'pi pi-pencil',
-      color: 'primary'
+      color: 'secondary'
     },
     {
       action: 'delete',

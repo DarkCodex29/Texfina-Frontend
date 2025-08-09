@@ -54,13 +54,13 @@ export class MovimientosComponent implements OnInit {
       icon: 'pi pi-eye',
       tooltip: 'Ver',
       action: 'view',
-      color: 'secondary'
+      color: 'primary'
     },
     {
       icon: 'pi pi-pencil',
       tooltip: 'Editar',
       action: 'edit',
-      color: 'primary'
+      color: 'secondary'
     },
     {
       icon: 'pi pi-trash',

@@ -109,13 +109,13 @@ export class AlmacenesComponent implements OnInit, OnDestroy {
       tooltip: 'Editar',
       icon: 'pi pi-pencil',
       action: 'edit',
-      color: 'primary'
+      color: 'secondary'
     },
     {
       tooltip: 'Eliminar',
       icon: 'pi pi-trash',
       action: 'delete',
-      color: 'warn'
+      color: 'danger'
     }
   ];
   buttons: TableButtonConfig[] = [

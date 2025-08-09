@@ -279,7 +279,7 @@ Los usuarios asignados a este rol perderán sus permisos hasta que se les asigne
         action: 'edit',
         tooltip: 'Editar Rol y Permisos',
         icon: 'pi pi-pencil',
-        color: 'success',
+        color: 'secondary',
       },
       {
         action: 'delete',

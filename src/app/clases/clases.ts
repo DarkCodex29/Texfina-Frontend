@@ -90,19 +90,19 @@ export class ClasesComponent implements OnInit, OnDestroy {
     {
       action: 'view',
       tooltip: 'Ver Detalle',
-      icon: 'visibility',
+      icon: 'pi pi-eye',
       color: 'primary'
     },
     {
       action: 'edit',
       tooltip: 'Editar',
-      icon: 'edit',
-      color: 'warn'
+      icon: 'pi pi-pencil',
+      color: 'secondary'
     },
     {
       action: 'delete',
       tooltip: 'Eliminar',
-      icon: 'delete',
+      icon: 'pi pi-trash',
       color: 'danger'
     }
   ];
@@ -111,13 +111,13 @@ export class ClasesComponent implements OnInit, OnDestroy {
     {
       action: 'add',
       label: 'Agregar Clase',
-      icon: 'add',
+      icon: 'pi pi-plus',
       color: 'primary'
     },
     {
       action: 'bulk',
       label: 'Carga Masiva',
-      icon: 'upload_file',
+      icon: 'pi pi-upload',
       color: 'secondary'
     }
   ];

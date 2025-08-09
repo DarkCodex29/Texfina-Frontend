@@ -91,13 +91,13 @@ export class RolesComponent implements OnInit {
       {
         action: 'add',
         label: 'Agregar Rol',
-        icon: 'add',
+        icon: 'pi pi-plus',
         color: 'primary',
       },
       {
         action: 'bulk-upload',
         label: 'Carga Masiva',
-        icon: 'upload',
+        icon: 'pi pi-upload',
         color: 'secondary',
       },
     ];

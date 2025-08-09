@@ -122,20 +122,20 @@ export class ReportesComponent implements OnInit, OnDestroy {
     {
       action: 'download',
       tooltip: 'Descargar',
-      icon: 'download',
+      icon: 'pi pi-download',
       color: 'primary',
       condition: (item: any) => item.estado === 'COMPLETADO'
     },
     {
       action: 'view',
       tooltip: 'Ver Detalle',
-      icon: 'visibility',
-      color: 'secondary'
+      icon: 'pi pi-eye',
+      color: 'primary'
     },
     {
       action: 'delete',
       tooltip: 'Eliminar',
-      icon: 'delete',
+      icon: 'pi pi-trash',
       color: 'danger'
     }
   ];
@@ -144,13 +144,13 @@ export class ReportesComponent implements OnInit, OnDestroy {
     {
       action: 'generate',
       label: 'Generar Reporte',
-      icon: 'add',
+      icon: 'pi pi-plus',
       color: 'primary'
     },
     {
       action: 'bulk',
       label: 'Carga Masiva',
-      icon: 'upload_file',
+      icon: 'pi pi-upload',
       color: 'secondary'
     }
   ];

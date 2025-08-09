@@ -111,7 +111,7 @@ export interface TableState {
             (click)="handleButtonClick(button.action)"
             type="button"
           >
-            <i *ngIf="button.icon" [class]="button.icon" class="mr-2"></i>
+            <i *ngIf="button.icon" [class]="button.icon"></i>
             {{ button.label }}
           </button>
         </div>
@@ -661,11 +661,12 @@ export class PrimeDataTableComponent implements OnInit, OnDestroy, OnChanges {
 
   getButtonSeverity(color?: string): any {
     const severityMap: { [key: string]: string } = {
-      'primary': 'info',
-      'secondary': 'secondary', 
-      'warn': 'warning',
-      'danger': 'danger',
-      'success': 'success'
+      'primary': 'info',      // Ver - Azul celeste
+      'secondary': 'secondary', // Editar - Gris oscuro
+      'warn': 'danger',        // Eliminar - Rojo (warn se mapea a danger)
+      'danger': 'danger',      // Eliminar - Rojo
+      'success': 'success',    // Acciones positivas - Verde
+      'info': 'info'          // Info/Ver - Azul celeste
     };
     return severityMap[color || 'secondary'] || 'secondary';
   }
