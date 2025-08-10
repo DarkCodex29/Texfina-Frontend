@@ -90,6 +90,20 @@ body {
 body {
   background-color: var(--texfina-bg-primary);
   color: var(--texfina-text-primary);
+  
+  // Contenedores principales que podrían estar recortando (FIX GLOBAL PARA DROPDOWN EN TABLAS)
+  .main-layout,
+  .content-container,
+  .content,
+  .content-wrapper,
+  .page-container,
+  .page-content,
+  .table-card,
+  .prime-table-card,
+  .mat-sidenav-content,
+  .mat-drawer-content {
+    overflow: visible !important;
+  }
 }
 
 * {
@@ -147,21 +161,7 @@ button, .btn, .p-button, .btn-texfina, [type="button"] {
 /* =================================================================== */
 
 // Override global para asegurar que los overlays no se recorten
-body {
-  // Contenedores principales que podrían estar recortando
-  .main-layout,
-  .content-container,
-  .content,
-  .content-wrapper,
-  .page-container,
-  .page-content,
-  .table-card,
-  .prime-table-card,
-  .mat-sidenav-content,
-  .mat-drawer-content {
-    overflow: visible !important;
-  }
-}
+// (Movido al selector body principal para evitar duplicación)
 
 // Global z-index supremo para overlays
 .p-component-overlay,

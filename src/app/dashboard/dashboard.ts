@@ -478,7 +478,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   formatearTexto(texto?: string): string {
-    return texto && texto.trim() ? texto : '-';
+    return texto?.trim() || '-';
   }
 
   getAlertIcon(tipo: string): string {
@@ -848,16 +848,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
       datasets: [{
         label: 'Eficiencia (%)',
         data: this.dashboardDesempeno.eficienciaOperaciones.map(e => e.eficiencia),
-        backgroundColor: this.dashboardDesempeno.eficienciaOperaciones.map(e => 
-          e.eficiencia >= 95 ? 'rgba(22, 163, 74, 0.8)' :
-          e.eficiencia >= 90 ? 'rgba(245, 158, 11, 0.8)' :
-          'rgba(189, 33, 38, 0.8)'
-        ),
-        borderColor: this.dashboardDesempeno.eficienciaOperaciones.map(e => 
-          e.eficiencia >= 95 ? '#16a34a' :
-          e.eficiencia >= 90 ? '#f59e0b' :
-          '#bd2126'
-        ),
+        backgroundColor: this.dashboardDesempeno.eficienciaOperaciones.map(e => {
+          if (e.eficiencia >= 95) return 'rgba(22, 163, 74, 0.8)';
+          if (e.eficiencia >= 90) return 'rgba(245, 158, 11, 0.8)';
+          return 'rgba(189, 33, 38, 0.8)';
+        }),
+        borderColor: this.dashboardDesempeno.eficienciaOperaciones.map(e => {
+          if (e.eficiencia >= 95) return '#16a34a';
+          if (e.eficiencia >= 90) return '#f59e0b';
+          return '#bd2126';
+        }),
         borderWidth: 2,
         borderRadius: 6
       }]
