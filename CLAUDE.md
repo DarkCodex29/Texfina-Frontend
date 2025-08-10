@@ -19,7 +19,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Technology Stack
 - **Framework**: Angular 20 (standalone components)
-- **UI Library**: Angular Material
+- **UI Libraries**: Angular Material + PrimeNG (for data tables and UI components)
+- **Icons**: PrimeIcons + Material Icons
 - **Styling**: SCSS with organized structure
 - **Build Tool**: Angular CLI with @angular/build
 - **Testing**: Jasmine with Karma
@@ -85,10 +86,12 @@ src/
 - Table-based data display with filtering and pagination
 
 #### Shared Components
-- `FormularioDialogComponent`: Generic form dialog
-- `DetalleDialogComponent`: Generic detail view dialog
+- `PrimeDataTableComponent`: Reusable data table with sorting, filtering, pagination
+- `FormularioDialogComponent`: Generic form dialog for CRUD operations
+- `DetalleDialogComponent`: Generic detail view dialog (also used for comparisons)
 - `ConfirmacionDialogComponent`: Confirmation dialogs
-- `NotificationComponent`: User notifications
+- `NotificationComponent`: User notifications with badge support
+- `NotificationItemComponent`: Individual notification items in dropdown
 
 ### Styling Architecture
 
@@ -103,11 +106,14 @@ styles/
 └── vendors/           # Third-party overrides
 ```
 
-#### Material Design Integration
-- Angular Material components extensively used
+#### Design System Integration
+- Angular Material components for forms and dialogs
+- PrimeNG components for data tables and advanced UI
 - Custom theming in `styles.scss`
+- Transparent Material Dialog containers for cleaner appearance
 - Responsive breakpoints with CDK Layout
 - Consistent design system across components
+- Custom action button styles (icon-only, no borders)
 
 ### Data Models
 - TypeScript interfaces for type safety
@@ -163,36 +169,73 @@ See `README_CONTROLADORES.md` for complete API documentation.
 - Efficient data fetching with pagination
 - Optimized build configurations for production
 
-## Current Migration Progress
+## UI/UX Standards
 
-### Component Architecture Migration
-The application is currently undergoing a migration from traditional Angular Material components to PrimeDataTable for improved data visualization and performance.
+### Visual Design Guidelines
+- **Logo**: Use PNG format (`assets/logo.png`) throughout the application
+- **Icons**: PrimeIcons for actions, Material Icons for UI elements
+- **Colors**: 
+  - Primary: Texfina brand colors
+  - Actions: View (blue #3b82f6), Edit (gray #374151), Delete (red #ef4444)
+- **Modals**: Transparent container backgrounds for cleaner appearance
+- **Buttons**: Icon-only action buttons without borders in tables
 
-#### Migration Pattern
-- **From**: Custom Angular Material tables with manual filtering and pagination
-- **To**: PrimeDataTable with built-in features and configurations
-- **Benefits**: Reduced boilerplate, better performance, consistent UI patterns
+### Component Standards
 
-#### Completed Migrations
-- ✅ Ingresos component - migrated to PrimeDataTable
-- ✅ Unidades component - migrated to PrimeDataTable with button reorganization
-- ✅ Dashboard component - refactored for improved presentation
-- ✅ Various layout components - unified styling approach
-- ✅ Model updates - added missing properties (area, responsable) to Consumo model
+#### Login Page
+- Modern, subtle design with gradient backgrounds
+- Compact form with reduced spacing
+- PNG logo display
+- Password visibility toggle with proper icon display
 
-#### Migration Pattern Established
-**Standard PrimeDataTable Integration:**
-- Header: Page title + Export dropdown only
-- Table: All CRUD actions via `tableButtons` (Add, Bulk Upload) and row `actions` (View, Edit, Delete)
-- Config: Separate `getTableColumns()` and `getTableActions()` methods in config files
-- Loading: Natural API response times without artificial delays
+#### Sidebar Navigation
+- Logo display instead of text
+- Icon-based menu items with labels
+- Role-based menu visibility
+- Gradient hover effects
 
-#### Migration Guidelines
-1. Replace component-specific table logic with PrimeDataTable configuration
-2. Move table configurations to dedicated config files in `src/app/shared/configs/`
-3. Simplify component templates by removing manual table implementations
-4. Update component TypeScript to use simplified data loading patterns
-5. Ensure SCSS follows the unified styling approach
-6. **Header Actions**: Keep only export functionality in page header
-7. **Table Buttons**: Move "Add" and "Bulk Upload" buttons to table header via `tableButtons` property
-8. **Loading States**: Remove artificial delays - let real API response times determine loading duration
+#### Data Tables (PrimeDataTable)
+- Consistent column configurations in config files
+- Action buttons: View, Edit, Delete with standardized colors
+- Export functionality in header
+- Add/Bulk Upload buttons in table header
+- Natural loading states without artificial delays
+
+#### Notifications
+- Dropdown with badge counter
+- Color-coded by priority (High: red, Medium: orange, Low: blue)
+- White check icon for marking as resolved
+- Notification items with icon indicators
+
+### Modal Dialogs
+- **FormularioDialog**: For create/edit operations
+- **DetalleDialog**: For viewing details and comparisons
+- **ConfirmacionDialog**: For delete confirmations
+- Transparent backgrounds to eliminate white borders
+- Consistent header with gradient background
+- Maximum width of 800px for standard modals
+
+## Development Best Practices
+
+### Code Organization
+1. Use standalone components with explicit imports
+2. Place table configurations in `src/app/shared/configs/`
+3. Follow established naming conventions
+4. Implement proper TypeScript typing
+
+### State Management
+- Service-based state with BehaviorSubjects
+- Proper error handling with RxJS operators
+- Loading states managed at component level
+
+### Performance
+- Lazy loading for all feature routes
+- OnPush change detection where applicable
+- Efficient API calls with proper caching
+- Optimized bundle sizes for production
+
+### Security
+- JWT token management
+- Route guards for authentication
+- Input validation and sanitization
+- No hardcoded credentials or sensitive data
