@@ -251,4 +251,24 @@ button, .btn, .p-button, .btn-texfina, [type="button"] {
   }
 }
 
+/* =================================================================== */
+/* ESTILOS GLOBALES PARA MATERIAL DIALOG - FONDO TRANSPARENTE */
+/* =================================================================== */
+.mat-mdc-dialog-container {
+  background: transparent !important;
+  box-shadow: none !important;
+  
+  .mdc-dialog__surface {
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+  
+  .mat-mdc-dialog-content {
+    padding: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
 

@@ -295,10 +295,82 @@ export class AuditoriaComponent implements OnInit {
   }
 
   private compararCambios(auditoria: Auditoria): void {
-    console.log('Comparar cambios para:', auditoria);
-    alert(
-      `Comparando cambios para ${auditoria.tipo_entidad} ${auditoria.id_entidad}:\n\nAntes: ${auditoria.datos_anteriores}\n\nDespués: ${auditoria.datos_nuevos}`
+    import('../shared/dialogs/detalle-dialog/detalle-dialog.component').then(
+      ({ DetalleDialogComponent }) => {
+        let datosAnteriores: any = {};
+        let datosNuevos: any = {};
+        
+        try {
+          datosAnteriores = auditoria.datos_anteriores ? JSON.parse(auditoria.datos_anteriores) : {};
+          datosNuevos = auditoria.datos_nuevos ? JSON.parse(auditoria.datos_nuevos) : {};
+        } catch (e) {
+          console.error('Error al parsear datos:', e);
+        }
+
+        // Crear las filas de comparación
+        const filas: any[] = [
+          [
+            { key: 'accion', label: 'Acción', tipo: 'text' },
+            { key: 'usuario', label: 'Usuario', tipo: 'text' }
+          ],
+          [
+            { key: 'fecha_hora', label: 'Fecha/Hora', tipo: 'date' },
+            { key: 'ip_address', label: 'IP Address', tipo: 'text' }
+          ]
+        ];
+
+        // Agregar campos modificados
+        const camposModificados = auditoria.campos_modificados?.split(',').map(c => c.trim()) || [];
+        
+        camposModificados.forEach(campo => {
+          filas.push([
+            {
+              key: campo + '_anterior',
+              label: `${this.formatearNombreCampo(campo)} (Anterior)`,
+              tipo: 'text'
+            },
+            {
+              key: campo + '_nuevo',
+              label: `${this.formatearNombreCampo(campo)} (Nuevo)`,
+              tipo: 'text'
+            }
+          ]);
+        });
+
+        // Preparar los datos combinados
+        const datosCombinados: any = {
+          accion: auditoria.accion,
+          usuario: auditoria.usuario,
+          fecha_hora: auditoria.fecha_hora,
+          ip_address: auditoria.ip_address
+        };
+
+        // Agregar los valores anteriores y nuevos
+        camposModificados.forEach(campo => {
+          datosCombinados[campo + '_anterior'] = datosAnteriores[campo] || 'Sin valor';
+          datosCombinados[campo + '_nuevo'] = datosNuevos[campo] || 'Sin valor';
+        });
+
+        const config = {
+          entidad: 'Comparación de Cambios',
+          entidadArticulo: `${auditoria.tipo_entidad} - ${auditoria.id_entidad}`,
+          filas: filas,
+          datos: datosCombinados
+        };
+
+        this.dialog.open(DetalleDialogComponent, {
+          width: '800px',
+          disableClose: true,
+          data: config
+        });
+      }
     );
+  }
+  
+  private formatearNombreCampo(campo: string): string {
+    return campo
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, l => l.toUpperCase());
   }
 
   private eliminar(auditoria: Auditoria): void {

@@ -4,9 +4,10 @@
   max-height: 90vh;
   width: 100%;
   max-width: 800px;
-  background: var(--texfina-bg-primary);
+  background: white;
   border-radius: var(--texfina-radius-lg);
   overflow: hidden;
+  box-shadow: 0 24px 38px rgba(0,0,0,0.14);
 }
 
 .dialog-header {

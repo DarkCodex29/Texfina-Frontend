@@ -78,7 +78,7 @@ export class AuditoriaConfig {
         color: 'primary'
       },
       {
-        icon: 'pi pi-compare',
+        icon: 'pi pi-arrows-h',
         tooltip: 'Comparar cambios',
         action: 'compare',
         color: 'secondary'
