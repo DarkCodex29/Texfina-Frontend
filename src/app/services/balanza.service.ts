@@ -230,7 +230,7 @@ export class BalanzaService {
         // Procesar todas las líneas completas excepto la última (que puede estar incompleta)
         for (let i = 0; i < lineas.length - 1; i++) {
           const linea = lineas[i].trim();
-          if (linea) {
+          if (linea && linea.startsWith('S')) { // Solo procesar líneas que empiezan con S
             console.log('📋 [BALANZA] Procesando línea completa:', linea);
             const lectura = this.parsearRespuestaSICS(linea, config.modelo);
             
@@ -245,7 +245,7 @@ export class BalanzaService {
         buffer = lineas[lineas.length - 1];
         
         // Si el buffer tiene una respuesta que parece completa, procesarla
-        if (buffer.length > 10 && buffer.includes('g')) {
+        if (buffer.length > 10 && buffer.startsWith('S') && buffer.includes('g')) {
           console.log('📋 [BALANZA] Procesando buffer acumulado:', buffer);
           const lectura = this.parsearRespuestaSICS(buffer, config.modelo);
           
@@ -254,6 +254,12 @@ export class BalanzaService {
             this._pesoActual.next(lectura);
             buffer = ''; // Limpiar buffer después de procesar
           }
+        }
+        
+        // Limpiar buffer si tiene basura o es muy largo
+        if (buffer.length > 50 && !buffer.startsWith('S')) {
+          console.log('🧹 [BALANZA] Limpiando buffer con datos no válidos:', buffer);
+          buffer = '';
         }
       }
 

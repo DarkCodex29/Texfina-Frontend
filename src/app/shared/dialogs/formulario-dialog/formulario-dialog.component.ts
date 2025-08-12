@@ -112,15 +112,8 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
       .subscribe(peso => {
         if (peso) {
           console.log('📡 [FORMULARIO] Peso recibido:', peso);
-          
-          // Si estamos pesando y el peso es estable, capturar automáticamente
-          if (this.pesandoActivo && peso.estable) {
-            console.log('⚖️ [FORMULARIO] Peso estable detectado, capturando automáticamente...');
-            const campoPeso = this.obtenerCampoActivo('pesado');
-            if (campoPeso) {
-              this.aplicarPesoAutomatico(campoPeso, peso);
-            }
-          }
+          // Solo actualizar el display, NO capturar automáticamente
+          // El usuario debe hacer clic para capturar
         }
         this.pesoActual = peso;
       });
