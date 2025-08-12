@@ -100,22 +100,48 @@ export class BalanzaService {
       }
 
       console.log('✅ [BALANZA] Puerto seleccionado:', this.puerto);
+      
+      // Verificar si el puerto ya está abierto
+      if (this.puerto.readable || this.puerto.writable) {
+        console.log('⚠️ [BALANZA] El puerto ya estaba abierto, cerrando primero...');
+        try {
+          await this.puerto.close();
+          console.log('✅ [BALANZA] Puerto cerrado correctamente');
+          // Esperar un momento antes de reabrir
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (closeError) {
+          console.warn('⚠️ [BALANZA] Error al cerrar puerto:', closeError);
+        }
+      }
+      
       console.log('🔧 [BALANZA] Configurando puerto: 9600,8,N,1');
       
       // Configurar y abrir el puerto
-      await this.puerto.open({
-        baudRate: 9600,
-        dataBits: 8,
-        stopBits: 1,
-        parity: 'none',
-        flowControl: 'none'
-      });
-
-      console.log('✅ [BALANZA] Puerto abierto exitosamente');
-      console.log('📊 [BALANZA] Estado del puerto:', {
-        readable: !!this.puerto.readable,
-        writable: !!this.puerto.writable
-      });
+      try {
+        await this.puerto.open({
+          baudRate: 9600,
+          dataBits: 8,
+          stopBits: 1,
+          parity: 'none',
+          flowControl: 'none'
+        });
+        
+        console.log('✅ [BALANZA] Puerto abierto exitosamente');
+        console.log('📊 [BALANZA] Estado del puerto:', {
+          readable: !!this.puerto.readable,
+          writable: !!this.puerto.writable
+        });
+      } catch (openError: any) {
+        // Analizar el tipo de error
+        if (openError.message?.includes('Failed to open serial port')) {
+          console.error('❌ [BALANZA] No se pudo abrir el puerto. Posibles causas:');
+          console.error('   1. El puerto está siendo usado por otro programa');
+          console.error('   2. El dispositivo fue desconectado');
+          console.error('   3. Problemas con los drivers USB-Serial');
+          console.error('   Solución: Cierre otros programas que puedan estar usando COM3');
+        }
+        throw openError;
+      }
 
       this._conectado.next(true);
       this._error.next(null);
@@ -345,6 +371,40 @@ export class BalanzaService {
   async conectarBalanzaSinFiltros(config: BalanzaConfig): Promise<boolean> {
     console.log('🔓 [BALANZA] Conectando sin filtros - se mostrarán TODOS los puertos COM');
     return this.conectarBalanza(config, true);
+  }
+
+  // Método para forzar desconexión y reconexión
+  async reconectarBalanza(config: BalanzaConfig): Promise<boolean> {
+    console.log('🔄 [BALANZA] Intentando reconectar balanza...');
+    
+    // Primero intentar desconectar si hay conexión
+    if (this.puerto) {
+      await this.desconectarBalanza();
+      // Esperar un momento para que el puerto se libere
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    // Intentar reconectar
+    return this.conectarBalanza(config);
+  }
+
+  // Método para obtener puertos disponibles (diagnóstico)
+  async listarPuertosDisponibles(): Promise<void> {
+    try {
+      console.log('📋 [BALANZA] Listando puertos seriales disponibles...');
+      const ports = await (navigator as any).serial.getPorts();
+      
+      if (ports.length === 0) {
+        console.log('ℹ️ [BALANZA] No hay puertos previamente autorizados');
+      } else {
+        console.log(`✅ [BALANZA] ${ports.length} puerto(s) previamente autorizado(s):`, ports);
+        ports.forEach((port: any, index: number) => {
+          console.log(`   Puerto ${index + 1}:`, port);
+        });
+      }
+    } catch (error) {
+      console.error('❌ [BALANZA] Error al listar puertos:', error);
+    }
   }
 
   // Métodos para integración con componentes
