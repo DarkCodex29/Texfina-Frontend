@@ -112,6 +112,15 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
       .subscribe(peso => {
         if (peso) {
           console.log('📡 [FORMULARIO] Peso recibido:', peso);
+          
+          // Si estamos pesando y el peso es estable, capturar automáticamente
+          if (this.pesandoActivo && peso.estable) {
+            console.log('⚖️ [FORMULARIO] Peso estable detectado, capturando automáticamente...');
+            const campoPeso = this.obtenerCampoActivo('pesado');
+            if (campoPeso) {
+              this.aplicarPesoAutomatico(campoPeso, peso);
+            }
+          }
         }
         this.pesoActual = peso;
       });
@@ -203,31 +212,39 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
     }
   }
 
+  private aplicarPesoAutomatico(campo: string, lectura: BalanzaReading): void {
+    console.log('🎯 [FORMULARIO] Aplicando peso automático para campo:', campo);
+    console.log('📊 [FORMULARIO] Lectura de peso:', lectura);
+    
+    // Convertir unidades si es necesario
+    let pesoFinal = lectura.peso;
+    const unidadOriginal = lectura.unidad;
+    
+    // Si el peso está en gramos y es mayor a 1000, convertir a kg
+    if (lectura.unidad === 'g' && pesoFinal >= 1000) {
+      console.log('🔄 [FORMULARIO] Convirtiendo de gramos a kilogramos');
+      pesoFinal = pesoFinal / 1000;
+    }
+    
+    console.log(`⚖️ [FORMULARIO] Aplicando peso: ${pesoFinal} (original: ${lectura.peso} ${unidadOriginal})`);
+    
+    // Aplicar peso al campo
+    this.formulario.patchValue({
+      [campo]: pesoFinal
+    });
+    
+    console.log(`✅ [FORMULARIO] Peso aplicado automáticamente al campo ${campo}: ${pesoFinal}`);
+  }
+
   async capturarPeso(campo: string): Promise<void> {
-    console.log('🎯 [FORMULARIO] Capturando peso para campo:', campo);
+    console.log('🎯 [FORMULARIO] Capturando peso manualmente para campo:', campo);
     console.log('📊 [FORMULARIO] Peso actual:', this.pesoActual);
     
     if (this.pesoActual && this.pesoActual.estable) {
       console.log('✅ [FORMULARIO] Peso estable detectado');
       
-      // Convertir unidades si es necesario
-      let pesoFinal = this.pesoActual.peso;
-      const unidadOriginal = this.pesoActual.unidad;
-      
-      // Si el peso está en gramos y es mayor a 1000, convertir a kg
-      if (this.pesoActual.unidad === 'g' && pesoFinal >= 1000) {
-        console.log('🔄 [FORMULARIO] Convirtiendo de gramos a kilogramos');
-        pesoFinal = pesoFinal / 1000;
-      }
-      
-      console.log(`⚖️ [FORMULARIO] Aplicando peso: ${pesoFinal} (original: ${this.pesoActual.peso} ${unidadOriginal})`);
-      
-      // Aplicar peso al campo
-      this.formulario.patchValue({
-        [campo]: pesoFinal
-      });
-      
-      console.log(`✅ [FORMULARIO] Peso aplicado al campo ${campo}: ${pesoFinal}`);
+      // Aplicar el peso usando el método común
+      this.aplicarPesoAutomatico(campo, this.pesoActual);
       
       // Detener pesado
       await this.detenerPesado();
