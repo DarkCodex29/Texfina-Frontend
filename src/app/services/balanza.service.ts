@@ -204,8 +204,11 @@ export class BalanzaService {
       console.log('📤 [BALANZA] Enviando comando S (lectura continua)...');
       await this.enviarComando('S\r\n');
 
-      // Leer respuesta continua
+      // Buffer para acumular fragmentos
+      let buffer = '';
       let lecturaCount = 0;
+      
+      // Leer respuesta continua
       while (this.leyendoPeso && this.reader) {
         const { value, done } = await this.reader.read();
         
@@ -214,16 +217,43 @@ export class BalanzaService {
           break;
         }
 
-        const respuesta = new TextDecoder().decode(value);
-        console.log(`📥 [BALANZA] Respuesta #${++lecturaCount}:`, respuesta.replace(/\r\n/g, '\\r\\n'));
+        const fragmento = new TextDecoder().decode(value);
+        console.log(`📥 [BALANZA] Fragmento #${++lecturaCount}:`, fragmento.replace(/\r\n/g, '\\r\\n'));
         
-        const lectura = this.parsearRespuestaSICS(respuesta, config.modelo);
+        // Acumular fragmentos en el buffer
+        buffer += fragmento;
+        console.log('📝 [BALANZA] Buffer actual:', buffer.replace(/\r\n/g, '\\r\\n'));
         
-        if (lectura) {
-          console.log('✅ [BALANZA] Lectura válida:', lectura);
-          this._pesoActual.next(lectura);
-        } else {
-          console.warn('⚠️ [BALANZA] Lectura inválida o incompleta');
+        // Buscar líneas completas terminadas en \r\n o \n
+        const lineas = buffer.split(/[\r\n]+/);
+        
+        // Procesar todas las líneas completas excepto la última (que puede estar incompleta)
+        for (let i = 0; i < lineas.length - 1; i++) {
+          const linea = lineas[i].trim();
+          if (linea) {
+            console.log('📋 [BALANZA] Procesando línea completa:', linea);
+            const lectura = this.parsearRespuestaSICS(linea, config.modelo);
+            
+            if (lectura) {
+              console.log('✅ [BALANZA] Lectura válida:', lectura);
+              this._pesoActual.next(lectura);
+            }
+          }
+        }
+        
+        // Mantener solo la última línea (posiblemente incompleta) en el buffer
+        buffer = lineas[lineas.length - 1];
+        
+        // Si el buffer tiene una respuesta que parece completa, procesarla
+        if (buffer.length > 10 && buffer.includes('g')) {
+          console.log('📋 [BALANZA] Procesando buffer acumulado:', buffer);
+          const lectura = this.parsearRespuestaSICS(buffer, config.modelo);
+          
+          if (lectura) {
+            console.log('✅ [BALANZA] Lectura válida del buffer:', lectura);
+            this._pesoActual.next(lectura);
+            buffer = ''; // Limpiar buffer después de procesar
+          }
         }
       }
 
