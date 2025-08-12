@@ -57,10 +57,11 @@ export class BalanzaService {
     this._dispositivos.next(dispositivos);
   }
 
-  async conectarBalanza(config: BalanzaConfig): Promise<boolean> {
+  async conectarBalanza(config: BalanzaConfig, sinFiltros: boolean = false): Promise<boolean> {
     try {
       console.log('🔌 [BALANZA] Iniciando conexión con balanza...');
       console.log('📋 [BALANZA] Configuración:', config);
+      console.log('🔍 [BALANZA] Modo sin filtros:', sinFiltros);
       
       if (!('serial' in navigator)) {
         console.error('❌ [BALANZA] Web Serial API no disponible');
@@ -68,16 +69,35 @@ export class BalanzaService {
       }
 
       console.log('🔍 [BALANZA] Solicitando puerto serie...');
-      console.log('🔍 [BALANZA] Filtros USB: VendorId=0x0EB8 (Mettler-Toledo)');
       
-      // Solicitar puerto serie con filtros específicos para Mettler-Toledo
-      this.puerto = await (navigator as any).serial.requestPort({
-        filters: [
-          { usbVendorId: 0x0EB8 }, // Mettler Toledo VID oficial
-          { usbVendorId: 0x0EB8, usbProductId: 0x0001 }, // MS303TS
-          { usbVendorId: 0x0EB8, usbProductId: 0x0002 }, // MS32001L
-        ]
-      });
+      // Solicitar puerto serie con o sin filtros
+      if (sinFiltros) {
+        console.log('📂 [BALANZA] Mostrando TODOS los puertos disponibles (sin filtros)');
+        this.puerto = await (navigator as any).serial.requestPort();
+      } else {
+        console.log('🔍 [BALANZA] Buscando adaptadores USB-Serial conocidos');
+        
+        // Solicitar puerto serie con filtros para adaptadores comunes
+        // NOTA: Las balanzas pueden estar conectadas vía adaptadores USB-Serial
+        this.puerto = await (navigator as any).serial.requestPort({
+          filters: [
+            // Adaptadores Prolific (PL2303GT y otros)
+            { usbVendorId: 0x067B }, // Prolific Technology
+            { usbVendorId: 0x067B, usbProductId: 0x2303 }, // PL2303
+            
+            // Adaptadores FTDI
+            { usbVendorId: 0x0403 }, // FTDI
+            { usbVendorId: 0x0403, usbProductId: 0x6001 }, // FT232R
+            
+            // Adaptadores Silicon Labs
+            { usbVendorId: 0x10C4 }, // Silicon Labs
+            { usbVendorId: 0x10C4, usbProductId: 0xEA60 }, // CP210x
+            
+            // Mettler Toledo (por si acaso tienen conexión directa)
+            { usbVendorId: 0x0EB8 }, // Mettler Toledo VID oficial
+          ]
+        });
+      }
 
       console.log('✅ [BALANZA] Puerto seleccionado:', this.puerto);
       console.log('🔧 [BALANZA] Configurando puerto: 9600,8,N,1');
@@ -321,13 +341,24 @@ export class BalanzaService {
     }
   }
 
+  // Método alternativo para conectar mostrando TODOS los puertos
+  async conectarBalanzaSinFiltros(config: BalanzaConfig): Promise<boolean> {
+    console.log('🔓 [BALANZA] Conectando sin filtros - se mostrarán TODOS los puertos COM');
+    return this.conectarBalanza(config, true);
+  }
+
   // Métodos para integración con componentes
   async pesarParaConsumo(): Promise<BalanzaReading | null> {
     const dispositivos = this._dispositivos.value;
     const balanzaPrincipal = dispositivos[0]; // Usar primera balanza configurada
     
     if (!this._conectado.value) {
-      await this.conectarBalanza(balanzaPrincipal);
+      // Intentar primero con filtros, si falla, intentar sin filtros
+      const conectado = await this.conectarBalanza(balanzaPrincipal);
+      if (!conectado) {
+        console.log('⚠️ [BALANZA] Reintentando sin filtros...');
+        await this.conectarBalanzaSinFiltros(balanzaPrincipal);
+      }
     }
 
     return await this.obtenerPesoEstable(balanzaPrincipal); // Usar peso estable

@@ -180,7 +180,17 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
       
       if (!conectado) {
         console.log('🔌 [FORMULARIO] Conectando balanza...');
-        await this.balanzaService.conectarBalanza(config);
+        const exito = await this.balanzaService.conectarBalanza(config);
+        
+        if (!exito) {
+          console.log('⚠️ [FORMULARIO] Conexión con filtros falló, intentando sin filtros...');
+          const exitoSinFiltros = await this.balanzaService.conectarBalanzaSinFiltros(config);
+          
+          if (!exitoSinFiltros) {
+            console.error('❌ [FORMULARIO] No se pudo conectar la balanza');
+            throw new Error('No se pudo conectar la balanza');
+          }
+        }
       }
       
       console.log('📡 [FORMULARIO] Iniciando lectura de peso...');
