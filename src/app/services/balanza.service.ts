@@ -59,10 +59,17 @@ export class BalanzaService {
 
   async conectarBalanza(config: BalanzaConfig): Promise<boolean> {
     try {
+      console.log('🔌 [BALANZA] Iniciando conexión con balanza...');
+      console.log('📋 [BALANZA] Configuración:', config);
+      
       if (!('serial' in navigator)) {
+        console.error('❌ [BALANZA] Web Serial API no disponible');
         throw new Error('Web Serial API no está disponible en este navegador');
       }
 
+      console.log('🔍 [BALANZA] Solicitando puerto serie...');
+      console.log('🔍 [BALANZA] Filtros USB: VendorId=0x0EB8 (Mettler-Toledo)');
+      
       // Solicitar puerto serie con filtros específicos para Mettler-Toledo
       this.puerto = await (navigator as any).serial.requestPort({
         filters: [
@@ -72,6 +79,9 @@ export class BalanzaService {
         ]
       });
 
+      console.log('✅ [BALANZA] Puerto seleccionado:', this.puerto);
+      console.log('🔧 [BALANZA] Configurando puerto: 9600,8,N,1');
+      
       // Configurar y abrir el puerto
       await this.puerto.open({
         baudRate: 9600,
@@ -81,16 +91,28 @@ export class BalanzaService {
         flowControl: 'none'
       });
 
+      console.log('✅ [BALANZA] Puerto abierto exitosamente');
+      console.log('📊 [BALANZA] Estado del puerto:', {
+        readable: !!this.puerto.readable,
+        writable: !!this.puerto.writable
+      });
+
       this._conectado.next(true);
       this._error.next(null);
       
-      console.log(`Balanza ${config.modelo} conectada exitosamente`);
+      console.log(`✅ [BALANZA] ${config.modelo} conectada exitosamente`);
       return true;
 
-    } catch (error) {
-      const errorMsg = `Error al conectar balanza: ${error}`;
+    } catch (error: any) {
+      console.error('❌ [BALANZA] Error al conectar:', error);
+      console.error('❌ [BALANZA] Detalles del error:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      
+      const errorMsg = `Error al conectar balanza: ${error.message || error}`;
       this._error.next(errorMsg);
-      console.error(errorMsg);
       return false;
     }
   }
@@ -117,36 +139,51 @@ export class BalanzaService {
   }
 
   async iniciarLecturaPeso(config: BalanzaConfig): Promise<void> {
+    console.log('⚖️ [BALANZA] Iniciando lectura de peso...');
+    
     if (!this.puerto || this.leyendoPeso) {
+      console.warn('⚠️ [BALANZA] Puerto no disponible o ya leyendo peso');
       return;
     }
 
     this.leyendoPeso = true;
+    console.log('📡 [BALANZA] Modo lectura continua activado');
 
     try {
       // Configurar lector
       this.reader = this.puerto.readable!.getReader();
+      console.log('📖 [BALANZA] Reader configurado');
       
       // Enviar comando SICS para obtener peso
+      console.log('📤 [BALANZA] Enviando comando S (lectura continua)...');
       await this.enviarComando('S\r\n');
 
       // Leer respuesta continua
+      let lecturaCount = 0;
       while (this.leyendoPeso && this.reader) {
         const { value, done } = await this.reader.read();
         
-        if (done) break;
+        if (done) {
+          console.log('🔚 [BALANZA] Lectura finalizada');
+          break;
+        }
 
         const respuesta = new TextDecoder().decode(value);
+        console.log(`📥 [BALANZA] Respuesta #${++lecturaCount}:`, respuesta.replace(/\r\n/g, '\\r\\n'));
+        
         const lectura = this.parsearRespuestaSICS(respuesta, config.modelo);
         
         if (lectura) {
+          console.log('✅ [BALANZA] Lectura válida:', lectura);
           this._pesoActual.next(lectura);
+        } else {
+          console.warn('⚠️ [BALANZA] Lectura inválida o incompleta');
         }
       }
 
     } catch (error) {
+      console.error('❌ [BALANZA] Error en lectura de peso:', error);
       this._error.next(`Error en lectura de peso: ${error}`);
-      console.error('Error en lectura de peso:', error);
     }
   }
 
@@ -186,13 +223,22 @@ export class BalanzaService {
   }
 
   private async enviarComando(comando: string): Promise<void> {
+    console.log(`📤 [BALANZA] Enviando comando: "${comando.replace(/\r\n/g, '\\r\\n')}"`);
+    
     if (!this.puerto || !this.puerto.writable) {
+      console.error('❌ [BALANZA] Puerto no disponible para escritura');
       throw new Error('Puerto no disponible para escritura');
     }
 
     const writer = this.puerto.writable.getWriter();
     try {
-      await writer.write(new TextEncoder().encode(comando));
+      const bytes = new TextEncoder().encode(comando);
+      console.log(`📤 [BALANZA] Bytes a enviar:`, Array.from(bytes));
+      await writer.write(bytes);
+      console.log('✅ [BALANZA] Comando enviado exitosamente');
+    } catch (error) {
+      console.error('❌ [BALANZA] Error al enviar comando:', error);
+      throw error;
     } finally {
       writer.releaseLock();
     }
@@ -200,55 +246,77 @@ export class BalanzaService {
 
   private parsearRespuestaSICS(respuesta: string, modelo: 'MS32001L' | 'MS303TS'): BalanzaReading | null {
     try {
+      console.log(`🔍 [BALANZA] Parseando respuesta: "${respuesta.replace(/\r\n/g, '\\r\\n')}"`);
+      
       // Formato típico: "S S      0.00 g\r\n" o "S D    123.45 g\r\n" o "S I    ------\r\n"
       const match = respuesta.match(/S\s+([SDI])\s+([\-\d\.]+|------)\s*(\w*)/);
       
       if (!match) {
+        console.warn('⚠️ [BALANZA] Respuesta no coincide con formato SICS esperado');
         return null;
       }
 
-      const [, status, pesoStr, unidad] = match;
+      const [fullMatch, status, pesoStr, unidad] = match;
+      console.log('📊 [BALANZA] Datos parseados:', { status, pesoStr, unidad });
       
       // Manejar peso inválido
       if (status === 'I' || pesoStr === '------') {
-        console.warn('Peso inválido recibido de la balanza');
+        console.warn('⚠️ [BALANZA] Peso inválido recibido (Status=I o peso=------)');
         return null;
       }
       
       const peso = parseFloat(pesoStr);
       const estable = status === 'S'; // S = Stable, D = Dynamic, I = Invalid
-
-      return {
+      
+      const reading = {
         peso,
         unidad,
         estable,
         timestamp: new Date(),
         dispositivo: modelo
       };
+      
+      console.log('✅ [BALANZA] Lectura parseada:', reading);
+      return reading;
 
     } catch (error) {
-      console.error('Error al parsear respuesta SICS:', error);
+      console.error('❌ [BALANZA] Error al parsear respuesta SICS:', error);
       return null;
     }
   }
 
   // Obtener peso estable únicamente
   async obtenerPesoEstable(config: BalanzaConfig): Promise<BalanzaReading | null> {
+    console.log('⚖️ [BALANZA] Solicitando peso estable...');
+    
     if (!this.puerto) {
+      console.error('❌ [BALANZA] Balanza no conectada');
       throw new Error('Balanza no conectada');
     }
 
     try {
+      console.log('📤 [BALANZA] Enviando comando ST (peso estable)...');
       await this.enviarComando('ST\r\n'); // Send stable weight only
       
       const reader = this.puerto.readable!.getReader();
+      console.log('⏳ [BALANZA] Esperando respuesta de peso estable...');
       const { value } = await reader.read();
       reader.releaseLock();
 
       const respuesta = new TextDecoder().decode(value);
-      return this.parsearRespuestaSICS(respuesta, config.modelo);
+      console.log(`📥 [BALANZA] Respuesta recibida: "${respuesta.replace(/\r\n/g, '\\r\\n')}"`);
+      
+      const lectura = this.parsearRespuestaSICS(respuesta, config.modelo);
+      if (lectura) {
+        console.log('✅ [BALANZA] Peso estable obtenido:', lectura);
+      } else {
+        console.warn('⚠️ [BALANZA] No se pudo obtener peso estable');
+      }
+      
+      return lectura;
 
     } catch (error) {
+      console.error('❌ [BALANZA] Error al obtener peso estable:', error);
       throw new Error(`Error al obtener peso estable: ${error}`);
     }
   }

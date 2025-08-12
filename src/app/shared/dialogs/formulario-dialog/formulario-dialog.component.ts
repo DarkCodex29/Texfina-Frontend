@@ -104,10 +104,15 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
   }
 
   private configurarSuscripciones(): void {
+    console.log('🔔 [FORMULARIO] Configurando suscripciones...');
+    
     // Suscribirse a cambios de peso
     this.balanzaService.pesoActual$
       .pipe(takeUntil(this.destroy$))
       .subscribe(peso => {
+        if (peso) {
+          console.log('📡 [FORMULARIO] Peso recibido:', peso);
+        }
         this.pesoActual = peso;
       });
 
@@ -116,6 +121,7 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(scan => {
         if (scan && this.escaneandoActivo) {
+          console.log('📡 [FORMULARIO] Scan recibido:', scan);
           this.ultimoScan = scan;
           this.aplicarScan(scan);
         }
@@ -159,42 +165,64 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
 
   // Métodos para pesado
   async iniciarPesado(campo: string): Promise<void> {
+    console.log('🎯 [FORMULARIO] Iniciando pesado para campo:', campo);
+    
     try {
       this.pesandoActivo = true;
       const dispositivos = this.balanzaService.obtenerConfiguracion();
+      console.log('📊 [FORMULARIO] Dispositivos disponibles:', dispositivos);
+      
       const config = dispositivos[0]; // Usar primera balanza
+      console.log('🔧 [FORMULARIO] Usando configuración:', config);
       
       const conectado = await firstValueFrom(this.balanzaService.conectado$);
+      console.log('🔌 [FORMULARIO] Estado de conexión:', conectado);
+      
       if (!conectado) {
+        console.log('🔌 [FORMULARIO] Conectando balanza...');
         await this.balanzaService.conectarBalanza(config);
       }
       
+      console.log('📡 [FORMULARIO] Iniciando lectura de peso...');
       await this.balanzaService.iniciarLecturaPeso(config);
+      console.log('✅ [FORMULARIO] Lectura de peso iniciada exitosamente');
+      
     } catch (error) {
-      console.error('Error al iniciar pesado:', error);
+      console.error('❌ [FORMULARIO] Error al iniciar pesado:', error);
       this.pesandoActivo = false;
     }
   }
 
   async capturarPeso(campo: string): Promise<void> {
+    console.log('🎯 [FORMULARIO] Capturando peso para campo:', campo);
+    console.log('📊 [FORMULARIO] Peso actual:', this.pesoActual);
+    
     if (this.pesoActual && this.pesoActual.estable) {
+      console.log('✅ [FORMULARIO] Peso estable detectado');
+      
       // Convertir unidades si es necesario
       let pesoFinal = this.pesoActual.peso;
+      const unidadOriginal = this.pesoActual.unidad;
       
       // Si el peso está en gramos y es mayor a 1000, convertir a kg
       if (this.pesoActual.unidad === 'g' && pesoFinal >= 1000) {
+        console.log('🔄 [FORMULARIO] Convirtiendo de gramos a kilogramos');
         pesoFinal = pesoFinal / 1000;
       }
+      
+      console.log(`⚖️ [FORMULARIO] Aplicando peso: ${pesoFinal} (original: ${this.pesoActual.peso} ${unidadOriginal})`);
       
       // Aplicar peso al campo
       this.formulario.patchValue({
         [campo]: pesoFinal
       });
       
-      console.log(`Peso aplicado al campo ${campo}: ${pesoFinal} ${this.pesoActual.unidad}`);
+      console.log(`✅ [FORMULARIO] Peso aplicado al campo ${campo}: ${pesoFinal}`);
       
       // Detener pesado
       await this.detenerPesado();
+    } else {
+      console.warn('⚠️ [FORMULARIO] No hay peso estable disponible para capturar');
     }
   }
 
@@ -210,17 +238,23 @@ export class FormularioDialogComponent implements OnInit, OnDestroy {
 
   // Métodos para scanner
   async iniciarScanner(campo: string): Promise<void> {
+    console.log('📦 [FORMULARIO] Iniciando scanner para campo:', campo);
+    
     try {
       this.escaneandoActivo = true;
       
       const conectado = await firstValueFrom(this.scannerService.conectado$);
+      console.log('🔌 [FORMULARIO] Estado de conexión del scanner:', conectado);
+      
       if (!conectado) {
+        console.log('🔌 [FORMULARIO] Conectando scanner...');
         await this.scannerService.conectarScanner();
       }
       
+      console.log('✅ [FORMULARIO] Scanner listo y escuchando');
       // El scanner escuchará automáticamente
     } catch (error) {
-      console.error('Error al iniciar scanner:', error);
+      console.error('❌ [FORMULARIO] Error al iniciar scanner:', error);
       this.escaneandoActivo = false;
     }
   }
